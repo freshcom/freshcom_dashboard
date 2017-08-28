@@ -3,6 +3,8 @@
 import Vue from 'vue'
 import App from './App'
 
+import _ from 'lodash'
+
 // -- Sync Store & Router --
 import { sync } from 'vuex-router-sync'
 import router from './router'
@@ -32,10 +34,32 @@ Vue.component('icon', Icon)
 Vue.component('left-nav', LeftNav)
 Vue.component('locale-selector', LocaleSelector)
 
+// -- i18n --
+import VueI18n from 'vue-i18n'
+import { DEFAULT_LOCALE } from '@/env'
+import elementEnLocale from 'element-ui/lib/locale/lang/en'
+import elementZhLocale from 'element-ui/lib/locale/lang/zh-CN'
+import en from '@/locales/en'
+import zh from '@/locales/zh-CN'
+
+Vue.use(VueI18n)
+export const i18n = new VueI18n({
+  locale: DEFAULT_LOCALE,
+  messages: {
+    'en': _.merge(elementEnLocale, en),
+    'zh-CN': _.merge(elementZhLocale, zh)
+  }
+})
+
 // -- Element UI --
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
-Vue.use(ElementUI)
+Vue.use(ElementUI, {
+  i18n (path, options) {
+    console.log(path, i18n.t(path))
+    return i18n.t(path)
+  }
+})
 
 Vue.config.productionTip = false
 
@@ -44,6 +68,7 @@ new Vue({
   el: '#app',
   router,
   store,
+  i18n,
   template: '<App/>',
   components: { App }
 })

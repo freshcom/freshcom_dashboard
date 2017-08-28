@@ -58,7 +58,7 @@ export default {
   },
   mixins: [NewPage({ storeNamespace: 'sku', name: 'SKU' })],
   methods: {
-    recordCreated(record) {
+    recordCreated (record) {
       this.$store.dispatch('pushRoute', { name: 'ShowSku', params: { id: record.id } })
     }
   }

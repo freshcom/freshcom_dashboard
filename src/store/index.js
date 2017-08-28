@@ -25,6 +25,7 @@ export default new Vuex.Store({
     sku: SkuStore
   },
   state: {
+    uiLocale: DEFAULT_LOCALE,
     resourceLocale: DEFAULT_LOCALE
   },
   actions: {

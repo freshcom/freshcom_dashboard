@@ -1,27 +1,15 @@
 import { MessageBox } from 'element-ui'
+import { i18n } from '@/main'
 
 export function warnDanger (options = {}) {
   options.type = options.type || 'nav'
 
-  let typeText = {
-    locale: {
-      message: 'Are you sure you want to change resource language? If you change, the data will be reloaded and your unsaved changes for the current resource language will be discarded.',
-      confirm: 'Change',
-      cancel: 'Cancel'
-    },
-    nav: {
-      message: 'Are you sure you want to leave this screen? If you leave, your unsaved changes will be discarded.',
-      confirm: 'Leave',
-      cancel: 'Stay'
-    }
-  }
-
   return MessageBox.confirm(
-    typeText[options.type].message,
+    i18n.t(`warnDanger.${options.type}.message`),
     'Confirm',
     {
-      confirmButtonText: typeText[options.type].confirm,
-      cancelButtonText: typeText[options.type].cancel
+      confirmButtonText: i18n.t(`warnDanger.${options.type}.confirm`),
+      cancelButtonText: i18n.t(`warnDanger.${options.type}.cancel`)
     }
   ).then(() => {
     if (options.confirm) {

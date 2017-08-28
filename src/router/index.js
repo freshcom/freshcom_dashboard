@@ -10,6 +10,7 @@ import LoginPage from '@/pages/login'
 import ListSkuPage from '@/pages/sku/list'
 import ShowSkuPage from '@/pages/sku/show'
 import EditSkuPage from '@/pages/sku/edit'
+import NewSkuPage from '@/pages/sku/new'
 
 Vue.use(Router)
 
@@ -53,6 +54,11 @@ export default new Router({
           page: page
         }
       }
+    },
+    {
+      path: '/skus/new',
+      name: 'NewSku',
+      component: NewSkuPage
     },
     {
       path: '/skus/:id',

@@ -1,53 +1,53 @@
 import _ from 'lodash'
 import { warnDanger } from '@/helpers/plugin-wrappers'
 
-export default function(options) {
+export default function (options) {
   let storeNamespace = options.storeNamespace
   let name = options.name
 
   return {
-    data() {
+    data () {
       return {
         errors: {},
         isLoading: false
       }
     },
-    created() {
+    created () {
       this.$store.dispatch(`${storeNamespace}/resetRecord`)
     },
-    beforeRouteLeave(to, from, next) {
+    beforeRouteLeave (to, from, next) {
       if (_.isEqual(this.recordDraft, this.record)) {
         return next()
       }
 
       warnDanger({
-        leave: () => {
+        leave () {
           next(false)
         },
-        confirm: () => {
+        confirm () {
           this.$store.dispatch(`${storeNamespace}/setRecordDraft`, this.record)
           next()
         }
       })
     },
     computed: {
-      record() {
+      record () {
         return this.$store.state[storeNamespace].record
       },
       recordDraft: {
-        get() {
+        get () {
           return this.$store.state[storeNamespace].recordDraft
         },
-        set(value) {
+        set (value) {
           this.$store.dispatch(`${storeNamespace}/setRecordDraft`, value)
         }
       }
     },
     methods: {
-      cancel() {
+      cancel () {
         this.$router.go(-1)
       },
-      submit(recordDraft) {
+      submit (recordDraft) {
         this.isLoading = true
 
         this.$store.dispatch(`${storeNamespace}/createRecord`, recordDraft).then((record) => {
@@ -62,7 +62,6 @@ export default function(options) {
             this.recordCreated(record)
           }
         }).catch(errors => {
-          console.log(errors)
           this.errors = errors
           this.isLoading = false
 
