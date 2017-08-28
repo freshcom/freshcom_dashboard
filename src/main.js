@@ -27,8 +27,10 @@ jsonapiAxios.interceptors.request.use(function (config) {
 // -- Global Component --
 import Icon from 'vue-awesome/components/Icon.vue'
 import LeftNav from '@/components/left-nav'
+import LocaleSelector from '@/components/locale-selector'
 Vue.component('icon', Icon)
 Vue.component('left-nav', LeftNav)
+Vue.component('locale-selector', LocaleSelector)
 
 // -- Element UI --
 import ElementUI from 'element-ui'

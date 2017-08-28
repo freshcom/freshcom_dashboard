@@ -60,7 +60,7 @@ export default {
       }
 
       // Match relationship base on value
-      if (_.isPlainObject(value)) {
+      if (_.isPlainObject(value) && value.id) {
         let type = _.snakeCase(key)
         let rio = { id: value.id, type: value.type }
 

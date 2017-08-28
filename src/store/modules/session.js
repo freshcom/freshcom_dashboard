@@ -9,7 +9,7 @@ const MT = {
   SET_ACCOUNT: 'SET_ACCOUNT'
 }
 
-export const Store = {
+export default {
   namespaced: true,
   state: {
     record: undefined,

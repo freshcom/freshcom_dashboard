@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="component-wrapper">
     <div class="account">
       <p class="text-center">{{sessionAccount.name}}</p>
     </div>
@@ -11,34 +11,37 @@
           <a>Home</a>
         </el-menu-item>
 
-        <el-menu-item index="orders">
-          <icon name="inbox" scale="1"></icon>
-          <span>Orders</span>
-        </el-menu-item>
-
-        <el-menu-item index="customers">
-          <icon name="users" scale="0.8"></icon>
-          <span>Customers</span>
-        </el-menu-item>
-
-        <el-menu-item index="products">
-          <icon name="cubes" scale="0.8"></icon>
-          <span>Products</span>
-        </el-menu-item>
-
-        <el-menu-item index="unlockables">
-          <icon name="unlock-alt" scale="0.8"></icon>
-          <span>Unlockables</span>
-        </el-menu-item>
+        <el-submenu index="storefront">
+          <template slot="title">
+            <icon name="shopping-bag" scale="0.8"></icon>
+            <span>Storefront</span>
+          </template>
+          <el-menu-item index="orders">
+            <icon name="inbox" scale="1"></icon>
+            <span>Orders</span>
+          </el-menu-item>
+          <el-menu-item index="customers">
+            <icon name="users" scale="0.8"></icon>
+            <span>Customers</span>
+          </el-menu-item>
+          <el-menu-item index="products">
+            <icon name="cubes" scale="0.8"></icon>
+            <span>Products</span>
+          </el-menu-item>
+        </el-submenu>
 
         <el-submenu index="inventory">
           <template slot="title">
             <icon name="archive" scale="0.8"></icon>
             <span>Inventory</span>
           </template>
-          <el-menu-item index="skus">
+          <el-menu-item :route="{ name: 'ListSku' }" index="skus">
             <icon name="cube" scale="0.8"></icon>
             <span>SKUs</span>
+          </el-menu-item>
+          <el-menu-item index="unlockables">
+            <icon name="unlock-alt" scale="0.8"></icon>
+            <span>Unlockables</span>
           </el-menu-item>
           <el-menu-item index="stockTransfers">
             <icon name="exchange" scale="0.8"></icon>
@@ -104,6 +107,7 @@
 <script>
 import 'vue-awesome/icons/home'
 import 'vue-awesome/icons/inbox'
+import 'vue-awesome/icons/shopping-bag'
 import 'vue-awesome/icons/users'
 import 'vue-awesome/icons/cubes'
 import 'vue-awesome/icons/unlock-alt'
@@ -173,47 +177,4 @@ export default {
 .primary-nav {
   padding-bottom: 20px;
 }
-
-/* START Left Nav */
-.el-menu-item a {
-  text-decoration: none;
-  color: #48576a;
-
-  &:hover {
-    color: #48576a;
-  }
-}
-
-.el-menu-item-group__title {
-  padding-bottom: 10px;
-}
-
-.el-menu-item.is-active a {
-  font-weight: 500;
-  color: #20a0ff;
-}
-
-.el-submenu .el-menu {
-  background-color: #eef1f6;
-}
-
-.el-menu-item, .el-submenu__title, .el-submenu .el-menu-item {
-  height: 35px;
-  line-height: 35px;
-}
-
-.el-menu-item .fa-icon, .el-submenu .fa-icon {
-  width: 20px;
-}
-
-.el-menu-item:hover, .el-submenu .el-menu-item:hover, .el-submenu__title:hover {
-  background-color: inherit;
-  font-weight: 500;
-}
-
-.el-menu-item .fa-icon, .el-menu-item span {
-  vertical-align: middle;
-}
-/* END Left Nav */
-
 </style>

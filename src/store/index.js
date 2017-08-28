@@ -3,7 +3,11 @@ import Vuex from 'vuex'
 
 import router from '@/router'
 
-import { Store as SessionStore } from '@/store/modules/session'
+import { DEFAULT_LOCALE } from '@/env'
+
+import SessionStore from '@/store/modules/session'
+import SkuStore from '@/store/modules/sku'
+import { Store as ExternalFileStore, Plugin as ExternalFilePlugin } from '@/store/modules/external-file'
 
 Vue.use(Vuex)
 
@@ -14,8 +18,14 @@ const MT = {
 
 export default new Vuex.Store({
   strict: true,
+  plugins: [ExternalFilePlugin],
   modules: {
-    session: SessionStore
+    session: SessionStore,
+    externalFile: ExternalFileStore,
+    sku: SkuStore
+  },
+  state: {
+    resourceLocale: DEFAULT_LOCALE
   },
   actions: {
     pushRoute ({ commit }, route) {
