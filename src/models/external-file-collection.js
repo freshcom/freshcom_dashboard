@@ -1,5 +1,5 @@
 export default {
-  objectWithDefaults() {
+  objectWithDefaults () {
     return {
       id: undefined,
       type: 'ExternalFileCollection',

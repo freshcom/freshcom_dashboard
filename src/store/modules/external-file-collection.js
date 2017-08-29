@@ -12,7 +12,7 @@ const MT = {
   SET_RECORDS: 'SET_RECORDS'
 }
 
-export const Store = {
+export default {
   namespaced: true,
   state: {
     record: {},
@@ -20,19 +20,19 @@ export const Store = {
     records: []
   },
   actions: {
-    setRecord({ commit }, record) {
+    setRecord ({ commit }, record) {
       commit(MT.SET_RECORD, record)
     },
 
-    setRecordDraft({ commit }, record) {
+    setRecordDraft ({ commit }, record) {
       commit(MT.SET_RECORD_DRAFT, record)
     },
 
-    resetRecord({ commit }) {
+    resetRecord ({ commit }) {
       commit(MT.RESET_RECORD)
     },
 
-    loadRecord({ state, commit, rootState }, actionPayload) {
+    loadRecord ({ state, commit, rootState }, actionPayload) {
       if (state.record && state.record.id === actionPayload.id && state.record.locale === rootState.resourceLocale) {
         return new Promise((resolve, reject) => {
           resolve(state.record)
@@ -55,10 +55,9 @@ export const Store = {
       })
     },
 
-    createRecord(context, recordDraft) {
-      console.log(recordDraft)
+    createRecord (context, recordDraft) {
       let apiPayload = { data: JSONAPI.serialize(recordDraft) }
-      console.log(apiPayload)
+
       return ExternalFileCollectionAPI.createRecord(apiPayload).then(response => {
         return JSONAPI.deserialize(response.data.data)
       }).then(record => {
@@ -70,7 +69,7 @@ export const Store = {
       })
     },
 
-    updateRecord({ state, commit, rootState }, actionPayload) {
+    updateRecord ({ state, commit, rootState }, actionPayload) {
       let apiPayload = { data: JSONAPI.serialize(actionPayload.recordDraft) }
 
       return ExternalFileCollectionAPI.updateRecord(actionPayload.id, apiPayload, rootState.resourceLocale).then(response => {
@@ -84,7 +83,7 @@ export const Store = {
       })
     },
 
-    loadRecords({ state, commit }, actionPayload) {
+    loadRecords ({ state, commit }, actionPayload) {
       actionPayload = _.merge({}, actionPayload, { locale: state.resourceLocale })
 
       return ExternalFileCollectionAPI.queryRecord(actionPayload).then(response => {
@@ -96,7 +95,7 @@ export const Store = {
       })
     },
 
-    deleteRecord({ commit }, id) {
+    deleteRecord ({ commit }, id) {
       return ExternalFileCollectionAPI.deleteRecord(id).then(response => {
         commit(MT.RESET_RECORD)
 
@@ -106,21 +105,21 @@ export const Store = {
   },
 
   mutations: {
-    [MT.RESET_RECORD](state) {
+    [MT.RESET_RECORD] (state) {
       state.record = ExternalFileCollection.objectWithDefaults()
       state.recordDraft = ExternalFileCollection.objectWithDefaults()
     },
 
-    [MT.SET_RECORD](state, record) {
+    [MT.SET_RECORD] (state, record) {
       state.record = record
       state.recordDraft = record
     },
 
-    [MT.SET_RECORD_DRAFT](state, recordDraft) {
+    [MT.SET_RECORD_DRAFT] (state, recordDraft) {
       state.recordDraft = recordDraft
     },
 
-    [MT.SET_RECORDS](state, records) {
+    [MT.SET_RECORDS] (state, records) {
       state.records = records
     }
   }

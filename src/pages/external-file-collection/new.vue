@@ -28,7 +28,7 @@
           </div>
 
           <div class="data">
-            <external-file-collection-form v-model="recordDraft"></external-file-collection-form>
+            <external-file-collection-form v-model="recordDraft" :errors="errors"></external-file-collection-form>
           </div>
 
           <div class="footer">
@@ -60,7 +60,7 @@ export default {
   },
   mixins: [NewPage({ storeNamespace: 'externalFileCollection', name: 'File Collection' })],
   props: ['skuId'],
-  created() {
+  created () {
     if (!this.skuId) {
       return
     }
@@ -70,7 +70,7 @@ export default {
     this.$store.dispatch('externalFileCollection/setRecord', record)
   },
   methods: {
-    recordCreated(record) {
+    recordCreated (record) {
       if (this.skuId) {
         return this.$store.dispatch('pushRoute', { name: 'ShowSku', params: { id: this.skuId } })
       }

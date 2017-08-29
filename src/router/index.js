@@ -12,6 +12,8 @@ import ShowSkuPage from '@/pages/sku/show'
 import EditSkuPage from '@/pages/sku/edit'
 import NewSkuPage from '@/pages/sku/new'
 
+import NewExternalFileCollectionPage from '@/pages/external-file-collection/new'
+
 Vue.use(Router)
 
 function extractPagination (route) {
@@ -74,6 +76,17 @@ export default new Router({
       component: EditSkuPage,
       props (route) {
         return { id: route.params.id }
+      }
+    },
+    {
+      path: '/file_collections/new',
+      name: 'NewExternalFileCollection',
+      component: NewExternalFileCollectionPage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { skuId: query.skuId }
       }
     }
   ]

@@ -20,7 +20,7 @@
               </el-input>
             </div>
 
-            <el-button @click="goTo({ name: 'NewSku' })" style="float: right;">
+            <el-button @click="goTo({ name: 'NewSku' })" class="pull-right">
               <icon name="plus" scale="0.7" class="v-middle"></icon> New
             </el-button>
           </div>
@@ -91,6 +91,7 @@ export default {
   text-align: right;
   border-top: 0;
 }
+
 .total {
   float: left;
   display: inline-block;

@@ -8,6 +8,7 @@ import { DEFAULT_LOCALE } from '@/env'
 import SessionStore from '@/store/modules/session'
 import SkuStore from '@/store/modules/sku'
 import { Store as ExternalFileStore, Plugin as ExternalFilePlugin } from '@/store/modules/external-file'
+import ExternalFileCollectionStore from '@/store/modules/external-file-collection'
 
 Vue.use(Vuex)
 
@@ -21,6 +22,7 @@ export default new Vuex.Store({
   plugins: [ExternalFilePlugin],
   modules: {
     session: SessionStore,
+    externalFileCollection: ExternalFileCollectionStore,
     externalFile: ExternalFileStore,
     sku: SkuStore
   },

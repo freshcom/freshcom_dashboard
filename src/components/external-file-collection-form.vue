@@ -1,11 +1,11 @@
 <template>
 <el-form @input.native="updateValue" label-width="150px">
 
-  <el-form-item v-if="formModel.sku" label="SKU ID" :error="errorMessages.name" required>
+  <el-form-item v-if="formModel.sku" label="SKU ID" :error="errorMessages.name">
     {{formModel.sku.id}}
   </el-form-item>
 
-  <el-form-item label="Name" :error="errorMessages.name" required>
+  <el-form-item label="Name" :error="errorMessages.name">
     <el-input v-model="formModel.name"></el-input>
   </el-form-item>
 
@@ -71,7 +71,7 @@ import 'vue-awesome/icons/plus'
 export default {
   name: 'ExternalFileCollectionForm',
   props: ['value', 'errors'],
-  data() {
+  data () {
     return {
       formModel: _.cloneDeep(this.value),
       imageUrl: '',
@@ -82,16 +82,16 @@ export default {
     }
   },
   computed: {
-    errorMessages() {
+    errorMessages () {
       return _.reduce(this.errors, (result, v, k) => {
         result[k] = this.$t(`errors.${v[0]}`, { name: _.startCase(k) })
         return result
       }, {})
     },
-    pendingExternalFiles() {
+    pendingExternalFiles () {
       return this.$store.state.externalFile.pendingRecords
     },
-    uploadedExternalFiles() {
+    uploadedExternalFiles () {
       return this.$store.state.externalFile.uploadedRecords
     }
   },
@@ -99,7 +99,7 @@ export default {
     value (v) {
       this.formModel = _.cloneDeep(v)
     },
-    uploadedExternalFiles(uploadedEfs) {
+    uploadedExternalFiles (uploadedEfs) {
       if (uploadedEfs.length === 0) {
         return
       }
@@ -112,24 +112,24 @@ export default {
     }
   },
   methods: {
-    updateValue: _.debounce(function() {
+    updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
-    uploadExternalFile(e) {
+    uploadExternalFile (e) {
       let file = e.file
       let externalFile = { type: 'ExternalFile', name: file.name, sizeBytes: file.size, contentType: file.type, file: file }
       this.$store.dispatch('externalFile/pushPendingRecords', [externalFile]).then(files => {
         this.pendingAvatarId = files[0].id
       })
     },
-    deleteExternalFile(targetEf) {
+    deleteExternalFile (targetEf) {
       this.formModel.files = _.reject(this.formModel.files, (ef) => { return ef.id === targetEf.id })
       this.updateValue()
     },
-    isImage(externalFile) {
+    isImage (externalFile) {
       return externalFile.contentType.startsWith('image/')
     },
-    previewUrl(externalFile) {
+    previewUrl (externalFile) {
       return URL.createObjectURL(externalFile.file)
     }
   }
