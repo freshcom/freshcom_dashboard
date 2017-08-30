@@ -481,7 +481,7 @@ small {
 .file-thumbnail {
   text-align: center;
   display: inline-block;
-  margin: 0px 5px;
+  margin: 5px 10px;
   vertical-align: top;
 
   .wrapper {
@@ -489,29 +489,29 @@ small {
     border-radius: 6px;
     position: relative;
     overflow: hidden;
-    width: 175px;
-    height: 175px;
+    width: 150px;
+    height: 150px;
     display: inline-block;
   }
 
   .file-icon {
     color: #8c939d;
     width: 80px;
-    height: 175px;
+    height: 150px;
     vertical-align: middle;
-    line-height: 175px;
+    line-height: 150px;
     text-align: center;
   }
 
   img {
     display: block;
-    width: 175px;
-    height: 175px;
+    width: 150px;
+    height: 150px;
   }
 
   .caption {
     height: 20px;
-    width: 177px;
+    width: 150px;
     text-overflow: ellipsis;
     overflow: hidden;
   }
@@ -558,8 +558,8 @@ small {
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    width: 175px;
-    height: 175px;
+    width: 150px;
+    height: 150px;
   }
 
   .el-upload:hover {
@@ -569,19 +569,19 @@ small {
   .file-uploader-icon {
     color: #8c939d;
     width: 20px;
-    height: 175px;
-    line-height: 175px;
+    height: 150px;
+    line-height: 150px;
     text-align: center;
   }
 
   .file {
-    width: 175px;
-    height: 175px;
+    width: 150px;
+    height: 150px;
     display: block;
   }
 
   .el-progress {
-    width: 175px;
+    width: 150px;
     display: inline-block;
     text-align: center;
   }

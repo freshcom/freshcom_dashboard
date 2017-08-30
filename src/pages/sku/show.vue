@@ -101,7 +101,8 @@
                     <template scope="scope">
                       <router-link :to="{ name: 'ShowExternalFileCollection', params: { id: scope.row.id } }">
                         <span>{{scope.row.name}}</span>
-                        <small>{{scope.row.label}}</small>
+                        <span v-if="scope.row.name"> - </span>
+                        <span>{{scope.row.label}}</span>
                       </router-link>
                     </template>
                   </el-table-column>

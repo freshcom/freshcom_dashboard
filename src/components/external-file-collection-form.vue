@@ -13,6 +13,37 @@
     <el-input v-model="formModel.label"></el-input>
   </el-form-item>
 
+  <div class="block-title">
+    <h3 v-if="isUploading">Uploading...</h3>
+    <h3 v-else>Upload files</h3>
+  </div>
+  <div class="block">
+    <div class="block-body">
+      <div class="file-uploader file-thumbnail">
+        <el-upload :http-request="uploadExternalFile" action="" :multiple="true " :show-file-list="false" :file-list="[]">
+          <icon name="plus" class="file-uploader-icon"></icon>
+        </el-upload>
+      </div>
+
+      <template v-for="pendingEf in pendingExternalFiles">
+        <div class="file-thumbnail">
+          <div>
+            <div class="wrapper">
+              <img v-if="isImage(pendingEf)" :src="previewUrl(pendingEf)">
+              <icon v-else name="file" class="file-icon"></icon>
+            </div>
+          </div>
+          <div class="caption">
+            <el-progress :show-text="false" :percentage="pendingEf.percentage"></el-progress>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+
+  <div class="block-title">
+    <h3>Uploaded files</h3>
+  </div>
   <div class="block">
     <div class="block-body">
       <template v-for="ef in formModel.files">
@@ -37,26 +68,6 @@
           </div>
         </div>
       </template>
-
-      <template v-for="pendingEf in pendingExternalFiles">
-        <div class="file-thumbnail">
-          <div>
-            <div class="wrapper">
-              <img v-if="isImage(pendingEf)" :src="previewUrl(pendingEf)">
-              <icon v-else name="file" class="file-icon"></icon>
-            </div>
-          </div>
-          <div class="caption">
-            <el-progress :show-text="false" :percentage="pendingEf.percentage"></el-progress>
-          </div>
-        </div>
-      </template>
-
-      <div class="file-uploader file-thumbnail">
-        <el-upload :http-request="uploadExternalFile" action="" :multiple="true " :show-file-list="false" :file-list="[]">
-          <icon name="plus" class="file-uploader-icon"></icon>
-        </el-upload>
-      </div>
     </div>
   </div>
 </el-form>
@@ -93,6 +104,9 @@ export default {
     },
     uploadedExternalFiles () {
       return this.$store.state.externalFile.uploadedRecords
+    },
+    isUploading () {
+      return this.pendingExternalFiles.length > 0
     }
   },
   watch: {

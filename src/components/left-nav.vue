@@ -76,14 +76,24 @@
           </el-menu-item>
         </el-submenu>
 
+        <el-submenu index="fileStorage">
+          <template slot="title">
+            <icon name="folder" scale="0.8"></icon>
+            <span>File Storage</span>
+          </template>
+          <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="externalFileCollections">
+            <icon name="folder-open" scale="0.8"></icon>
+            <span>File Collections</span>
+          </el-menu-item>
+          <el-menu-item index="externalFiles">
+            <icon name="file" scale="0.8"></icon>
+            <span>Files</span>
+          </el-menu-item>
+        </el-submenu>
+
         <el-menu-item index="operators">
           <icon name="id-card" scale="0.8"></icon>
           <span>Operators</span>
-        </el-menu-item>
-
-        <el-menu-item index="files">
-          <icon name="file" scale="0.8"></icon>
-          <span>Files</span>
         </el-menu-item>
 
         <el-menu-item index="api">
@@ -119,6 +129,8 @@ import 'vue-awesome/icons/truck'
 import 'vue-awesome/icons/terminal'
 import 'vue-awesome/icons/bank'
 import 'vue-awesome/icons/id-card'
+import 'vue-awesome/icons/folder-open'
+import 'vue-awesome/icons/folder'
 
 import 'vue-awesome/icons/cog'
 import 'vue-awesome/icons/podcast'

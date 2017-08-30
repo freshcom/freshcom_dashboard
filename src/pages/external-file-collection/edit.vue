@@ -59,7 +59,7 @@ export default {
   },
   mixins: [EditPage({ storeNamespace: 'externalFileCollection', name: 'File Collection', include: 'files' })],
   methods: {
-    recordUpdated(record) {
+    recordUpdated (record) {
       this.$store.dispatch('pushRoute', { name: 'ShowExternalFileCollection', params: { id: record.id } })
     }
   }

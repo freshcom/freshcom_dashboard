@@ -129,13 +129,13 @@ export default {
   },
   mixins: [ShowPage({ storeNamespace: 'externalFileCollection', name: 'File Collection', include: 'files' })],
   methods: {
-    isImage(record) {
+    isImage (record) {
       return record.contentType.startsWith('image/')
     },
-    editRecord() {
+    editRecord () {
       this.$store.dispatch('pushRoute', { name: 'EditExternalFileCollection', params: { id: this.record.id } })
     },
-    recordDeleted(record) {
+    recordDeleted (record) {
       this.$store.dispatch('pushRoute', { name: 'ListExternalFileCollection' })
     }
   }

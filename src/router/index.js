@@ -13,6 +13,9 @@ import EditSkuPage from '@/pages/sku/edit'
 import NewSkuPage from '@/pages/sku/new'
 
 import NewExternalFileCollectionPage from '@/pages/external-file-collection/new'
+import EditExternalFileCollectionPage from '@/pages/external-file-collection/edit'
+import ShowExternalFileCollectionPage from '@/pages/external-file-collection/show'
+import ListExternalFileCollectionPage from '@/pages/external-file-collection/list'
 
 Vue.use(Router)
 
@@ -79,6 +82,18 @@ export default new Router({
       }
     },
     {
+      path: '/file_collections',
+      name: 'ListExternalFileCollection',
+      component: ListExternalFileCollectionPage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          page: page
+        }
+      }
+    },
+    {
       path: '/file_collections/new',
       name: 'NewExternalFileCollection',
       component: NewExternalFileCollectionPage,
@@ -87,6 +102,22 @@ export default new Router({
         let query = qs.parse(queryString)
 
         return { skuId: query.skuId }
+      }
+    },
+    {
+      path: '/file_collections/:id',
+      name: 'ShowExternalFileCollection',
+      component: ShowExternalFileCollectionPage,
+      props (route) {
+        return { id: route.params.id }
+      }
+    },
+    {
+      path: '/file_collections/:id/edit',
+      name: 'EditExternalFileCollection',
+      component: EditExternalFileCollectionPage,
+      props (route) {
+        return { id: route.params.id }
       }
     }
   ]

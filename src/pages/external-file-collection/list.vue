@@ -68,7 +68,7 @@ export default {
   },
   mixins: [ListPage({ storeNamespace: 'externalFileCollection', fields: { 'Sku': 'name,label,contentType' } })],
   methods: {
-    viewRecord(row) {
+    viewRecord (row) {
       this.goTo({ name: 'ShowExternalFileCollection', params: { id: row.id } })
     }
   }
