@@ -85,7 +85,7 @@
             <icon name="folder-open" scale="0.8"></icon>
             <span>File Collections</span>
           </el-menu-item>
-          <el-menu-item index="externalFiles">
+          <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">
             <icon name="file" scale="0.8"></icon>
             <span>Files</span>
           </el-menu-item>
@@ -154,6 +154,7 @@ export default {
 
       if (routePath.startsWith('/skus')) { return '/skus' }
       if (routePath.startsWith('/file_collections')) { return '/file_collections' }
+      if (routePath.startsWith('/files')) { return '/files' }
 
       return routePath
     },

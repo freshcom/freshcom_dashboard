@@ -16,6 +16,8 @@ import NewExternalFileCollectionPage from '@/pages/external-file-collection/new'
 import EditExternalFileCollectionPage from '@/pages/external-file-collection/edit'
 import ShowExternalFileCollectionPage from '@/pages/external-file-collection/show'
 import ListExternalFileCollectionPage from '@/pages/external-file-collection/list'
+import ListExternalFilePage from '@/pages/external-file/list'
+import ShowExternalFilePage from '@/pages/external-file/show'
 
 Vue.use(Router)
 
@@ -116,6 +118,26 @@ export default new Router({
       path: '/file_collections/:id/edit',
       name: 'EditExternalFileCollection',
       component: EditExternalFileCollectionPage,
+      props (route) {
+        return { id: route.params.id }
+      }
+    },
+    {
+      path: '/files',
+      name: 'ListExternalFile',
+      component: ListExternalFilePage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          page: page
+        }
+      }
+    },
+    {
+      path: '/files/:id',
+      name: 'ShowExternalFile',
+      component: ShowExternalFilePage,
       props (route) {
         return { id: route.params.id }
       }

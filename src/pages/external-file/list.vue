@@ -3,9 +3,8 @@
   <div class="content">
 
     <div class="secondary-nav">
-      <el-menu :router="true" default-active="files" mode="horizontal">
-        <el-menu-item :route="{ name: 'ListExternalFile' }" index="files">Files</el-menu-item>
-        <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="file_collections">Collections</el-menu-item>
+      <el-menu :router="true" default-active="/files" mode="horizontal">
+        <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">Files</el-menu-item>
       </el-menu>
       <locale-selector @change="search"></locale-selector>
     </div>
@@ -62,7 +61,7 @@ export default {
   },
   mixins: [ListPage({ storeNamespace: 'externalFile', fields: { 'ExternalFile': 'name,contentType' } })],
   methods: {
-    viewRecord(row) {
+    viewRecord (row) {
       this.goTo({ name: 'ShowExternalFile', params: { id: row.id } })
     }
   }

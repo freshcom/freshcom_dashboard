@@ -3,9 +3,8 @@
   <div class="content">
 
     <div class="secondary-nav">
-      <el-menu :router="true" default-active="files" mode="horizontal">
-        <el-menu-item :route="{ name: 'ListExternalFile' }" index="files">Files</el-menu-item>
-        <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="file_collections">Collections</el-menu-item>
+      <el-menu :router="true" default-active="/files" mode="horizontal">
+        <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">Files</el-menu-item>
       </el-menu>
       <locale-selector></locale-selector>
     </div>
@@ -123,10 +122,10 @@ export default {
   },
   mixins: [ShowPage({ storeNamespace: 'externalFile', name: 'File' })],
   methods: {
-    isImage(externalFile) {
+    isImage (externalFile) {
       return externalFile.contentType.startsWith('image/')
     },
-    recordDeleted() {
+    recordDeleted () {
       this.$store.dispatch('pushRoute', { name: 'ListExternalFile' })
     }
   }
