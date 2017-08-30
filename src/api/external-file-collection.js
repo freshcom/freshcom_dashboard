@@ -1,12 +1,24 @@
 import axios from './jsonapi-axios'
 
 export default {
-  createRecord (payload, params = {}) {
+  createRecord (payload, options = {}) {
     return axios.post('/external_file_collections', payload)
   },
 
-  updateRecord (id, payload, locale) {
-    return axios.patch(`/external_file_collections/${id}`, payload, { params: { locale: locale } })
+  updateRecord (id, payload, options) {
+    let params = {}
+
+    let include = options.include
+    if (include) {
+      params.include = include
+    }
+
+    let locale = options.locale
+    if (locale) {
+      params.locale = locale
+    }
+
+    return axios.patch(`/external_file_collections/${id}`, payload, { params: params })
   },
 
   queryRecord (options = {}) {

@@ -19,12 +19,6 @@
   </div>
   <div class="block">
     <div class="block-body">
-      <div class="file-uploader file-thumbnail">
-        <el-upload :http-request="uploadExternalFile" action="" :multiple="true " :show-file-list="false" :file-list="[]">
-          <icon name="plus" class="file-uploader-icon"></icon>
-        </el-upload>
-      </div>
-
       <template v-for="pendingEf in pendingExternalFiles">
         <div class="file-thumbnail">
           <div>
@@ -38,6 +32,12 @@
           </div>
         </div>
       </template>
+
+      <div class="file-uploader file-thumbnail">
+        <el-upload :http-request="uploadExternalFile" action="" :multiple="true " :show-file-list="false" :file-list="[]">
+          <icon name="plus" class="file-uploader-icon"></icon>
+        </el-upload>
+      </div>
     </div>
   </div>
 
@@ -86,10 +86,7 @@ export default {
     return {
       formModel: _.cloneDeep(this.value),
       imageUrl: '',
-      pendingAvatarId: '',
-      fileTableData: [
-        { name: 'x1.png', contentType: 'image/png' }
-      ]
+      pendingAvatarId: ''
     }
   },
   computed: {

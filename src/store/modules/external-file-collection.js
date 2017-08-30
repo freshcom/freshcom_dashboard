@@ -43,8 +43,8 @@ export default {
         commit(MT.RESET_RECORD)
       }
 
-      actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
-      return ExternalFileCollectionAPI.getRecord(actionPayload.id, actionPayload).then(response => {
+      let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
+      return ExternalFileCollectionAPI.getRecord(actionPayload.id, options).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
         commit(MT.SET_RECORD, record)
@@ -72,9 +72,10 @@ export default {
     updateRecord ({ state, commit, rootState }, actionPayload) {
       let apiPayload = { data: JSONAPI.serialize(actionPayload.recordDraft) }
 
-      return ExternalFileCollectionAPI.updateRecord(actionPayload.id, apiPayload, rootState.resourceLocale).then(response => {
-        return JSONAPI.deserialize(response.data.data)
-      }).then(record => {
+      let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
+      return ExternalFileCollectionAPI.updateRecord(actionPayload.id, apiPayload, options).then(response => {
+        let apiPayload = response.data
+        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
         commit(MT.SET_RECORD, record)
 
         return record

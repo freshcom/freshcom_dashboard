@@ -5,8 +5,20 @@ export default {
     return axios.post('/skus', payload)
   },
 
-  updateRecord (id, payload, locale) {
-    return axios.patch(`/skus/${id}`, payload, { params: { locale: locale } })
+  updateRecord (id, payload, options) {
+    let params = {}
+
+    let include = options.include
+    if (include) {
+      params.include = include
+    }
+
+    let locale = options.locale
+    if (locale) {
+      params.locale = locale
+    }
+
+    return axios.patch(`/skus/${id}`, payload, { params: params })
   },
 
   queryRecord (options = {}) {

@@ -62,7 +62,7 @@ export default function (options) {
       submit (recordDraft) {
         this.isLoading = true
 
-        this.$store.dispatch(`${storeNamespace}/updateRecord`, { id: recordDraft.id, recordDraft: recordDraft }).then((record) => {
+        this.$store.dispatch(`${storeNamespace}/updateRecord`, { id: recordDraft.id, recordDraft: recordDraft, include: include }).then((record) => {
           this.isLoading = false
 
           this.$message({

@@ -6,7 +6,7 @@
     <div class="primary-nav-scroller">
       <el-menu mode="vertical" :router="true" :default-active="selected" class="primary-nav">
 
-        <el-menu-item index="/">
+        <el-menu-item :route="{ name: 'Home' }" index="/">
           <icon name="home" scale="1"></icon>
           <a>Home</a>
         </el-menu-item>
@@ -35,7 +35,7 @@
             <icon name="archive" scale="0.8"></icon>
             <span>Inventory</span>
           </template>
-          <el-menu-item :route="{ name: 'ListSku' }" index="skus">
+          <el-menu-item :route="{ name: 'ListSku' }" index="/skus">
             <icon name="cube" scale="0.8"></icon>
             <span>SKUs</span>
           </el-menu-item>
@@ -81,7 +81,7 @@
             <icon name="folder" scale="0.8"></icon>
             <span>File Storage</span>
           </template>
-          <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="externalFileCollections">
+          <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="/file_collections">
             <icon name="folder-open" scale="0.8"></icon>
             <span>File Collections</span>
           </el-menu-item>
@@ -141,21 +141,21 @@ import 'vue-awesome/icons/globe'
 
 export default {
   name: 'LeftNav',
-  props: {
-    selected: {
-      type: String,
-      default () {
-        return 'home'
-      }
-    }
-  },
   computed: {
-    sessionAccount: function () {
+    sessionAccount () {
       if (this.$store.state.session.account) {
         return this.$store.state.session.account
       }
 
       return {}
+    },
+    selected () {
+      let routePath = this.$store.state.route.fullPath
+
+      if (routePath.startsWith('/skus')) { return '/skus' }
+      if (routePath.startsWith('/file_collections')) { return '/file_collections' }
+
+      return routePath
     },
     isDashboardActive: function () {
       return this.selected === 'dashboard'

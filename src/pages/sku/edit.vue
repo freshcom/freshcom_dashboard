@@ -56,7 +56,7 @@ export default {
   components: {
     SkuForm
   },
-  mixins: [EditPage({ storeNamespace: 'sku', name: 'SKU', include: 'avatar' })],
+  mixins: [EditPage({ storeNamespace: 'sku', name: 'SKU', include: 'avatar,externalFileCollections' })],
   methods: {
     recordUpdated (record) {
       this.$store.dispatch('pushRoute', { name: 'ShowSku', params: { id: record.id } })

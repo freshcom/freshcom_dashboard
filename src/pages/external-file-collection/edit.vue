@@ -28,7 +28,7 @@
           </div>
 
           <div class="data">
-            <external-file-collection-form v-model="recordDraft"></external-file-collection-form>
+            <external-file-collection-form v-model="recordDraft" :errors="errors"></external-file-collection-form>
           </div>
 
           <div class="footer">
