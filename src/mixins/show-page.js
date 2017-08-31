@@ -38,6 +38,7 @@ export default function (options) {
       deleteRecord () {
         this.isLoading = true
 
+        let targetRecord = this.record
         this.$store.dispatch(`${storeNamespace}/deleteRecord`, this.record.id).then(() => {
           this.isLoading = false
 
@@ -47,7 +48,7 @@ export default function (options) {
             type: 'success'
           })
           if (this.recordDeleted) {
-            this.recordDeleted()
+            this.recordDeleted(targetRecord)
           }
         })
       }

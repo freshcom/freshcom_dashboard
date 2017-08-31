@@ -14,6 +14,7 @@
 
   <el-form-item label="Status" :error="errorMessages.status" required>
     <el-select @change="updateValue" v-model="formModel.status">
+      <el-option label="Draft" value="draft"></el-option>
       <el-option label="Active" value="active"></el-option>
       <el-option label="Disabled" value="disabled"></el-option>
     </el-select>

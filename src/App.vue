@@ -216,7 +216,7 @@ a:hover {
     padding: 20px;
 
     &.full {
-      padding: 0
+      padding: 0;
     }
   }
 

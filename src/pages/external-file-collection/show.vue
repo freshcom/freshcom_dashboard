@@ -135,7 +135,10 @@ export default {
       this.$store.dispatch('pushRoute', { name: 'EditExternalFileCollection', params: { id: this.record.id } })
     },
     recordDeleted (record) {
-      this.$store.dispatch('pushRoute', { name: 'ListExternalFileCollection' })
+      if (record.sku) {
+        this.$store.dispatch('sku/resetRecord')
+      }
+      this.$store.dispatch('popRoute', 1)
     }
   }
 }

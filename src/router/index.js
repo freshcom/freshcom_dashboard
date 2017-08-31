@@ -22,6 +22,7 @@ import ShowExternalFilePage from '@/pages/external-file/show'
 
 import ListProductPage from '@/pages/product/list'
 import NewProductPage from '@/pages/product/new'
+import ShowProductPage from '@/pages/product/show'
 
 Vue.use(Router)
 
@@ -107,7 +108,7 @@ export default new Router({
         let queryString = route.fullPath.split('?')[1]
         let query = qs.parse(queryString)
 
-        return { skuId: query.skuId }
+        return { skuId: query.skuId, callbackPath: query.callbackPath }
       }
     },
     {
@@ -162,6 +163,14 @@ export default new Router({
       path: '/products/new',
       name: 'NewProduct',
       component: NewProductPage
+    },
+    {
+      path: '/products/:id',
+      name: 'ShowProduct',
+      component: ShowProductPage,
+      props (route) {
+        return { id: route.params.id }
+      }
     }
   ]
 })

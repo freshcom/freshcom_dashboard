@@ -15,6 +15,7 @@ Vue.use(Vuex)
 
 const MT = {
   PUSH_ROUTE: 'PUSH_ROUTE',
+  POP_ROUTE: 'POP_ROUTE',
   SET_RESOURCE_LOCALE: 'SET_RESOURCE_LOCALE'
 }
 
@@ -37,6 +38,10 @@ export default new Vuex.Store({
       commit(MT.PUSH_ROUTE, route)
     },
 
+    popRoute ({ commit }, n) {
+      commit(MT.POP_ROUTE, n)
+    },
+
     setResourceLocale ({ commit }, locale) {
       commit(MT.SET_RESOURCE_LOCALE, locale)
     }
@@ -44,6 +49,10 @@ export default new Vuex.Store({
   mutations: {
     [MT.PUSH_ROUTE] (state, route) {
       router.push(route)
+    },
+
+    [MT.POP_ROUTE] (state, n) {
+      router.go(-n)
     },
 
     [MT.SET_RESOURCE_LOCALE] (state, locale) {

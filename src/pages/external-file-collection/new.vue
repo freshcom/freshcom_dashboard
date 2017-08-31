@@ -14,7 +14,7 @@
       <div class="main">
         <el-card v-loading="isLoading" class="main-card">
           <div slot="header">
-            <span style="line-height: 36px;">Create a File Collection</span>
+            <span style="line-height: 36px;">Create a File Collection {{callbackPath}}</span>
 
             <div class="pull-right">
               <el-button @click="cancel">
@@ -59,7 +59,7 @@ export default {
     ExternalFileCollectionForm
   },
   mixins: [NewPage({ storeNamespace: 'externalFileCollection', name: 'File Collection' })],
-  props: ['skuId'],
+  props: ['skuId', 'callbackPath'],
   created () {
     if (!this.skuId) {
       return
@@ -71,8 +71,12 @@ export default {
   },
   methods: {
     recordCreated (record) {
-      if (this.skuId) {
-        return this.$store.dispatch('pushRoute', { name: 'ShowSku', params: { id: this.skuId } })
+      if (record.sku) {
+        this.$store.dispatch('sku/resetRecord')
+      }
+
+      if (this.callbackPath) {
+        return this.$store.dispatch('pushRoute', { path: this.callbackPath })
       }
 
       this.$store.dispatch('pushRoute', { name: 'ShowExternalFileCollection', params: { id: record.id } })

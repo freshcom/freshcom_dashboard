@@ -150,7 +150,7 @@ export default {
         if (_.isPlainObject(value.data)) {
           let rio = value.data
           let relationshipObject = this._find(db, rio.type, rio.id)
-          object[name] = relationshipObject
+          object[name] = relationshipObject || value.data
         }
       })
     }
