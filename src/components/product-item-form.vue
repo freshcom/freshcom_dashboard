@@ -2,21 +2,6 @@
 <el-form @input.native="updateValue" label-width="150px">
 
   <div class="block-title">
-    <h3>Product</h3>
-  </div>
-  <div class="block">
-    <div class="block-body">
-      <el-form-item label="Name">
-        <el-input></el-input>
-      </el-form-item>
-
-      <el-form-item v-if="formModel.product" label="ID" :error="errorMessages.product">
-        {{formModel.product.id}}
-      </el-form-item>
-    </div>
-  </div>
-
-  <div class="block-title">
     <h3>Source</h3>
   </div>
   <div class="block">
@@ -37,6 +22,18 @@
       </el-form-item>
     </div>
   </div>
+
+  <el-form-item label="Product">
+    <el-autocomplete
+      :fetch-suggestions="queryProduct"
+      placeholder="Search for product..."
+      @select="setProduct"
+    ></el-autocomplete>
+  </el-form-item>
+
+  <el-form-item v-if="formModel.product" label="ID" :error="errorMessages.product">
+    {{formModel.product.id}}
+  </el-form-item>
 
   <hr>
 
@@ -84,9 +81,11 @@
 
 <script>
 import _ from 'lodash'
+import JSONAPI from '@/jsonapi'
+import ProductAPI from '@/api/product'
 
 export default {
-  name: 'ProductForm',
+  name: 'ProductItemForm',
   props: ['value', 'errors'],
   data () {
     return {
@@ -143,6 +142,25 @@ export default {
     },
     handleAvatarSuccess () {
 
+    },
+    queryProduct (searchKeyword, callback) {
+      ProductAPI.queryRecord({ search: searchKeyword }).then(response => {
+        let apiPayload = response.data
+        let records = JSONAPI.deserialize(apiPayload.data)
+        let names = _.map(records, (record) => {
+          let info = ''
+          if (record.code) {
+            info += `[${record.code}]`
+          }
+          info += record.name + ' :: ' + record.status + ' :: ' + record.id
+          return { value: info, id: 'x' }
+        })
+
+        callback(names)
+      })
+    },
+    setProduct (item) {
+      this.formModel.product = item
     },
     uploadAvatar (e) {
       let file = e.file

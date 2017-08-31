@@ -324,6 +324,10 @@ hr {
 small {
   font-size: 12px;
 }
+
+.el-autocomplete {
+  width: 100%;
+}
 /* END Common Overwrite */
 
 
