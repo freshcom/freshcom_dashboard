@@ -3,8 +3,8 @@
   <div class="content">
 
     <div class="secondary-nav">
-      <el-menu :router="true" default-active="/skus" mode="horizontal">
-        <el-menu-item :route="{ name: 'ListSku' }" index="/skus">SKUs</el-menu-item>
+      <el-menu :router="true" default-active="/products" mode="horizontal">
+        <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
       </el-menu>
       <locale-selector></locale-selector>
     </div>
@@ -13,7 +13,7 @@
       <div class="main">
         <el-card v-loading="isLoading" class="main-card">
           <div slot="header">
-            <span style="line-height: 36px;">Create a SKU</span>
+            <span style="line-height: 36px;">Create a Product</span>
 
             <div class="pull-right">
               <el-button @click="cancel">
@@ -27,7 +27,7 @@
           </div>
 
           <div class="data">
-            <sku-form v-model="recordDraft" :errors="errors"></sku-form>
+            <product-form v-model="recordDraft" :errors="errors"></product-form>
           </div>
 
           <div class="footer">
@@ -49,17 +49,17 @@
 
 <script>
 import NewPage from '@/mixins/new-page'
-import SkuForm from '@/components/sku-form'
+import ProductForm from '@/components/product-form'
 
 export default {
-  name: 'NewSku',
+  name: 'NewProduct',
   components: {
-    SkuForm
+    ProductForm
   },
-  mixins: [NewPage({ storeNamespace: 'sku', name: 'SKU' })],
+  mixins: [NewPage({ storeNamespace: 'product', name: 'Product' })],
   methods: {
     recordCreated (record) {
-      this.$store.dispatch('pushRoute', { name: 'ShowSku', params: { id: record.id } })
+      this.$store.dispatch('pushRoute', { name: 'ShowProduct', params: { id: record.id } })
     }
   }
 }

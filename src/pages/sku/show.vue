@@ -131,10 +131,13 @@
               </div>
             </div>
 
-            <h3>Custom Data</h3>
+
+            <div class="block-title">
+              <h3>Custom Data</h3>
+            </div>
             <div class="block">
               <div class="block-body">
-
+                {{record.customData}}
               </div>
             </div>
 

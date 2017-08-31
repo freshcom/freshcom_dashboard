@@ -24,7 +24,7 @@
             <icon name="users" scale="0.8"></icon>
             <span>Customers</span>
           </el-menu-item>
-          <el-menu-item index="products">
+          <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
             <icon name="cubes" scale="0.8"></icon>
             <span>Products</span>
           </el-menu-item>
@@ -155,6 +155,7 @@ export default {
       if (routePath.startsWith('/skus')) { return '/skus' }
       if (routePath.startsWith('/file_collections')) { return '/file_collections' }
       if (routePath.startsWith('/files')) { return '/files' }
+      if (routePath.startsWith('/products')) { return '/products' }
 
       return routePath
     },

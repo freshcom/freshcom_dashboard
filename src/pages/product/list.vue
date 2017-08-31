@@ -3,8 +3,8 @@
   <div class="content">
 
     <div class="secondary-nav">
-      <el-menu :router="true" default-active="/skus" mode="horizontal">
-        <el-menu-item :route="{ name: 'ListSku' }" index="/skus">SKUs</el-menu-item>
+      <el-menu :router="true" default-active="/products" mode="horizontal">
+        <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
       </el-menu>
       <locale-selector @change="search"></locale-selector>
     </div>
@@ -20,7 +20,7 @@
               </el-input>
             </div>
 
-            <el-button @click="goTo({ name: 'NewSku' })" class="pull-right">
+            <el-button @click="goTo({ name: 'NewProduct' })" class="pull-right">
               <icon name="plus" scale="0.7" class="v-middle"></icon> New
             </el-button>
           </div>
@@ -61,11 +61,11 @@ import Pagination from '@/components/pagination'
 import ListPage from '@/mixins/list-page'
 
 export default {
-  name: 'ListSku',
+  name: 'ListProduct',
   components: {
     Pagination
   },
-  mixins: [ListPage({ storeNamespace: 'sku', fields: { 'Sku': 'code,name,status' } })],
+  mixins: [ListPage({ storeNamespace: 'product', fields: { 'Product': 'code,name,status' } })],
   computed: {
     tableData () {
       return _.map(this.records, (record) => {
@@ -79,7 +79,7 @@ export default {
   },
   methods: {
     viewRecord (row) {
-      this.goTo({ name: 'ShowSku', params: { id: row.id } })
+      this.goTo({ name: 'ShowProduct', params: { id: row.id } })
     }
   }
 }

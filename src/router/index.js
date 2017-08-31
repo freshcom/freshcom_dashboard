@@ -16,8 +16,12 @@ import NewExternalFileCollectionPage from '@/pages/external-file-collection/new'
 import EditExternalFileCollectionPage from '@/pages/external-file-collection/edit'
 import ShowExternalFileCollectionPage from '@/pages/external-file-collection/show'
 import ListExternalFileCollectionPage from '@/pages/external-file-collection/list'
+
 import ListExternalFilePage from '@/pages/external-file/list'
 import ShowExternalFilePage from '@/pages/external-file/show'
+
+import ListProductPage from '@/pages/product/list'
+import NewProductPage from '@/pages/product/new'
 
 Vue.use(Router)
 
@@ -141,6 +145,23 @@ export default new Router({
       props (route) {
         return { id: route.params.id }
       }
+    },
+    {
+      path: '/products',
+      name: 'ListProduct',
+      component: ListProductPage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          page: page
+        }
+      }
+    },
+    {
+      path: '/products/new',
+      name: 'NewProduct',
+      component: NewProductPage
     }
   ]
 })

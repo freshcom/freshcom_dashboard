@@ -272,6 +272,10 @@ a:hover {
     }
   }
 }
+
+p.search-notice {
+  margin-top: 60px;
+}
 /* END Layout */
 
 
@@ -478,6 +482,7 @@ small {
 }
 /* END Main Card */
 
+/* START File Collection */
 .file-thumbnail {
   text-align: center;
   display: inline-block;
@@ -586,4 +591,8 @@ small {
     text-align: center;
   }
 }
+
+/* END File Collection */
+
+
 </style>
