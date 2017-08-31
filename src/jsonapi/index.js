@@ -94,8 +94,10 @@ export default {
 
     _.forEach(errors, item => {
       let pointerArray = _.split(item.source.pointer, '/')
-      errorObjects[pointerArray[3]] = errorObjects[pointerArray[3]] || []
-      errorObjects[pointerArray[3]].push(item.code)
+      let index = 3
+      if (pointerArray.length === 3) { index = 2 }
+      errorObjects[pointerArray[index]] = errorObjects[pointerArray[index]] || []
+      errorObjects[pointerArray[index]].push(item.code)
     })
 
     return errorObjects

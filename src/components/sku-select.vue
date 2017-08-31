@@ -1,0 +1,64 @@
+<template>
+  <el-autocomplete
+    v-model="skuChoice"
+    :fetch-suggestions="querySku"
+    placeholder="Search for SKU..."
+    :disabled="selected"
+    @select="setSku"
+  >
+
+  <el-button v-if="selected" slot="append" @click="clear()">
+    <icon name="times" scale="0.8" class="v-middle"></icon>
+  </el-button>
+
+  </el-autocomplete>
+</template>
+
+<script>
+import _ from 'lodash'
+import JSONAPI from '@/jsonapi'
+import SkuAPI from '@/api/sku'
+
+export default {
+  name: 'SkuSelect',
+  data () {
+    return {
+      skuChoice: undefined,
+      selected: false
+    }
+  },
+  methods: {
+    querySku (searchKeyword, callback) {
+      SkuAPI.queryRecord({ search: searchKeyword }).then(response => {
+        let apiPayload = response.data
+        let records = JSONAPI.deserialize(apiPayload.data)
+        let names = _.map(records, (record) => {
+          let info = ''
+          if (record.code) {
+            info += `[${record.code}] `
+          }
+          info += record.name + ' :: ' + record.status + ' :: ' + record.id
+          return { value: info, id: record.id }
+        })
+
+        callback(names)
+      })
+    },
+    setSku (skuChoice) {
+      this.selected = true
+      this.$emit('select', skuChoice.id)
+    },
+    clear () {
+      this.skuChoice = undefined
+      this.selected = false
+
+      this.$emit('select', undefined)
+    }
+  }
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+
+</style>

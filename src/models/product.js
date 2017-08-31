@@ -5,7 +5,7 @@ export default {
       type: 'Product',
 
       code: '',
-      status: 'active',
+      status: 'draft',
       itemMode: 'any'
     }
   }

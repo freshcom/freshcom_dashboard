@@ -5,12 +5,12 @@ export default {
       type: 'ProductItem',
 
       code: '',
-      status: 'active',
+      status: 'draft',
+      nameSync: 'disabled',
       name: '',
       printName: '',
       sourceQuantity: 1,
       sortIndex: 0,
-      sourceType: 'Sku',
 
       caption: '',
       desecription: ''

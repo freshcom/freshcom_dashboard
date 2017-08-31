@@ -28,7 +28,7 @@
           </div>
 
           <div class="data">
-            <product-item-form v-model="recordDraft" :errors="errors"></product-item-form>
+            <product-item-form v-model="recordDraft" :record="record" :errors="errors"></product-item-form>
           </div>
 
           <div class="footer">
@@ -54,7 +54,7 @@ import NewPage from '@/mixins/new-page'
 import ProductItemForm from '@/components/product-item-form'
 
 export default {
-  name: 'NewSku',
+  name: 'NewProductItem',
   components: {
     ProductItemForm
   },

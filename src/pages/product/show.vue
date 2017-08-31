@@ -76,13 +76,11 @@
 
             <div class="block">
               <div class="block-body full">
-              <el-table :data="record.items" stripe class="block-table" :show-header="false" style="width: 100%">
+                <el-table :data="record.items" stripe class="block-table" :show-header="false" style="width: 100%">
                   <el-table-column width="500">
                     <template scope="scope">
                       <router-link :to="{ name: 'ShowExternalFileCollection', params: { id: scope.row.id } }">
                         <span>{{scope.row.name}}</span>
-                        <span v-if="scope.row.name"> - </span>
-                        <span>{{scope.row.label}}</span>
                       </router-link>
                     </template>
                   </el-table-column>
@@ -216,7 +214,7 @@ export default {
   components: {
     DeleteButton
   },
-  mixins: [ShowPage({ storeNamespace: 'product', name: 'Product', include: 'avatar,externalFileCollections' })],
+  mixins: [ShowPage({ storeNamespace: 'product', name: 'Product', include: 'avatar,items,externalFileCollections' })],
   computed: {
     avatarUrl () {
       if (this.record.avatar) {

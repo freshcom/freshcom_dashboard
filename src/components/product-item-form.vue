@@ -1,38 +1,22 @@
 <template>
 <el-form @input.native="updateValue" label-width="150px">
-
-  <div class="block-title">
-    <h3>Source</h3>
-  </div>
-  <div class="block">
-    <div class="block-body">
-      <el-form-item label="Type" required>
-        <el-select @change="updateValue" v-model="formModel.sourceType">
-          <el-option label="SKU" value="Sku"></el-option>
-          <el-option label="Unlockable" value="Unlockable"></el-option>
-        </el-select>
-      </el-form-item>
-
-      <el-form-item label="Name">
-        <el-input></el-input>
-      </el-form-item>
-
-      <el-form-item v-if="formModel.product" label="ID" :error="errorMessages.product">
-        {{formModel.product.id}}
-      </el-form-item>
-    </div>
-  </div>
-
-  <el-form-item label="Product">
-    <el-autocomplete
-      :fetch-suggestions="queryProduct"
-      placeholder="Search for product..."
-      @select="setProduct"
-    ></el-autocomplete>
+  <el-form-item v-if="!record.product" label="Product" required>
+    <product-select @select="setProduct"></product-select>
   </el-form-item>
 
-  <el-form-item v-if="formModel.product" label="ID" :error="errorMessages.product">
+  <el-form-item v-if="record.product" label="Product">
     {{formModel.product.id}}
+  </el-form-item>
+
+  <el-form-item label="Source Type" required>
+    <el-select v-model="sourceType">
+      <el-option label="SKU" value="Sku"></el-option>
+      <el-option label="Unlockable" value="Unlockable"></el-option>
+    </el-select>
+  </el-form-item>
+
+  <el-form-item v-if="sourceType == 'Sku'" label="SKU" :error="skuErrorMessage" required>
+    <sku-select @select="setSku"></sku-select>
   </el-form-item>
 
   <hr>
@@ -41,7 +25,7 @@
     <el-input v-model="formModel.code"></el-input>
   </el-form-item>
 
-  <el-form-item label="Status" :error="errorMessages.status" required>
+  <el-form-item v-if="formModel.id" label="Status" :error="errorMessages.status" required>
     <el-select @change="updateValue" v-model="formModel.status">
       <el-option label="Draft" value="draft"></el-option>
       <el-option label="Active" value="active"></el-option>
@@ -49,16 +33,20 @@
     </el-select>
   </el-form-item>
 
-  <el-form-item label="Name" :error="errorMessages.name" required>
+  <el-form-item label="Name Sync" required>
+    <el-radio-group @change="updateValue" v-model="formModel.nameSync">
+      <el-radio label="disabled">Disabled</el-radio>
+      <el-radio label="sync_with_source">Sync with source</el-radio>
+      <el-radio label="sync_with_product">Sync with product</el-radio>
+    </el-radio-group>
+  </el-form-item>
+
+  <el-form-item v-if="formModel.nameSync == 'disabled'" label="Name" :error="errorMessages.name" required>
     <el-input v-model="formModel.name"></el-input>
   </el-form-item>
 
-  <el-form-item label="Short Name" :error="errorMessages.name" required>
+  <el-form-item v-if="formModel.nameSync == 'sync_with_product'" label="Short Name" :error="errorMessages.name">
     <el-input v-model="formModel.shortName"></el-input>
-  </el-form-item>
-
-  <el-form-item label="Print Name" :error="errorMessages.printName" required>
-    <el-input v-model="formModel.printName"></el-input>
   </el-form-item>
 
   <el-form-item label="Source Quantity" :error="errorMessages.sourceQuantity" required>
@@ -81,15 +69,21 @@
 
 <script>
 import _ from 'lodash'
-import JSONAPI from '@/jsonapi'
-import ProductAPI from '@/api/product'
+import ProductSelect from '@/components/product-select'
+import SkuSelect from '@/components/sku-select'
 
 export default {
   name: 'ProductItemForm',
-  props: ['value', 'errors'],
+  components: {
+    ProductSelect,
+    SkuSelect
+  },
+  props: ['value', 'errors', 'record'],
   data () {
     return {
       formModel: _.cloneDeep(this.value),
+      productChoice: '',
+      sourceType: 'Sku',
       imageUrl: '',
       pendingAvatarId: ''
     }
@@ -100,6 +94,13 @@ export default {
         result[k] = this.$t(`errors.${v[0]}`, { name: _.startCase(k) })
         return result
       }, {})
+    },
+    skuErrorMessage () {
+      if (this.errorMessages['relationships']) {
+        return 'SKU is invalid'
+      } else {
+        return
+      }
     },
     avatarUrl () {
       if (!this.formModel.avatar) {
@@ -143,24 +144,24 @@ export default {
     handleAvatarSuccess () {
 
     },
-    queryProduct (searchKeyword, callback) {
-      ProductAPI.queryRecord({ search: searchKeyword }).then(response => {
-        let apiPayload = response.data
-        let records = JSONAPI.deserialize(apiPayload.data)
-        let names = _.map(records, (record) => {
-          let info = ''
-          if (record.code) {
-            info += `[${record.code}]`
-          }
-          info += record.name + ' :: ' + record.status + ' :: ' + record.id
-          return { value: info, id: 'x' }
-        })
+    querySku () {
 
-        callback(names)
-      })
     },
-    setProduct (item) {
-      this.formModel.product = item
+    setSku (id) {
+      if (id) {
+        this.formModel.sku = { id: id, type: 'Sku' }
+      } else {
+        delete this.formModel.sku
+      }
+      this.updateValue()
+    },
+    setProduct (id) {
+      if (id) {
+        this.formModel.product = { id: id, type: 'Product' }
+      } else {
+        delete this.formModel.product
+      }
+      this.updateValue()
     },
     uploadAvatar (e) {
       let file = e.file

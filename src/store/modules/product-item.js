@@ -57,7 +57,7 @@ export default {
 
     createRecord (context, recordDraft) {
       let apiPayload = { data: JSONAPI.serialize(recordDraft) }
-      return ProductItemAPI.createRecord(apiPayload).then(response => {
+      return ProductItemAPI.createRecord(recordDraft.product.id, apiPayload).then(response => {
         return JSONAPI.deserialize(response.data.data)
       }).then(record => {
         context.commit(MT.SET_RECORD, record)

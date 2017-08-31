@@ -1,7 +1,8 @@
 export default {
   hello: 'Hi',
   errors: {
-    required: '{name} is required'
+    required: '{name} is required',
+    invalid: '{name} is invalid'
   },
   warnDanger: {
     locale: {
