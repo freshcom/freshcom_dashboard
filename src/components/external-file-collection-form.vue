@@ -1,7 +1,7 @@
 <template>
 <el-form @input.native="updateValue" label-width="150px">
 
-  <el-form-item v-if="formModel.sku" label="SKU ID" :error="errorMessages.name">
+  <el-form-item v-if="formModel.sku" label="SKU ID" :error="errorMessages.sku">
     {{formModel.sku.id}}
   </el-form-item>
 

@@ -49,6 +49,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import NewPage from '@/mixins/new-page'
 import ProductItemForm from '@/components/product-item-form'
 
@@ -58,6 +59,16 @@ export default {
     ProductItemForm
   },
   mixins: [NewPage({ storeNamespace: 'productItem', name: 'Product Item' })],
+  props: ['productId', 'callbackPath'],
+  created () {
+    if (!this.productId) {
+      return
+    }
+
+    let record = _.cloneDeep(this.record)
+    record.product = { id: this.productId, type: 'Product' }
+    this.$store.dispatch('productItem/setRecord', record)
+  },
   methods: {
     recordCreated (record) {
       this.$store.dispatch('pushRoute', { name: 'ShowProductItem', params: { id: record.id } })

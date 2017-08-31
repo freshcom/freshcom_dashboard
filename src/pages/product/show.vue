@@ -67,7 +67,7 @@
               <h3>Items</h3>
 
               <span class="block-title-actions pull-right">
-                <router-link :to="{ name: 'NewExternalFileCollection', query: { skuId: record.id } }">
+                <router-link :to="{ name: 'NewProductItem', query: { productId: record.id, callbackPath: currentRoutePath } }">
                   <icon name="plus" scale="0.8" class="v-middle"></icon>
                   <span>Add</span>
                 </router-link>
@@ -224,6 +224,9 @@ export default {
       }
 
       return 'http://placehold.it/80x80'
+    },
+    currentRoutePath () {
+      return this.$store.state.route.fullPath
     }
   },
   methods: {

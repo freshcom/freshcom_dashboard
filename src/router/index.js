@@ -24,6 +24,8 @@ import ListProductPage from '@/pages/product/list'
 import NewProductPage from '@/pages/product/new'
 import ShowProductPage from '@/pages/product/show'
 
+import NewProductItemPage from '@/pages/product-item/new'
+
 Vue.use(Router)
 
 function extractPagination (route) {
@@ -170,6 +172,17 @@ export default new Router({
       component: ShowProductPage,
       props (route) {
         return { id: route.params.id }
+      }
+    },
+    {
+      path: '/product_items/new',
+      name: 'NewProductItem',
+      component: NewProductItemPage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { productId: query.productId, callbackPath: query.callbackPath }
       }
     }
   ]
