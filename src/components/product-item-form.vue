@@ -1,5 +1,5 @@
 <template>
-<el-form @input.native="updateValue" label-width="150px">
+<el-form @input.native="updateValue" label-width="180px">
   <el-form-item v-if="!record.product" label="Product" required>
     <product-select @select="setProduct"></product-select>
   </el-form-item>
@@ -8,15 +8,19 @@
     {{formModel.product.id}}
   </el-form-item>
 
-  <el-form-item label="Source Type" required>
+  <el-form-item v-if="!record.id" label="Source Type" required>
     <el-select v-model="sourceType">
       <el-option label="SKU" value="Sku"></el-option>
       <el-option label="Unlockable" value="Unlockable"></el-option>
     </el-select>
   </el-form-item>
 
-  <el-form-item v-if="sourceType == 'Sku'" label="SKU" :error="skuErrorMessage" required>
+  <el-form-item v-if="sourceType == 'Sku' && !record.id" label="SKU" :error="skuErrorMessage" required>
     <sku-select @select="setSku"></sku-select>
+  </el-form-item>
+
+  <el-form-item v-if="record.sku" label="SKU">
+    {{formModel.sku.id}}
   </el-form-item>
 
   <hr>
@@ -55,6 +59,10 @@
 
   <el-form-item label="Sort Index" :error="errorMessages.sortIndex" required>
     <el-input-number v-model="formModel.sortIndex" :min="0" :step="100"></el-input-number>
+  </el-form-item>
+
+  <el-form-item label="Maximum PO Quantity" :error="errorMessages.maximumPublicOrderQuantity" required>
+    <el-input-number v-model="formModel.maximumPublicOrderQuantity" :min="1" :step="1"></el-input-number>
   </el-form-item>
 
   <el-form-item label="Caption">

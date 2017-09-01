@@ -269,6 +269,10 @@ a:hover {
         min-height: 16px;
         height: 16px;
       }
+
+      .el-button+.el-button {
+        margin-left: 0px;
+      }
     }
   }
 }

@@ -28,6 +28,7 @@ import EditProductPage from '@/pages/product/edit'
 import NewProductItemPage from '@/pages/product-item/new'
 import ShowProductItemPage from '@/pages/product-item/show'
 import ListProductItemPage from '@/pages/product-item/list'
+import EditProductItemPage from '@/pages/product-item/edit'
 
 Vue.use(Router)
 
@@ -212,6 +213,14 @@ export default new Router({
       path: '/product_items/:id',
       name: 'ShowProductItem',
       component: ShowProductItemPage,
+      props (route) {
+        return { id: route.params.id }
+      }
+    },
+    {
+      path: '/product_items/:id/edit',
+      name: 'EditProductItem',
+      component: EditProductItemPage,
       props (route) {
         return { id: route.params.id }
       }

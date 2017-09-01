@@ -156,6 +156,7 @@ export default {
       if (routePath.startsWith('/file_collections')) { return '/file_collections' }
       if (routePath.startsWith('/files')) { return '/files' }
       if (routePath.startsWith('/products')) { return '/products' }
+      if (routePath.startsWith('/product_items')) { return '/products' }
 
       return routePath
     },

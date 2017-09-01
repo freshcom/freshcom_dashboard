@@ -79,32 +79,20 @@
             <div class="block">
               <div class="block-body full">
                 <el-table :data="record.items" stripe class="block-table" :show-header="false" style="width: 100%">
-
-                  <el-table-column type="expand">
-                    <template scope="props">
-                      <el-row>
-                        <el-col :span="12">
-                          <dl class="thin">
-                            <dt>Code</dt>
-                            <dd>{{record.code}}</dd>
-                          </dl>
-                        </el-col>
-
-                        <el-col :span="12">
-                          <dl class="thin">
-                            <dt>Status</dt>
-                            <dd>{{record.status}}</dd>
-                          </dl>
-                        </el-col>
-                      </el-row>
-                    </template>
-                  </el-table-column>
-
-                  <el-table-column width="400">
+                  <el-table-column width="320">
                     <template scope="scope">
                       <router-link :to="{ name: 'ShowProductItem', params: { id: scope.row.id } }">
                         <span>{{scope.row.name}}</span>
+                        <el-tag v-if="scope.row.status == 'active'" type="primary">Primary</el-tag>
+                        <el-tag v-else type="gray">{{$t(`attributes.productItem.status.${scope.row.status}`)}}</el-tag>
+                        <el-tag>Primary</el-tag>
                       </router-link>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column width="150">
+                    <template scope="scope">
+                      $19.99/EA
                     </template>
                   </el-table-column>
 
@@ -113,6 +101,9 @@
                       <p class="text-right actions">
                         <el-button type="primary" @click="makeItemActive(scope.row.id)" size="mini">
                           Make Active
+                        </el-button>
+                        <el-button @click="makeItemActive(scope.row.id)" size="mini">
+                          Make Primary
                         </el-button>
                         <el-button @click="goTo({ name: 'EditProductItem', params: { id: scope.row.id } })" size="mini">
                           Edit
@@ -190,7 +181,10 @@
             <h3>Related Resources</h3>
             <div class="block">
               <div class="block-body">
-
+                <dl>
+                  <dt v-if="record.avatar">Avatar</dt>
+                  <dd><a href="#">{{record.avatar.id}}</a></dd>
+                </dl>
               </div>
             </div>
 

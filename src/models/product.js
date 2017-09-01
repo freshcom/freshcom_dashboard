@@ -11,7 +11,9 @@ export default {
       itemMode: 'any',
 
       caption: '',
-      description: ''
+      description: '',
+
+      avatar: {}
     }
   }
 }

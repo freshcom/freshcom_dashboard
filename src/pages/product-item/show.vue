@@ -43,17 +43,29 @@
 
                   <dt>Status</dt>
                   <dd>
-                    {{record.status}}
+                    {{$t(`attributes.productItem.status.${record.status}`)}}
                     <el-button type="primary" size="mini">
-                      Mark as Active
+                      Make Active
                     </el-button>
                   </dd>
+
+                  <dt>Name Sync</dt>
+                  <dd>{{$t(`attributes.productItem.nameSync.${record.nameSync}`)}}</dd>
 
                   <dt>Name</dt>
                   <dd>{{record.name}}</dd>
 
-                  <dt>Print Name</dt>
-                  <dd>{{record.printName}}</dd>
+                  <dt>Short Name</dt>
+                  <dd>{{record.shortName}}</dd>
+
+                  <dt>Sort Index</dt>
+                  <dd>{{record.sortIndex}}</dd>
+
+                  <dt>Source Quantity</dt>
+                  <dd>{{record.sourceQuantity}}</dd>
+
+                  <dt>Maximum PO Quantity</dt>
+                  <dd>{{record.maximumPublicOrderQuantity}}</dd>
                 </dl>
               </div>
             </div>

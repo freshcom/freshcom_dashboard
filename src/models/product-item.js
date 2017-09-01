@@ -11,6 +11,7 @@ export default {
       printName: '',
       sourceQuantity: 1,
       sortIndex: 0,
+      maximumPublicOrderQuantity: 9999,
 
       caption: '',
       desecription: '',
