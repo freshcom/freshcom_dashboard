@@ -83,9 +83,13 @@
                     <template scope="scope">
                       <router-link :to="{ name: 'ShowProductItem', params: { id: scope.row.id } }">
                         <span>{{scope.row.name}}</span>
-                        <el-tag v-if="scope.row.status == 'active'" type="primary">Primary</el-tag>
-                        <el-tag v-else type="gray">{{$t(`attributes.productItem.status.${scope.row.status}`)}}</el-tag>
-                        <el-tag>Primary</el-tag>
+                        <el-tag v-if="scope.row.status != 'active'" type="gray">
+                          {{$t(`attributes.productItem.status.${scope.row.status}`)}}
+                        </el-tag>
+
+                        <el-tag v-if="scope.row.primary">
+                          Primary
+                        </el-tag>
                       </router-link>
                     </template>
                   </el-table-column>
@@ -99,12 +103,14 @@
                   <el-table-column>
                     <template scope="scope">
                       <p class="text-right actions">
-                        <el-button type="primary" @click="makeItemActive(scope.row.id)" size="mini">
-                          Make Active
+                        <el-button v-if="!scope.row.primary" @click="markItemPrimary(scope.row)" size="mini">
+                          Mark Primary
                         </el-button>
-                        <el-button @click="makeItemActive(scope.row.id)" size="mini">
-                          Make Primary
+
+                        <el-button v-if="scope.row.status != 'active'" type="primary" @click="makeItemActive(scope.row.id)" size="mini">
+                          Mark Active
                         </el-button>
+
                         <el-button @click="goTo({ name: 'EditProductItem', params: { id: scope.row.id } })" size="mini">
                           Edit
                         </el-button>
@@ -219,6 +225,7 @@ import 'vue-awesome/icons/times'
 import 'vue-awesome/icons/pencil'
 import 'vue-awesome/icons/plus'
 
+import _ from 'lodash'
 import ShowPage from '@/mixins/show-page'
 import DeleteButton from '@/components/delete-button'
 
@@ -246,6 +253,22 @@ export default {
     },
     recordDeleted () {
       this.$store.dispatch('pushRoute', { name: 'ListProduct' })
+    },
+    markItemPrimary (item) {
+      let itemDraft = _.cloneDeep(item)
+      itemDraft.primary = true
+      this.$store.dispatch('productItem/updateRecord', { id: itemDraft.id, recordDraft: itemDraft }).then(updatedItem => {
+        let product = _.cloneDeep(this.record)
+        _.each(product.items, (item) => {
+          if (item.id === updatedItem.id) {
+            item.primary = true
+          } else {
+            item.primary = false
+          }
+        })
+
+        return this.$store.dispatch('product/setRecord', product)
+      })
     }
   }
 }

@@ -19,7 +19,7 @@
     <sku-select @select="setSku"></sku-select>
   </el-form-item>
 
-  <el-form-item v-if="record.sku" label="SKU">
+  <el-form-item v-if="record.sku.id" label="SKU">
     {{formModel.sku.id}}
   </el-form-item>
 
@@ -159,7 +159,7 @@ export default {
       if (id) {
         this.formModel.sku = { id: id, type: 'Sku' }
       } else {
-        delete this.formModel.sku
+        this.formModel.sku = {}
       }
       this.updateValue()
     },

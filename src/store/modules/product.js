@@ -20,6 +20,10 @@ export default {
     records: []
   },
   actions: {
+    setRecord ({ commit }, record) {
+      commit(MT.SET_RECORD, record)
+    },
+
     setRecordDraft ({ commit }, record) {
       commit(MT.SET_RECORD_DRAFT, record)
     },

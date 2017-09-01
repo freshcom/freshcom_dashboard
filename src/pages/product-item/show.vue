@@ -27,7 +27,6 @@
             </div>
           </div>
 
-
           <div class="data">
             <div class="block-title">
               <h3>Details</h3>
@@ -131,7 +130,11 @@
               <div class="block-body">
                 <dl>
                   <dt>Product</dt>
-                  <dd><a href="#">{{record.product.id}}</a></dd>
+                  <dd>
+                    <router-link :to="{ name: 'ShowProduct', params: { id: record.product.id }}">
+                      {{record.product.id}}
+                    </router-link>
+                  </dd>
 
                   <dt v-if="record.sku">SKU</dt>
                   <dd v-if="record.sku">
