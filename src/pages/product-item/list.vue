@@ -3,8 +3,9 @@
   <div class="content">
 
     <div class="secondary-nav">
-      <el-menu :router="true" default-active="/skus" mode="horizontal">
-        <el-menu-item :route="{ name: 'ListSku' }" index="/skus">SKUs</el-menu-item>
+      <el-menu :router="true" default-active="/product_items" mode="horizontal">
+        <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
+        <el-menu-item :route="{ name: 'ListProductItem' }" index="/product_items">Items</el-menu-item>
       </el-menu>
       <locale-selector @change="search"></locale-selector>
     </div>
@@ -19,10 +20,6 @@
                 <template slot="prepend"><icon name="search" scale="1" class="v-middle"></icon></template>
               </el-input>
             </div>
-
-            <el-button @click="goTo({ name: 'NewSku' })" class="pull-right">
-              <icon name="plus" scale="0.7" class="v-middle"></icon> New
-            </el-button>
           </div>
 
           <div class="data full" v-loading="isLoading">
@@ -33,7 +30,7 @@
               Stop typing to search...
             </p>
             <el-table v-if="hasSearchResult" @row-click="viewRecord" :data="tableData" stripe class="full">
-              <el-table-column prop="name" label="SKU" width="350"></el-table-column>
+              <el-table-column prop="name" label="Product" width="350"></el-table-column>
               <el-table-column prop="status" label="Status" width="100"></el-table-column>
               <el-table-column prop="id" label="ID"></el-table-column>
             </el-table>
@@ -61,11 +58,11 @@ import Pagination from '@/components/pagination'
 import ListPage from '@/mixins/list-page'
 
 export default {
-  name: 'ListSku',
+  name: 'ListProductItem',
   components: {
     Pagination
   },
-  mixins: [ListPage({ storeNamespace: 'sku', fields: { 'Sku': 'code,name,status' } })],
+  mixins: [ListPage({ storeNamespace: 'productItem', fields: { 'ProductItem': 'code,name,status' } })],
   computed: {
     tableData () {
       return _.map(this.records, (record) => {
@@ -81,7 +78,7 @@ export default {
   },
   methods: {
     viewRecord (row) {
-      this.goTo({ name: 'ShowSku', params: { id: row.id } })
+      this.goTo({ name: 'ShowProductItem', params: { id: row.id } })
     }
   }
 }

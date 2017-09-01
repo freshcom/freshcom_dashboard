@@ -29,6 +29,9 @@ export default function (options) {
       }
     },
     methods: {
+      goTo (route) {
+        this.$store.dispatch('pushRoute', route)
+      },
       loadRecord () {
         this.isLoading = true
         this.$store.dispatch(`${storeNamespace}/loadRecord`, { id: this.id, include: include }).then(() => {

@@ -13,7 +13,11 @@ export default {
       sortIndex: 0,
 
       caption: '',
-      desecription: ''
+      desecription: '',
+
+      product: {},
+      sku: {},
+      unlockable: {}
     }
   }
 }

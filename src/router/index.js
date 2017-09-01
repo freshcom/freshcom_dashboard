@@ -23,8 +23,11 @@ import ShowExternalFilePage from '@/pages/external-file/show'
 import ListProductPage from '@/pages/product/list'
 import NewProductPage from '@/pages/product/new'
 import ShowProductPage from '@/pages/product/show'
+import EditProductPage from '@/pages/product/edit'
 
 import NewProductItemPage from '@/pages/product-item/new'
+import ShowProductItemPage from '@/pages/product-item/show'
+import ListProductItemPage from '@/pages/product-item/list'
 
 Vue.use(Router)
 
@@ -175,6 +178,26 @@ export default new Router({
       }
     },
     {
+      path: '/products/:id/edit',
+      name: 'EditProduct',
+      component: EditProductPage,
+      props (route) {
+        return { id: route.params.id }
+      }
+    },
+    {
+      path: '/product_items',
+      name: 'ListProductItem',
+      component: ListProductItemPage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          page: page
+        }
+      }
+    },
+    {
       path: '/product_items/new',
       name: 'NewProductItem',
       component: NewProductItemPage,
@@ -183,6 +206,14 @@ export default new Router({
         let query = qs.parse(queryString)
 
         return { productId: query.productId, callbackPath: query.callbackPath }
+      }
+    },
+    {
+      path: '/product_items/:id',
+      name: 'ShowProductItem',
+      component: ShowProductItemPage,
+      props (route) {
+        return { id: route.params.id }
       }
     }
   ]

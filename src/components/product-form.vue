@@ -20,11 +20,18 @@
     </el-select>
   </el-form-item>
 
+  <el-form-item v-if="formModel.itemMode" label="Item Mode" :error="errorMessages.itemMode" required>
+    <el-select @change="updateValue" v-model="formModel.itemMode">
+      <el-option label="Any" value="any"></el-option>
+      <el-option label="All" value="all"></el-option>
+    </el-select>
+  </el-form-item>
+
   <el-form-item label="Name" :error="errorMessages.name" required>
     <el-input v-model="formModel.name"></el-input>
   </el-form-item>
 
-  <el-form-item label="Print Name" :error="errorMessages.printName" required>
+  <el-form-item v-if="formModel.itemMode == 'all'" label="Print Name" :error="errorMessages.printName" required>
     <el-input v-model="formModel.printName"></el-input>
   </el-form-item>
 

@@ -70,8 +70,10 @@ export default {
   computed: {
     tableData () {
       return _.map(this.records, (record) => {
+        let name = record.name
+        if (record.code) { name = `[${record.code}] ` + name }
         return {
-          name: `${record.code} - ${record.name}`,
+          name: name,
           status: record.status,
           id: record.id
         }

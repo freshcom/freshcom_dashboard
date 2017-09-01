@@ -5,8 +5,13 @@ export default {
       type: 'Product',
 
       code: '',
+      name: '',
+      printName: '',
       status: 'draft',
-      itemMode: 'any'
+      itemMode: 'any',
+
+      caption: '',
+      description: ''
     }
   }
 }

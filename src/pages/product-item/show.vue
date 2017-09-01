@@ -2,7 +2,7 @@
 <div class="main-col">
   <div class="content">
     <div class="secondary-nav">
-      <el-menu :router="true" default-active="/products" mode="horizontal">
+      <el-menu :router="true" default-active="/product_items" mode="horizontal">
         <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
         <el-menu-item :route="{ name: 'ListProductItem' }" index="/product_items">Items</el-menu-item>
       </el-menu>
@@ -14,11 +14,7 @@
         <el-card v-loading="isLoading" class="main-card">
           <div slot="header">
 
-            <div class="brief">
-              <div class="avatar">
-                <img :src="avatarUrl">
-              </div>
-
+            <div class="brief no-avatar">
               <div class="detail">
                 <p>{{record.code}}</p>
                 <h2>{{record.name}}</h2>
@@ -30,6 +26,7 @@
               <el-button @click="editRecord()">Edit</el-button>
             </div>
           </div>
+
 
           <div class="data">
             <div class="block-title">
@@ -45,31 +42,27 @@
                   <dd>{{record.code}}</dd>
 
                   <dt>Status</dt>
-                  <dd>{{record.status}}</dd>
-
-                  <dt>Item Mode</dt>
-                  <dd>{{record.itemMode}}</dd>
+                  <dd>
+                    {{record.status}}
+                    <el-button type="primary" size="mini">
+                      Mark as Active
+                    </el-button>
+                  </dd>
 
                   <dt>Name</dt>
                   <dd>{{record.name}}</dd>
 
                   <dt>Print Name</dt>
                   <dd>{{record.printName}}</dd>
-
-                  <dt>Caption</dt>
-                  <dd>{{record.caption}}</dd>
-
-                  <dt>Description</dt>
-                  <dd>{{record.description}}</dd>
                 </dl>
               </div>
             </div>
 
             <div class="block-title">
-              <h3>Items</h3>
+              <h3>Prices</h3>
 
               <span class="block-title-actions pull-right">
-                <router-link :to="{ name: 'NewProductItem', query: { productId: record.id, callbackPath: currentRoutePath } }">
+                <router-link :to="{ name: 'NewPrice', query: { productId: record.id, callbackPath: currentRoutePath } }">
                   <icon name="plus" scale="0.8" class="v-middle"></icon>
                   <span>Add</span>
                 </router-link>
@@ -79,76 +72,10 @@
             <div class="block">
               <div class="block-body full">
                 <el-table :data="record.items" stripe class="block-table" :show-header="false" style="width: 100%">
-
-                  <el-table-column type="expand">
-                    <template scope="props">
-                      <el-row>
-                        <el-col :span="12">
-                          <dl class="thin">
-                            <dt>Code</dt>
-                            <dd>{{record.code}}</dd>
-                          </dl>
-                        </el-col>
-
-                        <el-col :span="12">
-                          <dl class="thin">
-                            <dt>Status</dt>
-                            <dd>{{record.status}}</dd>
-                          </dl>
-                        </el-col>
-                      </el-row>
-                    </template>
-                  </el-table-column>
-
-                  <el-table-column width="400">
-                    <template scope="scope">
-                      <router-link :to="{ name: 'ShowProductItem', params: { id: scope.row.id } }">
-                        <span>{{scope.row.name}}</span>
-                      </router-link>
-                    </template>
-                  </el-table-column>
-
-                  <el-table-column>
-                    <template scope="scope">
-                      <p class="text-right actions">
-                        <el-button type="primary" @click="makeItemActive(scope.row.id)" size="mini">
-                          Make Active
-                        </el-button>
-                        <el-button @click="goTo({ name: 'EditProductItem', params: { id: scope.row.id } })" size="mini">
-                          Edit
-                        </el-button>
-                      </p>
-                    </template>
-                  </el-table-column>
-                </el-table>
-              </div>
-
-
-              <div class="block-footer no-divider text-center">
-                <a class="view-more" href="#">View More</a>
-              </div>
-            </div>
-
-            <div class="block-title">
-              <h3>File Collections</h3>
-
-              <span class="block-title-actions pull-right">
-                <router-link :to="{ name: 'NewExternalFileCollection', query: { skuId: record.id } }">
-                  <icon name="plus" scale="0.8" class="v-middle"></icon>
-                  <span>Add</span>
-                </router-link>
-              </span>
-            </div>
-
-            <div class="block">
-              <div class="block-body full">
-                <el-table :data="record.externalFileCollections" stripe class="block-table" :show-header="false" style="width: 100%">
                   <el-table-column width="500">
                     <template scope="scope">
                       <router-link :to="{ name: 'ShowExternalFileCollection', params: { id: scope.row.id } }">
                         <span>{{scope.row.name}}</span>
-                        <span v-if="scope.row.name"> - </span>
-                        <span>{{scope.row.label}}</span>
                       </router-link>
                     </template>
                   </el-table-column>
@@ -172,11 +99,11 @@
                 </el-table>
               </div>
 
+
               <div class="block-footer no-divider text-center">
                 <a class="view-more" href="#">View More</a>
               </div>
             </div>
-
 
             <div class="block-title">
               <h3>Custom Data</h3>
@@ -190,7 +117,20 @@
             <h3>Related Resources</h3>
             <div class="block">
               <div class="block-body">
+                <dl>
+                  <dt>Product</dt>
+                  <dd><a href="#">{{record.product.id}}</a></dd>
 
+                  <dt v-if="record.sku">SKU</dt>
+                  <dd v-if="record.sku">
+                    <a href="#">{{record.sku.id}}</a>
+                  </dd>
+
+                  <dt v-if="record.unlockable">Unlockable</dt>
+                  <dd v-if="record.unlockable">
+                    <a href="#">{{record.unlockable.id}}</a>
+                  </dd>
+                </dl>
               </div>
             </div>
 
@@ -229,29 +169,22 @@ import ShowPage from '@/mixins/show-page'
 import DeleteButton from '@/components/delete-button'
 
 export default {
-  name: 'ShowSku',
+  name: 'ShowProductItem',
   components: {
     DeleteButton
   },
-  mixins: [ShowPage({ storeNamespace: 'product', name: 'Product', include: 'avatar,items,externalFileCollections' })],
+  mixins: [ShowPage({ storeNamespace: 'productItem', name: 'Product Item', include: 'prices' })],
   computed: {
-    avatarUrl () {
-      if (this.record.avatar) {
-        return this.record.avatar.url
-      }
-
-      return 'http://placehold.it/80x80'
-    },
     currentRoutePath () {
       return this.$store.state.route.fullPath
     }
   },
   methods: {
     editRecord () {
-      this.$store.dispatch('pushRoute', { name: 'EditProduct', params: { id: this.record.id } })
+      this.$store.dispatch('pushRoute', { name: 'EditProductItem', params: { id: this.record.id } })
     },
     recordDeleted () {
-      this.$store.dispatch('pushRoute', { name: 'ListProduct' })
+      this.$store.dispatch('pushRoute', { name: 'ListProductItem' })
     }
   }
 }

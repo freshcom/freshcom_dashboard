@@ -359,6 +359,10 @@ small {
     }
   }
 
+  &.no-avatar .detail {
+    padding-left: 0px;
+  }
+
   .detail {
     padding: 0 120px 0 91px;
     height: 80px;
@@ -382,7 +386,6 @@ small {
       }
     }
   }
-
 }
 
 .main-card {
@@ -474,6 +477,16 @@ small {
       line-height: 25px;
       color: #48576a;
       margin-left: 165px;
+    }
+  }
+
+  dl.thin {
+    dt {
+      width: 100px;
+    }
+
+    dd {
+      margin-left: 115px;
     }
   }
 
