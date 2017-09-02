@@ -54,15 +54,16 @@
   </el-form-item>
 
   <el-form-item label="Source Quantity" :error="errorMessages.sourceQuantity" required>
-    <el-input-number v-model="formModel.sourceQuantity" :min="1" :step="1"></el-input-number>
+    <el-input-number @change="updateValue" v-model="formModel.sourceQuantity" :min="1" :step="1"></el-input-number>
   </el-form-item>
 
   <el-form-item label="Sort Index" :error="errorMessages.sortIndex" required>
-    <el-input-number v-model="formModel.sortIndex" :min="0" :step="100"></el-input-number>
+    <el-input-number @change="updateValue" v-model="formModel.sortIndex" :min="0" :step="100"></el-input-number>
   </el-form-item>
 
+  {{formModel}}
   <el-form-item label="Maximum PO Quantity" :error="errorMessages.maximumPublicOrderQuantity" required>
-    <el-input-number v-model="formModel.maximumPublicOrderQuantity" :min="1" :step="1"></el-input-number>
+    <el-input-number @change="updateValue" v-model="formModel.maximumPublicOrderQuantity" :min="1" :step="1"></el-input-number>
   </el-form-item>
 
   <el-form-item label="Caption">

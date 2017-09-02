@@ -234,7 +234,7 @@ export default {
   components: {
     DeleteButton
   },
-  mixins: [ShowPage({ storeNamespace: 'product', name: 'Product', include: 'avatar,items,externalFileCollections' })],
+  mixins: [ShowPage({ storeNamespace: 'product', name: 'Product', include: 'avatar,items.sku.avatar,externalFileCollections' })],
   computed: {
     avatarUrl () {
       if (this.record.avatar) {
