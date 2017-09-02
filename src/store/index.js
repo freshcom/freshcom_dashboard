@@ -11,6 +11,7 @@ import { Store as ExternalFileStore, Plugin as ExternalFilePlugin } from '@/stor
 import ExternalFileCollectionStore from '@/store/modules/external-file-collection'
 import ProductStore from '@/store/modules/product'
 import ProductItemStore from '@/store/modules/product-item'
+import PriceStore from '@/store/modules/price'
 
 Vue.use(Vuex)
 
@@ -29,7 +30,8 @@ export default new Vuex.Store({
     externalFile: ExternalFileStore,
     sku: SkuStore,
     product: ProductStore,
-    productItem: ProductItemStore
+    productItem: ProductItemStore,
+    price: PriceStore
   },
   state: {
     uiLocale: DEFAULT_LOCALE,

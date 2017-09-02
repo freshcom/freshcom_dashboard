@@ -310,6 +310,13 @@ p.search-notice {
 /* END Top Search */
 
 
+/* START Utils */
+.m-l-10 {
+  margin-left: 10px;
+}
+
+/* END Utils */
+
 /* START Common Overwrite */
 .el-pagination {
   padding: 0px;

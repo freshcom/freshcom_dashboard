@@ -1,29 +1,24 @@
 <template>
 <el-form @input.native="updateValue" label-width="180px">
-  <el-form-item v-if="!record.product" label="Product" required>
-    <product-select @select="setProduct"></product-select>
-  </el-form-item>
-
-  <el-form-item v-if="record.product" label="Product">
-    {{formModel.product.id}}
-  </el-form-item>
-
-  <el-form-item v-if="!record.id" label="Source Type" required>
-    <el-select v-model="sourceType">
-      <el-option label="SKU" value="Sku"></el-option>
-      <el-option label="Unlockable" value="Unlockable"></el-option>
-    </el-select>
-  </el-form-item>
-
-  <el-form-item v-if="sourceType == 'Sku' && !record.id" label="SKU" :error="skuErrorMessage" required>
-    <sku-select @select="setSku"></sku-select>
-  </el-form-item>
-
-  <el-form-item v-if="record.sku.id" label="SKU">
-    {{formModel.sku.id}}
+  <el-form-item v-if="record.productItem" label="Product Item">
+    {{formModel.productItem.id}}
   </el-form-item>
 
   <hr>
+
+  <el-form-item label="Charge Amount" :error="errorMessages.chargeCents" required>
+    <el-input-number @change="updateValue" v-model="formModel.chargeCents" :min="0.00" :controls="false">
+    </el-input-number>
+    <span> / </span>
+    <el-input v-model="formModel.chargeUnit" class="unit-input" placeholder="Unit"></el-input>
+  </el-form-item>
+
+  <el-form-item label="Charge Amount" :error="errorMessages.chargeCents" required>
+    <price-amount-input @change="updateValue" v-model="formModel.chargeCents">
+    </price-amount-input>
+    <span> / </span>
+    <el-input v-model="formModel.chargeUnit" class="unit-input" placeholder="Unit"></el-input>
+  </el-form-item>
 
   <el-form-item label="Code" :error="errorMessages.code">
     <el-input v-model="formModel.code"></el-input>
@@ -35,6 +30,10 @@
       <el-option label="Active" value="active"></el-option>
       <el-option label="Disabled" value="disabled"></el-option>
     </el-select>
+  </el-form-item>
+
+  <el-form-item label="Label">
+    <el-input v-model="formModel.label"></el-input>
   </el-form-item>
 
   <el-form-item label="Name Sync" required>
@@ -61,6 +60,7 @@
     <el-input-number @change="updateValue" v-model="formModel.sortIndex" :min="0" :step="100"></el-input-number>
   </el-form-item>
 
+  {{formModel}}
   <el-form-item label="Maximum PO Quantity" :error="errorMessages.maximumPublicOrderQuantity" required>
     <el-input-number @change="updateValue" v-model="formModel.maximumPublicOrderQuantity" :min="1" :step="1"></el-input-number>
   </el-form-item>
@@ -77,14 +77,12 @@
 
 <script>
 import _ from 'lodash'
-import ProductSelect from '@/components/product-select'
-import SkuSelect from '@/components/sku-select'
+import PriceAmountInput from '@/components/price-amount-input'
 
 export default {
   name: 'ProductItemForm',
   components: {
-    ProductSelect,
-    SkuSelect
+    PriceAmountInput
   },
   props: ['value', 'errors', 'record'],
   data () {
@@ -184,5 +182,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+.unit-input {
+  width: 100px;
+}
 </style>

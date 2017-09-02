@@ -43,8 +43,8 @@
                   <dt>Status</dt>
                   <dd>
                     {{$t(`attributes.productItem.status.${record.status}`)}}
-                    <el-button type="primary" size="mini">
-                      Make Active
+                    <el-button type="primary" size="mini" class="m-l-10">
+                      Mark Active
                     </el-button>
                   </dd>
 
@@ -73,7 +73,7 @@
               <h3>Prices</h3>
 
               <span class="block-title-actions pull-right">
-                <router-link :to="{ name: 'NewPrice', query: { productId: record.id, callbackPath: currentRoutePath } }">
+                <router-link :to="{ name: 'NewPrice', query: { productItemId: record.id, callbackPath: currentRoutePath } }">
                   <icon name="plus" scale="0.8" class="v-middle"></icon>
                   <span>Add</span>
                 </router-link>
