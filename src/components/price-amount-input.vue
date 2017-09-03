@@ -1,7 +1,6 @@
 <template>
-  <el-input :placeholder="placeholder" v-model="strValue" @focus="$event.target.select()" class="price-amount">
+  <el-input :placeholder="placeholder" v-model="strValue" @focus="$event.target.select()" type="number" class="price-amount">
     <template slot="prepend">$</template>
-    <!-- <template slot="append">{{xxx}}</template> -->
   </el-input>
 </template>
 
@@ -17,7 +16,12 @@ export default {
       },
 
       set: _.debounce(function (value) {
-        this.$emit('input', Math.round(parseFloat(value) * 100))
+        let valueInt = Math.round(parseFloat(Math.abs(value)) * 100)
+        if (isNaN(valueInt)) {
+          this.$emit('input', 0)
+        } else {
+          this.$emit('input', valueInt)
+        }
       }, 500)
     }
   }

@@ -6,22 +6,12 @@
 
   <hr>
 
-  <el-form-item label="Charge Amount" :error="errorMessages.chargeCents" required>
-    <el-input-number @change="updateValue" v-model="formModel.chargeCents" :min="0.00" :controls="false">
-    </el-input-number>
-    <span> / </span>
-    <el-input v-model="formModel.chargeUnit" class="unit-input" placeholder="Unit"></el-input>
-  </el-form-item>
-
-  <el-form-item label="Charge Amount" :error="errorMessages.chargeCents" required>
-    <price-amount-input @change="updateValue" v-model="formModel.chargeCents">
-    </price-amount-input>
-    <span> / </span>
-    <el-input v-model="formModel.chargeUnit" class="unit-input" placeholder="Unit"></el-input>
-  </el-form-item>
-
   <el-form-item label="Code" :error="errorMessages.code">
     <el-input v-model="formModel.code"></el-input>
+  </el-form-item>
+
+  <el-form-item label="Label">
+    <el-input v-model="formModel.label"></el-input>
   </el-form-item>
 
   <el-form-item v-if="formModel.id" label="Status" :error="errorMessages.status" required>
@@ -32,57 +22,72 @@
     </el-select>
   </el-form-item>
 
-  <el-form-item label="Label">
-    <el-input v-model="formModel.label"></el-input>
+  <el-form-item label="Charge Amount" :error="errorMessages.chargeCents" required>
+    <price-amount-input @change="updateValue" v-model="formModel.chargeCents">
+    </price-amount-input>
+    <span> / </span>
+    <el-input v-model="formModel.chargeUnit" class="unit-input" placeholder="Unit"></el-input>
   </el-form-item>
 
-  <el-form-item label="Name Sync" required>
-    <el-radio-group @change="updateValue" v-model="formModel.nameSync">
-      <el-radio label="disabled">Disabled</el-radio>
-      <el-radio label="sync_with_source">Sync with source</el-radio>
-      <el-radio label="sync_with_product">Sync with product</el-radio>
-    </el-radio-group>
+  <el-form-item label="Estimate By Default" :error="errorMessages.estimateByDefault" required>
+    <el-switch
+      v-model="formModel.estimateByDefault"
+      on-text="Yes"
+      off-text="No">
+    </el-switch>
   </el-form-item>
 
-  <el-form-item v-if="formModel.nameSync == 'disabled'" label="Name" :error="errorMessages.name" required>
-    <el-input v-model="formModel.name"></el-input>
+  <el-form-item v-if="formModel.estimateByDefault" label="Order Unit" :error="errorMessages.orderUnit" required>
+    <el-input v-model="formModel.orderUnit" class="unit-input"></el-input>
   </el-form-item>
 
-  <el-form-item v-if="formModel.nameSync == 'sync_with_product'" label="Short Name" :error="errorMessages.name">
-    <el-input v-model="formModel.shortName"></el-input>
+  <el-form-item  v-if="formModel.estimateByDefault" label="Estimate Average" required>
+    <percentage-input @change="updateValue" v-model="formModel.estimateAveragePercentage">
+    </percentage-input>
+  </el-form-item>
+
+  <el-form-item  v-if="formModel.estimateByDefault" label="Estimate Maximum" required>
+    <percentage-input @change="updateValue" v-model="formModel.estimateMaximumPercentage">
+    </percentage-input>
+  </el-form-item>
+
+  <el-form-item label="Minimum Order Quantity" required>
+    <el-input-number @change="updateValue" v-model="formModel.minimumOrderQuantity" :min="1" :step="1"></el-input-number>
   </el-form-item>
 
   <el-form-item label="Source Quantity" :error="errorMessages.sourceQuantity" required>
     <el-input-number @change="updateValue" v-model="formModel.sourceQuantity" :min="1" :step="1"></el-input-number>
   </el-form-item>
 
-  <el-form-item label="Sort Index" :error="errorMessages.sortIndex" required>
-    <el-input-number @change="updateValue" v-model="formModel.sortIndex" :min="0" :step="100"></el-input-number>
+  <el-form-item label="Tax One" required>
+    <percentage-input @change="updateValue" v-model="formModel.taxOnePercentage">
+    </percentage-input>
+  </el-form-item>
+
+  <el-form-item label="Tax Two" required>
+    <percentage-input @change="updateValue" v-model="formModel.taxTwoPercentage">
+    </percentage-input>
+  </el-form-item>
+
+  <el-form-item label="Tax Three" required>
+    <percentage-input @change="updateValue" v-model="formModel.taxThreePercentage">
+    </percentage-input>
   </el-form-item>
 
   {{formModel}}
-  <el-form-item label="Maximum PO Quantity" :error="errorMessages.maximumPublicOrderQuantity" required>
-    <el-input-number @change="updateValue" v-model="formModel.maximumPublicOrderQuantity" :min="1" :step="1"></el-input-number>
-  </el-form-item>
-
-  <el-form-item label="Caption">
-    <el-input v-model="formModel.caption"></el-input>
-  </el-form-item>
-
-  <el-form-item label="Description">
-    <el-input type="textarea" v-model="formModel.description"></el-input>
-  </el-form-item>
 </el-form>
 </template>
 
 <script>
 import _ from 'lodash'
 import PriceAmountInput from '@/components/price-amount-input'
+import PercentageInput from '@/components/percentage-input'
 
 export default {
   name: 'ProductItemForm',
   components: {
-    PriceAmountInput
+    PriceAmountInput,
+    PercentageInput
   },
   props: ['value', 'errors', 'record'],
   data () {
@@ -183,6 +188,9 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .unit-input {
+  width: 100px;
+}
+.ratio-input {
   width: 100px;
 }
 </style>
