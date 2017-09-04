@@ -10,10 +10,6 @@
     <el-input v-model="formModel.code"></el-input>
   </el-form-item>
 
-  <el-form-item label="Label">
-    <el-input v-model="formModel.label"></el-input>
-  </el-form-item>
-
   <el-form-item v-if="formModel.id" label="Status" :error="errorMessages.status" required>
     <el-select @change="updateValue" v-model="formModel.status">
       <el-option label="Draft" value="draft"></el-option>
@@ -22,15 +18,33 @@
     </el-select>
   </el-form-item>
 
-  <el-form-item label="Charge Amount" :error="errorMessages.chargeCents" required>
+  <el-form-item label="Name" :error="errorMessages.name">
+    <el-input v-model="formModel.name"></el-input>
+  </el-form-item>
+
+  <el-form-item label="Label" :error="errorMessages.label" required>
+    <el-input v-model="formModel.label"></el-input>
+  </el-form-item>
+
+  <el-form-item label="Charge Amount" :error="chargeAmountError" required>
     <price-amount-input @change="updateValue" v-model="formModel.chargeCents">
     </price-amount-input>
     <span> / </span>
     <el-input v-model="formModel.chargeUnit" class="unit-input" placeholder="Unit"></el-input>
   </el-form-item>
 
+  <el-form-item label="Public Orderable" :error="errorMessages.publicOrderable" required>
+    <el-switch
+      @change="updateValue"
+      v-model="formModel.publicOrderable"
+      on-text="Yes"
+      off-text="No">
+    </el-switch>
+  </el-form-item>
+
   <el-form-item label="Estimate By Default" :error="errorMessages.estimateByDefault" required>
     <el-switch
+      @change="updateValue"
       v-model="formModel.estimateByDefault"
       on-text="Yes"
       off-text="No">
@@ -41,13 +55,13 @@
     <el-input v-model="formModel.orderUnit" class="unit-input"></el-input>
   </el-form-item>
 
-  <el-form-item  v-if="formModel.estimateByDefault" label="Estimate Average" required>
-    <percentage-input @change="updateValue" v-model="formModel.estimateAveragePercentage">
+  <el-form-item  v-if="formModel.estimateByDefault" :error="errorMessages.estimateAveragePercentage" label="Estimate Average" required>
+    <percentage-input v-model="formModel.estimateAveragePercentage">
     </percentage-input>
   </el-form-item>
 
-  <el-form-item  v-if="formModel.estimateByDefault" label="Estimate Maximum" required>
-    <percentage-input @change="updateValue" v-model="formModel.estimateMaximumPercentage">
+  <el-form-item  v-if="formModel.estimateByDefault" :error="errorMessages.estimateMaximumPercentage" label="Estimate Maximum" required>
+    <percentage-input v-model="formModel.estimateMaximumPercentage">
     </percentage-input>
   </el-form-item>
 
@@ -60,21 +74,19 @@
   </el-form-item>
 
   <el-form-item label="Tax One" required>
-    <percentage-input @change="updateValue" v-model="formModel.taxOnePercentage">
+    <percentage-input v-model="formModel.taxOnePercentage">
     </percentage-input>
   </el-form-item>
 
   <el-form-item label="Tax Two" required>
-    <percentage-input @change="updateValue" v-model="formModel.taxTwoPercentage">
+    <percentage-input v-model="formModel.taxTwoPercentage">
     </percentage-input>
   </el-form-item>
 
   <el-form-item label="Tax Three" required>
-    <percentage-input @change="updateValue" v-model="formModel.taxThreePercentage">
+    <percentage-input v-model="formModel.taxThreePercentage">
     </percentage-input>
   </el-form-item>
-
-  {{formModel}}
 </el-form>
 </template>
 
@@ -84,7 +96,7 @@ import PriceAmountInput from '@/components/price-amount-input'
 import PercentageInput from '@/components/percentage-input'
 
 export default {
-  name: 'ProductItemForm',
+  name: 'PriceForm',
   components: {
     PriceAmountInput,
     PercentageInput
@@ -92,11 +104,7 @@ export default {
   props: ['value', 'errors', 'record'],
   data () {
     return {
-      formModel: _.cloneDeep(this.value),
-      productChoice: '',
-      sourceType: 'Sku',
-      imageUrl: '',
-      pendingAvatarId: ''
+      formModel: _.cloneDeep(this.value)
     }
   },
   computed: {
@@ -106,81 +114,25 @@ export default {
         return result
       }, {})
     },
-    skuErrorMessage () {
-      if (this.errorMessages['relationships']) {
-        return 'SKU is invalid'
-      } else {
-        return
-      }
-    },
-    avatarUrl () {
-      if (!this.formModel.avatar) {
-        return
+    chargeAmountError () {
+      if (this.errorMessages.chargeCents) {
+        return this.errorMessages.chargeCents
       }
 
-      if (this.formModel.avatar.status === 'uploaded') {
-        return this.formModel.avatar.url
+      if (this.errorMessages.chargeUnit) {
+        return this.errorMessages.chargeUnit
       }
-
-      return URL.createObjectURL(this.formModel.avatar.file)
-    },
-    pendingAvatar () {
-      return _.find(this.$store.state.externalFile.pendingRecords, (externalFile) => { return externalFile.id === this.pendingAvatarId })
-    },
-    uploadedAvatar () {
-      return _.find(this.$store.state.externalFile.uploadedRecords, (externalFile) => { return externalFile.id === this.pendingAvatarId })
     }
   },
   watch: {
     value (v) {
       this.formModel = _.cloneDeep(v)
-    },
-    uploadedAvatar (externalFile) {
-      if (!externalFile) {
-        return
-      }
-
-      this.$store.dispatch('externalFile/popUploadedRecords', [externalFile])
-      this.formModel = _.merge({}, this.formModel, { avatar: externalFile })
-      this.updateValue()
     }
   },
   methods: {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
-    }, 300),
-    beforeAvatarUpload () {
-
-    },
-    handleAvatarSuccess () {
-
-    },
-    querySku () {
-
-    },
-    setSku (id) {
-      if (id) {
-        this.formModel.sku = { id: id, type: 'Sku' }
-      } else {
-        this.formModel.sku = {}
-      }
-      this.updateValue()
-    },
-    setProduct (id) {
-      if (id) {
-        this.formModel.product = { id: id, type: 'Product' }
-      } else {
-        delete this.formModel.product
-      }
-      this.updateValue()
-    },
-    uploadAvatar (e) {
-      let file = e.file
-      let externalFile = { type: 'ExternalFile', name: file.name, sizeBytes: file.size, contentType: file.type, file: file }
-      this.$store.dispatch('externalFile/pushPendingRecords', [externalFile]).then(externalFiles => {
-        this.pendingAvatarId = externalFiles[0].id
-      })
-    }
+    }, 300)
   }
 }
 </script>

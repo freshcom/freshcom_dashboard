@@ -17,8 +17,8 @@ export default {
       desecription: '',
 
       product: {},
-      sku: {},
-      unlockable: {}
+      sku: null,
+      unlockable: null
     }
   }
 }

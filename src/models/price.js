@@ -9,10 +9,10 @@ export default {
       name: '',
       label: '',
       currencyCode: 'CAD',
-      chargeCents: 0,
+      chargeCents: null,
       estimateByDefault: false,
-      estimateAveragePercentage: '',
-      estimateMaximumPercentage: '',
+      estimateAveragePercentage: null,
+      estimateMaximumPercentage: null,
       minimumOrderQuantity: 1,
       orderUnit: '',
       chargeUnit: '',
@@ -21,7 +21,9 @@ export default {
       taxTwoPercentage: 0,
       taxThreePercentage: 0,
       startTime: '',
-      endTime: ''
+      endTime: '',
+
+      productItem: null
     }
   }
 }

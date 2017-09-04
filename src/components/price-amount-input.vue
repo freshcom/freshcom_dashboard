@@ -5,24 +5,29 @@
 </template>
 
 <script>
-import _ from 'lodash'
 export default {
   name: 'PriceAmountInput',
   props: ['placeholder', 'value'],
   computed: {
     strValue: {
       get () {
-        return (this.value / 100).toFixed(2)
+        if (this.value === 0) {
+          return '0'
+        } else if (!this.value) {
+          return ''
+        } else {
+          return (this.value / 100).toString()
+        }
       },
 
-      set: _.debounce(function (value) {
+      set (value) {
         let valueInt = Math.round(parseFloat(Math.abs(value)) * 100)
         if (isNaN(valueInt)) {
           this.$emit('input', 0)
         } else {
           this.$emit('input', valueInt)
         }
-      }, 500)
+      }
     }
   }
 }

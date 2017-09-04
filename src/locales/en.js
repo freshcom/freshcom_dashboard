@@ -15,6 +15,12 @@ export default {
         sync_with_source: 'Sync with source',
         sync_with_product: 'Sync with product'
       }
+    },
+    price: {
+      status: {
+        draft: 'Draft',
+        active: 'Active'
+      }
     }
   },
   warnDanger: {

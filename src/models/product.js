@@ -13,7 +13,8 @@ export default {
       caption: '',
       description: '',
 
-      avatar: {}
+      avatar: null,
+      items: []
     }
   }
 }

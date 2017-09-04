@@ -7,16 +7,16 @@
         <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
         <el-menu-item :route="{ name: 'ListProductItem' }" index="/product_items">Items</el-menu-item>
       </el-menu>
-      <locale-selector></locale-selector>
+      <locale-selector :before-change="confirmResourceLocaleChange" @change="loadRecord"></locale-selector>
     </div>
 
     <div class="main-scroller">
       <div class="main">
-        <el-card v-loading="isLoading" class="main-card">
+        <el-card class="main-card">
           <div slot="header">
-            <span style="line-height: 36px;">Create a Price</span>
+            <span style="line-height: 36px;">Edit Price</span>
 
-            <div class="pull-right">
+            <div style="float: right;">
               <el-button @click="cancel">
                 Cancel
               </el-button>
@@ -49,28 +49,17 @@
 </template>
 
 <script>
-import _ from 'lodash'
-import NewPage from '@/mixins/new-page'
 import PriceForm from '@/components/price-form'
+import EditPage from '@/mixins/edit-page'
 
 export default {
-  name: 'NewPrice',
+  name: 'EditPrice',
   components: {
     PriceForm
   },
-  mixins: [NewPage({ storeNamespace: 'price', name: 'Price' })],
-  props: ['productItemId', 'callbackPath'],
-  created () {
-    if (!this.productItemId) {
-      return
-    }
-
-    let record = _.cloneDeep(this.record)
-    record.productItem = { id: this.productItemId, type: 'ProductItem' }
-    this.$store.dispatch('price/setRecord', record)
-  },
+  mixins: [EditPage({ storeNamespace: 'price', name: 'Price' })],
   methods: {
-    recordCreated (record) {
+    recordUpdated (record) {
       this.$store.dispatch('pushRoute', { name: 'ShowPrice', params: { id: record.id } })
     }
   }

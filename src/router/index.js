@@ -31,6 +31,8 @@ import ListProductItemPage from '@/pages/product-item/list'
 import EditProductItemPage from '@/pages/product-item/edit'
 
 import NewPricePage from '@/pages/price/new'
+import EditPricePage from '@/pages/price/edit'
+import ShowPricePage from '@/pages/price/show'
 
 Vue.use(Router)
 
@@ -236,6 +238,22 @@ export default new Router({
         let query = qs.parse(queryString)
 
         return { productItemId: query.productItemId, callbackPath: query.callbackPath }
+      }
+    },
+    {
+      path: '/prices/:id',
+      name: 'ShowPrice',
+      component: ShowPricePage,
+      props (route) {
+        return { id: route.params.id }
+      }
+    },
+    {
+      path: '/prices/:id/edit',
+      name: 'EditPrice',
+      component: EditPricePage,
+      props (route) {
+        return { id: route.params.id }
       }
     }
   ]

@@ -5,28 +5,29 @@
 </template>
 
 <script>
-import _ from 'lodash'
 export default {
   name: 'PercentageInput',
   props: ['placeholder', 'value'],
   computed: {
     strValue: {
       get () {
-        if (!this.value) {
-          return 0
+        if (this.value === 0) {
+          return '0'
+        } else if (!this.value) {
+          return ''
         } else {
-          return this.value
+          return this.value.toString()
         }
       },
 
-      set: _.debounce(function (value) {
+      set (value) {
         let valueFloat = parseFloat(Math.abs(value))
-        if (isNaN(valueFloat)) {
-          this.$emit('input', 0)
+        if (isNaN(valueFloat) || value === '') {
+          this.$emit('input', null)
         } else {
           this.$emit('input', valueFloat)
         }
-      }, 500)
+      }
     }
   }
 }

@@ -33,6 +33,7 @@
 
   <el-form-item label="Variable Weight" :error="errorMessages.variableWeight" required>
     <el-switch
+      @change="updateValue"
       v-model="formModel.variableWeight"
       on-text="Yes"
       off-text="No">
@@ -51,6 +52,7 @@
 
   <el-form-item label="Stackable" :error="errorMessages.stackable" required>
     <el-switch
+      @change="updateValue"
       v-model="formModel.stackable"
       on-text="Yes"
       off-text="No">

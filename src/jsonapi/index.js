@@ -154,6 +154,10 @@ export default {
           let relationshipObject = this._find(db, rio.type, rio.id)
           object[name] = relationshipObject || value.data
         }
+
+        if (value.data === null) {
+          object[name] = null
+        }
       })
     }
 

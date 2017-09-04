@@ -189,7 +189,7 @@
               <div class="block-body">
                 <dl>
                   <dt v-if="record.avatar">Avatar</dt>
-                  <dd><a href="#">{{record.avatar.id}}</a></dd>
+                  <dd v-if="record.avatar"><a href="#">{{record.avatar.id}}</a></dd>
                 </dl>
               </div>
             </div>
@@ -230,7 +230,7 @@ import ShowPage from '@/mixins/show-page'
 import DeleteButton from '@/components/delete-button'
 
 export default {
-  name: 'ShowSku',
+  name: 'ShowProduct',
   components: {
     DeleteButton
   },

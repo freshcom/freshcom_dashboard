@@ -63,7 +63,7 @@
                   <dt>Source Quantity</dt>
                   <dd>{{record.sourceQuantity}}</dd>
 
-                  <dt>Maximum PO Quantity</dt>
+                  <dt>Maximum Public OQ</dt>
                   <dd>{{record.maximumPublicOrderQuantity}}</dd>
                 </dl>
               </div>
@@ -82,28 +82,42 @@
 
             <div class="block">
               <div class="block-body full">
-                <el-table :data="record.items" stripe class="block-table" :show-header="false" style="width: 100%">
-                  <el-table-column width="500">
+                <el-table :data="record.prices" stripe class="block-table" :show-header="false" style="width: 100%">
+                  <el-table-column width="300">
                     <template scope="scope">
-                      <router-link :to="{ name: 'ShowExternalFileCollection', params: { id: scope.row.id } }">
+                      <router-link :to="{ name: 'ShowPrice', params: { id: scope.row.id } }">
                         <span>{{scope.row.name}}</span>
+                        <span v-if="scope.row.name"> - </span>
+                        <span>{{scope.row.label}}</span>
+                        <el-tag v-if="scope.row.status != 'active'" type="gray">
+                          {{$t(`attributes.price.status.${scope.row.status}`)}}
+                        </el-tag>
                       </router-link>
                     </template>
                   </el-table-column>
 
                   <el-table-column width="100">
                     <template scope="scope">
-                      <span>{{scope.row.fileCount}} files</span>
+                      <span>{{scope.row.minimumOrderQuantity}}+</span>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column width="150">
+                    <template scope="scope">
+                      <span>${{scope.row.chargeCents / 100}}/{{scope.row.chargeUnit}}</span>
                     </template>
                   </el-table-column>
 
                   <el-table-column>
                     <template scope="scope">
                       <p class="text-right actions">
-                        <router-link :to="{ name: 'EditExternalFileCollection', params: { id: scope.row.id }}">
-                          <icon name="pencil" scale="0.8" class="v-middle"></icon>
-                          <span class="v-middle">Edit</span>
-                        </router-link>
+                        <el-button v-if="scope.row.status != 'active'" type="primary" @click="makePriceActive(scope.row.id)" size="mini">
+                          Mark Active
+                        </el-button>
+
+                        <el-button @click="goTo({ name: 'EditPrice', params: { id: scope.row.id } })" size="mini">
+                          Edit
+                        </el-button>
                       </p>
                     </template>
                   </el-table-column>
@@ -200,6 +214,9 @@ export default {
     },
     recordDeleted () {
       this.$store.dispatch('pushRoute', { name: 'ListProductItem' })
+    },
+    makePriceActive () {
+
     }
   }
 }
