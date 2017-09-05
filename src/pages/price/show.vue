@@ -76,9 +76,6 @@
                   <dt>Minimum OQ</dt>
                   <dd>{{record.minimumOrderQuantity}}</dd>
 
-                  <dt>Public Orderable</dt>
-                  <dd>{{record.publicOrderable}}</dd>
-
                   <dt>Tax One</dt>
                   <dd>{{record.taxOnePercentage}}%</dd>
 

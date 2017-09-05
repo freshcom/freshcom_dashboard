@@ -10,10 +10,11 @@
     <el-input v-model="formModel.code"></el-input>
   </el-form-item>
 
-  <el-form-item v-if="formModel.id" label="Status" :error="errorMessages.status" required>
+  <el-form-item label="Status" :error="errorMessages.status" required>
     <el-select @change="updateValue" v-model="formModel.status">
       <el-option label="Draft" value="draft"></el-option>
       <el-option label="Active" value="active"></el-option>
+      <el-option label="Internal" value="internal"></el-option>
       <el-option label="Disabled" value="disabled"></el-option>
     </el-select>
   </el-form-item>
@@ -31,15 +32,6 @@
     </price-amount-input>
     <span> / </span>
     <el-input v-model="formModel.chargeUnit" class="unit-input" placeholder="Unit"></el-input>
-  </el-form-item>
-
-  <el-form-item label="Public Orderable" :error="errorMessages.publicOrderable" required>
-    <el-switch
-      @change="updateValue"
-      v-model="formModel.publicOrderable"
-      on-text="Yes"
-      off-text="No">
-    </el-switch>
   </el-form-item>
 
   <el-form-item label="Estimate By Default" :error="errorMessages.estimateByDefault" required>

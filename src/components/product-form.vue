@@ -66,7 +66,7 @@ export default {
       }, {})
     },
     avatarUrl () {
-      if (!this.formModel.avatar.id) {
+      if (!this.formModel.avatar) {
         return
       }
 

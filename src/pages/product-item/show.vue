@@ -213,7 +213,7 @@ export default {
       this.$store.dispatch('pushRoute', { name: 'EditProductItem', params: { id: this.record.id } })
     },
     recordDeleted () {
-      this.$store.dispatch('pushRoute', { name: 'ListProductItem' })
+      this.$store.dispatch('popRoute', 1)
     },
     makePriceActive () {
 

@@ -1,8 +1,9 @@
 export default {
   hello: 'Hi',
   errors: {
-    required: '{name} is required',
-    invalid: '{name} is invalid'
+    required: '{name} is required.',
+    invalid: '{name} is invalid.',
+    active_only_one_po: 'There is already an Active Price have the same Minimum Order Quantity.'
   },
   attributes: {
     productItem: {

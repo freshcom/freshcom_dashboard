@@ -5,7 +5,7 @@ export default {
       type: 'Price',
 
       code: '',
-      status: 'draft',
+      status: 'active',
       name: '',
       label: '',
       currencyCode: 'CAD',
@@ -16,7 +16,6 @@ export default {
       minimumOrderQuantity: 1,
       orderUnit: '',
       chargeUnit: '',
-      publicOrderable: true,
       taxOnePercentage: 0,
       taxTwoPercentage: 0,
       taxThreePercentage: 0,

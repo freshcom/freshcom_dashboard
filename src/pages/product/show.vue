@@ -107,7 +107,7 @@
                           Mark Primary
                         </el-button>
 
-                        <el-button v-if="scope.row.status != 'active'" type="primary" @click="makeItemActive(scope.row.id)" size="mini">
+                        <el-button v-if="scope.row.status != 'active'" type="primary" @click="markItemActive(scope.row)" size="mini">
                           Mark Active
                         </el-button>
 
@@ -253,6 +253,20 @@ export default {
     },
     recordDeleted () {
       this.$store.dispatch('pushRoute', { name: 'ListProduct' })
+    },
+    markItemActive (item) {
+      let itemDraft = _.cloneDeep(item)
+      itemDraft.status = 'active'
+      this.$store.dispatch('productItem/updateRecord', { id: itemDraft.id, recordDraft: itemDraft }).then(updatedItem => {
+        let product = _.cloneDeep(this.record)
+        _.each(product.items, (item) => {
+          if (item.id === updatedItem.id) {
+            item.status = 'active'
+          }
+        })
+
+        return this.$store.dispatch('product/setRecord', product)
+      })
     },
     markItemPrimary (item) {
       let itemDraft = _.cloneDeep(item)

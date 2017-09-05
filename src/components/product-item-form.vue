@@ -19,7 +19,7 @@
     <sku-select @select="setSku"></sku-select>
   </el-form-item>
 
-  <el-form-item v-if="record.sku.id" label="SKU">
+  <el-form-item v-if="record.sku" label="SKU">
     {{formModel.sku.id}}
   </el-form-item>
 
