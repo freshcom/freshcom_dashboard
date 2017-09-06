@@ -16,7 +16,7 @@
 
             <div class="brief no-avatar">
               <div class="detail">
-                <p>{{record.code}}</p>
+                <p>Price {{record.code}}</p>
                 <h2>{{record.name}}</h2>
                 <p class="id">{{record.id}}</p>
               </div>
@@ -43,7 +43,7 @@
                   <dt>Status</dt>
                   <dd>
                     {{$t(`attributes.price.status.${record.status}`)}}
-                    <el-button type="primary" size="mini" class="m-l-10">
+                    <el-button v-if="record.status == 'draft'" type="primary" size="mini" class="m-l-10">
                       Mark Active
                     </el-button>
                   </dd>
@@ -161,7 +161,10 @@ export default {
       this.$store.dispatch('pushRoute', { name: 'EditPrice', params: { id: this.record.id } })
     },
     recordDeleted () {
-      this.$store.dispatch('pushRoute', { name: 'ListProductItem' })
+      this.$store.dispatch('productItem/resetRecord')
+      this.$store.dispatch('product/resetRecord')
+
+      this.$store.dispatch('popRoute', 1)
     }
   }
 }

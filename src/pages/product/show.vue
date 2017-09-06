@@ -20,7 +20,7 @@
               </div>
 
               <div class="detail">
-                <p>{{record.code}}</p>
+                <p>Product {{record.code}}</p>
                 <h2>{{record.name}}</h2>
                 <p class="id">{{record.id}}</p>
               </div>

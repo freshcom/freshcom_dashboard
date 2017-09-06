@@ -16,7 +16,7 @@
 
             <div class="brief no-avatar">
               <div class="detail">
-                <p>{{record.code}}</p>
+                <p>Product Item {{record.code}}</p>
                 <h2>{{record.name}}</h2>
                 <p class="id">{{record.id}}</p>
               </div>
@@ -213,6 +213,7 @@ export default {
       this.$store.dispatch('pushRoute', { name: 'EditProductItem', params: { id: this.record.id } })
     },
     recordDeleted () {
+      this.$store.dispatch('product/resetRecord')
       this.$store.dispatch('popRoute', 1)
     },
     makePriceActive () {

@@ -71,12 +71,14 @@ export default {
   },
   methods: {
     recordCreated (record) {
-      if (record.product) {
-        this.$store.dispatch('pushRoute', { name: 'ShowProduct', params: { id: record.product.id } })
-      }
+      this.$store.dispatch('product/resetRecord')
 
       if (this.callbackPath) {
         return this.$store.dispatch('pushRoute', { path: this.callbackPath })
+      }
+
+      if (record.product) {
+        this.$store.dispatch('pushRoute', { name: 'ShowProduct', params: { id: record.product.id } })
       }
 
       this.$store.dispatch('pushRoute', { name: 'ShowProductItem', params: { id: record.id } })
