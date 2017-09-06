@@ -82,6 +82,16 @@
 </el-form>
 </template>
 
+<i18n>
+{
+  "en": {
+    "errors": {
+      "active_only_one_po": "There is already an Active Price have the same Minimum Order Quantity."
+    }
+  }
+}
+</i18n>
+
 <script>
 import _ from 'lodash'
 import PriceAmountInput from '@/components/price-amount-input'

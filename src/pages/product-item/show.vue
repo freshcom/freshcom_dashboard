@@ -43,7 +43,7 @@
                   <dt>Status</dt>
                   <dd>
                     {{$t(`attributes.productItem.status.${record.status}`)}}
-                    <el-button type="primary" size="mini" class="m-l-10">
+                    <el-button v-if="record.status == 'draft'" @click="markActive()" type="primary" size="mini" class="m-l-10">
                       Mark Active
                     </el-button>
                   </dd>
@@ -190,6 +190,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import 'vue-awesome/icons/times'
 import 'vue-awesome/icons/pencil'
 import 'vue-awesome/icons/plus'
@@ -215,6 +216,16 @@ export default {
     recordDeleted () {
       this.$store.dispatch('product/resetRecord')
       this.$store.dispatch('popRoute', 1)
+    },
+    markActive () {
+      let recordDraft = _.cloneDeep(this.record)
+      recordDraft.status = 'active'
+      this.$store.dispatch('productItem/updateRecord', { id: recordDraft.id, recordDraft: recordDraft, include: 'prices' }).catch(error => {
+        this.$alert(
+          this.$t(`errors.${error.status[0]}`),
+          'Error')
+        throw error
+      })
     },
     makePriceActive () {
 

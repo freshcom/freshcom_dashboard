@@ -3,13 +3,14 @@ export default {
   errors: {
     required: '{name} is required.',
     invalid: '{name} is invalid.',
-    active_only_one_po: 'There is already an Active Price have the same Minimum Order Quantity.'
+    require_at_least_one_active_price: 'A Product Item must have at least one Active Price in order to be marked active.'
   },
   attributes: {
     productItem: {
       status: {
         draft: 'Draft',
-        active: 'Active'
+        active: 'Active',
+        internal: 'Internal'
       },
       nameSync: {
         disabled: 'Disabled',
@@ -20,7 +21,8 @@ export default {
     price: {
       status: {
         draft: 'Draft',
-        active: 'Active'
+        active: 'Active',
+        internal: 'Internal'
       }
     }
   },
