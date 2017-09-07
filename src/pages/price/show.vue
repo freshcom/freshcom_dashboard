@@ -43,9 +43,6 @@
                   <dt>Status</dt>
                   <dd>
                     {{$t(`attributes.price.status.${record.status}`)}}
-                    <el-button v-if="record.status == 'draft'" type="primary" size="mini" class="m-l-10">
-                      Mark Active
-                    </el-button>
                   </dd>
 
                   <dt>Name</dt>

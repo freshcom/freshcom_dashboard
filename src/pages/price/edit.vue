@@ -60,6 +60,17 @@ export default {
   mixins: [EditPage({ storeNamespace: 'price', name: 'Price' })],
   methods: {
     recordUpdated (record) {
+      this.$store.dispatch('productItem/resetRecord')
+      this.$store.dispatch('product/resetRecord')
+
+      if (this.callbackPath) {
+        return this.$store.dispatch('pushRoute', { path: this.callbackPath })
+      }
+
+      if (record.productItem) {
+        return this.$store.dispatch('pushRoute', { name: 'ShowProductItem', params: { id: record.productItem.id } })
+      }
+
       this.$store.dispatch('pushRoute', { name: 'ShowPrice', params: { id: record.id } })
     }
   }

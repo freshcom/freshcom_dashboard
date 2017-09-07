@@ -43,9 +43,6 @@
                   <dt>Status</dt>
                   <dd>
                     {{$t(`attributes.productItem.status.${record.status}`)}}
-                    <el-button v-if="record.status == 'draft'" @click="markActive()" type="primary" size="mini" class="m-l-10">
-                      Mark Active
-                    </el-button>
                   </dd>
 
                   <dt>Name Sync</dt>
@@ -111,11 +108,11 @@
                   <el-table-column>
                     <template scope="scope">
                       <p class="text-right actions">
-                        <el-button v-if="scope.row.status != 'active'" type="primary" @click="makePriceActive(scope.row.id)" size="mini">
+                        <el-button v-if="scope.row.status == 'draft'" type="primary" @click="makePriceActive(scope.row)" size="mini">
                           Mark Active
                         </el-button>
 
-                        <el-button @click="goTo({ name: 'EditPrice', params: { id: scope.row.id } })" size="mini">
+                        <el-button @click="goTo({ name: 'EditPrice', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } })" size="mini">
                           Edit
                         </el-button>
                       </p>
@@ -197,6 +194,7 @@ import 'vue-awesome/icons/plus'
 
 import ShowPage from '@/mixins/show-page'
 import DeleteButton from '@/components/delete-button'
+import errorI18nKey from '@/utils/error-i18n-key'
 
 export default {
   name: 'ShowProductItem',
@@ -217,18 +215,32 @@ export default {
       this.$store.dispatch('product/resetRecord')
       this.$store.dispatch('popRoute', 1)
     },
-    markActive () {
-      let recordDraft = _.cloneDeep(this.record)
-      recordDraft.status = 'active'
-      this.$store.dispatch('productItem/updateRecord', { id: recordDraft.id, recordDraft: recordDraft, include: 'prices' }).catch(error => {
+    makePriceActive (price) {
+      let priceDraft = _.cloneDeep(price)
+      priceDraft.status = 'active'
+      return this.$store.dispatch('price/updateRecord', { id: priceDraft.id, recordDraft: priceDraft }).then(updatedPrice => {
+        let productItem = _.cloneDeep(this.record)
+        _.each(productItem.prices, (price) => {
+          if (price.id === updatedPrice.id) {
+            price.status = updatedPrice.status
+          }
+        })
+
+        this.$store.dispatch('productItem/setRecord', productItem)
+
+        this.$message({
+          showClose: true,
+          message: 'Price updated successfully.',
+          type: 'success'
+        })
+
+        return updatedPrice
+      }).catch(error => {
         this.$alert(
-          this.$t(`errors.${error.status[0]}`),
+          this.$t(errorI18nKey('Price', 'status', error.status[0])),
           'Error')
         throw error
       })
-    },
-    makePriceActive () {
-
     }
   }
 }

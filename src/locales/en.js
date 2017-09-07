@@ -3,7 +3,17 @@ export default {
   errors: {
     required: '{name} is required.',
     invalid: '{name} is invalid.',
-    require_at_least_one_active_price: 'A Product Item must have at least one Active Price in order to be marked active.'
+    price: {
+      status: {
+        canOnlyActiveOnePerMoq: 'There is already an Active Price that have the same Minimum Order Quantity.'
+      }
+    },
+    productItem: {
+      status: {
+        requireAtLeastOneActivePrice: 'A Product Item must have at least one Active Price in order to be marked active.',
+        requireAtLeastOneActiveOrInternalPrice: 'A Product Item must have at least one Active or Internal Price in order to be marked internal.'
+      }
+    }
   },
   attributes: {
     productItem: {

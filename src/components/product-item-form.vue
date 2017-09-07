@@ -76,20 +76,11 @@
 </el-form>
 </template>
 
-<i18n>
-{
-  "en": {
-    "errors": {
-      "require_at_least_one_active_or_internal_price": "A Product Item must have at least one Active or Internal Price in order to be marked internal."
-    }
-  }
-}
-</i18n>
-
 <script>
 import _ from 'lodash'
 import ProductSelect from '@/components/product-select'
 import SkuSelect from '@/components/sku-select'
+import errorI18nKey from '@/utils/error-i18n-key'
 
 export default {
   name: 'ProductItemForm',
@@ -110,7 +101,7 @@ export default {
   computed: {
     errorMessages () {
       return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(`errors.${v[0]}`, { name: _.startCase(k) })
+        result[k] = this.$t(errorI18nKey('ProductItem', k, v[0]), { name: _.startCase(k) })
         return result
       }, {})
     },

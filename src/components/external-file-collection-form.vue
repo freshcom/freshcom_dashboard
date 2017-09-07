@@ -79,6 +79,8 @@ import _ from 'lodash'
 import 'vue-awesome/icons/file'
 import 'vue-awesome/icons/plus'
 
+import errorI18nKey from '@/utils/error-i18n-key'
+
 export default {
   name: 'ExternalFileCollectionForm',
   props: ['value', 'errors'],
@@ -92,7 +94,7 @@ export default {
   computed: {
     errorMessages () {
       return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(`errors.${v[0]}`, { name: _.startCase(k) })
+        result[k] = this.$t(errorI18nKey('ExternalFileCollection', k, v[0]), { name: _.startCase(k) })
         return result
       }, {})
     },

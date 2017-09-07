@@ -82,20 +82,11 @@
 </el-form>
 </template>
 
-<i18n>
-{
-  "en": {
-    "errors": {
-      "active_only_one_po": "There is already an Active Price have the same Minimum Order Quantity."
-    }
-  }
-}
-</i18n>
-
 <script>
 import _ from 'lodash'
 import PriceAmountInput from '@/components/price-amount-input'
 import PercentageInput from '@/components/percentage-input'
+import errorI18nKey from '@/utils/error-i18n-key'
 
 export default {
   name: 'PriceForm',
@@ -112,7 +103,7 @@ export default {
   computed: {
     errorMessages () {
       return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(`errors.${v[0]}`, { name: _.startCase(k) })
+        result[k] = this.$t(errorI18nKey('Price', k, v[0]), { name: _.startCase(k) })
         return result
       }, {})
     },

@@ -107,7 +107,7 @@
                           Mark Primary
                         </el-button>
 
-                        <el-button v-if="scope.row.status != 'active'" type="primary" @click="markItemActive(scope.row)" size="mini">
+                        <el-button v-if="scope.row.status == 'draft'" type="primary" @click="markItemActive(scope.row)" size="mini">
                           Mark Active
                         </el-button>
 
@@ -228,6 +228,7 @@ import 'vue-awesome/icons/plus'
 import _ from 'lodash'
 import ShowPage from '@/mixins/show-page'
 import DeleteButton from '@/components/delete-button'
+import errorI18nKey from '@/utils/error-i18n-key'
 
 export default {
   name: 'ShowProduct',
@@ -265,7 +266,20 @@ export default {
           }
         })
 
-        return this.$store.dispatch('product/setRecord', product)
+        this.$store.dispatch('product/setRecord', product)
+
+        this.$message({
+          showClose: true,
+          message: 'Product Item updated successfully.',
+          type: 'success'
+        })
+
+        return updatedItem
+      }).catch(error => {
+        this.$alert(
+          this.$t(errorI18nKey('ProductItem', 'status', error.status[0])),
+          'Error')
+        throw error
       })
     },
     markItemPrimary (item) {

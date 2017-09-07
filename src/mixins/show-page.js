@@ -30,6 +30,7 @@ export default function (options) {
     },
     methods: {
       goTo (route) {
+        console.log(route)
         this.$store.dispatch('pushRoute', route)
       },
       loadRecord () {
