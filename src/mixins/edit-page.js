@@ -24,10 +24,10 @@ export default function (options) {
       }
 
       warnDanger({
-        leave () {
+        cancel: () => {
           next(false)
         },
-        confirm () {
+        confirm: () => {
           this.$store.dispatch(`${storeNamespace}/setRecordDraft`, this.record)
           next()
         }
@@ -57,7 +57,7 @@ export default function (options) {
     },
     methods: {
       cancel () {
-        this.$router.go(-1)
+        this.$store.dispatch('popRoute', 1)
       },
       submit (recordDraft) {
         this.isLoading = true
