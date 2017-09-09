@@ -26,12 +26,20 @@ export default {
     },
     product: {
       status: {
-        requireAtLeastOneActiveItem: 'A Product must have at least one Active Item in order to be marked Active.',
+        requirePrimaryActiveItem: 'A Product must have a Primary Active Item in order to be marked Active.',
         requireAtLeastOneInternalItem: 'A Product must have at least one Active/Internal Item in order to be marked Internal.'
       }
     }
   },
   attributes: {
+    product: {
+      status: {
+        draft: 'Draft',
+        active: 'Active',
+        internal: 'Internal',
+        disabled: 'Disabled'
+      }
+    },
     productItem: {
       status: {
         draft: 'Draft',

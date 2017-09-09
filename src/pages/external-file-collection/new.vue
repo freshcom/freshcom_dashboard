@@ -14,7 +14,7 @@
       <div class="main">
         <el-card v-loading="isLoading" class="main-card">
           <div slot="header">
-            <span style="line-height: 36px;">Create a File Collection {{callbackPath}}</span>
+            <span style="line-height: 36px;">Create a File Collection</span>
 
             <div class="pull-right">
               <el-button @click="cancel">
@@ -59,20 +59,30 @@ export default {
     ExternalFileCollectionForm
   },
   mixins: [NewPage({ storeNamespace: 'externalFileCollection', name: 'File Collection' })],
-  props: ['skuId'],
+  props: ['skuId', 'productId', 'unlockableId'],
   created () {
-    if (!this.skuId) {
+    if (this.skuId) {
+      let record = _.cloneDeep(this.record)
+      record.sku = { id: this.skuId, type: 'Sku' }
+      this.$store.dispatch('externalFileCollection/setRecord', record)
       return
     }
 
-    let record = _.cloneDeep(this.record)
-    record.sku = { id: this.skuId, type: 'Sku' }
-    this.$store.dispatch('externalFileCollection/setRecord', record)
+    if (this.productId) {
+      let record = _.cloneDeep(this.record)
+      record.product = { id: this.productId, type: 'Product' }
+      this.$store.dispatch('externalFileCollection/setRecord', record)
+      return
+    }
   },
   methods: {
     recordCreated (record) {
       if (record.sku) {
         this.$store.dispatch('sku/resetRecord')
+      }
+
+      if (record.product) {
+        this.$store.dispatch('product/resetRecord')
       }
 
       if (this.callbackPath) {

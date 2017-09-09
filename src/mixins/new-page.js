@@ -22,10 +22,10 @@ export default function (options) {
       }
 
       warnDanger({
-        leave () {
+        cancel: () => {
           next(false)
         },
-        confirm () {
+        confirm: () => {
           this.$store.dispatch(`${storeNamespace}/setRecordDraft`, this.record)
           next()
         }

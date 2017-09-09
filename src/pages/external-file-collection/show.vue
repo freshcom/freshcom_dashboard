@@ -81,7 +81,26 @@
             <h3>Related Resources</h3>
             <div class="block">
               <div class="block-body">
+                <dl>
+                  <dt v-if="record.product">Product</dt>
+                  <dd v-if="record.product">
+                    <router-link :to="{ name: 'ShowProduct', params: { id: record.product.id }}">
+                      {{record.product.id}}
+                    </router-link>
+                  </dd>
 
+                  <dt v-if="record.sku">SKU</dt>
+                  <dd v-if="record.sku">
+                    <router-link :to="{ name: 'ShowSku', params: { id: record.sku.id }}">
+                      {{record.sku.id}}
+                    </router-link>
+                  </dd>
+
+                  <dt v-if="record.unlockable">Unlockable</dt>
+                  <dd v-if="record.unlockable">
+                    <a href="#">{{record.unlockable.id}}</a>
+                  </dd>
+                </dl>
               </div>
             </div>
 

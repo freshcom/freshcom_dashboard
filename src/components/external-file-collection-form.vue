@@ -5,6 +5,10 @@
     {{formModel.sku.id}}
   </el-form-item>
 
+  <el-form-item v-if="formModel.product" label="Product ID" :error="errorMessages.product">
+    {{formModel.product.id}}
+  </el-form-item>
+
   <el-form-item label="Name" :error="errorMessages.name">
     <el-input v-model="formModel.name"></el-input>
   </el-form-item>
@@ -137,6 +141,7 @@ export default {
     },
     deleteExternalFile (targetEf) {
       this.formModel.files = _.reject(this.formModel.files, (ef) => { return ef.id === targetEf.id })
+      console.log(this.formModel.files)
       this.updateValue()
     },
     isImage (externalFile) {

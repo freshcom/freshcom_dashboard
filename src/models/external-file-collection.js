@@ -6,7 +6,10 @@ export default {
 
       name: '',
       label: '',
-      files: []
+      files: [],
+      sku: null,
+      product: null,
+      unlockable: null
     }
   }
 }

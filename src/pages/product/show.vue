@@ -46,7 +46,9 @@
                   <dd>{{record.code}}</dd>
 
                   <dt>Status</dt>
-                  <dd>{{record.status}}</dd>
+                  <dd>
+                    {{$t(`attributes.product.status.${record.status}`)}}
+                  </dd>
 
                   <dt>Item Mode</dt>
                   <dd>{{record.itemMode}}</dd>
@@ -133,7 +135,7 @@
               <h3>File Collections</h3>
 
               <span class="block-title-actions pull-right">
-                <router-link :to="{ name: 'NewExternalFileCollection', query: { skuId: record.id } }">
+                <router-link :to="{ name: 'NewExternalFileCollection', query: { productId: record.id, callbackPath: currentRoutePath } }">
                   <icon name="plus" scale="0.8" class="v-middle"></icon>
                   <span>Add</span>
                 </router-link>
@@ -238,7 +240,7 @@ export default {
   components: {
     DeleteButton
   },
-  mixins: [ShowPage({ storeNamespace: 'product', name: 'Product', include: 'avatar,items.defaultPrice' })],
+  mixins: [ShowPage({ storeNamespace: 'product', name: 'Product', include: 'avatar,items.defaultPrice,externalFileCollections' })],
   computed: {
     avatarUrl () {
       if (this.record.avatar) {
