@@ -79,7 +79,9 @@ export default {
   deserialize (data, included = []) {
     let db = {}
     if (!_.isEmpty(included)) {
+      // TODO: Improve this double call to add in the relationship
       db = this._deserializeIncluded(included)
+      db = this._deserializeIncluded(included, db)
     }
 
     if (_.isArray(data)) {
@@ -103,11 +105,9 @@ export default {
     return errorObjects
   },
 
-  _deserializeIncluded (included) {
-    let db = {}
-
+  _deserializeIncluded (included, db = {}) {
     _.forEach(included, resourceObject => {
-      let object = this._deserializeResourceObject(resourceObject)
+      let object = this._deserializeResourceObject(resourceObject, db)
       db[object.type] = db[object.type] || {}
       db[object.type][object.id] = object
     })

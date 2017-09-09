@@ -59,7 +59,7 @@ export default {
     PriceForm
   },
   mixins: [NewPage({ storeNamespace: 'price', name: 'Price' })],
-  props: ['productItemId', 'callbackPath'],
+  props: ['productItemId'],
   created () {
     if (!this.productItemId) {
       return

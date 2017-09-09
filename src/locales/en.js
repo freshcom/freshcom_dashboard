@@ -4,14 +4,30 @@ export default {
     required: '{name} is required.',
     invalid: '{name} is invalid.',
     price: {
+      id: {
+        onlyDisabledCanBeDeleted: 'Only Disabled Price can be deleted. Please update the status of the Price to Disabled, then try again.'
+      },
       status: {
-        canOnlyActiveOnePerMoq: 'There is already an Active Price that have the same Minimum Order Quantity.'
+        canOnlyActiveOnePerMoq: 'There is already an Active Price that have the same Minimum Order Quantity.',
+        cannotChangeStatusOfOnlyActivePriceOfActiveProductItem: 'Can not change status of the only Active Price of a Active Product Item. Please update the status of the corresponding Product Item first, then try again.',
+        cannotChangeStatusOfOnlyInternalPriceOfInternalProductItem: 'Can not change status of the only Active/Internal Price of a Internal Product Item. Please update the status of the corresponding Product Item first, then try again.'
       }
     },
     productItem: {
+      id: {
+        onlyDisabledCanBeDeleted: 'Only Disabled Product Item can be deleted. Please update the status of the Product Item to Disabled, then try again.'
+      },
       status: {
-        requireAtLeastOneActivePrice: 'A Product Item must have at least one Active Price in order to be marked active.',
-        requireAtLeastOneActiveOrInternalPrice: 'A Product Item must have at least one Active or Internal Price in order to be marked internal.'
+        requireAtLeastOneActivePrice: 'A Product Item must have at least one Active Price in order to be marked Active.',
+        requireAtLeastOneInternalPrice: 'A Product Item must have at least one Active or Internal Price in order to be marked Internal.',
+        cannotChangeStatusOfOnlyActiveItemOfActiveProduct: 'Can not change status of the only Active Product Item of a Active Product. Please update the status of the corresponding Product first, then try again.',
+        cannotChangeStatusOfOnlyInternalItemOfInternalProduct: 'Can not change status of the only Active/Internal Product Item of a Internal Product. Please update the status of the corresponding Product first, then try again.'
+      }
+    },
+    product: {
+      status: {
+        requireAtLeastOneActiveItem: 'A Product must have at least one Active Item in order to be marked Active.',
+        requireAtLeastOneInternalItem: 'A Product must have at least one Active/Internal Item in order to be marked Internal.'
       }
     }
   },
@@ -20,7 +36,8 @@ export default {
       status: {
         draft: 'Draft',
         active: 'Active',
-        internal: 'Internal'
+        internal: 'Internal',
+        disabled: 'Disabled'
       },
       nameSync: {
         disabled: 'Disabled',
@@ -32,7 +49,8 @@ export default {
       status: {
         draft: 'Draft',
         active: 'Active',
-        internal: 'Internal'
+        internal: 'Internal',
+        disabled: 'Disabled'
       }
     }
   },

@@ -5,6 +5,7 @@
       <el-menu :router="true" default-active="/products" mode="horizontal">
         <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
         <el-menu-item :route="{ name: 'ListProductItem' }" index="/product_items">Items</el-menu-item>
+        <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">Collections</el-menu-item>
       </el-menu>
       <locale-selector @change="loadRecord"></locale-selector>
     </div>
@@ -96,7 +97,9 @@
 
                   <el-table-column width="150">
                     <template scope="scope">
-                      $19.99/EA
+                      <template v-if="scope.row.defaultPrice">
+                        ${{scope.row.defaultPrice.chargeCents / 100}}/{{scope.row.defaultPrice.chargeUnit}}
+                      </template>
                     </template>
                   </el-table-column>
 
@@ -111,7 +114,7 @@
                           Mark Active
                         </el-button>
 
-                        <el-button @click="goTo({ name: 'EditProductItem', params: { id: scope.row.id } })" size="mini">
+                        <el-button @click="goTo({ name: 'EditProductItem', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } })" size="mini">
                           Edit
                         </el-button>
                       </p>
@@ -235,7 +238,7 @@ export default {
   components: {
     DeleteButton
   },
-  mixins: [ShowPage({ storeNamespace: 'product', name: 'Product', include: 'avatar,items' })],
+  mixins: [ShowPage({ storeNamespace: 'product', name: 'Product', include: 'avatar,items.defaultPrice' })],
   computed: {
     avatarUrl () {
       if (this.record.avatar) {
@@ -243,9 +246,6 @@ export default {
       }
 
       return 'http://placehold.it/80x80'
-    },
-    currentRoutePath () {
-      return this.$store.state.route.fullPath
     }
   },
   methods: {

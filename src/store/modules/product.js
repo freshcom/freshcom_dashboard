@@ -46,6 +46,7 @@ export default {
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
       return ProductAPI.getRecord(actionPayload.id, options).then(response => {
         let apiPayload = response.data
+        console.log('start de')
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
         commit(MT.SET_RECORD, record)
 

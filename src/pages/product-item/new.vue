@@ -6,6 +6,7 @@
       <el-menu :router="true" default-active="/product_items" mode="horizontal">
         <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
         <el-menu-item :route="{ name: 'ListProductItem' }" index="/product_items">Items</el-menu-item>
+        <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">Collections</el-menu-item>
       </el-menu>
       <locale-selector></locale-selector>
     </div>
@@ -59,7 +60,7 @@ export default {
     ProductItemForm
   },
   mixins: [NewPage({ storeNamespace: 'productItem', name: 'Product Item' })],
-  props: ['productId', 'callbackPath'],
+  props: ['productId'],
   created () {
     if (!this.productId) {
       return

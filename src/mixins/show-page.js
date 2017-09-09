@@ -1,3 +1,5 @@
+import errorI18nKey from '@/utils/error-i18n-key'
+
 export default function (options) {
   let storeNamespace = options.storeNamespace
   let include = options.include
@@ -20,6 +22,9 @@ export default function (options) {
       },
       session () {
         return this.$store.state.session.record
+      },
+      currentRoutePath () {
+        return this.$store.state.route.fullPath
       }
     },
     watch: {
@@ -30,7 +35,6 @@ export default function (options) {
     },
     methods: {
       goTo (route) {
-        console.log(route)
         this.$store.dispatch('pushRoute', route)
       },
       loadRecord () {
@@ -54,6 +58,11 @@ export default function (options) {
           if (this.recordDeleted) {
             this.recordDeleted(targetRecord)
           }
+        }).catch(error => {
+          this.isLoading = false
+
+          this.$alert(this.$t(errorI18nKey(storeNamespace, 'id', error.id[0])), 'Error')
+          throw error
         })
       }
     }

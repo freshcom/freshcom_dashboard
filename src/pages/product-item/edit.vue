@@ -6,6 +6,7 @@
       <el-menu :router="true" default-active="/product_items" mode="horizontal">
         <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
         <el-menu-item :route="{ name: 'ListProductItem' }" index="/product_items">Items</el-menu-item>
+        <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">Collections</el-menu-item>
       </el-menu>
       <locale-selector :before-change="confirmResourceLocaleChange" @change="loadRecord"></locale-selector>
     </div>
@@ -60,6 +61,16 @@ export default {
   mixins: [EditPage({ storeNamespace: 'productItem', name: 'Product Item', include: 'prices' })],
   methods: {
     recordUpdated (record) {
+      this.$store.dispatch('product/resetRecord')
+
+      if (this.callbackPath) {
+        return this.$store.dispatch('pushRoute', { path: this.callbackPath })
+      }
+
+      if (record.product) {
+        return this.$store.dispatch('pushRoute', { name: 'ShowProduct', params: { id: record.product.id } })
+      }
+
       this.$store.dispatch('pushRoute', { name: 'ShowProductItem', params: { id: record.id } })
     }
   }

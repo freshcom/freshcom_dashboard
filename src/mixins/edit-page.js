@@ -7,7 +7,7 @@ export default function (options) {
   let name = options.name
 
   return {
-    props: ['id'],
+    props: ['id', 'callbackPath'],
     data () {
       return {
         errors: {},

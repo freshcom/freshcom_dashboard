@@ -59,7 +59,7 @@ export default {
     ExternalFileCollectionForm
   },
   mixins: [NewPage({ storeNamespace: 'externalFileCollection', name: 'File Collection' })],
-  props: ['skuId', 'callbackPath'],
+  props: ['skuId'],
   created () {
     if (!this.skuId) {
       return

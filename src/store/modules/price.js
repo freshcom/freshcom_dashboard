@@ -88,6 +88,8 @@ export default {
         commit(MT.RESET_RECORD)
 
         return response
+      }).catch(error => {
+        throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
     }
   },

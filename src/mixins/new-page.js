@@ -6,6 +6,7 @@ export default function (options) {
   let name = options.name
 
   return {
+    props: ['callbackPath'],
     data () {
       return {
         errors: {},

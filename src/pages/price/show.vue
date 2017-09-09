@@ -5,6 +5,7 @@
       <el-menu :router="true" default-active="/product_items" mode="horizontal">
         <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
         <el-menu-item :route="{ name: 'ListProductItem' }" index="/product_items">Items</el-menu-item>
+        <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">Collections</el-menu-item>
       </el-menu>
       <locale-selector @change="loadRecord"></locale-selector>
     </div>
@@ -148,11 +149,6 @@ export default {
     DeleteButton
   },
   mixins: [ShowPage({ storeNamespace: 'price', name: 'Price' })],
-  computed: {
-    currentRoutePath () {
-      return this.$store.state.route.fullPath
-    }
-  },
   methods: {
     editRecord () {
       this.$store.dispatch('pushRoute', { name: 'EditPrice', params: { id: this.record.id } })
