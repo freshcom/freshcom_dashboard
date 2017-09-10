@@ -34,6 +34,9 @@ import NewPricePage from '@/pages/price/new'
 import EditPricePage from '@/pages/price/edit'
 import ShowPricePage from '@/pages/price/show'
 
+import ListOrderPage from '@/pages/order/list'
+import NewOrderPage from '@/pages/order/new'
+
 Vue.use(Router)
 
 function extractPagination (route) {
@@ -260,6 +263,29 @@ export default new Router({
         let query = qs.parse(queryString)
 
         return { id: route.params.id, callbackPath: query.callbackPath }
+      }
+    },
+    {
+      path: '/orders',
+      name: 'ListOrder',
+      component: ListOrderPage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          page: page
+        }
+      }
+    },
+    {
+      path: '/orders/new',
+      name: 'NewOrder',
+      component: NewOrderPage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { customerId: query.customerId, callbackPath: query.callbackPath }
       }
     }
   ]

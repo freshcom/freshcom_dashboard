@@ -12,6 +12,7 @@ import ExternalFileCollectionStore from '@/store/modules/external-file-collectio
 import ProductStore from '@/store/modules/product'
 import ProductItemStore from '@/store/modules/product-item'
 import PriceStore from '@/store/modules/price'
+import OrderStore from '@/store/modules/order'
 
 Vue.use(Vuex)
 
@@ -31,7 +32,8 @@ export default new Vuex.Store({
     sku: SkuStore,
     product: ProductStore,
     productItem: ProductItemStore,
-    price: PriceStore
+    price: PriceStore,
+    order: OrderStore
   },
   state: {
     uiLocale: DEFAULT_LOCALE,
