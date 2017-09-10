@@ -291,14 +291,6 @@ p.search-notice {
 }
 /* END Card Search */
 
-
-/* START Top Search */
-.search-input input, .search-input .el-input-group__prepend {
-  border: none;
-}
-/* END Top Search */
-
-
 /* START Utils */
 .m-l-10 {
   margin-left: 10px;

@@ -1,6 +1,6 @@
 <template>
 
-<div class="component-wrapper">
+<div class="primary-search component-wrapper">
   <el-input placeholder="Search..." class="search-input">
     <template slot="prepend"><icon name="search" scale="1" class="v-middle"></icon></template>
   </el-input>
@@ -26,5 +26,11 @@ export default {
   display: inline-block;
   margin-left: 35px;
   width: 500px;
+}
+</style>
+
+<style lang="scss">
+.primary-search .search-input input, .primary-search .search-input .el-input-group__prepend {
+  border: none;
 }
 </style>
