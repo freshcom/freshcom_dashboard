@@ -27,12 +27,4 @@ export default {
   margin-left: 35px;
   width: 500px;
 }
-
-.search-input {
-  box-shadow: 0 2px 4px 0 rgba(0,0,0,.12), 0 0 6px 0 rgba(0,0,0,.04);
-}
-
-.search-input input, .search-input .el-input-group__prepend {
-  border: none;
-}
 </style>

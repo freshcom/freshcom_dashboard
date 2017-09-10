@@ -102,10 +102,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-.main-col .controls {
-  margin: 10px;
-  height: 50px;
-  line-height: 50px;
-  vertical-align: middle;
-}
 </style>

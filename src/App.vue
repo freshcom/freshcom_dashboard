@@ -292,6 +292,24 @@ p.search-notice {
 /* END Card Search */
 
 
+/* START Top Search */
+.search-input {
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,.12), 0 0 6px 0 rgba(0,0,0,.04);
+}
+
+.search-input input, .search-input .el-input-group__prepend {
+  border: none;
+}
+
+.main-col .controls {
+  margin: 10px;
+  height: 50px;
+  line-height: 50px;
+  vertical-align: middle;
+}
+/* END Top Search */
+
+
 /* START Utils */
 .m-l-10 {
   margin-left: 10px;
