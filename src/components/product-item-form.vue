@@ -157,17 +157,17 @@ export default {
     querySku () {
 
     },
-    setSku (id) {
-      if (id) {
-        this.formModel.sku = { id: id, type: 'Sku' }
+    setSku (sku) {
+      if (sku) {
+        this.formModel.sku = { id: sku.id, type: 'Sku' }
       } else {
         this.formModel.sku = {}
       }
       this.updateValue()
     },
-    setProduct (id) {
-      if (id) {
-        this.formModel.product = { id: id, type: 'Product' }
+    setProduct (product) {
+      if (product) {
+        this.formModel.product = { id: product.id, type: 'Product' }
       } else {
         delete this.formModel.product
       }

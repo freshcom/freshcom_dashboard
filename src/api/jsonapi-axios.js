@@ -11,7 +11,7 @@ let config = {
     locale: DEFAULT_LOCALE
   },
   paramsSerializer: function (params) {
-    return qs.stringify(params)
+    return qs.stringify(params, { arrayFormat: 'brackets' })
   }
 }
 

@@ -16,7 +16,7 @@
             <icon name="shopping-bag" scale="0.8"></icon>
             <span>Storefront</span>
           </template>
-          <el-menu-item index="orders">
+          <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">
             <icon name="inbox" scale="1"></icon>
             <span>Orders</span>
           </el-menu-item>

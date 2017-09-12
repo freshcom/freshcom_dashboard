@@ -1,5 +1,5 @@
 <template>
-  <el-input :placeholder="placeholder" v-model="strValue" @focus="$event.target.select()" type="number" class="price-amount">
+  <el-input :placeholder="placeholder" v-model="strValue" @focus="$event.target.select()" :disabled="disabled" type="number" class="price-amount">
     <template slot="prepend">$</template>
   </el-input>
 </template>
@@ -7,7 +7,7 @@
 <script>
 export default {
   name: 'PriceAmountInput',
-  props: ['placeholder', 'value'],
+  props: ['placeholder', 'value', 'disabled'],
   computed: {
     strValue: {
       get () {

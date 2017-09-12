@@ -21,6 +21,12 @@ import ProductAPI from '@/api/product'
 
 export default {
   name: 'ProductSelect',
+  props: {
+    filter: Object,
+    default: function () {
+      return {}
+    }
+  },
   data () {
     return {
       productChoice: undefined,
@@ -29,7 +35,7 @@ export default {
   },
   methods: {
     queryProduct (searchKeyword, callback) {
-      ProductAPI.queryRecord({ search: searchKeyword }).then(response => {
+      ProductAPI.queryRecord({ search: searchKeyword, filter: this.filter }).then(response => {
         let apiPayload = response.data
         let records = JSONAPI.deserialize(apiPayload.data)
         let names = _.map(records, (record) => {
@@ -37,7 +43,7 @@ export default {
           if (record.code) {
             info += `[${record.code}] `
           }
-          info += record.name + ' :: ' + record.status + ' :: ' + record.id
+          info += record.name + ' :: ' + record.status
           return { value: info, id: record.id }
         })
 
@@ -46,7 +52,7 @@ export default {
     },
     setProduct (productChoice) {
       this.selected = true
-      this.$emit('select', productChoice.id)
+      this.$emit('select', productChoice)
     },
     clear () {
       this.productChoice = undefined

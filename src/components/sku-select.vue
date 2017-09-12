@@ -46,7 +46,7 @@ export default {
     },
     setSku (skuChoice) {
       this.selected = true
-      this.$emit('select', skuChoice.id)
+      this.$emit('select', skuChoice)
     },
     clear () {
       this.skuChoice = undefined

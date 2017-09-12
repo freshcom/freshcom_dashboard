@@ -43,6 +43,11 @@ export default {
       params.locale = locale
     }
 
+    let filter = options.filter
+    if (filter) {
+      params.filter = filter
+    }
+
     return axios.get('/products', {
       params: params
     })

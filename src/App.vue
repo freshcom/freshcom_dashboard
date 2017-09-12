@@ -296,6 +296,13 @@ p.search-notice {
   margin-left: 10px;
 }
 
+.m-r-10 {
+  margin-right: 10px;
+}
+
+.m-b-10 {
+  margin-bottom: 10px;
+}
 /* END Utils */
 
 /* START Common Overwrite */
