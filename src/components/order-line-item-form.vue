@@ -31,9 +31,9 @@
       </span>
 
       <span v-if="!price || !price.estimateByDefault" class="m-r-10">@</span>
-      <el-select @change="updateValue" v-model="price" class="price-input">
+      <el-select @change="updateValue" v-model="price" value-key="id" placeholder="$xx.xx/xx" :disabled="!productItem" class="price-input">
         <template v-if="productItem">
-          <el-option v-for="price in productItem.prices" :key="price.id" :label="chargePriceStr(price)" :value="price.id">
+          <el-option v-for="price in prices" :key="price.id" :label="chargePriceStr(price)" :value="price">
             {{chargePriceStr(price)}}
           </el-option>
         </template>
@@ -64,6 +64,11 @@
         </el-button>
       </span>
     </div>
+
+    {{prices}}
+    <div v-if="productItem">
+      {{productItem.defaultPrice}}
+    </div>
   </el-form-item>
 
 </el-form>
@@ -73,6 +78,8 @@
 import _ from 'lodash'
 import JSONAPI from '@/jsonapi'
 import ProductItemAPI from '@/api/product-item'
+
+import Price from '@/models/price'
 
 import OrderLineItem from '@/models/order-line-item'
 import ProductItemSelect from '@/components/product-item-select'
@@ -93,12 +100,11 @@ export default {
       product: null,
       productItems: [],
       productItem: null,
-      prices: [],
       price: null,
       isEstimate: false,
       orderQuantity: 1,
       chargeQuantity: null,
-      subTotalCents: 1999
+      subTotalCents: null
     }
   },
   watch: {
@@ -111,14 +117,20 @@ export default {
       }
     },
     price (price) {
-      if (price.estimateByDefault) {
+      if (price && price.estimateByDefault) {
         this.chargeQuantity = this.orderQuantity * (price.estimateAveragePercentage / 100)
         this.isEstimate = true
+      }
+
+      if (price && !price.estimateByDefault) {
+        this.subTotalCents = this.orderQuantity * this.price.chargeCents
       }
     },
     orderQuantity (orderQuantity) {
       if (this.price && !this.price.estimateByDefault) {
         this.subTotalCents = orderQuantity * this.price.chargeCents
+        console.log(this.productItem.prices)
+        this.price = Price.getLowestActivePrice(this.productItem.prices, orderQuantity, this.price)
       }
     }
   },
@@ -136,6 +148,20 @@ export default {
       } else {
         return 'All'
       }
+    },
+    prices () {
+      if (this.productItem) {
+        let prices = this.productItem.prices
+        let lowestActivePrice = Price.getLowestActivePrice(prices, this.orderQuantity, this.price)
+        let internalPrices = _.filter(this.productItem.prices, (price) => {
+          return price.status === 'internal'
+        })
+
+        if (lowestActivePrice) {
+          return _.concat(lowestActivePrice, internalPrices)
+        }
+        return internalPrices
+      }
     }
   },
   methods: {
@@ -143,12 +169,14 @@ export default {
       this.$emit('input', this.formModel)
     }, 300),
     chargePriceStr (price) {
-      return `$${price.chargeCents / 100} / ${price.chargeUnit}`
+      return `$${price.chargeCents / 100}/${price.chargeUnit}`
     },
     setProduct (product) {
       if (!product) {
         this.product = null
         this.productItem = null
+        this.price = null
+        this.subTotalCents = null
         return
       }
 
@@ -173,7 +201,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .product-input {
-  width: 50%;
+  width: 49.9%;
 }
 
 .product-item-input {

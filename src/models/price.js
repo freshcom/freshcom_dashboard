@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 export default {
   objectWithDefaults () {
     return {
@@ -24,5 +26,27 @@ export default {
 
       productItem: null
     }
+  },
+
+  getLowestActivePrice (prices, orderQuantity = 1, currentPrice = undefined) {
+    let activePrices = _.filter(prices, (price) => {
+      return price.status === 'active'
+    })
+
+    activePrices = _.orderBy(activePrices, ['minimumOrderQuantity'], ['desc'])
+
+    let lowestActivePrice = _.find(activePrices, (p) => {
+      return orderQuantity >= p.minimumOrderQuantity
+    })
+
+    if (!lowestActivePrice) {
+      return currentPrice
+    }
+
+    if (currentPrice && currentPrice.status !== 'active' && currentPrice.chargeCents <= lowestActivePrice.chargeCents) {
+      return currentPrice
+    }
+
+    return lowestActivePrice
   }
 }
