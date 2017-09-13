@@ -84,9 +84,8 @@
                   <el-table-column width="300">
                     <template scope="scope">
                       <router-link :to="{ name: 'ShowPrice', params: { id: scope.row.id } }">
-                        <span>{{scope.row.name}}</span>
-                        <span v-if="scope.row.name"> - </span>
-                        <span>{{scope.row.label}}</span>
+                        <span v-if="scope.row.name">{{scope.row.name}}</span>
+                        <span v-if="!scope.row.name">{{scope.row.label}}</span>
                         <el-tag v-if="scope.row.status != 'active'" type="gray">
                           {{$t(`attributes.price.status.${scope.row.status}`)}}
                         </el-tag>

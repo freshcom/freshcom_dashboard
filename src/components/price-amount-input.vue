@@ -36,6 +36,6 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
 .price-amount {
-  width: 150px;
+  width: 120px;
 }
 </style>

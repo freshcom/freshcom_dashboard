@@ -45,6 +45,13 @@ html, body {
   color: #2c3e50;
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
 /* START Left Nav */
 .el-menu-item a {
   text-decoration: none;

@@ -28,25 +28,17 @@ export default {
     }
   },
 
-  getLowestActivePrice (prices, orderQuantity = 1, currentPrice = undefined) {
-    let activePrices = _.filter(prices, (price) => {
-      return price.status === 'active'
+  getLowestPrice (prices, orderQuantity = 1, status = 'active') {
+    prices = _.filter(prices, (price) => {
+      return price.status === status
     })
 
-    activePrices = _.orderBy(activePrices, ['minimumOrderQuantity'], ['desc'])
+    prices = _.orderBy(prices, ['minimumOrderQuantity'], ['desc'])
 
-    let lowestActivePrice = _.find(activePrices, (p) => {
+    let lowestPrice = _.find(prices, (p) => {
       return orderQuantity >= p.minimumOrderQuantity
     })
 
-    if (!lowestActivePrice) {
-      return currentPrice
-    }
-
-    if (currentPrice && currentPrice.status !== 'active' && currentPrice.chargeCents <= lowestActivePrice.chargeCents) {
-      return currentPrice
-    }
-
-    return lowestActivePrice
+    return lowestPrice
   }
 }
