@@ -35,7 +35,7 @@
           </div>
 
           <div class="data">
-            <order-line-item-form v-model="recordDraft" :errors="errors">
+            <order-line-item-form :order="recordDraft" :errors="errors">
             </order-line-item-form>
           </div>
 

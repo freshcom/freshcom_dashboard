@@ -8,7 +8,7 @@ export default {
       printName: '',
       orderQuantity: 1,
       isEstimate: false,
-      subTotalCents: 0,
+      subTotalCents: null,
 
       product: null,
       productItem: null,

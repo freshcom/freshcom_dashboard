@@ -1,6 +1,7 @@
 <template>
 <el-form @input.native="updateValue">
   <div class="m-b-10">
+
     <el-tabs v-model="activeTab" type="border-card">
       <el-tab-pane label="Product" name="productTab">
         <el-form-item>
@@ -63,7 +64,7 @@
                 off-text="No">
               </el-switch>
 
-              <el-button type="default" :disabled="!isAddClickable">
+              <el-button type="default" @click="add()" :disabled="!isAddClickable">
                 Add
               </el-button>
             </span>
@@ -77,52 +78,63 @@
     </el-tabs>
   </div>
 
-  <div>
+  <div class="m-b-10">
     <el-table
-      :data="[]"
+      :data="tableData"
       style="width: 100%">
-      <el-table-column type="expand">
+      <el-table-column type="expand" width="40px">
         <template scope="props">
-          <el-form label-position="left" inline class="demo-table-expand">
-            <el-form-item label="商品名称">
-              <span>{{ props.row.name }}</span>
-            </el-form-item>
-            <el-form-item label="所属店铺">
-              <span>{{ props.row.shop }}</span>
-            </el-form-item>
-            <el-form-item label="商品 ID">
-              <span>{{ props.row.id }}</span>
-            </el-form-item>
-            <el-form-item label="店铺 ID">
-              <span>{{ props.row.shopId }}</span>
-            </el-form-item>
-            <el-form-item label="商品分类">
-              <span>{{ props.row.category }}</span>
-            </el-form-item>
-            <el-form-item label="店铺地址">
-              <span>{{ props.row.address }}</span>
-            </el-form-item>
-            <el-form-item label="商品描述">
-              <span>{{ props.row.desc }}</span>
-            </el-form-item>
-          </el-form>
+
         </template>
       </el-table-column>
       <el-table-column
-        label="商品 ID"
-        prop="id">
-      </el-table-column>
-      <el-table-column
-        label="商品名称"
+        width="300px"
+        label="Name"
         prop="name">
       </el-table-column>
       <el-table-column
-        label="描述"
-        prop="desc">
+        width="150px"
+        label="Qty"
+        prop="quantity">
+      </el-table-column>
+      <el-table-column
+        label="$"
+        prop="subTotal">
+      </el-table-column>
+      <el-table-column label="" width="130px">
+        <template scope="scope">
+          <el-button size="mini">
+            Edit
+          </el-button>
+          <delete-button @confirmed="deleteLineItem(scope.id)" size="mini">
+            Delete
+          </delete-button>
+        </template>
       </el-table-column>
     </el-table>
   </div>
 
+  <div style="text-align: right;">
+    <p v-if="order.subTotalCents">
+      <b>Sub Total:</b> <span>${{order.subTotalCents / 100}}</span>
+    </p>
+
+    <p v-if="order.taxOneCents">
+      <b>Tax 1:</b> <span>${{order.taxOneCents / 100}}</span>
+    </p>
+
+    <p v-if="order.taxTwoCents">
+      <b>Tax 2:</b> <span>${{order.taxTwoCents / 100}}</span>
+    </p>
+
+    <p v-if="order.taxThreeCents">
+      <b>Tax 3:</b> <span>${{order.taxThreeCents / 100}}</span>
+    </p>
+
+    <p v-if="order.grandTotalCents">
+      <b>Grand Total:</b> <span>${{order.grandTotalCents / 100}}</span>
+    </p>
+  </div>
 
 </el-form>
 </template>
@@ -133,23 +145,24 @@ import JSONAPI from '@/jsonapi'
 import ProductItemAPI from '@/api/product-item'
 
 import Price from '@/models/price'
-
 import OrderLineItem from '@/models/order-line-item'
+
 import ProductItemSelect from '@/components/product-item-select'
 import ProductSelect from '@/components/product-select'
 import PriceAmountInput from '@/components/price-amount-input'
+import DeleteButton from '@/components/delete-button'
 
 export default {
   name: 'OrderLineItemForm',
-  props: ['value', 'errors', 'record'],
+  props: ['order'],
   components: {
     ProductItemSelect,
     ProductSelect,
-    PriceAmountInput
+    PriceAmountInput,
+    DeleteButton
   },
   data () {
     return {
-      formModel: OrderLineItem.objectWithDefaults(),
       product: null,
       productItems: [],
       productItem: null,
@@ -162,9 +175,6 @@ export default {
     }
   },
   watch: {
-    value (v) {
-      this.formModel = _.cloneDeep(v)
-    },
     productItem (productItem) {
       if (productItem) {
         this.price = productItem.defaultPrice
@@ -208,6 +218,26 @@ export default {
     }
   },
   computed: {
+    tableData () {
+      return _.reduce(this.order.lineItems, (acc, lineItem) => {
+        let quantity = `x ${lineItem.orderQuantity}`
+        if (lineItem.priceEstimateByDefault) {
+          quantity += ` (${lineItem.chargeQuantity}${lineItem.priceChargeUnit})`
+        }
+        let subTotal = lineItem.subTotalCents / 100
+        let taxTotal = (lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents) / 100
+        let grandTotal = (lineItem.subTotalCents + lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents) / 100
+
+        return _.concat(acc, {
+          id: lineItem.id,
+          name: lineItem.name,
+          quantity: quantity,
+          subTotal: `$${subTotal}`,
+          taxTotal: `$${taxTotal}`,
+          grandTotal: `$${grandTotal}`
+        })
+      }, [])
+    },
     isProductItemSelectable () {
       if (!this.product || this.product.itemModel === 'all') {
         return false
@@ -265,17 +295,20 @@ export default {
         return
       }
 
-      if (product.itemMode === 'all') {
-        this.formModel.product = product
-      }
-
       ProductItemAPI.queryRecord({ filter: { productId: product.id, status: ['active', 'internal'] }, include: 'defaultPrice,prices' }).then(response => {
         let apiPayload = response.data
         let records = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
         this.product = product
         this.product.items = records
 
-        let primaryItem = _.find(records, { primary: true })
+        return records
+      }).then(productItems => {
+        // TODO:
+        // if (product.itemMode === 'all') {
+
+        // }
+
+        let primaryItem = _.find(productItems, { primary: true })
         this.productItem = primaryItem
       })
     },
@@ -283,6 +316,22 @@ export default {
       if (this.price && this.price.estimateByDefault) {
         this.chargeQuantity = subTotalCents / this.price.chargeCents
       }
+    },
+    add () {
+      let orderLineItem = OrderLineItem.objectWithDefaults()
+      if (this.product.itemMode === 'all') {
+        orderLineItem.product = this.product
+      } else {
+        orderLineItem.productItem = this.productItem
+      }
+
+      orderLineItem.price = this.price
+      orderLineItem.orderQuantity = this.orderQuantity
+      orderLineItem.isEstimate = this.isEstimate
+      orderLineItem.chargeQuantity = this.chargeQuantity
+      orderLineItem.order = this.order
+
+      this.$store.dispatch('order/createLineItem', orderLineItem)
     }
   }
 }

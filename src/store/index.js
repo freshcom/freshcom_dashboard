@@ -13,6 +13,7 @@ import ProductStore from '@/store/modules/product'
 import ProductItemStore from '@/store/modules/product-item'
 import PriceStore from '@/store/modules/price'
 import OrderStore from '@/store/modules/order'
+import OrderLineItemStore from '@/store/modules/order-line-item'
 
 Vue.use(Vuex)
 
@@ -33,7 +34,8 @@ export default new Vuex.Store({
     product: ProductStore,
     productItem: ProductItemStore,
     price: PriceStore,
-    order: OrderStore
+    order: OrderStore,
+    orderLineItem: OrderLineItemStore
   },
   state: {
     uiLocale: DEFAULT_LOCALE,
