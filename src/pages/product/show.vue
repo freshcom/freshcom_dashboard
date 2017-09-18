@@ -108,7 +108,7 @@
                   <el-table-column>
                     <template scope="scope">
                       <p class="text-right actions">
-                        <el-button v-if="!scope.row.primary" @click="markItemPrimary(scope.row)" size="mini">
+                        <el-button v-if="isMarkItemPrimaryVisible(scope.row)" @click="markItemPrimary(scope.row)" size="mini">
                           Mark Primary
                         </el-button>
 
@@ -256,6 +256,9 @@ export default {
     },
     recordDeleted () {
       this.$store.dispatch('pushRoute', { name: 'ListProduct' })
+    },
+    isMarkItemPrimaryVisible (productItem) {
+      return this.record.itemMode === 'any' && !productItem.primary
     },
     markItemActive (item) {
       let itemDraft = _.cloneDeep(item)
