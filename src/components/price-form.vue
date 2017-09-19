@@ -38,6 +38,10 @@
     <el-input v-model="formModel.chargeUnit" class="unit-input" placeholder="Unit"></el-input>
   </el-form-item>
 
+  <el-form-item v-if="formModel.product" label="Unit" :error="errorMessages.chargeUnit" required>
+    <el-input v-model="formModel.chargeUnit" class="unit-input" placeholder="Unit"></el-input>
+  </el-form-item>
+
   <el-form-item v-if="formModel.productItem" label="Estimate By Default" :error="errorMessages.estimateByDefault" required>
     <el-switch
       @change="updateValue"
@@ -65,20 +69,39 @@
     <el-input-number @change="updateValue" v-model="formModel.minimumOrderQuantity" :min="1" :step="1"></el-input-number>
   </el-form-item>
 
-  <el-form-item v-if="formModel.productItem" label="Tax One" required>
+  <el-form-item label="Tax One" required>
     <percentage-input v-model="formModel.taxOnePercentage">
     </percentage-input>
   </el-form-item>
 
-  <el-form-item v-if="formModel.productItem" label="Tax Two" required>
+  <el-form-item label="Tax Two" required>
     <percentage-input v-model="formModel.taxTwoPercentage">
     </percentage-input>
   </el-form-item>
 
-  <el-form-item v-if="formModel.productItem" label="Tax Three" required>
+  <el-form-item label="Tax Three" required>
     <percentage-input v-model="formModel.taxThreePercentage">
     </percentage-input>
   </el-form-item>
+
+  <div class="children-form" v-if="formModel.product">
+    <div v-for="child in formModel.children" class="child-row">
+      <hr>
+
+      <div class="product-item">{{child.productItem.name}}</div>
+
+      <div class="price">
+        <price-amount-input v-model="child.chargeCents" class="child-price-input">
+        </price-amount-input>
+      </div>
+    </div>
+
+    <div class="total">
+      <hr>
+
+      <span>Product Price: </span> <span>${{subTotal}}</span><span v-if="formModel.chargeUnit">/{{formModel.chargeUnit}}</span><br>
+    </div>
+  </div>
 
 </el-form>
 </template>
@@ -89,6 +112,9 @@ import PriceAmountInput from '@/components/price-amount-input'
 import PercentageInput from '@/components/percentage-input'
 import errorI18nKey from '@/utils/error-i18n-key'
 import ProductItemSelect from '@/components/product-item-select'
+import ProductItemAPI from '@/api/product-item'
+import JSONAPI from '@/jsonapi'
+import Price from '@/models/price'
 
 export default {
   name: 'PriceForm',
@@ -105,7 +131,15 @@ export default {
       productItems: []
     }
   },
+  created () {
+    if (this.session && this.formModel.product) {
+      this.setPriceChildren()
+    }
+  },
   computed: {
+    session () {
+      return this.$store.state.session.record
+    },
     errorMessages () {
       return _.reduce(this.errors, (result, v, k) => {
         result[k] = this.$t(errorI18nKey('Price', k, v[0]), { name: _.startCase(k) })
@@ -120,27 +154,126 @@ export default {
       if (this.errorMessages.chargeUnit) {
         return this.errorMessages.chargeUnit
       }
+    },
+    subTotalCents () {
+      return _.reduce(this.formModel.children, (acc, price) => {
+        let cc = price.chargeCents || 0
+        return acc + cc
+      }, 0)
+    },
+    subTotal () {
+      return (this.subTotalCents / 100).toFixed(2)
+    },
+    grandTotalCents () {
+      return _.reduce(this.formModel.children, (acc, price) => {
+        let cc = price.chargeCents || 0
+        let t1p = price.taxOnePercentage / 100
+        let t2p = price.taxTwoPercentage / 100
+        let t3p = price.taxThreePercentage / 100
+
+        return acc + cc + cc * t1p + cc * t2p + cc * t3p
+      }, 0)
+    },
+    grandTotal () {
+      return (this.grandTotalCents / 100).toFixed(2)
     }
   },
   watch: {
     value (v) {
       this.formModel = _.cloneDeep(v)
+    },
+    session (newSession) {
+      if (!newSession) { return }
+
+      if (this.formModel.product) {
+        this.setPriceChildren()
+      }
+    },
+    subTotalCents (subTotalCents) {
+      this.formModel.chargeCents = subTotalCents
     }
   },
   methods: {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
-    }, 300)
+    }, 300),
+    setPriceChildren () {
+      if (this.formModel.id) { return }
+      ProductItemAPI.queryRecord({ filter: { productId: this.formModel.product.id } }).then(response => {
+        let apiPayload = response.data
+        let productItems = JSONAPI.deserialize(apiPayload.data)
+
+        this.formModel.children = _.map(productItems, pi => {
+          let price = Price.objectWithDefaults()
+          price.productItem = pi
+          price.chargeCents = 0
+          return price
+        })
+
+        this.formModel.chargeCents = 0
+        this.updateValue()
+      })
+    }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style lang="scss" scoped>
 .unit-input {
   width: 100px;
 }
+
 .ratio-input {
   width: 100px;
+}
+
+.child-row {
+  vertical-align: middle;
+  margin-top: 10px;
+
+  .product-item {
+    width: 40%;
+    height: 36px;
+    line-height:36px;
+    display: inline-block;
+  }
+
+  .price {
+    width: 60%;
+    float: right;
+    text-align: right;
+  }
+
+  hr {
+    margin-bottom: 10px;
+  }
+
+  &:last-child {
+    margin-bottom: 10px;
+  }
+
+  .child-price-input {
+    width: 100px;
+  }
+
+  .child-tax-input {
+    width: 80px;
+  }
+}
+
+.total {
+  text-align: right;
+  margin-top: 10px;
+  margin-bottom: 10px;
+
+  hr {
+    margin-bottom: 10px;
+  }
+}
+
+.children-form {
+  margin-right: 30px;
+  margin-left: 30px;
 }
 </style>

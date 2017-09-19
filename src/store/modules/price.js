@@ -60,22 +60,47 @@ export default {
       return PriceAPI.createRecord(apiPayload).then(response => {
         return JSONAPI.deserialize(response.data.data)
       }).then(record => {
-        context.commit(MT.SET_RECORD, record)
+        let cPromises = _.map(recordDraft.children, child => {
+          child.parent = record
+          let apiPayload = { data: JSONAPI.serialize(child) }
+          return PriceAPI.createRecord(apiPayload).then(response => {
+            return JSONAPI.deserialize(response.data.data)
+          })
+        })
 
-        return record
+        return Promise.all(_.concat([record], cPromises))
+      }).then(records => {
+        let record = records.shift()
+        record.children = records
+
+        context.commit(MT.RESET_RECORD, record)
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
     },
 
     updateRecord ({ state, commit, rootState }, actionPayload) {
-      let apiPayload = { data: JSONAPI.serialize(actionPayload.recordDraft) }
+      let recordDraft = actionPayload.recordDraft
+      let apiPayload = { data: JSONAPI.serialize(recordDraft) }
 
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
       return PriceAPI.updateRecord(actionPayload.id, apiPayload, options).then(response => {
         let apiPayload = response.data
-        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.SET_RECORD, record)
+        return JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+      }).then(record => {
+        let cPromises = _.map(recordDraft.children, child => {
+          let apiPayload = { data: JSONAPI.serialize(child) }
+          return PriceAPI.updateRecord(child.id, apiPayload, options).then(response => {
+            return JSONAPI.deserialize(response.data.data)
+          })
+        })
+
+        return Promise.all(_.concat([record], cPromises))
+      }).then(records => {
+        let record = records.shift()
+        record.children = records
+
+        commit(MT.RESET_RECORD)
 
         return record
       }).catch(error => {

@@ -105,6 +105,13 @@
                       {{record.productItem.id}}
                     </router-link>
                   </dd>
+
+                  <dt v-if="record.product">Product</dt>
+                  <dd v-if="record.product">
+                    <router-link :to="{ name: 'ShowProduct', params: { id: record.product.id }}">
+                      {{record.product.id}}
+                    </router-link>
+                  </dd>
                 </dl>
               </div>
             </div>
@@ -148,7 +155,7 @@ export default {
   components: {
     DeleteButton
   },
-  mixins: [ShowPage({ storeNamespace: 'price', name: 'Price' })],
+  mixins: [ShowPage({ storeNamespace: 'price', name: 'Price', include: 'children.productItem' })],
   methods: {
     editRecord () {
       this.$store.dispatch('pushRoute', { name: 'EditPrice', params: { id: this.record.id } })

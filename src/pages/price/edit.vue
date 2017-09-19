@@ -58,7 +58,7 @@ export default {
   components: {
     PriceForm
   },
-  mixins: [EditPage({ storeNamespace: 'price', name: 'Price' })],
+  mixins: [EditPage({ storeNamespace: 'price', name: 'Price', include: 'children.productItem' })],
   methods: {
     recordUpdated (record) {
       this.$store.dispatch('productItem/resetRecord')
