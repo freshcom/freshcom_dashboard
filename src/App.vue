@@ -310,6 +310,10 @@ p.search-notice {
 .m-b-10 {
   margin-bottom: 10px;
 }
+
+.m-t-10 {
+  margin-top: 10px;
+}
 /* END Utils */
 
 /* START Common Overwrite */

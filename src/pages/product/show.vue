@@ -131,6 +131,66 @@
               </div>
             </div>
 
+            <div v-if="record.itemMode === 'all'" class="block-title">
+              <h3>Prices</h3>
+
+              <span class="block-title-actions pull-right">
+                <router-link :to="{ name: 'NewPrice', query: { productId: record.id, callbackPath: currentRoutePath } }">
+                  <icon name="plus" scale="0.8" class="v-middle"></icon>
+                  <span>Add</span>
+                </router-link>
+              </span>
+            </div>
+
+            <div v-if="record.itemMode === 'all'" class="block">
+              <div class="block-body full">
+                <el-table :data="record.prices" stripe class="block-table" :show-header="false" style="width: 100%">
+                  <el-table-column width="300">
+                    <template scope="scope">
+                      <router-link :to="{ name: 'ShowPrice', params: { id: scope.row.id } }">
+                        <span v-if="scope.row.name">{{scope.row.name}}</span>
+                        <span v-if="!scope.row.name">{{scope.row.label}}</span>
+                        <el-tag v-if="scope.row.status != 'active'" type="gray">
+                          {{$t(`attributes.price.status.${scope.row.status}`)}}
+                        </el-tag>
+                      </router-link>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column width="100">
+                    <template scope="scope">
+                      <span>{{scope.row.minimumOrderQuantity}}+</span>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column width="150">
+                    <template scope="scope">
+                      <span>${{scope.row.chargeCents / 100}}/{{scope.row.chargeUnit}}</span>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column>
+                    <template scope="scope">
+                      <p class="text-right actions">
+                        <el-button v-if="scope.row.status == 'draft'" type="primary" @click="makePriceActive(scope.row)" size="mini">
+                          Mark Active
+                        </el-button>
+
+                        <el-button @click="goTo({ name: 'EditPrice', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } })" size="mini">
+                          Edit
+                        </el-button>
+                      </p>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </div>
+
+
+              <div class="block-footer no-divider text-center">
+                <a class="view-more" href="#">View More</a>
+              </div>
+            </div>
+
             <div class="block-title">
               <h3>File Collections</h3>
 
@@ -240,7 +300,7 @@ export default {
   components: {
     DeleteButton
   },
-  mixins: [ShowPage({ storeNamespace: 'product', name: 'Product', include: 'avatar,items.defaultPrice,externalFileCollections' })],
+  mixins: [ShowPage({ storeNamespace: 'product', name: 'Product', include: 'avatar,items.defaultPrice,externalFileCollections,prices' })],
   computed: {
     avatarUrl () {
       if (this.record.avatar) {

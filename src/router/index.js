@@ -243,7 +243,7 @@ export default new Router({
         let queryString = route.fullPath.split('?')[1]
         let query = qs.parse(queryString)
 
-        return { productItemId: query.productItemId, callbackPath: query.callbackPath }
+        return { productItemId: query.productItemId, productId: query.productId, callbackPath: query.callbackPath }
       }
     },
     {

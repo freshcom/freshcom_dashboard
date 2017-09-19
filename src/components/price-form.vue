@@ -4,6 +4,10 @@
     {{formModel.productItem.id}}
   </el-form-item>
 
+  <el-form-item v-if="record.product" label="Product">
+    {{formModel.product.id}}
+  </el-form-item>
+
   <hr>
 
   <el-form-item label="Code" :error="errorMessages.code">
@@ -27,14 +31,14 @@
     <el-input v-model="formModel.label"></el-input>
   </el-form-item>
 
-  <el-form-item label="Charge Amount" :error="chargeAmountError" required>
+  <el-form-item v-if="formModel.productItem" label="Charge Amount" :error="chargeAmountError" required>
     <price-amount-input @change="updateValue" v-model="formModel.chargeCents">
     </price-amount-input>
     <span> / </span>
     <el-input v-model="formModel.chargeUnit" class="unit-input" placeholder="Unit"></el-input>
   </el-form-item>
 
-  <el-form-item label="Estimate By Default" :error="errorMessages.estimateByDefault" required>
+  <el-form-item v-if="formModel.productItem" label="Estimate By Default" :error="errorMessages.estimateByDefault" required>
     <el-switch
       @change="updateValue"
       v-model="formModel.estimateByDefault"
@@ -47,12 +51,12 @@
     <el-input v-model="formModel.orderUnit" class="unit-input"></el-input>
   </el-form-item>
 
-  <el-form-item  v-if="formModel.estimateByDefault" :error="errorMessages.estimateAveragePercentage" label="Estimate Average" required>
+  <el-form-item v-if="formModel.estimateByDefault" :error="errorMessages.estimateAveragePercentage" label="Estimate Average" required>
     <percentage-input v-model="formModel.estimateAveragePercentage">
     </percentage-input>
   </el-form-item>
 
-  <el-form-item  v-if="formModel.estimateByDefault" :error="errorMessages.estimateMaximumPercentage" label="Estimate Maximum" required>
+  <el-form-item v-if="formModel.estimateByDefault" :error="errorMessages.estimateMaximumPercentage" label="Estimate Maximum" required>
     <percentage-input v-model="formModel.estimateMaximumPercentage">
     </percentage-input>
   </el-form-item>
@@ -61,24 +65,21 @@
     <el-input-number @change="updateValue" v-model="formModel.minimumOrderQuantity" :min="1" :step="1"></el-input-number>
   </el-form-item>
 
-  <el-form-item label="Source Quantity" :error="errorMessages.sourceQuantity" required>
-    <el-input-number @change="updateValue" v-model="formModel.sourceQuantity" :min="1" :step="1"></el-input-number>
-  </el-form-item>
-
-  <el-form-item label="Tax One" required>
+  <el-form-item v-if="formModel.productItem" label="Tax One" required>
     <percentage-input v-model="formModel.taxOnePercentage">
     </percentage-input>
   </el-form-item>
 
-  <el-form-item label="Tax Two" required>
+  <el-form-item v-if="formModel.productItem" label="Tax Two" required>
     <percentage-input v-model="formModel.taxTwoPercentage">
     </percentage-input>
   </el-form-item>
 
-  <el-form-item label="Tax Three" required>
+  <el-form-item v-if="formModel.productItem" label="Tax Three" required>
     <percentage-input v-model="formModel.taxThreePercentage">
     </percentage-input>
   </el-form-item>
+
 </el-form>
 </template>
 
@@ -87,17 +88,21 @@ import _ from 'lodash'
 import PriceAmountInput from '@/components/price-amount-input'
 import PercentageInput from '@/components/percentage-input'
 import errorI18nKey from '@/utils/error-i18n-key'
+import ProductItemSelect from '@/components/product-item-select'
 
 export default {
   name: 'PriceForm',
   components: {
     PriceAmountInput,
-    PercentageInput
+    PercentageInput,
+    ProductItemSelect
   },
   props: ['value', 'errors', 'record'],
   data () {
     return {
-      formModel: _.cloneDeep(this.value)
+      formModel: _.cloneDeep(this.value),
+      children: [{ type: 'Price' }, { type: 'Price' }],
+      productItems: []
     }
   },
   computed: {

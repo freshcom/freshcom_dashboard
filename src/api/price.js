@@ -1,8 +1,8 @@
 import axios from './jsonapi-axios'
 
 export default {
-  createRecord (productItemId, payload, params = {}) {
-    return axios.post(`/product_items/${productItemId}/prices`, payload)
+  createRecord (payload, params = {}) {
+    return axios.post(`/prices`, payload)
   },
 
   updateRecord (id, payload, options) {
