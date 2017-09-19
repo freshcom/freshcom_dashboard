@@ -99,7 +99,7 @@
 
                   <el-table-column width="150">
                     <template scope="scope">
-                      <template v-if="scope.row.defaultPrice">
+                      <template v-if="isProductItemPriceVisiable(scope.row)">
                         ${{scope.row.defaultPrice.chargeCents / 100}}/{{scope.row.defaultPrice.chargeUnit}}
                       </template>
                     </template>
@@ -316,6 +316,9 @@ export default {
     },
     recordDeleted () {
       this.$store.dispatch('pushRoute', { name: 'ListProduct' })
+    },
+    isProductItemPriceVisiable (productItem) {
+      return this.record.itemMode === 'any' && productItem.defaultPrice
     },
     isMarkItemPrimaryVisible (productItem) {
       return this.record.itemMode === 'any' && !productItem.primary

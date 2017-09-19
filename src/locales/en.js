@@ -27,7 +27,11 @@ export default {
     product: {
       status: {
         requirePrimaryActiveItem: 'A Product must have a Primary Active Item in order to be marked Active.',
-        requireAtLeastOneInternalItem: 'A Product must have at least one Active/Internal Item in order to be marked Internal.'
+        requireAtLeastOneInternalItem: 'A Product must have at least one Active/Internal Item in order to be marked Internal.',
+        requireAllItemActive: 'A Product with Item Mode set to All must have all of its Item set to Active in order to be marked Active.',
+        requireAllItemInternal: 'A Product with Item Mode set to All must have all of its Item set to Active/Internal in order to be marked Internal.',
+        requireAtLeastOneActivePrice: 'A Product with Item Mode set to All require at least one Active Price in order to be marked Active.',
+        requireAtLeastOneInternalPrice: 'A Product with Item Mode set to All require at least one Active/Internal Price in order to be marked Internal.'
       }
     }
   },

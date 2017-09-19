@@ -67,7 +67,7 @@
               </div>
             </div>
 
-            <div class="block-title">
+            <div v-if="isPriceBlockVisiable" class="block-title">
               <h3>Prices</h3>
 
               <span class="block-title-actions pull-right">
@@ -78,7 +78,7 @@
               </span>
             </div>
 
-            <div class="block">
+            <div v-if="isPriceBlockVisiable" class="block">
               <div class="block-body full">
                 <el-table :data="record.prices" stripe class="block-table" :show-header="false" style="width: 100%">
                   <el-table-column width="300">
@@ -201,7 +201,12 @@ export default {
   components: {
     DeleteButton
   },
-  mixins: [ShowPage({ storeNamespace: 'productItem', name: 'Product Item', include: 'prices' })],
+  mixins: [ShowPage({ storeNamespace: 'productItem', name: 'Product Item', include: 'prices,product' })],
+  computed: {
+    isPriceBlockVisiable () {
+      return this.record.product && this.record.product.itemMode === 'any'
+    }
+  },
   methods: {
     editRecord () {
       this.$store.dispatch('pushRoute', { name: 'EditProductItem', params: { id: this.record.id }, query: { callbackPath: this.currentRoutePath } })
