@@ -172,7 +172,7 @@
                   <el-table-column>
                     <template scope="scope">
                       <p class="text-right actions">
-                        <el-button v-if="scope.row.status == 'draft'" type="primary" @click="makePriceActive(scope.row)" size="mini">
+                        <el-button v-if="scope.row.status == 'draft'" type="primary" @click="markPriceActive(scope.row)" size="mini">
                           Mark Active
                         </el-button>
 
@@ -364,6 +364,33 @@ export default {
         })
 
         return this.$store.dispatch('product/setRecord', product)
+      })
+    },
+    markPriceActive (price) {
+      let priceDraft = _.cloneDeep(price)
+      priceDraft.status = 'active'
+      return this.$store.dispatch('price/updateRecord', { id: priceDraft.id, recordDraft: priceDraft }).then(updatedPrice => {
+        let product = _.cloneDeep(this.record)
+        _.each(product.prices, (price) => {
+          if (price.id === updatedPrice.id) {
+            price.status = updatedPrice.status
+          }
+        })
+
+        this.$store.dispatch('product/setRecord', product)
+
+        this.$message({
+          showClose: true,
+          message: 'Price updated successfully.',
+          type: 'success'
+        })
+
+        return updatedPrice
+      }).catch(error => {
+        this.$alert(
+          this.$t(errorI18nKey('Price', 'status', error.status[0])),
+          'Error')
+        throw error
       })
     }
   }

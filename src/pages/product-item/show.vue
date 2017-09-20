@@ -108,7 +108,7 @@
                   <el-table-column>
                     <template scope="scope">
                       <p class="text-right actions">
-                        <el-button v-if="scope.row.status == 'draft'" type="primary" @click="makePriceActive(scope.row)" size="mini">
+                        <el-button v-if="scope.row.status == 'draft'" type="primary" @click="markPriceActive(scope.row)" size="mini">
                           Mark Active
                         </el-button>
 
@@ -215,7 +215,7 @@ export default {
       this.$store.dispatch('product/resetRecord')
       this.$store.dispatch('popRoute', 1)
     },
-    makePriceActive (price) {
+    markPriceActive (price) {
       let priceDraft = _.cloneDeep(price)
       priceDraft.status = 'active'
       return this.$store.dispatch('price/updateRecord', { id: priceDraft.id, recordDraft: priceDraft }).then(updatedPrice => {
