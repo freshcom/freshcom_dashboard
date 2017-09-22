@@ -48,6 +48,11 @@ export default {
       params.filter = filter
     }
 
+    let include = options.include
+    if (include) {
+      params.include = include
+    }
+
     return axios.get('/products', {
       params: params
     })

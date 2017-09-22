@@ -6,7 +6,7 @@
       <el-tab-pane label="Product" name="productTab">
         <el-form-item>
           <div class="m-b-10">
-            <product-select @select="setProduct" :filter="{ status: ['active', 'internal'] }" class="product-input">
+            <product-select @select="setProduct" :filter="{ status: ['active', 'internal'] }" include="prices,defaultPrice" class="product-input">
             </product-select>
 
             <el-select @change="updateValue" :disabled="!isProductItemSelectable" placeholder="Select product first..." v-model="productItem" value-key="id" class="product-item-input">
@@ -35,13 +35,11 @@
             </span>
 
             <span v-if="!price || !price.estimateByDefault" class="m-r-10">@</span>
-            <el-select @change="updateValue" v-model="price" value-key="id" placeholder="$xx.xx/xx" :disabled="!productItem" class="price-input">
-              <template v-if="productItem">
-                <el-option v-for="price in prices" :key="price.id" :label="chargePriceStr(price)" :value="price">
-                  <span v-if="price.name">{{price.name}} -</span>
-                  <span>{{chargePriceStr(price)}}</span>
-                </el-option>
-              </template>
+            <el-select @change="updateValue" v-model="price" value-key="id" placeholder="$xx.xx/xx" :disabled="!price" class="price-input">
+              <el-option v-for="price in selectablePrices" :key="price.id" :label="chargePriceStr(price)" :value="price">
+                <span v-if="price.name">{{price.name}} -</span>
+                <span>{{chargePriceStr(price)}}</span>
+              </el-option>
             </el-select>
 
             <div class="pull-right">
@@ -167,6 +165,7 @@ export default {
       productItems: [],
       productItem: null,
       price: null,
+      prices: [],
       isEstimate: false,
       orderQuantity: 1,
       chargeQuantity: null,
@@ -178,10 +177,34 @@ export default {
     productItem (productItem) {
       if (productItem) {
         this.price = productItem.defaultPrice
+        this.prices = productItem.prices
         return
       }
+    },
+    product (product) {
+      if (product && product.itemMode === 'all') {
+        this.price = product.defaultPrice
+        this.prices = product.prices
+      }
 
-      this.price = null
+      if (product && product.itemMode === 'any') {
+        ProductItemAPI.queryRecord({ filter: { productId: product.id, status: ['active', 'internal'] }, include: 'defaultPrice,prices' }).then(response => {
+          let apiPayload = response.data
+          let records = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+          this.product = product
+          this.product.items = records
+
+          return records
+        }).then(productItems => {
+          // TODO:
+          // if (product.itemMode === 'all') {
+
+          // }
+
+          let primaryItem = _.find(productItems, { primary: true })
+          this.productItem = primaryItem
+        })
+      }
     },
     price (price) {
       if (price && price.estimateByDefault) {
@@ -213,7 +236,7 @@ export default {
       }
 
       if (this.price) {
-        this.price = Price.getLowestPrice(this.productItem.prices, orderQuantity, this.price.status)
+        this.price = Price.getLowestPrice(this.prices, orderQuantity, this.price.status)
       }
     }
   },
@@ -266,11 +289,17 @@ export default {
         return 'All'
       }
     },
-    prices () {
-      if (this.productItem) {
-        let prices = this.productItem.prices
+    selectablePrices () {
+      if (this.productItem || (this.product && this.product.itemMode === 'all')) {
+        let prices
+        if (this.productItem) {
+          prices = this.productItem.prices
+        } else {
+          prices = this.product.prices
+        }
+
         let lowestActivePrice = Price.getLowestPrice(prices, this.orderQuantity, 'active')
-        let internalPrices = _.filter(this.productItem.prices, (price) => {
+        let internalPrices = _.filter(prices, (price) => {
           return price.status === 'internal' && price.minimumOrderQuantity <= this.price.minimumOrderQuantity
         })
 
@@ -279,6 +308,8 @@ export default {
         }
         return internalPrices
       }
+
+      return []
     }
   },
   methods: {
@@ -286,31 +317,17 @@ export default {
       this.$emit('input', this.formModel)
     }, 300),
     chargePriceStr (price) {
-      return `$${price.chargeCents / 100}/${price.chargeUnit}`
+      return `$${(price.chargeCents / 100).toFixed(2)}/${price.chargeUnit}`
     },
     setProduct (product) {
       if (!product) {
         this.product = null
         this.productItem = null
+        this.price = null
         return
       }
 
-      ProductItemAPI.queryRecord({ filter: { productId: product.id, status: ['active', 'internal'] }, include: 'defaultPrice,prices' }).then(response => {
-        let apiPayload = response.data
-        let records = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        this.product = product
-        this.product.items = records
-
-        return records
-      }).then(productItems => {
-        // TODO:
-        // if (product.itemMode === 'all') {
-
-        // }
-
-        let primaryItem = _.find(productItems, { primary: true })
-        this.productItem = primaryItem
-      })
+      this.product = product
     },
     refreshChargeQuantity (subTotalCents) {
       if (this.price && this.price.estimateByDefault) {
