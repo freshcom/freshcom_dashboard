@@ -35,10 +35,10 @@
             </span>
 
             <span v-if="!price || !price.estimateByDefault" class="m-r-10">@</span>
-            <el-select @change="updateValue" v-model="price" value-key="id" placeholder="$xx.xx/xx" :disabled="!price" class="price-input">
-              <el-option v-for="price in selectablePrices" :key="price.id" :label="chargePriceStr(price)" :value="price">
+            <el-select @change="updateValue" v-model="price" value-key="id" placeholder="" :disabled="!price" class="price-input">
+              <el-option v-for="price in selectablePrices" :key="price.id" v-bind:label="price | chargeDollar" :value="price">
                 <span v-if="price.name">{{price.name}} -</span>
-                <span>{{chargePriceStr(price)}}</span>
+                <span>{{price | chargeDollar}}</span>
               </el-option>
             </el-select>
 
@@ -141,6 +141,7 @@
 import _ from 'lodash'
 import JSONAPI from '@/jsonapi'
 import ProductItemAPI from '@/api/product-item'
+import { chargeDollar } from '@/helpers/filters'
 
 import Price from '@/models/price'
 import OrderLineItem from '@/models/order-line-item'
@@ -153,6 +154,9 @@ import DeleteButton from '@/components/delete-button'
 export default {
   name: 'OrderLineItemForm',
   props: ['order'],
+  filters: {
+    chargeDollar
+  },
   components: {
     ProductItemSelect,
     ProductSelect,
@@ -318,9 +322,6 @@ export default {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
-    chargePriceStr (price) {
-      return `$${(price.chargeCents / 100).toFixed(2)}/${price.chargeUnit}`
-    },
     refreshChargeQuantity (subTotalCents) {
       if (this.price && this.price.estimateByDefault) {
         this.chargeQuantity = subTotalCents / this.price.chargeCents
