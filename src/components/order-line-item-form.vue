@@ -6,7 +6,7 @@
       <el-tab-pane label="Product" name="productTab">
         <el-form-item>
           <div class="m-b-10">
-            <product-select @select="setProduct" :filter="{ status: ['active', 'internal'] }" include="prices,defaultPrice" class="product-input">
+            <product-select v-model="product" :filter="{ status: ['active', 'internal'] }" include="prices,defaultPrice" class="product-input">
             </product-select>
 
             <el-select @change="updateValue" :disabled="!isProductItemSelectable" placeholder="Select product first..." v-model="productItem" value-key="id" class="product-item-input">
@@ -182,6 +182,13 @@ export default {
       }
     },
     product (product) {
+      if (!product) {
+        this.product = null
+        this.productItem = null
+        this.price = null
+        return
+      }
+
       if (product && product.itemMode === 'all') {
         this.price = product.defaultPrice
         this.prices = product.prices
@@ -196,11 +203,6 @@ export default {
 
           return records
         }).then(productItems => {
-          // TODO:
-          // if (product.itemMode === 'all') {
-
-          // }
-
           let primaryItem = _.find(productItems, { primary: true })
           this.productItem = primaryItem
         })
@@ -319,16 +321,6 @@ export default {
     chargePriceStr (price) {
       return `$${(price.chargeCents / 100).toFixed(2)}/${price.chargeUnit}`
     },
-    setProduct (product) {
-      if (!product) {
-        this.product = null
-        this.productItem = null
-        this.price = null
-        return
-      }
-
-      this.product = product
-    },
     refreshChargeQuantity (subTotalCents) {
       if (this.price && this.price.estimateByDefault) {
         this.chargeQuantity = subTotalCents / this.price.chargeCents
@@ -348,7 +340,11 @@ export default {
       orderLineItem.chargeQuantity = this.chargeQuantity
       orderLineItem.order = this.order
 
-      this.$store.dispatch('order/createLineItem', orderLineItem)
+      this.$store.dispatch('order/createLineItem', orderLineItem).then(() => {
+        this.product = null
+        this.productItem = null
+        this.price = null
+      })
     }
   }
 }

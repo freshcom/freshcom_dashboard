@@ -1,13 +1,13 @@
 <template>
   <el-autocomplete
-    v-model="productChoice"
+    v-model="selectedOption"
     :fetch-suggestions="queryProduct"
     placeholder="Search for product..."
-    :disabled="selected"
+    :disabled="!!selectedOption"
     @select="setProduct"
   >
 
-  <el-button v-if="selected" slot="append" @click="clear()">
+  <el-button v-if="selectedOption" slot="append" @click="clear()">
     <icon name="times" scale="0.8" class="v-middle"></icon>
   </el-button>
 
@@ -28,13 +28,19 @@ export default {
         return {}
       }
     },
-    include: String
+    include: String,
+    value: Object
   },
   data () {
     return {
-      productChoice: undefined,
-      selected: false,
+      selectedOption: undefined,
+      options: [],
       records: []
+    }
+  },
+  watch: {
+    value (newValue) {
+      this.selectedOption = this._productToOption(newValue).value
     }
   },
   methods: {
@@ -44,28 +50,29 @@ export default {
         let records = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
         this.records = records
 
-        let names = _.map(records, (record) => {
-          let info = ''
-          if (record.code) {
-            info += `[${record.code}] `
-          }
-          info += record.name + ' :: ' + record.status
-          return { value: info, id: record.id }
-        })
-
-        callback(names)
+        this.options = _.map(records, this._productToOption)
+        callback(this.options)
       })
     },
-    setProduct (productChoice) {
-      this.selected = true
-      let product = _.find(this.records, { id: productChoice.id })
-      this.$emit('select', product)
+    _productToOption (product) {
+      if (!product) {
+        return { value: undefined }
+      }
+
+      let info = ''
+      if (product.code) {
+        info += `[${product.code}] `
+      }
+      info += product.name + ' :: ' + product.status
+      return { value: info, id: product.id }
+    },
+    setProduct (selectedOption) {
+      let product = _.find(this.records, { id: selectedOption.id })
+      this.$emit('input', product)
     },
     clear () {
-      this.productChoice = undefined
-      this.selected = false
-
-      this.$emit('select', undefined)
+      this.selectedOption = undefined
+      this.$emit('input', undefined)
     }
   }
 }
