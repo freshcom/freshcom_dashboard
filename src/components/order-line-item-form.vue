@@ -9,7 +9,7 @@
             <product-select v-model="product" :filter="{ status: ['active', 'internal'] }" include="prices,defaultPrice" class="product-input">
             </product-select>
 
-            <el-select @change="updateValue" :disabled="!isProductItemSelectable" placeholder="Select product first..." v-model="productItem" value-key="id" class="product-item-input">
+            <el-select @change="updateValue" :disabled="!isProductItemSelectable" :placeholder="productItemPlaceholder" v-model="productItem" value-key="id" class="product-item-input">
               <template v-if="product">
                 <el-option v-for="item in product.items" :key="item.id" :label="item.name" :value="item">
                   {{item.name}}
@@ -51,7 +51,6 @@
           </div>
 
           <div>
-
             <span class="pull-right">
               <span>Is Estimate?</span>
               <el-switch
@@ -268,7 +267,7 @@ export default {
       }, [])
     },
     isProductItemSelectable () {
-      if (!this.product || this.product.itemModel === 'all') {
+      if (!this.product || this.product.itemMode === 'all') {
         return false
       }
 
@@ -289,10 +288,10 @@ export default {
       return false
     },
     productItemPlaceholder () {
-      if (this.isProductItemSelectable) {
-        return 'Select product first...'
-      } else {
+      if (this.product && this.product.itemMode === 'all') {
         return 'All'
+      } else {
+        return 'Select product first...'
       }
     },
     selectablePrices () {
