@@ -122,7 +122,7 @@ export default {
         return Promise.all([OrderLineItemAPI.createRecord(order.id, apiPayload), order])
       }).then(responses => {
         let order = responses[1]
-        return OrderAPI.getRecord(order.id, { include: 'lineItems' })
+        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children' })
       }).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
@@ -130,7 +130,6 @@ export default {
 
         return record
       }).catch(error => {
-        console.log(error)
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
     }

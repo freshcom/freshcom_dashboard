@@ -76,12 +76,19 @@
   </div>
 
   <div class="m-b-10">
-    <el-table
-      :data="tableData"
-      style="width: 100%">
+    <el-table :data="tableData" @expand="lineItemExpanded" row-key="id" :expand-row-keys="expandedLineItemIds" class="nested-table" style="width: 100%">
       <el-table-column type="expand" width="40px">
         <template scope="props">
-
+          <el-table :data="props.row.children" :show-header="false" style="width: 100%">
+            <el-table-column width="50px" label="" prop="">
+            </el-table-column>
+            <el-table-column width="300px" label="Name" prop="name">
+            </el-table-column>
+            <el-table-column width="150px" label="Qty" prop="orderQuantity">
+            </el-table-column>
+            <el-table-column label="$" prop="subTotal">
+            </el-table-column>
+          </el-table>
         </template>
       </el-table-column>
       <el-table-column
@@ -113,23 +120,23 @@
 
   <div style="text-align: right;">
     <p v-if="order.subTotalCents">
-      <b>Sub Total:</b> <span>${{order.subTotalCents / 100}}</span>
+      <b>Sub Total:</b> <span>{{order.subTotalCents | dollar}}</span>
     </p>
 
     <p v-if="order.taxOneCents">
-      <b>Tax 1:</b> <span>${{order.taxOneCents / 100}}</span>
+      <b>Tax 1:</b> <span>{{order.taxOneCents | dollar}}</span>
     </p>
 
     <p v-if="order.taxTwoCents">
-      <b>Tax 2:</b> <span>${{order.taxTwoCents / 100}}</span>
+      <b>Tax 2:</b> <span>{{order.taxTwoCents | dollar}}</span>
     </p>
 
     <p v-if="order.taxThreeCents">
-      <b>Tax 3:</b> <span>${{order.taxThreeCents / 100}}</span>
+      <b>Tax 3:</b> <span>{{order.taxThreeCents | dollar}}</span>
     </p>
 
     <p v-if="order.grandTotalCents">
-      <b>Grand Total:</b> <span>${{order.grandTotalCents / 100}}</span>
+      <b>Grand Total:</b> <span>{{order.grandTotalCents | dollar}}</span>
     </p>
   </div>
 
@@ -140,7 +147,7 @@
 import _ from 'lodash'
 import JSONAPI from '@/jsonapi'
 import ProductItemAPI from '@/api/product-item'
-import { chargeDollar } from '@/helpers/filters'
+import { chargeDollar, dollar } from '@/helpers/filters'
 
 import Price from '@/models/price'
 import OrderLineItem from '@/models/order-line-item'
@@ -154,7 +161,8 @@ export default {
   name: 'OrderLineItemForm',
   props: ['order'],
   filters: {
-    chargeDollar
+    chargeDollar,
+    dollar
   },
   components: {
     ProductItemSelect,
@@ -173,7 +181,8 @@ export default {
       orderQuantity: 1,
       chargeQuantity: null,
       subTotalCents: null,
-      activeTab: 'productTab'
+      activeTab: 'productTab',
+      expandedLineItemIds: []
     }
   },
   watch: {
@@ -247,22 +256,22 @@ export default {
   },
   computed: {
     tableData () {
-      return _.reduce(this.order.lineItems, (acc, lineItem) => {
-        let quantity = `x ${lineItem.orderQuantity}`
+      return _.reduce(this.order.rootLineItems, (acc, lineItem) => {
+        let quantity = `${lineItem.orderQuantity}`
         if (lineItem.priceEstimateByDefault) {
           quantity += ` (${lineItem.chargeQuantity}${lineItem.priceChargeUnit})`
         }
-        let subTotal = lineItem.subTotalCents / 100
-        let taxTotal = (lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents) / 100
-        let grandTotal = (lineItem.subTotalCents + lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents) / 100
+        let taxTotalCents = lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents
+        let grandTotalCents = lineItem.subTotalCents + lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents
 
         return _.concat(acc, {
           id: lineItem.id,
           name: lineItem.name,
           quantity: quantity,
-          subTotal: `$${subTotal}`,
-          taxTotal: `$${taxTotal}`,
-          grandTotal: `$${grandTotal}`
+          children: lineItem.children,
+          subTotal: dollar(lineItem.subTotalCents),
+          taxTotal: dollar(taxTotalCents),
+          grandTotal: dollar(grandTotalCents)
         })
       }, [])
     },
@@ -321,6 +330,13 @@ export default {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
+    lineItemExpanded (row) {
+      if (row.children && (row.children.length > 0) && !_.includes(this.expandedLineItemIds, row.id)) {
+        this.expandedLineItemIds = [row.id]
+        return
+      }
+      this.expandedLineItemIds = []
+    },
     refreshChargeQuantity (subTotalCents) {
       if (this.price && this.price.estimateByDefault) {
         this.chargeQuantity = subTotalCents / this.price.chargeCents
@@ -386,5 +402,11 @@ export default {
 
 .el-tabs .el-form-item {
   margin: 0px;
+}
+</style>
+
+<style>
+.nested-table .el-table__expanded-cell {
+  padding: 0px;
 }
 </style>
