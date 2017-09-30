@@ -132,6 +132,21 @@ export default {
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
+    },
+    deleteLineItem ({ state, commit }, lineItem) {
+      let order = lineItem.order
+
+      OrderLineItemAPI.deleteRecord(lineItem.id).then(() => {
+        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children' })
+      }).then(response => {
+        let apiPayload = response.data
+        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+        commit(MT.SET_RECORD, record)
+
+        return record
+      }).catch(error => {
+        throw JSONAPI.deserializeErrors(error.response.data.errors)
+      })
     }
   },
 

@@ -61,7 +61,7 @@
                 off-text="No">
               </el-switch>
 
-              <el-button type="default" @click="add()" :disabled="!isAddClickable">
+              <el-button type="default" @click="addProductLineItem()" :disabled="!isAddClickable">
                 Add
               </el-button>
             </span>
@@ -70,7 +70,53 @@
       </el-tab-pane>
 
       <el-tab-pane label="Custom" name="customTab">
+        <el-form-item>
+          <div class="m-b-10">
+            <el-input
+              placeholder="Enter name..."
+              v-model="name"
+              class="name-input">
+            </el-input>
 
+            <price-amount-input class="pull-right" @change="updateValue" v-model="subTotalCents">
+            </price-amount-input>
+          </div>
+
+          <div class="m-b-10">
+            <price-amount-input class="m-r-10" @change="updateValue" v-model="taxOneCents">
+            </price-amount-input>
+
+            <span class="m-r-10">+</span>
+
+            <price-amount-input class="m-r-10" @change="updateValue" v-model="taxTwoCents">
+            </price-amount-input>
+
+            <span class="m-r-10">+</span>
+
+            <price-amount-input class="m-r-10" @change="updateValue" v-model="taxThreeCents">
+            </price-amount-input>
+
+            <span class="m-r-10">=</span>
+            <price-amount-input class="pull-right" @change="updateValue" v-model="grandTotalCents" :disabled="true">
+            </price-amount-input>
+          </div>
+
+          <div>
+            <span class="pull-right">
+              <span>Is Estimate?</span>
+              <el-switch
+                @change="updateValue"
+                v-model="isEstimate"
+                on-text="Yes"
+                off-text="No">
+              </el-switch>
+
+              <el-button type="default" @click="addCustomLineItem()" :disabled="!isAddClickable">
+                Add
+              </el-button>
+            </span>
+          </div>
+        </el-form-item>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -110,7 +156,7 @@
           <el-button size="mini">
             Edit
           </el-button>
-          <delete-button @confirmed="deleteLineItem(scope.id)" size="mini">
+          <delete-button @confirmed="deleteLineItem(scope.row.id)" size="mini">
             Delete
           </delete-button>
         </template>
@@ -172,6 +218,7 @@ export default {
   },
   data () {
     return {
+      name: '',
       product: null,
       productItems: [],
       productItem: null,
@@ -182,7 +229,10 @@ export default {
       chargeQuantity: null,
       subTotalCents: null,
       activeTab: 'productTab',
-      expandedLineItemIds: []
+      expandedLineItemIds: [],
+      taxOneCents: 0,
+      taxTwoCents: 0,
+      taxThreeCents: 0
     }
   },
   watch: {
@@ -275,6 +325,13 @@ export default {
         })
       }, [])
     },
+    grandTotalCents () {
+      if (!this.subTotalCents) {
+        return 0
+      }
+
+      return this.subTotalCents + this.taxOneCents + this.taxTwoCents + this.taxThreeCents
+    },
     isProductItemSelectable () {
       if (!this.product || this.product.itemMode === 'all') {
         return false
@@ -342,7 +399,7 @@ export default {
         this.chargeQuantity = subTotalCents / this.price.chargeCents
       }
     },
-    add () {
+    addProductLineItem () {
       let orderLineItem = OrderLineItem.objectWithDefaults()
       if (this.product.itemMode === 'all') {
         orderLineItem.product = this.product
@@ -361,6 +418,30 @@ export default {
         this.productItem = null
         this.price = null
       })
+    },
+    addCustomLineItem () {
+      let orderLineItem = OrderLineItem.objectWithDefaults()
+      orderLineItem.name = this.name
+      orderLineItem.subTotalCents = this.subTotalCents
+      orderLineItem.taxOneCents = this.taxOneCents
+      orderLineItem.taxTwoCents = this.taxTwoCents
+      orderLineItem.taxThreeCents = this.taxThreeCents
+      orderLineItem.isEstimate = this.isEstimate
+      orderLineItem.order = this.order
+      orderLineItem.chargeQuantity = 1
+
+      this.$store.dispatch('order/createLineItem', orderLineItem).then(() => {
+        this.name = null
+        this.subTotalCents = null
+      })
+    },
+    deleteLineItem (id) {
+      let orderLineItem = _.find(this.order.rootLineItems, { id: id })
+      orderLineItem = _.cloneDeep(orderLineItem)
+      orderLineItem.order = this.order
+      this.$store.dispatch('order/deleteLineItem', orderLineItem).then(() => {
+        console.log('success')
+      })
     }
   }
 }
@@ -368,7 +449,11 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.product-input {
+.tax-input {
+  width: 25%;
+}
+
+.product-input, .name-input {
   width: 49.9%;
 }
 
