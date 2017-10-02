@@ -21,7 +21,7 @@ export default {
       },
 
       set (value) {
-        let valueInt = Math.round(parseFloat(Math.abs(value)) * 100)
+        let valueInt = Math.round(parseFloat(value) * 100)
         if (isNaN(valueInt)) {
           this.$emit('input', 0)
         } else {

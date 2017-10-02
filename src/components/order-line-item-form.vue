@@ -433,6 +433,9 @@ export default {
       this.$store.dispatch('order/createLineItem', orderLineItem).then(() => {
         this.name = null
         this.subTotalCents = null
+        this.taxOneCents = 0
+        this.taxTwoCents = 0
+        this.taxThreeCents = 0
       })
     },
     deleteLineItem (id) {

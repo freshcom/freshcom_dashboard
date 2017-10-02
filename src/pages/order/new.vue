@@ -27,7 +27,7 @@
           </div>
 
           <div class="step-indicator">
-            <el-steps :space="200" :active="0" :align-center="true" finish-status="success">
+            <el-steps :space="200" :active="activeStep" :align-center="true" finish-status="success">
               <el-step title="Line Items"></el-step>
               <el-step title="Information"></el-step>
               <el-step title="Payment"></el-step>
@@ -35,18 +35,48 @@
           </div>
 
           <div class="data">
-            <order-line-item-form :order="recordDraft" :errors="errors">
-            </order-line-item-form>
+            <template v-if="activeStep === 0">
+              <order-line-item-form :order="recordDraft" :errors="errors">
+              </order-line-item-form>
+            </template>
+
+            <template v-if="activeStep === 1">
+              <order-form v-model="recordDraft" :errors="errors"></order-form>
+            </template>
           </div>
 
           <div class="footer">
-            <el-button @click="cancel">
-              Cancel
-            </el-button>
 
-            <el-button @click="submit(recordDraft)" type="primary" class="pull-right">
-              Next
-            </el-button>
+            <template v-if="activeStep === 0">
+              <el-button @click="cancel">
+                Cancel
+              </el-button>
+
+              <el-button @click="nextStep" type="primary" class="pull-right">
+                Next
+              </el-button>
+            </template>
+
+            <template v-if="activeStep === 1">
+              <el-button @click="back">
+                Back
+              </el-button>
+
+              <el-button @click="nextStep" type="primary" class="pull-right">
+                Next
+              </el-button>
+            </template>
+
+            <template v-if="activeStep === 2">
+              <el-button @click="back">
+                Back
+              </el-button>
+
+              <el-button @click="placeOrder(recordDraft)" type="primary" class="pull-right">
+                Place Order
+              </el-button>
+            </template>
+
           </div>
         </el-card>
       </div>
@@ -59,16 +89,41 @@
 <script>
 import NewPage from '@/mixins/new-page'
 import OrderLineItemForm from '@/components/order-line-item-form'
+import OrderForm from '@/components/order-form'
 
 export default {
   name: 'NewOrder',
   components: {
-    OrderLineItemForm
+    OrderLineItemForm,
+    OrderForm
+  },
+  data () {
+    return {
+      activeStep: 0
+    }
   },
   mixins: [NewPage({ storeNamespace: 'order', name: 'Order' })],
+  computed: {
+    submitText () {
+      if (this.activeStep === 0) {
+        return 'Next'
+      }
+
+      return 'Place Order'
+    }
+  },
   methods: {
     recordCreated (record) {
       this.$store.dispatch('pushRoute', { name: 'ShowOrder', params: { id: record.id } })
+    },
+    nextStep () {
+      this.activeStep += 1
+    },
+    cancel () {
+      console.log('cancel')
+    },
+    back () {
+      this.activeStep -= 1
     }
   }
 }
