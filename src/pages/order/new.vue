@@ -14,16 +14,6 @@
         <el-card v-loading="isLoading" class="main-card">
           <div slot="header">
             <span style="line-height: 36px;">Create a Order</span>
-
-            <div class="pull-right">
-              <el-button @click="cancel">
-                Cancel
-              </el-button>
-
-              <el-button @click="submit(recordDraft)" type="primary">
-                Next
-              </el-button>
-            </div>
           </div>
 
           <div class="step-indicator">
@@ -36,12 +26,16 @@
 
           <div class="data">
             <template v-if="activeStep === 0">
-              <order-line-item-form :order="recordDraft" :errors="errors">
+              <order-line-item-form :order="orderDraft" :errors="errors">
               </order-line-item-form>
             </template>
 
             <template v-if="activeStep === 1">
-              <order-form v-model="recordDraft" :errors="errors"></order-form>
+              <order-form v-model="orderDraft" :errors="errors"></order-form>
+            </template>
+
+            <template v-if="activeStep === 2">
+              <payment-form v-model="paymentDraft" :errors="errors"></payment-form>
             </template>
           </div>
 
@@ -52,7 +46,7 @@
                 Cancel
               </el-button>
 
-              <el-button @click="nextStep" type="primary" class="pull-right">
+              <el-button @click="nextStep(orderDraft)" type="primary" class="pull-right">
                 Next
               </el-button>
             </template>
@@ -62,7 +56,7 @@
                 Back
               </el-button>
 
-              <el-button @click="nextStep" type="primary" class="pull-right">
+              <el-button @click="nextStep(orderDraft)" type="primary" class="pull-right">
                 Next
               </el-button>
             </template>
@@ -72,7 +66,7 @@
                 Back
               </el-button>
 
-              <el-button @click="placeOrder(recordDraft)" type="primary" class="pull-right">
+              <el-button @click="createPayment(paymentDraft, order)" type="primary" class="pull-right">
                 Place Order
               </el-button>
             </template>
@@ -87,22 +81,25 @@
 </template>
 
 <script>
-import NewPage from '@/mixins/new-page'
 import OrderLineItemForm from '@/components/order-line-item-form'
+import PaymentForm from '@/components/payment-form'
 import OrderForm from '@/components/order-form'
+import { createToken as createStripeToken } from 'vue-stripe-elements'
 
 export default {
   name: 'NewOrder',
   components: {
     OrderLineItemForm,
-    OrderForm
+    OrderForm,
+    PaymentForm
   },
   data () {
     return {
+      errors: {},
+      isLoading: false,
       activeStep: 0
     }
   },
-  mixins: [NewPage({ storeNamespace: 'order', name: 'Order' })],
   computed: {
     submitText () {
       if (this.activeStep === 0) {
@@ -110,14 +107,53 @@ export default {
       }
 
       return 'Place Order'
+    },
+    orderDraft: {
+      get () {
+        return this.$store.state.order.recordDraft
+      },
+      set (value) {
+        this.$store.dispatch(`order/setRecordDraft`, value)
+      }
+    },
+    order () {
+      return this.$store.state.order.record
+    },
+    paymentDraft: {
+      get () {
+        return this.$store.state.payment.recordDraft
+      },
+      set (value) {
+        this.$store.dispatch(`payment/setRecordDraft`, value)
+      }
     }
   },
   methods: {
-    recordCreated (record) {
-      this.$store.dispatch('pushRoute', { name: 'ShowOrder', params: { id: record.id } })
+    nextStep (orderDraft) {
+      if (this.activeStep === 0) {
+        this.activeStep += 1
+        return
+      }
+
+      if (this.activeStep === 1) {
+        this.isLoading = true
+        this.$store.dispatch('order/updateRecord', { id: orderDraft.id, recordDraft: orderDraft }).then(order => {
+          this.isLoading = false
+          this.activeStep += 1
+        }).catch(errors => {
+          this.errors = errors
+          this.isLoading = false
+
+          this.$message({
+            showClose: true,
+            message: `Unable to continue. please fix the highlighted form errors then try again.`,
+            type: 'error'
+          })
+        })
+      }
     },
-    nextStep () {
-      this.activeStep += 1
+    createPayment () {
+      createStripeToken().then(data => console.log(data.token))
     },
     cancel () {
       console.log('cancel')

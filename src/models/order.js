@@ -10,6 +10,8 @@ export default {
       email: '',
       status: 'cart',
 
+      fulfillmentMethod: 'ship',
+
       lineItems: []
     }
   }

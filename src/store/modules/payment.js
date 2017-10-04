@@ -1,10 +1,9 @@
 import _ from 'lodash'
 
-import OrderLineItemAPI from '@/api/order-line-item'
-import OrderAPI from '@/api/order'
+import PaymentAPI from '@/api/payment'
 import JSONAPI from '@/jsonapi'
 
-import Order from '@/models/order'
+import Payment from '@/models/payment'
 
 const MT = {
   SET_RECORD: 'SET_RECORD',
@@ -16,15 +15,11 @@ const MT = {
 export default {
   namespaced: true,
   state: {
-    record: Order.objectWithDefaults(),
-    recordDraft: Order.objectWithDefaults(),
+    record: Payment.objectWithDefaults(),
+    recordDraft: Payment.objectWithDefaults(),
     records: []
   },
   actions: {
-    setRecord ({ commit }, record) {
-      commit(MT.SET_RECORD, record)
-    },
-
     setRecordDraft ({ commit }, record) {
       commit(MT.SET_RECORD_DRAFT, record)
     },
@@ -45,7 +40,7 @@ export default {
       }
 
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
-      return OrderAPI.getRecord(actionPayload.id, options).then(response => {
+      return PaymentAPI.getRecord(actionPayload.id, options).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
         commit(MT.SET_RECORD, record)
@@ -58,7 +53,7 @@ export default {
 
     createRecord (context, recordDraft) {
       let apiPayload = { data: JSONAPI.serialize(recordDraft) }
-      return OrderAPI.createRecord(apiPayload).then(response => {
+      return PaymentAPI.createRecord(apiPayload).then(response => {
         return JSONAPI.deserialize(response.data.data)
       }).then(record => {
         context.commit(MT.SET_RECORD, record)
@@ -73,8 +68,7 @@ export default {
       let apiPayload = { data: JSONAPI.serialize(actionPayload.recordDraft) }
 
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
-      console.log('updateRecord')
-      return OrderAPI.updateRecord(actionPayload.id, apiPayload, options).then(response => {
+      return PaymentAPI.updateRecord(actionPayload.id, apiPayload, options).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
         commit(MT.SET_RECORD, record)
@@ -88,7 +82,7 @@ export default {
     loadRecords ({ state, commit, rootState }, actionPayload) {
       actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
 
-      return OrderAPI.queryRecord(actionPayload).then(response => {
+      return PaymentAPI.queryRecord(actionPayload).then(response => {
         return { meta: response.data.meta, resources: JSONAPI.deserialize(response.data.data) }
       }).then(response => {
         commit(MT.SET_RECORDS, response.resources)
@@ -98,63 +92,18 @@ export default {
     },
 
     deleteRecord ({ commit }, id) {
-      return OrderAPI.deleteRecord(id).then(response => {
+      return PaymentAPI.deleteRecord(id).then(response => {
         commit(MT.RESET_RECORD)
 
         return response
-      })
-    },
-
-    createLineItem ({ state, commit }, lineItemDraft) {
-      let orderCreated = new Promise((resolve, reject) => {
-        resolve(lineItemDraft.order)
-      })
-      if (!lineItemDraft.order.id) {
-        let order = Order.objectWithDefaults()
-        let payload = { data: JSONAPI.serialize(order) }
-
-        orderCreated = OrderAPI.createRecord(payload).then(response => {
-          return JSONAPI.deserialize(response.data.data)
-        })
-      }
-
-      orderCreated.then(order => {
-        let apiPayload = { data: JSONAPI.serialize(lineItemDraft) }
-        return Promise.all([OrderLineItemAPI.createRecord(order.id, apiPayload), order])
-      }).then(responses => {
-        let order = responses[1]
-        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children' })
-      }).then(response => {
-        let apiPayload = response.data
-        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.SET_RECORD, record)
-
-        return record
-      }).catch(error => {
-        throw JSONAPI.deserializeErrors(error.response.data.errors)
-      })
-    },
-    deleteLineItem ({ state, commit }, lineItem) {
-      let order = lineItem.order
-
-      OrderLineItemAPI.deleteRecord(lineItem.id).then(() => {
-        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children' })
-      }).then(response => {
-        let apiPayload = response.data
-        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.SET_RECORD, record)
-
-        return record
-      }).catch(error => {
-        throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
     }
   },
 
   mutations: {
     [MT.RESET_RECORD] (state) {
-      state.record = Order.objectWithDefaults()
-      state.recordDraft = Order.objectWithDefaults()
+      state.record = Payment.objectWithDefaults()
+      state.recordDraft = Payment.objectWithDefaults()
     },
 
     [MT.SET_RECORD] (state, record) {

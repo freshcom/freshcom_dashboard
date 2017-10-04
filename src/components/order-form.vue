@@ -9,12 +9,9 @@
     <el-input v-model="formModel.email"></el-input>
   </el-form-item>
 
-  <el-form-item label="First Name" :error="errorMessages.firstName">
-    <el-input v-model="formModel.firstName"></el-input>
-  </el-form-item>
-
-  <el-form-item label="Last Name" :error="errorMessages.lastName">
-    <el-input v-model="formModel.lastName"></el-input>
+  <el-form-item label="Name" :error="errorMessages.firstName" required>
+    <el-input v-model="formModel.firstName" placeholder="First Name" class="name-input"></el-input>
+    <el-input v-model="formModel.lastName" placeholder="Last Name" class="name-input"></el-input>
   </el-form-item>
 
   <el-form-item label="Phone Number" :error="errorMessages.phoneNumber">
@@ -23,29 +20,39 @@
 
   <hr>
 
-  <el-form-item label="Street Address 1" :error="errorMessages.deliveryAddressLineOne">
-    <el-input v-model="formModel.deliveryAddressLineOne"></el-input>
+  <el-form-item label="Fulfillment Method" :error="errorMessages.fulfillmentMethod" required>
+    <el-select @change="updateValue" v-model="formModel.fulfillmentMethod">
+      <el-option label="Ship" value="ship"></el-option>
+      <el-option label="Pick Up" value="pickup"></el-option>
+      <el-option label="Digital" value="digital"></el-option>
+    </el-select>
   </el-form-item>
 
-  <el-form-item label="Street Address 2" :error="errorMessages.deliveryAddressLineTwo">
-    <el-input v-model="formModel.deliveryAddressLineTwo"></el-input>
-  </el-form-item>
+  <template v-if="formModel.fulfillmentMethod === 'ship'">
+    <el-form-item label="Street Address 1" :error="errorMessages.deliveryAddressLineOne" required>
+      <el-input v-model="formModel.deliveryAddressLineOne"></el-input>
+    </el-form-item>
 
-  <el-form-item label="Province" :error="errorMessages.deliveryAddressProvince">
-    <el-input v-model="formModel.deliveryAddressProvince"></el-input>
-  </el-form-item>
+    <el-form-item label="Street Address 2" :error="errorMessages.deliveryAddressLineTwo">
+      <el-input v-model="formModel.deliveryAddressLineTwo"></el-input>
+    </el-form-item>
 
-  <el-form-item label="City" :error="errorMessages.deliveryAddressCity">
-    <el-input v-model="formModel.deliveryAddressCity"></el-input>
-  </el-form-item>
+    <el-form-item label="Province" :error="errorMessages.deliveryAddressProvince" required>
+      <el-input v-model="formModel.deliveryAddressProvince"></el-input>
+    </el-form-item>
 
-  <el-form-item label="Country" :error="errorMessages.deliveryAddressCountry">
-    <el-input v-model="formModel.deliveryAddressCountry"></el-input>
-  </el-form-item>
+    <el-form-item label="City" :error="errorMessages.deliveryAddressCity" required>
+      <el-input v-model="formModel.deliveryAddressCity"></el-input>
+    </el-form-item>
 
-  <el-form-item label="Postal Code" :error="errorMessages.deliveryAddressPostalCode">
-    <el-input v-model="formModel.deliveryAddressPostalCode"></el-input>
-  </el-form-item>
+    <el-form-item label="Country" :error="errorMessages.deliveryAddressCountry" required>
+      <el-input v-model="formModel.deliveryAddressCountry"></el-input>
+    </el-form-item>
+
+    <el-form-item label="Postal Code" :error="errorMessages.deliveryAddressPostalCode" required>
+      <el-input v-model="formModel.deliveryAddressPostalCode"></el-input>
+    </el-form-item>
+  </template>
 </el-form>
 </template>
 
@@ -91,5 +98,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+.name-input {
+  width: 49.6%;
+}
 </style>
