@@ -40,7 +40,6 @@
           </div>
 
           <div class="footer">
-
             <template v-if="activeStep === 0">
               <el-button @click="cancel">
                 Cancel
@@ -70,7 +69,6 @@
                 Place Order
               </el-button>
             </template>
-
           </div>
         </el-card>
       </div>
@@ -81,10 +79,12 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import OrderLineItemForm from '@/components/order-line-item-form'
 import PaymentForm from '@/components/payment-form'
 import OrderForm from '@/components/order-form'
 import { createToken as createStripeToken } from 'vue-stripe-elements'
+import errorI18nKey from '@/utils/error-i18n-key'
 
 export default {
   name: 'NewOrder',
@@ -92,6 +92,9 @@ export default {
     OrderLineItemForm,
     OrderForm,
     PaymentForm
+  },
+  created () {
+    this.$store.dispatch('order/resetRecord')
   },
   data () {
     return {
@@ -152,8 +155,36 @@ export default {
         })
       }
     },
-    createPayment () {
-      createStripeToken().then(data => console.log(data.token))
+    createPayment (paymentDraft, order) {
+      this.isLoading = true
+
+      createStripeToken().then(data => {
+        paymentDraft = _.cloneDeep(paymentDraft)
+        paymentDraft.order = order
+        paymentDraft.source = data.token.id
+        return this.$store.dispatch('payment/createRecord', paymentDraft)
+      }).then(payment => {
+        this.$message({
+          showClose: true,
+          message: `Order placed successfully.`,
+          type: 'success'
+        })
+
+        this.isLoading = false
+        this.$store.dispatch('order/resetRecord')
+        return this.$store.dispatch('pushRoute', { name: 'ListOrder' })
+      }).catch(errors => {
+        this.isLoading = false
+        if (errors.source) {
+          let errorCode = errors.source[0]
+          this.$message({
+            showClose: true,
+            duration: 0,
+            message: this.$t(errorI18nKey('payment', 'source', errorCode)),
+            type: 'error'
+          })
+        }
+      })
     },
     cancel () {
       console.log('cancel')

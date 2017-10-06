@@ -45,8 +45,8 @@
       <el-input v-model="formModel.deliveryAddressCity"></el-input>
     </el-form-item>
 
-    <el-form-item label="Country" :error="errorMessages.deliveryAddressCountry" required>
-      <el-input v-model="formModel.deliveryAddressCountry"></el-input>
+    <el-form-item label="Country" :error="errorMessages.deliveryAddressCountryCode" required>
+      <el-input v-model="formModel.deliveryAddressCountryCode"></el-input>
     </el-form-item>
 
     <el-form-item label="Postal Code" :error="errorMessages.deliveryAddressPostalCode" required>

@@ -1,6 +1,6 @@
 <template>
   <el-autocomplete
-    v-model="selectedOption"
+    v-model="inputModel"
     :fetch-suggestions="queryProduct"
     placeholder="Search for product..."
     :disabled="!!selectedOption"
@@ -33,6 +33,7 @@ export default {
   },
   data () {
     return {
+      inputModel: '',
       selectedOption: undefined,
       options: [],
       records: []
@@ -72,6 +73,7 @@ export default {
     },
     clear () {
       this.selectedOption = undefined
+      this.inputModel = ''
       this.$emit('input', undefined)
     }
   }

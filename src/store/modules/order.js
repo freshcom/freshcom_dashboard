@@ -73,7 +73,6 @@ export default {
       let apiPayload = { data: JSONAPI.serialize(actionPayload.recordDraft) }
 
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
-      console.log('updateRecord')
       return OrderAPI.updateRecord(actionPayload.id, apiPayload, options).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)

@@ -12,11 +12,11 @@ export default {
     strValue: {
       get () {
         if (this.value === 0) {
-          return '0'
+          return '0.00'
         } else if (!this.value) {
           return ''
         } else {
-          return (this.value / 100).toString()
+          return (this.value / 100).toFixed(2)
         }
       },
 

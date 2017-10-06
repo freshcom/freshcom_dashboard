@@ -15,7 +15,7 @@
   </el-form-item>
 
   <el-form-item v-if="formModel.gateway === 'online'" label="Action" :error="errorMessages.status" required>
-    <el-radio-group v-model="formModel.status">
+    <el-radio-group @change="updateValue" v-model="formModel.status">
       <el-radio label="paid">Pay Now</el-radio>
       <el-radio label="pending">Pay through Paylink</el-radio>
     </el-radio-group>
@@ -69,7 +69,6 @@
     </el-form-item>
   </template>
 
-  <button class='pay-with-stripe' @click='pay' type="button" :disabled='!complete'>Pay with credit card</button>
 </el-form>
 </template>
 
@@ -111,15 +110,7 @@ export default {
   methods: {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
-    }, 300),
-    pay () {
-      // createToken returns a Promise which resolves in a result object with
-      // either a token or an error key.
-      // See https://stripe.com/docs/api#tokens for the token object.
-      // See https://stripe.com/docs/api#errors for the error object.
-      // More general https://stripe.com/docs/stripe.js#stripe-create-token.
-      // createToken().then(data => console.log(data.token))
-    }
+    }, 300)
   }
 }
 </script>

@@ -13,7 +13,9 @@ export default {
       product: null,
       productItem: null,
       sku: null,
-      unlockable: null
+      unlockable: null,
+
+      children: []
     }
   }
 }

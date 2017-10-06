@@ -36,6 +36,8 @@ import ShowPricePage from '@/pages/price/show'
 
 import ListOrderPage from '@/pages/order/list'
 import NewOrderPage from '@/pages/order/new'
+import ShowOrderPage from '@/pages/order/show'
+import EditOrderPage from '@/pages/order/edit'
 
 Vue.use(Router)
 
@@ -286,6 +288,25 @@ export default new Router({
         let query = qs.parse(queryString)
 
         return { customerId: query.customerId, callbackPath: query.callbackPath }
+      }
+    },
+    {
+      path: '/orders/:id',
+      name: 'ShowOrder',
+      component: ShowOrderPage,
+      props (route) {
+        return { id: route.params.id }
+      }
+    },
+    {
+      path: '/orders/:id/edit',
+      name: 'EditOrder',
+      component: EditOrderPage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { id: route.params.id, callbackPath: query.callbackPath }
       }
     }
   ]

@@ -121,7 +121,7 @@
     </el-tabs>
   </div>
 
-  <div class="m-b-10">
+  <div v-if="isLineItemTableVisible" class="m-b-10">
     <el-table :data="tableData" @expand="lineItemExpanded" row-key="id" :expand-row-keys="expandedLineItemIds" class="nested-table" style="width: 100%">
       <el-table-column type="expand" width="40px">
         <template scope="props">
@@ -325,6 +325,9 @@ export default {
         })
       }, [])
     },
+    isLineItemTableVisible () {
+      return this.order.rootLineItems.length > 0
+    },
     grandTotalCents () {
       if (!this.subTotalCents) {
         return 0
@@ -417,6 +420,7 @@ export default {
         this.product = null
         this.productItem = null
         this.price = null
+        this.orderQuantity = 1
       })
     },
     addCustomLineItem () {
@@ -490,11 +494,5 @@ export default {
 
 .el-tabs .el-form-item {
   margin: 0px;
-}
-</style>
-
-<style>
-.nested-table .el-table__expanded-cell {
-  padding: 0px;
 }
 </style>

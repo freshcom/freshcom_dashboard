@@ -3,6 +3,12 @@ export default {
   errors: {
     required: '{name} is required.',
     invalid: '{name} is invalid.',
+    payment: {
+      source: {
+        cardDeclined: 'Your card was declined, please try another card.',
+        expiredCard: 'Your card has expired, please try another card.'
+      }
+    },
     price: {
       id: {
         onlyDisabledCanBeDeleted: 'Only Disabled Price can be deleted. Please update the status of the Price to Disabled, then try again.'
@@ -36,6 +42,15 @@ export default {
     }
   },
   attributes: {
+    order: {
+      status: {
+        opened: 'Opened'
+      },
+      fulfillmentMethod: {
+        pickup: 'Pick Up',
+        ship: 'Ship'
+      }
+    },
     product: {
       status: {
         draft: 'Draft',

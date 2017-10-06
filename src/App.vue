@@ -165,6 +165,10 @@ a {
   text-decoration: none;
 }
 
+.nested-table .el-table__expanded-cell {
+  padding: 0px;
+}
+
 a:hover {
   color: #1D8CE0;
 }
