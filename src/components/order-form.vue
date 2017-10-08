@@ -1,6 +1,10 @@
 <template>
 <el-form @input.native="updateValue" label-width="180px">
 
+  <el-form-item label="Customer" :error="errorMessages.customer">
+    <customer-select v-model="formModel.customer"></customer-select>
+  </el-form-item>
+
   <el-form-item label="Code" :error="errorMessages.code">
     <el-input v-model="formModel.code"></el-input>
   </el-form-item>
@@ -59,10 +63,14 @@
 <script>
 import _ from 'lodash'
 import errorI18nKey from '@/utils/error-i18n-key'
+import CustomerSelect from '@/components/customer-select'
 
 export default {
   name: 'OrderForm',
   props: ['value', 'errors', 'record'],
+  components: {
+    CustomerSelect
+  },
   data () {
     return {
       formModel: _.cloneDeep(this.value)

@@ -15,6 +15,8 @@ import PriceStore from '@/store/modules/price'
 import OrderStore from '@/store/modules/order'
 import OrderLineItemStore from '@/store/modules/order-line-item'
 import PaymentStore from '@/store/modules/payment'
+import UnlockableStore from '@/store/modules/unlockable'
+import CustomerStore from '@/store/modules/customer'
 
 Vue.use(Vuex)
 
@@ -37,7 +39,9 @@ export default new Vuex.Store({
     price: PriceStore,
     order: OrderStore,
     orderLineItem: OrderLineItemStore,
-    payment: PaymentStore
+    payment: PaymentStore,
+    unlockable: UnlockableStore,
+    customer: CustomerStore
   },
   state: {
     uiLocale: DEFAULT_LOCALE,

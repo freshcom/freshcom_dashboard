@@ -1,10 +1,10 @@
 <template>
   <el-autocomplete
     v-model="inputModel"
-    :fetch-suggestions="queryProduct"
-    placeholder="Search for product..."
+    :fetch-suggestions="queryUnlockable"
+    placeholder="Search for Unlockable..."
     :disabled="!!selectedOption"
-    @select="setSelectedProduct"
+    @select="setSelectedUnlockable"
   >
 
   <el-button v-if="selectedOption" slot="append" @click="clear()">
@@ -17,18 +17,11 @@
 <script>
 import _ from 'lodash'
 import JSONAPI from '@/jsonapi'
-import ProductAPI from '@/api/product'
+import UnlockableAPI from '@/api/unlockable'
 
 export default {
-  name: 'ProductSelect',
+  name: 'UnlockableSelect',
   props: {
-    filter: {
-      type: Object,
-      default: function () {
-        return {}
-      }
-    },
-    include: String,
     value: Object
   },
   data () {
@@ -41,32 +34,29 @@ export default {
   },
   watch: {
     value (newValue) {
-      this.selectedOption = this._productToOption(newValue).value
-      if (!this.selectedOption) {
-        this.inputModel = ''
-      }
+      this.selectedOption = this._unlockableToOption(newValue).value
     }
   },
   methods: {
-    queryProduct (searchKeyword, callback) {
-      ProductAPI.queryRecord({ search: searchKeyword, filter: this.filter, include: this.include }).then(response => {
+    queryUnlockable (searchKeyword, callback) {
+      UnlockableAPI.queryRecord({ search: searchKeyword }).then(response => {
         let apiPayload = response.data
-        this.records = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        this.options = _.map(this.records, this._productToOption)
+        this.records = JSONAPI.deserialize(apiPayload.data)
+        this.options = _.map(this.records, this._unlockableToOption)
 
         callback(this.options)
       })
     },
-    setSelectedProduct (selectedOption) {
-      let product = _.find(this.records, { id: selectedOption.id })
-      this.$emit('input', product)
+    setSelectedUnlockable (selectedOption) {
+      let unlockable = _.find(this.records, { id: selectedOption.id })
+      this.$emit('input', unlockable)
     },
     clear () {
       this.selectedOption = undefined
       this.inputModel = ''
       this.$emit('input', undefined)
     },
-    _productToOption (record) {
+    _unlockableToOption (record) {
       if (!record) {
         return { value: undefined }
       }

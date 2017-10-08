@@ -1,13 +1,13 @@
 <template>
   <el-autocomplete
-    v-model="skuChoice"
+    v-model="inputModel"
     :fetch-suggestions="querySku"
     placeholder="Search for SKU..."
-    :disabled="selected"
-    @select="setSku"
+    :disabled="!!selectedOption"
+    @select="setSelectedSku"
   >
 
-  <el-button v-if="selected" slot="append" @click="clear()">
+  <el-button v-if="selectedOption" slot="append" @click="clear()">
     <icon name="times" scale="0.8" class="v-middle"></icon>
   </el-button>
 
@@ -21,38 +21,52 @@ import SkuAPI from '@/api/sku'
 
 export default {
   name: 'SkuSelect',
+  props: {
+    value: Object
+  },
   data () {
     return {
-      skuChoice: undefined,
-      selected: false
+      inputModel: '',
+      selectedOption: undefined,
+      options: [],
+      records: []
+    }
+  },
+  watch: {
+    value (newValue) {
+      this.selectedOption = this._skuToOption(newValue).value
     }
   },
   methods: {
     querySku (searchKeyword, callback) {
       SkuAPI.queryRecord({ search: searchKeyword }).then(response => {
         let apiPayload = response.data
-        let records = JSONAPI.deserialize(apiPayload.data)
-        let names = _.map(records, (record) => {
-          let info = ''
-          if (record.code) {
-            info += `[${record.code}] `
-          }
-          info += record.name + ' :: ' + record.status + ' :: ' + record.id
-          return { value: info, id: record.id }
-        })
+        this.records = JSONAPI.deserialize(apiPayload.data)
+        this.options = _.map(this.records, this._skuToOption)
 
-        callback(names)
+        callback(this.options)
       })
     },
-    setSku (skuChoice) {
-      this.selected = true
-      this.$emit('select', skuChoice)
+    setSelectedSku (selectedOption) {
+      let sku = _.find(this.records, { id: selectedOption.id })
+      this.$emit('input', sku)
     },
     clear () {
-      this.skuChoice = undefined
-      this.selected = false
+      this.selectedOption = undefined
+      this.inputModel = ''
+      this.$emit('input', undefined)
+    },
+    _skuToOption (record) {
+      if (!record) {
+        return { value: undefined }
+      }
 
-      this.$emit('select', undefined)
+      let info = ''
+      if (record.code) {
+        info += `[${record.code}] `
+      }
+      info += record.name + ' :: ' + record.status
+      return { value: info, id: record.id }
     }
   }
 }

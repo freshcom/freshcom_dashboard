@@ -1,22 +1,22 @@
 <template>
 <el-form @input.native="updateValue" label-width="180px">
-  <el-form-item v-if="!record.product" label="Product" required>
-    <product-select @select="setProduct"></product-select>
-  </el-form-item>
-
   <el-form-item v-if="record.product" label="Product">
     {{formModel.product.id}}
   </el-form-item>
 
   <el-form-item v-if="!record.id" label="Source Type" required>
-    <el-select v-model="sourceType">
-      <el-option label="SKU" value="Sku"></el-option>
-      <el-option label="Unlockable" value="Unlockable"></el-option>
+    <el-select @change="clearSource()" v-model="sourceType">
+      <el-option label="SKU" value="sku"></el-option>
+      <el-option label="Unlockable" value="unlockable"></el-option>
     </el-select>
   </el-form-item>
 
-  <el-form-item v-if="sourceType == 'Sku' && !record.id" label="SKU" :error="skuErrorMessage" required>
-    <sku-select @select="setSku"></sku-select>
+  <el-form-item v-if="sourceType == 'sku' && !record.id" label="SKU" :error="skuErrorMessage" required>
+    <sku-select @input="updateValue" v-model="formModel.sku"></sku-select>
+  </el-form-item>
+
+  <el-form-item v-if="sourceType == 'unlockable' && !record.id" label="Unlockable" :error="skuErrorMessage" required>
+    <unlockable-select @input="updateValue" v-model="formModel.unlockable"></unlockable-select>
   </el-form-item>
 
   <el-form-item v-if="record.sku" label="SKU">
@@ -78,22 +78,22 @@
 
 <script>
 import _ from 'lodash'
-import ProductSelect from '@/components/product-select'
 import SkuSelect from '@/components/sku-select'
+import UnlockableSelect from '@/components/unlockable-select'
 import errorI18nKey from '@/utils/error-i18n-key'
 
 export default {
   name: 'ProductItemForm',
   components: {
-    ProductSelect,
-    SkuSelect
+    SkuSelect,
+    UnlockableSelect
   },
   props: ['value', 'errors', 'record'],
   data () {
     return {
       formModel: _.cloneDeep(this.value),
       productChoice: '',
-      sourceType: 'Sku',
+      sourceType: 'sku',
       imageUrl: '',
       pendingAvatarId: ''
     }
@@ -108,8 +108,11 @@ export default {
     skuErrorMessage () {
       if (this.errorMessages['relationships']) {
         return 'SKU is invalid'
-      } else {
-        return
+      }
+    },
+    unlockableErrorMessage () {
+      if (this.errorMessages['relationships']) {
+        return 'Unlockable is invalid'
       }
     },
     avatarUrl () {
@@ -148,29 +151,11 @@ export default {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
-    beforeAvatarUpload () {
-
-    },
-    handleAvatarSuccess () {
-
-    },
-    querySku () {
-
-    },
-    setSku (sku) {
-      if (sku) {
-        this.formModel.sku = { id: sku.id, type: 'Sku' }
-      } else {
-        this.formModel.sku = {}
-      }
-      this.updateValue()
-    },
-    setProduct (product) {
-      if (product) {
-        this.formModel.product = { id: product.id, type: 'Product' }
-      } else {
-        delete this.formModel.product
-      }
+    clearSource () {
+      let formModel = _.cloneDeep(this.formModel)
+      delete formModel.sku
+      delete formModel.unlockable
+      this.formModel = formModel
       this.updateValue()
     },
     uploadAvatar (e) {

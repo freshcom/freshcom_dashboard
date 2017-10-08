@@ -39,6 +39,16 @@ import NewOrderPage from '@/pages/order/new'
 import ShowOrderPage from '@/pages/order/show'
 import EditOrderPage from '@/pages/order/edit'
 
+import ListUnlockablePage from '@/pages/unlockable/list'
+import ShowUnlockablePage from '@/pages/unlockable/show'
+import EditUnlockablePage from '@/pages/unlockable/edit'
+import NewUnlockablePage from '@/pages/unlockable/new'
+
+import ListCustomerPage from '@/pages/customer/list'
+import ShowCustomerPage from '@/pages/customer/show'
+import NewCustomerPage from '@/pages/customer/new'
+import EditCustomerPage from '@/pages/customer/edit'
+
 Vue.use(Router)
 
 function extractPagination (route) {
@@ -302,6 +312,87 @@ export default new Router({
       path: '/orders/:id/edit',
       name: 'EditOrder',
       component: EditOrderPage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { id: route.params.id, callbackPath: query.callbackPath }
+      }
+    },
+    {
+      path: '/unlockables',
+      name: 'ListUnlockable',
+      component: ListUnlockablePage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          page: page
+        }
+      }
+    },
+    {
+      path: '/unlockables/:id',
+      name: 'ShowUnlockable',
+      component: ShowUnlockablePage,
+      props (route) {
+        return { id: route.params.id }
+      }
+    },
+    {
+      path: '/unlockables/:id/edit',
+      name: 'EditUnlockable',
+      component: EditUnlockablePage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { id: route.params.id, callbackPath: query.callbackPath }
+      }
+    },
+    {
+      path: '/unlockables/new',
+      name: 'NewUnlockable',
+      component: NewUnlockablePage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { customerId: query.customerId, callbackPath: query.callbackPath }
+      }
+    },
+    {
+      path: '/customers',
+      name: 'ListCustomer',
+      component: ListCustomerPage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          page: page
+        }
+      }
+    },
+    {
+      path: '/customers/new',
+      name: 'NewCustomer',
+      component: NewCustomerPage,
+      props (route) {
+        return { id: route.params.id }
+      }
+    },
+    {
+      path: '/customers/:id',
+      name: 'ShowCustomer',
+      component: ShowCustomerPage,
+      props (route) {
+        return { id: route.params.id }
+      }
+    },
+    {
+      path: '/customers/:id/edit',
+      name: 'EditCustomer',
+      component: EditCustomerPage,
       props (route) {
         let queryString = route.fullPath.split('?')[1]
         let query = qs.parse(queryString)

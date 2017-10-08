@@ -1,10 +1,10 @@
 <template>
   <el-autocomplete
     v-model="inputModel"
-    :fetch-suggestions="queryProduct"
-    placeholder="Search for product..."
+    :fetch-suggestions="queryCustomer"
+    placeholder="Search for Customer..."
     :disabled="!!selectedOption"
-    @select="setSelectedProduct"
+    @select="setSelectedCustomer"
   >
 
   <el-button v-if="selectedOption" slot="append" @click="clear()">
@@ -17,18 +17,12 @@
 <script>
 import _ from 'lodash'
 import JSONAPI from '@/jsonapi'
-import ProductAPI from '@/api/product'
+import CustomerAPI from '@/api/customer'
+import Customer from '@/models/customer'
 
 export default {
-  name: 'ProductSelect',
+  name: 'CustomerSelect',
   props: {
-    filter: {
-      type: Object,
-      default: function () {
-        return {}
-      }
-    },
-    include: String,
     value: Object
   },
   data () {
@@ -41,32 +35,29 @@ export default {
   },
   watch: {
     value (newValue) {
-      this.selectedOption = this._productToOption(newValue).value
-      if (!this.selectedOption) {
-        this.inputModel = ''
-      }
+      this.selectedOption = this._customerToOption(newValue).value
     }
   },
   methods: {
-    queryProduct (searchKeyword, callback) {
-      ProductAPI.queryRecord({ search: searchKeyword, filter: this.filter, include: this.include }).then(response => {
+    queryCustomer (searchKeyword, callback) {
+      CustomerAPI.queryRecord({ search: searchKeyword }).then(response => {
         let apiPayload = response.data
-        this.records = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        this.options = _.map(this.records, this._productToOption)
+        this.records = JSONAPI.deserialize(apiPayload.data)
+        this.options = _.map(this.records, this._customerToOption)
 
         callback(this.options)
       })
     },
-    setSelectedProduct (selectedOption) {
-      let product = _.find(this.records, { id: selectedOption.id })
-      this.$emit('input', product)
+    setSelectedCustomer (selectedOption) {
+      let customer = _.find(this.records, { id: selectedOption.id })
+      this.$emit('input', customer)
     },
     clear () {
       this.selectedOption = undefined
       this.inputModel = ''
       this.$emit('input', undefined)
     },
-    _productToOption (record) {
+    _customerToOption (record) {
       if (!record) {
         return { value: undefined }
       }
@@ -75,7 +66,9 @@ export default {
       if (record.code) {
         info += `[${record.code}] `
       }
-      info += record.name + ' :: ' + record.status
+
+      info += Customer.fullName(record)
+      info += ' :: ' + record.status
       return { value: info, id: record.id }
     }
   }

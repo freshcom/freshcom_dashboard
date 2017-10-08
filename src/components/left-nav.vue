@@ -20,7 +20,7 @@
             <icon name="inbox" scale="1"></icon>
             <span>Orders</span>
           </el-menu-item>
-          <el-menu-item index="customers">
+          <el-menu-item :route="{ name: 'ListCustomer' }" index="/customers">
             <icon name="users" scale="0.8"></icon>
             <span>Customers</span>
           </el-menu-item>
@@ -39,7 +39,7 @@
             <icon name="cube" scale="0.8"></icon>
             <span>SKUs</span>
           </el-menu-item>
-          <el-menu-item index="unlockables">
+          <el-menu-item :route="{ name: 'ListUnlockable' }" index="/unlockables">
             <icon name="unlock-alt" scale="0.8"></icon>
             <span>Unlockables</span>
           </el-menu-item>
