@@ -2,8 +2,10 @@
 <el-form @input.native="updateValue" label-width="180px">
 
   <el-form-item label="Customer" :error="errorMessages.customer">
-    <customer-select v-model="formModel.customer"></customer-select>
+    <customer-select @input="updateValue" v-model="formModel.customer" :filter="{ status: ['internal', 'registered'] }"></customer-select>
   </el-form-item>
+
+  <hr>
 
   <el-form-item label="Code" :error="errorMessages.code">
     <el-input v-model="formModel.code"></el-input>

@@ -1,5 +1,5 @@
 <template>
-<el-form @input.native="updateValue">
+<el-form v-loading="isLoading" @input.native="updateValue">
   <div class="m-b-10">
 
     <el-tabs v-model="activeTab" type="border-card">
@@ -62,7 +62,7 @@
               </el-switch>
 
               <el-button type="default" @click="addProductLineItem()" :disabled="!isAddClickable">
-                Add
+                Add Line Item
               </el-button>
             </span>
           </div>
@@ -232,7 +232,8 @@ export default {
       expandedLineItemIds: [],
       taxOneCents: 0,
       taxTwoCents: 0,
-      taxThreeCents: 0
+      taxThreeCents: 0,
+      isLoading: false
     }
   },
   watch: {
@@ -403,6 +404,7 @@ export default {
       }
     },
     addProductLineItem () {
+      this.isLoading = true
       let orderLineItem = OrderLineItem.objectWithDefaults()
       if (this.product.itemMode === 'all') {
         orderLineItem.product = this.product
@@ -421,6 +423,8 @@ export default {
         this.productItem = null
         this.price = null
         this.orderQuantity = 1
+
+        this.isLoading = false
       })
     },
     addCustomLineItem () {

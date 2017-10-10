@@ -117,7 +117,7 @@ export default {
         })
       }
 
-      orderCreated.then(order => {
+      return orderCreated.then(order => {
         let apiPayload = { data: JSONAPI.serialize(lineItemDraft) }
         return Promise.all([OrderLineItemAPI.createRecord(order.id, apiPayload), order])
       }).then(responses => {

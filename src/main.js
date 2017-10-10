@@ -61,6 +61,10 @@ Vue.use(ElementUI, {
   }
 })
 
+// -- Moment.js --
+import vueMoment from 'vue-moment'
+Vue.use(vueMoment)
+
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

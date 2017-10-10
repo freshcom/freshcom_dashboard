@@ -7,11 +7,11 @@
     @select="setSelectedCustomer"
   >
 
-  <el-button v-if="selectedOption" slot="append" @click="clear()">
-    <icon name="times" scale="0.8" class="v-middle"></icon>
-  </el-button>
-
+    <el-button v-if="selectedOption" slot="append" @click="clear()">
+      <icon name="times" scale="0.8" class="v-middle"></icon>
+    </el-button>
   </el-autocomplete>
+
 </template>
 
 <script>
@@ -23,6 +23,12 @@ import Customer from '@/models/customer'
 export default {
   name: 'CustomerSelect',
   props: {
+    filter: {
+      type: Object,
+      default: function () {
+        return {}
+      }
+    },
     value: Object
   },
   data () {
@@ -40,7 +46,7 @@ export default {
   },
   methods: {
     queryCustomer (searchKeyword, callback) {
-      CustomerAPI.queryRecord({ search: searchKeyword }).then(response => {
+      CustomerAPI.queryRecord({ search: searchKeyword, filter: this.filter }).then(response => {
         let apiPayload = response.data
         this.records = JSONAPI.deserialize(apiPayload.data)
         this.options = _.map(this.records, this._customerToOption)

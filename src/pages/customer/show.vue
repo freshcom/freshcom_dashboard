@@ -68,6 +68,97 @@
             </div>
 
             <div class="block-title">
+              <h3>Orders</h3>
+
+              <span class="block-title-actions pull-right">
+                <router-link :to="{ name: 'NewOrder', query: { customerId: record.id, callbackPath: currentRoutePath } }">
+                  <icon name="plus" scale="0.8" class="v-middle"></icon>
+                  <span>Add</span>
+                </router-link>
+              </span>
+            </div>
+
+            <div class="block">
+              <div class="block-body full">
+                <el-table :data="record.orders" stripe class="block-table" :show-header="false" style="width: 100%">
+                  <el-table-column width="500">
+                    <template scope="scope">
+                      <router-link :to="{ name: 'ShowOrder', params: { id: scope.row.id } }">
+                        <span v-if="scope.row.code">[{{scope.row.code}}]</span>
+                        <span v-if="!scope.row.code">{{scope.row.id}}</span>
+                        <el-tag type="gray">
+                          {{$t(`attributes.order.status.${scope.row.status}`)}}
+                        </el-tag>
+                      </router-link>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column width="150">
+                    <template scope="scope">
+                      {{scope.row.insertedAt | moment("MMM Do YYYY")}}
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column>
+                    <template scope="scope">
+                      {{scope.row.grandTotalCents | dollar}}
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </div>
+
+              <div class="block-footer no-divider text-center">
+                <a class="view-more" href="#">View More</a>
+              </div>
+            </div>
+
+            <div class="block-title">
+              <h3>Unlocks</h3>
+
+              <span class="block-title-actions pull-right">
+                <router-link :to="{ name: 'NewUnlock', query: { customerId: record.id, callbackPath: currentRoutePath } }">
+                  <icon name="plus" scale="0.8" class="v-middle"></icon>
+                  <span>Add</span>
+                </router-link>
+              </span>
+            </div>
+
+            <div class="block">
+              <div class="block-body full">
+                <el-table :data="record.unlocks" stripe class="block-table" :show-header="false" style="width: 100%">
+                  <el-table-column width="500">
+                    <template scope="scope">
+                      <router-link :to="{ name: 'ShowUnlockable', params: { id: scope.row.id } }">
+                        <span v-if="scope.row.unlockable.code">[{{scope.row.unlockable.code}}]</span>
+                        <span>{{scope.row.unlockable.name}}</span>
+                      </router-link>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column width="150">
+                    <template scope="scope">
+                      {{scope.row.insertedAt | moment("MMM Do YYYY")}}
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column>
+                    <template scope="scope">
+                      <p class="text-right actions">
+                        <delete-button @confirmed="deleteUnlock(scope.row.id)" size="mini">
+                          Delete
+                        </delete-button>
+                      </p>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </div>
+
+              <div class="block-footer no-divider text-center">
+                <a class="view-more" href="#">View More</a>
+              </div>
+            </div>
+
+            <div class="block-title">
               <h3>File Collections</h3>
 
               <span class="block-title-actions pull-right">
@@ -114,7 +205,6 @@
                 <a class="view-more" href="#">View More</a>
               </div>
             </div>
-
 
             <div class="block-title">
               <h3>Custom Data</h3>
@@ -165,13 +255,17 @@ import 'vue-awesome/icons/plus'
 
 import ShowPage from '@/mixins/show-page'
 import DeleteButton from '@/components/delete-button'
+import { dollar } from '@/helpers/filters'
 
 export default {
   name: 'ShowCustomer',
   components: {
     DeleteButton
   },
-  mixins: [ShowPage({ storeNamespace: 'customer', name: 'Customer', include: 'externalFileCollections' })],
+  filters: {
+    dollar
+  },
+  mixins: [ShowPage({ storeNamespace: 'customer', name: 'Customer', include: 'externalFileCollections,orders,unlocks.unlockable' })],
   computed: {
     avatarUrl () {
       if (this.record.avatar) {
