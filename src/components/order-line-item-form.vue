@@ -1,205 +1,228 @@
 <template>
-<el-form v-loading="isLoading" @input.native="updateValue">
-  <div class="m-b-10">
+<div id="order-line-item-form" class="component-wrapper">
+  <el-form v-loading="isLoading" @input.native="updateValue">
+    <div class="m-b-10">
 
-    <el-tabs v-model="activeTab" type="border-card">
-      <el-tab-pane label="Product" name="productTab">
-        <el-form-item>
-          <div class="m-b-10">
-            <product-select v-model="product" :filter="{ status: ['active', 'internal'] }" include="prices,defaultPrice" class="product-input">
-            </product-select>
+      <el-tabs v-model="activeTab" type="border-card">
+        <el-tab-pane label="Product" name="productTab">
+          <el-form-item>
+            <div class="m-b-10">
+              <product-select v-model="product" :filter="{ status: ['active', 'internal'] }" include="prices,defaultPrice" class="product-input">
+              </product-select>
 
-            <el-select @change="updateValue" :disabled="!isProductItemSelectable" :placeholder="productItemPlaceholder" v-model="productItem" value-key="id" class="product-item-input">
-              <template v-if="product">
-                <el-option v-for="item in product.items" :key="item.id" :label="item.name" :value="item">
-                  {{item.name}}
+              <el-select @change="updateValue" :disabled="!isProductItemSelectable" :placeholder="productItemPlaceholder" v-model="productItem" value-key="id" class="product-item-input">
+                <template v-if="product">
+                  <el-option v-for="item in product.items" :key="item.id" :label="item.name" :value="item">
+                    {{item.name}}
+                  </el-option>
+                </template>
+              </el-select>
+            </div>
+
+            <div class="m-b-10">
+              <span class="m-r-10">x</span>
+              <el-input-number v-model="orderQuantity" :min="1" :step="1" class="order-quantity-input"></el-input-number>
+
+              <span v-if="price" class="m-r-10">{{price.orderUnit}}</span>
+
+              <span v-if="price && price.estimateByDefault">
+                <span class="m-r-10">=</span>
+                <el-input v-model="chargeQuantity" @focus="$event.target.select()" type="number" class="charge-quantity-input">
+                </el-input>
+
+                <span class="m-r-10">LB</span>
+
+                <span class="m-r-10">x</span>
+              </span>
+
+              <span v-if="!price || !price.estimateByDefault" class="m-r-10">@</span>
+              <el-select @change="updateValue" v-model="price" value-key="id" placeholder="" :disabled="!price" class="price-input">
+                <el-option v-for="price in selectablePrices" :key="price.id" v-bind:label="price | chargeDollar" :value="price">
+                  <span v-if="price.name">{{price.name}} -</span>
+                  <span>{{price | chargeDollar}}</span>
                 </el-option>
-              </template>
-            </el-select>
-          </div>
+              </el-select>
 
-          <div class="m-b-10">
-            <span class="m-r-10">x</span>
-            <el-input-number v-model="orderQuantity" :min="1" :step="1" class="order-quantity-input"></el-input-number>
+              <div class="pull-right">
+                <span class="m-r-10">=</span>
 
-            <span v-if="price" class="m-r-10">{{price.orderUnit}}</span>
+                <price-amount-input class="sub-total-input" @change="updateValue" @input="refreshChargeQuantity" v-model="subTotalCents" :disabled="!price || !price.estimateByDefault">
+                </price-amount-input>
+              </div>
+            </div>
 
-            <span v-if="price && price.estimateByDefault">
-              <span class="m-r-10">=</span>
-              <el-input v-model="chargeQuantity" @focus="$event.target.select()" type="number" class="charge-quantity-input">
+            <div>
+              <span class="pull-right">
+                <span>Is Estimate?</span>
+                <el-switch
+                  @change="updateValue"
+                  v-model="isEstimate"
+                  :disabled="!isIsEstimateTogglable"
+                  on-text="Yes"
+                  off-text="No">
+                </el-switch>
+
+                <el-button type="default" @click="addProductLineItem()" :disabled="!isAddClickable">
+                  Add Line Item
+                </el-button>
+              </span>
+            </div>
+          </el-form-item>
+        </el-tab-pane>
+
+        <el-tab-pane label="Custom" name="customTab">
+          <el-form-item>
+            <div class="m-b-10">
+              <el-input
+                placeholder="Enter name..."
+                v-model="name"
+                class="name-input">
               </el-input>
 
-              <span class="m-r-10">LB</span>
-
-              <span class="m-r-10">x</span>
-            </span>
-
-            <span v-if="!price || !price.estimateByDefault" class="m-r-10">@</span>
-            <el-select @change="updateValue" v-model="price" value-key="id" placeholder="" :disabled="!price" class="price-input">
-              <el-option v-for="price in selectablePrices" :key="price.id" v-bind:label="price | chargeDollar" :value="price">
-                <span v-if="price.name">{{price.name}} -</span>
-                <span>{{price | chargeDollar}}</span>
-              </el-option>
-            </el-select>
-
-            <div class="pull-right">
-              <span class="m-r-10">=</span>
-
-              <price-amount-input @change="updateValue" @input="refreshChargeQuantity" v-model="subTotalCents" :disabled="!price || !price.estimateByDefault">
+              <price-amount-input class="pull-right" @change="updateValue" v-model="subTotalCents">
               </price-amount-input>
             </div>
-          </div>
 
-          <div>
-            <span class="pull-right">
-              <span>Is Estimate?</span>
-              <el-switch
-                @change="updateValue"
-                v-model="isEstimate"
-                :disabled="!isIsEstimateTogglable"
-                on-text="Yes"
-                off-text="No">
-              </el-switch>
+            <div class="m-b-10">
+              <price-amount-input class="m-r-10" @change="updateValue" v-model="taxOneCents">
+              </price-amount-input>
 
-              <el-button type="default" @click="addProductLineItem()" :disabled="!isAddClickable">
-                Add Line Item
-              </el-button>
-            </span>
-          </div>
-        </el-form-item>
-      </el-tab-pane>
+              <span class="m-r-10">+</span>
 
-      <el-tab-pane label="Custom" name="customTab">
-        <el-form-item>
-          <div class="m-b-10">
-            <el-input
-              placeholder="Enter name..."
-              v-model="name"
-              class="name-input">
-            </el-input>
+              <price-amount-input class="m-r-10" @change="updateValue" v-model="taxTwoCents">
+              </price-amount-input>
 
-            <price-amount-input class="pull-right" @change="updateValue" v-model="subTotalCents">
-            </price-amount-input>
-          </div>
+              <span class="m-r-10">+</span>
 
-          <div class="m-b-10">
-            <price-amount-input class="m-r-10" @change="updateValue" v-model="taxOneCents">
-            </price-amount-input>
+              <price-amount-input class="m-r-10" @change="updateValue" v-model="taxThreeCents">
+              </price-amount-input>
 
-            <span class="m-r-10">+</span>
+              <span class="m-r-10">=</span>
+              <price-amount-input class="pull-right" @change="updateValue" v-model="grandTotalCents" :disabled="true">
+              </price-amount-input>
+            </div>
 
-            <price-amount-input class="m-r-10" @change="updateValue" v-model="taxTwoCents">
-            </price-amount-input>
+            <div>
+              <span class="pull-right">
+                <span>Is Estimate?</span>
+                <el-switch
+                  @change="updateValue"
+                  v-model="isEstimate"
+                  on-text="Yes"
+                  off-text="No">
+                </el-switch>
 
-            <span class="m-r-10">+</span>
+                <el-button type="default" @click="addCustomLineItem()" :disabled="!isAddClickable">
+                  Add Line Item
+                </el-button>
+              </span>
+            </div>
+          </el-form-item>
+        </el-tab-pane>
+      </el-tabs>
+    </div>
 
-            <price-amount-input class="m-r-10" @change="updateValue" v-model="taxThreeCents">
-            </price-amount-input>
+    <div v-if="isLineItemTableVisible" class="m-b-10">
+      <el-table :data="tableData" @expand="lineItemExpanded" row-key="id" :expand-row-keys="expandedLineItemIds" class="nested-table" style="width: 100%">
+        <el-table-column type="expand" width="40px">
+          <template scope="props">
+            <el-table :data="props.row.children" :show-header="false" style="width: 100%">
+              <el-table-column width="50px" label="" prop="">
+              </el-table-column>
+              <el-table-column width="300px" label="Name" prop="name">
+              </el-table-column>
+              <el-table-column width="150px" label="Qty" prop="orderQuantity">
+              </el-table-column>
+              <el-table-column label="$" prop="subTotal">
+              </el-table-column>
+            </el-table>
+          </template>
+        </el-table-column>
+        <el-table-column
+          width="300px"
+          label="Name"
+          prop="name">
+        </el-table-column>
+        <el-table-column
+          header-align="c"
+          width="150px"
+          label="Qty"
+          prop="quantity">
+        </el-table-column>
+        <el-table-column
+          header-align="center"
+          width="120px"
+          align="right"
+          label="Amount"
+          prop="subTotal">
+        </el-table-column>
+        <el-table-column label="" width="130px">
+          <template scope="scope">
+            <el-button size="mini">
+              Edit
+            </el-button>
+            <delete-button @confirmed="deleteLineItem(scope.row.id)" size="mini">
+              Delete
+            </delete-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
 
-            <span class="m-r-10">=</span>
-            <price-amount-input class="pull-right" @change="updateValue" v-model="grandTotalCents" :disabled="true">
-            </price-amount-input>
-          </div>
+    <div id="summary" class="m-b-10">
+      <div id="summary-labels" style="width: 490px; float: left;" class="text-right">
+        <p>Sub Total</p>
+        <p v-if="order.taxOneCents">Tax 1</p>
+        <p v-if="order.taxTwoCents">Tax 2</p>
+        <p v-if="order.taxThreeCents">Tax 3</p>
+        <p><b>Grand Total</b></p>
+        <p v-if="order.isEstimate"><b>Authorization Amount</b></p>
+      </div>
 
-          <div>
-            <span class="pull-right">
-              <span>Is Estimate?</span>
-              <el-switch
-                @change="updateValue"
-                v-model="isEstimate"
-                on-text="Yes"
-                off-text="No">
-              </el-switch>
+      <div id="summary-values" style="overflow: hidden; width: 103px;" class="text-right">
+        <p><span v-if="order.isEstimate">~</span> <span>{{order.subTotalCents | dollar}}</span></p>
+        <p v-if="order.taxOneCents"><span>{{order.taxOneCents | dollar}}</span></p>
+        <p v-if="order.taxTwoCents"><span>{{order.taxTwoCents | dollar}}</span></p>
+        <p v-if="order.taxThreeCents"><span>{{order.taxThreeCents | dollar}}</span></p>
+        <span v-if="order.isEstimate">~</span> <span>{{order.grandTotalCents | dollar}}</span>
+        <p v-if="order.isEstimate">{{order.authorizationCents | dollar}}</p>
+      </div>
+    </div>
 
-              <el-button type="default" @click="addCustomLineItem()" :disabled="!isAddClickable">
-                Add Line Item
-              </el-button>
-            </span>
-          </div>
-        </el-form-item>
-      </el-tab-pane>
-    </el-tabs>
-  </div>
+<!--     <div class="text-right">
+      <p v-if="order.subTotalCents">
+        <span class="m-r-20">Sub Total:</span>
+        <span v-if="order.isEstimate">~</span> <span>{{order.subTotalCents | dollar}}</span>
+      </p>
 
-  <div v-if="isLineItemTableVisible" class="m-b-10">
-    <el-table :data="tableData" @expand="lineItemExpanded" row-key="id" :expand-row-keys="expandedLineItemIds" class="nested-table" style="width: 100%">
-      <el-table-column type="expand" width="40px">
-        <template scope="props">
-          <el-table :data="props.row.children" :show-header="false" style="width: 100%">
-            <el-table-column width="50px" label="" prop="">
-            </el-table-column>
-            <el-table-column width="300px" label="Name" prop="name">
-            </el-table-column>
-            <el-table-column width="150px" label="Qty" prop="orderQuantity">
-            </el-table-column>
-            <el-table-column label="$" prop="subTotal">
-            </el-table-column>
-          </el-table>
-        </template>
-      </el-table-column>
-      <el-table-column
-        width="300px"
-        label="Name"
-        prop="name">
-      </el-table-column>
-      <el-table-column
-        header-align="c"
-        width="150px"
-        label="Qty"
-        prop="quantity">
-      </el-table-column>
-      <el-table-column
-        header-align="center"
-        align="right"
-        label="Amount"
-        prop="subTotal">
-      </el-table-column>
-      <el-table-column label="" width="130px">
-        <template scope="scope">
-          <el-button size="mini">
-            Edit
-          </el-button>
-          <delete-button @confirmed="deleteLineItem(scope.row.id)" size="mini">
-            Delete
-          </delete-button>
-        </template>
-      </el-table-column>
-    </el-table>
-  </div>
+      <p v-if="order.taxOneCents">
+        <span class="m-r-20">Tax 1:</span>
+        <span>{{order.taxOneCents | dollar}}</span>
+      </p>
 
-  <div class="text-right">
-    <p v-if="order.subTotalCents">
-      <span class="m-r-20">Sub Total:</span>
-      <span v-if="order.isEstimate">~</span> <span>{{order.subTotalCents | dollar}}</span>
-    </p>
+      <p v-if="order.taxTwoCents">
+        <span class="m-r-20">Tax 2:</span>
+        <span>{{order.taxTwoCents | dollar}}</span>
+      </p>
 
-    <p v-if="order.taxOneCents">
-      <span class="m-r-20">Tax 1:</span>
-      <span>{{order.taxOneCents | dollar}}</span>
-    </p>
+      <p v-if="order.taxThreeCents">
+        <span class="m-r-20">Tax 3:</span>
+        <span>{{order.taxThreeCents | dollar}}</span>
+      </p>
 
-    <p v-if="order.taxTwoCents">
-      <span class="m-r-20">Tax 2:</span>
-      <span>{{order.taxTwoCents | dollar}}</span>
-    </p>
+      <p v-if="order.grandTotalCents">
+        <b class="m-r-20">Grand Total:</b>
+        <span v-if="order.isEstimate">~</span> <span>{{order.grandTotalCents | dollar}}</span>
+      </p>
 
-    <p v-if="order.taxThreeCents">
-      <span class="m-r-20">Tax 3:</span>
-      <span>{{order.taxThreeCents | dollar}}</span>
-    </p>
+      <p v-if="order.isEstimate">
+        <b class="m-r-20">AA:</b>
+        <span>{{order.authorizationCents | dollar}}</span>
+      </p>
+    </div> -->
 
-    <p v-if="order.grandTotalCents">
-      <b class="m-r-20">Grand Total:</b>
-      <span v-if="order.isEstimate">~</span> <span>{{order.grandTotalCents | dollar}}</span>
-    </p>
-
-    <p v-if="order.isEstimate">
-      <b class="m-r-20">AA:</b>
-      <span>{{order.authorizationCents | dollar}}</span>
-    </p>
-  </div>
-
-</el-form>
+  </el-form>
+</div>
 </template>
 
 <script>
@@ -525,5 +548,11 @@ export default {
 
 .el-tabs .el-form-item {
   margin: 0px;
+}
+</style>
+
+<style>
+#order-line-item-form .sub-total-input.el-input.is-disabled .el-input__inner {
+  color: black;
 }
 </style>
