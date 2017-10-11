@@ -100,7 +100,7 @@
                   <el-table-column width="150">
                     <template scope="scope">
                       <template v-if="isProductItemPriceVisiable(scope.row)">
-                        ${{scope.row.defaultPrice.chargeCents / 100}}/{{scope.row.defaultPrice.chargeUnit}}
+                        {{scope.row.defaultPrice | chargeDollar}}
                       </template>
                     </template>
                   </el-table-column>
@@ -184,7 +184,6 @@
                   </el-table-column>
                 </el-table>
               </div>
-
 
               <div class="block-footer no-divider text-center">
                 <a class="view-more" href="#">View More</a>
@@ -294,11 +293,15 @@ import _ from 'lodash'
 import ShowPage from '@/mixins/show-page'
 import DeleteButton from '@/components/delete-button'
 import errorI18nKey from '@/utils/error-i18n-key'
+import { chargeDollar } from '@/helpers/filters'
 
 export default {
   name: 'ShowProduct',
   components: {
     DeleteButton
+  },
+  filters: {
+    chargeDollar
   },
   mixins: [ShowPage({ storeNamespace: 'product', name: 'Product', include: 'avatar,items.defaultPrice,externalFileCollections,prices' })],
   computed: {

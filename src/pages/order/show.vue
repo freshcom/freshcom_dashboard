@@ -153,7 +153,61 @@
               </div>
             </div>
 
+            <div class="block-title">
+              <h3>Payments</h3>
 
+              <span class="block-title-actions pull-right">
+                <router-link :to="{ name: 'NewPayment', query: { orderId: record.id, callbackPath: currentRoutePath } }">
+                  <icon name="plus" scale="0.8" class="v-middle"></icon>
+                  <span>Add</span>
+                </router-link>
+              </span>
+            </div>
+
+            <div class="block">
+              <div class="block-body full">
+                <el-table :data="record.payments" stripe class="block-table" :show-header="false" style="width: 100%">
+                  <el-table-column width="250">
+                    <template scope="scope">
+                      <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }">
+                        <template v-if="scope.row.status === 'authorized'">
+                          {{scope.row.authorizedAmountCents | dollar}}
+                        </template>
+
+                        <template v-if="scope.row.status === 'paid'">
+                          {{scope.row.paidAmountCents | dollar}}
+                        </template>
+
+                        <el-tag v-if="scope.row.status != 'active'" type="gray">
+                          {{$t(`attributes.payment.status.${scope.row.status}`)}}
+                        </el-tag>
+                      </router-link>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column width="350">
+                    <template scope="scope">
+                      <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }">
+                        <span>{{scope.row.id}}</span>
+                      </router-link>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column>
+                    <template scope="scope">
+                      <p class="text-right">
+                        <span>{{scope.row.insertedAt | moment("MMM Do YYYY")}}</span>
+                      </p>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </div>
+
+
+              <div class="block-footer no-divider text-center">
+                <a class="view-more" href="#">View More</a>
+              </div>
+            </div>
 
             <div class="block-title">
               <h3>Custom Data</h3>
@@ -242,7 +296,7 @@ export default {
       }, [])
     }
   },
-  mixins: [ShowPage({ storeNamespace: 'order', name: 'Order', include: 'rootLineItems.children' })],
+  mixins: [ShowPage({ storeNamespace: 'order', name: 'Order', include: 'rootLineItems.children,payments' })],
   methods: {
     editRecord () {
       this.$store.dispatch('pushRoute', { name: 'EditOrder', params: { id: this.record.id }, query: { callbackPath: this.currentRoutePath } })

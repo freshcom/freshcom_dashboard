@@ -311,6 +311,10 @@ p.search-notice {
   margin-right: 10px;
 }
 
+.m-r-20 {
+  margin-right: 20px;
+}
+
 .m-b-10 {
   margin-bottom: 10px;
 }

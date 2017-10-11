@@ -46,7 +46,7 @@
                   </template>
 
                   <dt>Status</dt>
-                  <dd>{{record.status}}</dd>
+                  <dd>{{$t(`attributes.customer.status.${record.status}`)}}</dd>
 
                   <dt>Name</dt>
                   <dd>{{record.firstName}} {{record.lastName}}</dd>
@@ -86,7 +86,10 @@
                       <router-link :to="{ name: 'ShowOrder', params: { id: scope.row.id } }">
                         <span v-if="scope.row.code">[{{scope.row.code}}]</span>
                         <span v-if="!scope.row.code">{{scope.row.id}}</span>
-                        <el-tag type="gray">
+                        <el-tag v-if="scope.row.status === 'opened'">
+                          {{$t(`attributes.order.status.${scope.row.status}`)}}
+                        </el-tag>
+                        <el-tag v-if="scope.row.status != 'opened'" type="gray">
                           {{$t(`attributes.order.status.${scope.row.status}`)}}
                         </el-tag>
                       </router-link>
@@ -101,7 +104,8 @@
 
                   <el-table-column>
                     <template scope="scope">
-                      {{scope.row.grandTotalCents | dollar}}
+
+                      <p class="text-right">{{scope.row.grandTotalCents | dollar}}</p>
                     </template>
                   </el-table-column>
                 </el-table>

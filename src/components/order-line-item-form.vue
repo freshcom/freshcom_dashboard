@@ -22,7 +22,7 @@
             <span class="m-r-10">x</span>
             <el-input-number v-model="orderQuantity" :min="1" :step="1" class="order-quantity-input"></el-input-number>
 
-            <span class="m-r-10">BOX</span>
+            <span v-if="price" class="m-r-10">{{price.orderUnit}}</span>
 
             <span v-if="price && price.estimateByDefault">
               <span class="m-r-10">=</span>
@@ -112,7 +112,7 @@
               </el-switch>
 
               <el-button type="default" @click="addCustomLineItem()" :disabled="!isAddClickable">
-                Add
+                Add Line Item
               </el-button>
             </span>
           </div>
@@ -143,12 +143,15 @@
         prop="name">
       </el-table-column>
       <el-table-column
+        header-align="c"
         width="150px"
         label="Qty"
         prop="quantity">
       </el-table-column>
       <el-table-column
-        label="$"
+        header-align="center"
+        align="right"
+        label="Amount"
         prop="subTotal">
       </el-table-column>
       <el-table-column label="" width="130px">
@@ -164,25 +167,35 @@
     </el-table>
   </div>
 
-  <div style="text-align: right;">
+  <div class="text-right">
     <p v-if="order.subTotalCents">
-      <b>Sub Total:</b> <span>{{order.subTotalCents | dollar}}</span>
+      <span class="m-r-20">Sub Total:</span>
+      <span v-if="order.isEstimate">~</span> <span>{{order.subTotalCents | dollar}}</span>
     </p>
 
     <p v-if="order.taxOneCents">
-      <b>Tax 1:</b> <span>{{order.taxOneCents | dollar}}</span>
+      <span class="m-r-20">Tax 1:</span>
+      <span>{{order.taxOneCents | dollar}}</span>
     </p>
 
     <p v-if="order.taxTwoCents">
-      <b>Tax 2:</b> <span>{{order.taxTwoCents | dollar}}</span>
+      <span class="m-r-20">Tax 2:</span>
+      <span>{{order.taxTwoCents | dollar}}</span>
     </p>
 
     <p v-if="order.taxThreeCents">
-      <b>Tax 3:</b> <span>{{order.taxThreeCents | dollar}}</span>
+      <span class="m-r-20">Tax 3:</span>
+      <span>{{order.taxThreeCents | dollar}}</span>
     </p>
 
     <p v-if="order.grandTotalCents">
-      <b>Grand Total:</b> <span>{{order.grandTotalCents | dollar}}</span>
+      <b class="m-r-20">Grand Total:</b>
+      <span v-if="order.isEstimate">~</span> <span>{{order.grandTotalCents | dollar}}</span>
+    </p>
+
+    <p v-if="order.isEstimate">
+      <b class="m-r-20">AA:</b>
+      <span>{{order.authorizationCents | dollar}}</span>
     </p>
   </div>
 
@@ -246,10 +259,7 @@ export default {
     },
     product (product) {
       if (!product) {
-        this.product = null
-        this.productItem = null
-        this.price = null
-        return
+        return this.reset()
       }
 
       if (product && product.itemMode === 'all') {
@@ -309,20 +319,33 @@ export default {
     tableData () {
       return _.reduce(this.order.rootLineItems, (acc, lineItem) => {
         let quantity = `${lineItem.orderQuantity}`
-        if (lineItem.priceEstimateByDefault) {
+        if (lineItem.isEstimate) {
+          quantity += ` (~ ${lineItem.chargeQuantity}${lineItem.priceChargeUnit})`
+        } else if (lineItem.priceEstimateByDefault) {
           quantity += ` (${lineItem.chargeQuantity}${lineItem.priceChargeUnit})`
         }
+
         let taxTotalCents = lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents
         let grandTotalCents = lineItem.subTotalCents + lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents
+
+        let subTotal = dollar(lineItem.subTotalCents)
+        if (lineItem.isEstimate) {
+          subTotal = `~ ${subTotal}`
+        }
+
+        let grandTotal = dollar(grandTotalCents)
+        if (lineItem.isEstimate) {
+          grandTotal = `~ ${grandTotal}`
+        }
 
         return _.concat(acc, {
           id: lineItem.id,
           name: lineItem.name,
           quantity: quantity,
           children: lineItem.children,
-          subTotal: dollar(lineItem.subTotalCents),
+          subTotal: subTotal,
           taxTotal: dollar(taxTotalCents),
-          grandTotal: dollar(grandTotalCents)
+          grandTotal: grandTotal
         })
       }, [])
     },
@@ -391,6 +414,14 @@ export default {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
+    reset () {
+      this.product = null
+      this.productItem = null
+      this.price = null
+      this.orderQuantity = 1
+      this.chargeQuantity = null
+      this.isEstimate = false
+    },
     lineItemExpanded (row) {
       if (row.children && (row.children.length > 0) && !_.includes(this.expandedLineItemIds, row.id)) {
         this.expandedLineItemIds = [row.id]
@@ -419,11 +450,7 @@ export default {
       orderLineItem.order = this.order
 
       this.$store.dispatch('order/createLineItem', orderLineItem).then(() => {
-        this.product = null
-        this.productItem = null
-        this.price = null
-        this.orderQuantity = 1
-
+        this.reset()
         this.isLoading = false
       })
     },

@@ -42,6 +42,17 @@ export default {
     }
   },
   attributes: {
+    payment: {
+      status: {
+        authorized: 'Authorized',
+        paid: 'Paid'
+      }
+    },
+    customer: {
+      status: {
+        registered: 'Registered'
+      }
+    },
     order: {
       status: {
         opened: 'Opened'

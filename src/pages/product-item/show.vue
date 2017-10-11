@@ -101,7 +101,7 @@
 
                   <el-table-column width="150">
                     <template scope="scope">
-                      <span>${{scope.row.chargeCents / 100}}/{{scope.row.chargeUnit}}</span>
+                      <span>{{scope.row | chargeDollar}}</span>
                     </template>
                   </el-table-column>
 
@@ -195,11 +195,15 @@ import 'vue-awesome/icons/plus'
 import ShowPage from '@/mixins/show-page'
 import DeleteButton from '@/components/delete-button'
 import errorI18nKey from '@/utils/error-i18n-key'
+import { chargeDollar } from '@/helpers/filters'
 
 export default {
   name: 'ShowProductItem',
   components: {
     DeleteButton
+  },
+  filters: {
+    chargeDollar
   },
   mixins: [ShowPage({ storeNamespace: 'productItem', name: 'Product Item', include: 'prices,product' })],
   computed: {

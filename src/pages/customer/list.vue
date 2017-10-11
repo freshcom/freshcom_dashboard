@@ -33,7 +33,7 @@
               Stop typing to search...
             </p>
             <el-table v-if="hasSearchResult" @row-click="viewRecord" :data="tableData" stripe class="full">
-              <el-table-column prop="name" label="Customer" width="350"></el-table-column>
+              <el-table-column prop="name" label="Customer" width="300"></el-table-column>
               <el-table-column prop="status" label="Status" width="150"></el-table-column>
               <el-table-column prop="id" label="ID"></el-table-column>
             </el-table>
