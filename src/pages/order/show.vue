@@ -107,6 +107,13 @@
 
             <div class="block-title">
               <h3>Line Items</h3>
+
+              <span class="block-title-actions pull-right">
+                <router-link :to="{ name: 'NewOrderLineItem', query: { orderId: record.id, callbackPath: currentRoutePath } }">
+                  <icon name="plus" scale="0.8" class="v-middle"></icon>
+                  <span>Add</span>
+                </router-link>
+              </span>
             </div>
             <div class="block">
               <div class="block-body full">
@@ -187,16 +194,14 @@
 
                   <el-table-column width="350">
                     <template scope="scope">
-                      <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }">
-                        <span>{{scope.row.id}}</span>
-                      </router-link>
+                      <span>{{scope.row.insertedAt | moment("MMM Do YYYY")}}</span>
                     </template>
                   </el-table-column>
 
                   <el-table-column>
                     <template scope="scope">
-                      <p class="text-right">
-                        <span>{{scope.row.insertedAt | moment("MMM Do YYYY")}}</span>
+                      <p class="text-right actions">
+
                       </p>
                     </template>
                   </el-table-column>

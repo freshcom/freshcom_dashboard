@@ -5,6 +5,7 @@
     placeholder="Search for product..."
     :disabled="!!selectedOption"
     @select="setSelectedProduct"
+    class="product-select"
   >
 
   <el-button v-if="selectedOption" slot="append" @click="clear()">
@@ -83,6 +84,8 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-
+<style>
+.product-select .el-input.is-disabled .el-input__inner {
+  color: #000;
+}
 </style>
