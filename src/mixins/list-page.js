@@ -21,15 +21,16 @@ export default function (options) {
         isEnteringSearchKeyword: false,
         searched: false,
         totalCount: 0,
-        resultCount: 0,
-        isLoading: true
+        resultCount: 0
       }
     },
     created () {
-      if (!this.session) { return }
       this.search()
     },
     computed: {
+      isLoading () {
+        return this.$store.state[storeNamespace].isLoadingRecords
+      },
       noSearchResult () {
         return this.searched && this.resultCount === 0
       },
@@ -38,9 +39,6 @@ export default function (options) {
       },
       records () {
         return this.$store.state[storeNamespace].records
-      },
-      session () {
-        return this.$store.state.session.record
       }
     },
     watch: {
@@ -51,10 +49,6 @@ export default function (options) {
         if (_.isEqual(newPage, oldPage)) {
           return
         }
-        this.search()
-      },
-      session (newSession) {
-        if (!newSession) { return }
         this.search()
       }
     },
@@ -73,16 +67,14 @@ export default function (options) {
         this.$router.replace({ name: this.$store.state.route.name, query: q })
       }, 300),
       search () {
-        this.isLoading = true
         this.$store.dispatch(`${storeNamespace}/loadRecords`, { search: this.searchKeyword, page: this.page, fields: fields }).then(response => {
           this.totalCount = response.meta.totalCount
           this.resultCount = response.meta.resultCount
           this.searched = true
-          this.isLoading = false
         })
       },
       goTo (route) {
-        this.$store.dispatch('pushRoute', route)
+        this.$router.push(route)
       }
     }
   }

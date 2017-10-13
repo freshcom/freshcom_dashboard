@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 import router from '@/router'
+import createLogger from 'vuex/dist/logger'
 
 import { DEFAULT_LOCALE } from '@/env'
 
@@ -28,7 +29,7 @@ const MT = {
 
 export default new Vuex.Store({
   strict: true,
-  plugins: [ExternalFilePlugin],
+  plugins: [createLogger(), ExternalFilePlugin],
   modules: {
     session: SessionStore,
     externalFileCollection: ExternalFileCollectionStore,

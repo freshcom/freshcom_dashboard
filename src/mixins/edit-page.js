@@ -15,7 +15,6 @@ export default function (options) {
       }
     },
     created () {
-      if (!this.session) { return }
       this.loadRecord()
     },
     beforeRouteLeave (to, from, next) {
@@ -44,15 +43,6 @@ export default function (options) {
         set (value) {
           this.$store.dispatch(`${storeNamespace}/setRecordDraft`, value)
         }
-      },
-      session () {
-        return this.$store.state.session.record
-      }
-    },
-    watch: {
-      session (newSession) {
-        if (!newSession) { return }
-        this.loadRecord()
       }
     },
     methods: {

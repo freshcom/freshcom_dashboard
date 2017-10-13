@@ -7,10 +7,12 @@ import JSONAPI from '@/jsonapi'
 import Order from '@/models/order'
 
 const MT = {
-  SET_RECORD: 'SET_RECORD',
-  SET_RECORD_DRAFT: 'SET_RECORD_DRAFT',
-  RESET_RECORD: 'RESET_RECORD',
-  SET_RECORDS: 'SET_RECORDS'
+  RECORD_CHANGED: 'RECORD_CHANGED',
+  RECORD_DRAFT_CHANGED: 'RECORD_DRAFT_CHANGED',
+  RECORD_RESET: 'RECORD_RESET',
+  RECORD_LOADING: 'RECORD_LOADING',
+  RECORDS_CHANGED: 'RECORDS_CHANGED',
+  RECORDS_LOADING: 'RECORDS_LOADING'
 }
 
 export default {
@@ -18,22 +20,25 @@ export default {
   state: {
     record: Order.objectWithDefaults(),
     recordDraft: Order.objectWithDefaults(),
-    records: []
+    isLoadingRecord: true,
+    records: [],
+    isLoadingRecords: true
   },
   actions: {
     setRecord ({ commit }, record) {
-      commit(MT.SET_RECORD, record)
+      commit(MT.RECORD_CHANGED, record)
     },
 
     setRecordDraft ({ commit }, record) {
-      commit(MT.SET_RECORD_DRAFT, record)
+      commit(MT.RECORD_DRAFT_CHANGED, record)
     },
 
     resetRecord ({ commit }) {
-      commit(MT.RESET_RECORD)
+      commit(MT.RECORD_RESET)
     },
 
     loadRecord ({ state, commit, rootState }, actionPayload) {
+      commit(MT.RECORD_LOADING)
       if (state.record && state.record.id === actionPayload.id && state.record.locale === rootState.resourceLocale) {
         return new Promise((resolve, reject) => {
           resolve(state.record)
@@ -41,14 +46,14 @@ export default {
       }
 
       if (state.record.id !== actionPayload.id) {
-        commit(MT.RESET_RECORD)
+        commit(MT.RECORD_RESET)
       }
 
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
       return OrderAPI.getRecord(actionPayload.id, options).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.SET_RECORD, record)
+        commit(MT.RECORD_CHANGED, record)
 
         return record
       }).catch(error => {
@@ -61,7 +66,7 @@ export default {
       return OrderAPI.createRecord(apiPayload).then(response => {
         return JSONAPI.deserialize(response.data.data)
       }).then(record => {
-        context.commit(MT.SET_RECORD, record)
+        context.commit(MT.RECORD_CHANGED, record)
 
         return record
       }).catch(error => {
@@ -76,7 +81,7 @@ export default {
       return OrderAPI.updateRecord(actionPayload.id, apiPayload, options).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.SET_RECORD, record)
+        commit(MT.RECORD_CHANGED, record)
 
         return record
       }).catch(error => {
@@ -85,12 +90,13 @@ export default {
     },
 
     loadRecords ({ state, commit, rootState }, actionPayload) {
+      commit(MT.RECORDS_LOADING)
       actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
 
       return OrderAPI.queryRecord(actionPayload).then(response => {
         return { meta: response.data.meta, resources: JSONAPI.deserialize(response.data.data) }
       }).then(response => {
-        commit(MT.SET_RECORDS, response.resources)
+        commit(MT.RECORDS_CHANGED, response.resources)
 
         return response
       })
@@ -98,7 +104,7 @@ export default {
 
     deleteRecord ({ commit }, id) {
       return OrderAPI.deleteRecord(id).then(response => {
-        commit(MT.RESET_RECORD)
+        commit(MT.RECORD_RESET)
 
         return response
       })
@@ -126,7 +132,7 @@ export default {
       }).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.SET_RECORD, record)
+        commit(MT.RECORD_CHANGED, record)
 
         return record
       }).catch(error => {
@@ -141,7 +147,7 @@ export default {
       }).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.SET_RECORD, record)
+        commit(MT.RECORD_CHANGED, record)
 
         return record
       }).catch(error => {
@@ -151,22 +157,32 @@ export default {
   },
 
   mutations: {
-    [MT.RESET_RECORD] (state) {
+    [MT.RECORD_RESET] (state) {
       state.record = Order.objectWithDefaults()
       state.recordDraft = Order.objectWithDefaults()
     },
 
-    [MT.SET_RECORD] (state, record) {
+    [MT.RECORD_CHANGED] (state, record) {
       state.record = record
       state.recordDraft = record
+      state.isLoadingRecord = false
     },
 
-    [MT.SET_RECORD_DRAFT] (state, recordDraft) {
+    [MT.RECORD_LOADING] (state, records) {
+      state.isLoadingRecord = true
+    },
+
+    [MT.RECORD_DRAFT_CHANGED] (state, recordDraft) {
       state.recordDraft = recordDraft
     },
 
-    [MT.SET_RECORDS] (state, records) {
+    [MT.RECORDS_CHANGED] (state, records) {
       state.records = records
+      state.isLoadingRecords = false
+    },
+
+    [MT.RECORDS_LOADING] (state, records) {
+      state.isLoadingRecords = true
     }
   }
 }

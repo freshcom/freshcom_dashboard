@@ -171,20 +171,20 @@
 
     <div id="summary" class="m-b-10">
       <div id="summary-labels" style="width: 490px; float: left;" class="text-right">
-        <p>Sub Total</p>
+        <p v-if="order.subTotalCents">Sub Total</p>
         <p v-if="order.taxOneCents">Tax 1</p>
         <p v-if="order.taxTwoCents">Tax 2</p>
         <p v-if="order.taxThreeCents">Tax 3</p>
-        <p><b>Grand Total</b></p>
+        <p v-if="order.grandTotalCents"><b>Grand Total</b></p>
         <p v-if="order.isEstimate"><b>Authorization Amount</b></p>
       </div>
 
       <div id="summary-values" style="overflow: hidden; width: 103px;" class="text-right">
-        <p><span v-if="order.isEstimate">~</span> <span>{{order.subTotalCents | dollar}}</span></p>
+        <p v-if="order.subTotalCents"><span v-if="order.isEstimate">~</span> <span>{{order.subTotalCents | dollar}}</span></p>
         <p v-if="order.taxOneCents"><span>{{order.taxOneCents | dollar}}</span></p>
         <p v-if="order.taxTwoCents"><span>{{order.taxTwoCents | dollar}}</span></p>
         <p v-if="order.taxThreeCents"><span>{{order.taxThreeCents | dollar}}</span></p>
-        <span v-if="order.isEstimate">~</span> <span>{{order.grandTotalCents | dollar}}</span>
+        <p v-if="order.grandTotalCents"><span v-if="order.isEstimate">~</span> <span>{{order.grandTotalCents | dollar}}</span></p>
         <p v-if="order.isEstimate">{{order.authorizationCents | dollar}}</p>
       </div>
     </div>

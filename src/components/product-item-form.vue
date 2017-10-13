@@ -5,18 +5,39 @@
   </el-form-item>
 
   <el-form-item v-if="!record.id" label="Source Type" required>
-    <el-select @change="clearSource()" v-model="sourceType">
+    <el-select v-model="sourceType" @change="clearSource()">
       <el-option label="SKU" value="sku"></el-option>
       <el-option label="Unlockable" value="unlockable"></el-option>
     </el-select>
   </el-form-item>
 
-  <el-form-item v-if="sourceType == 'sku' && !record.id" label="SKU" :error="skuErrorMessage" required>
-    <sku-select @input="updateValue" v-model="formModel.sku"></sku-select>
+  <el-form-item v-if="sourceType == 'sku' && !record.id" :error="skuErrorMessage" label="SKU" required>
+    <remote-select
+      v-model="formModel.sku"
+      @filter="loadSelectableSkus"
+      @reset="resetSelectableSkus"
+      @input="updateValue"
+      :records="selectableSkus"
+      :isLoading="isLoadingSelectableSkus"
+      placeholder="Select SKU"
+      class="source-select"
+    >
+    </remote-select>
   </el-form-item>
 
-  <el-form-item v-if="sourceType == 'unlockable' && !record.id" label="Unlockable" :error="skuErrorMessage" required>
-    <unlockable-select @input="updateValue" v-model="formModel.unlockable"></unlockable-select>
+  <el-form-item v-if="sourceType == 'unlockable' && !record.id" label="Unlockable" :error="unlockableErrorMessage" required>
+    <!-- <unlockable-select @input="updateValue" v-model="formModel.unlockable"></unlockable-select> -->
+    <remote-select
+      v-model="formModel.unlockable"
+      @filter="loadSelectableUnlockables"
+      @reset="resetSelectableUnlockables"
+      @input="updateValue"
+      :records="selectableUnlockables"
+      :isLoading="isLoadingSelectableUnlockables"
+      placeholder="Select Unlockable"
+      class="source-select"
+    >
+    </remote-select>
   </el-form-item>
 
   <el-form-item v-if="record.sku" label="SKU">
@@ -78,30 +99,39 @@
 
 <script>
 import _ from 'lodash'
-import SkuSelect from '@/components/sku-select'
+import RemoteSelect from '@/components/remote-select'
 import UnlockableSelect from '@/components/unlockable-select'
 import errorI18nKey from '@/utils/error-i18n-key'
 
 export default {
   name: 'ProductItemForm',
   components: {
-    SkuSelect,
+    RemoteSelect,
     UnlockableSelect
   },
   props: ['value', 'errors', 'record'],
   data () {
     return {
       formModel: _.cloneDeep(this.value),
-      productChoice: '',
-      sourceType: 'sku',
-      imageUrl: '',
-      pendingAvatarId: ''
+      sourceType: 'sku'
     }
   },
   computed: {
+    isLoadingSelectableSkus () {
+      return this.$store.state.productItem.isLoadingSelectableSkus
+    },
+    selectableSkus () {
+      return this.$store.state.productItem.selectableSkus
+    },
+    isLoadingSelectableUnlockables () {
+      return this.$store.state.productItem.isLoadingSelectableUnlockables
+    },
+    selectableUnlockables () {
+      return this.$store.state.productItem.selectableUnlockables
+    },
     errorMessages () {
       return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(errorI18nKey('ProductItem', k, v[0]), { name: _.startCase(k) })
+        result[k] = this.$t(errorI18nKey('productItem', k, v[0]), { name: _.startCase(k) })
         return result
       }, {})
     },
@@ -114,56 +144,35 @@ export default {
       if (this.errorMessages['relationships']) {
         return 'Unlockable is invalid'
       }
-    },
-    avatarUrl () {
-      if (!this.formModel.avatar) {
-        return
-      }
-
-      if (this.formModel.avatar.status === 'uploaded') {
-        return this.formModel.avatar.url
-      }
-
-      return URL.createObjectURL(this.formModel.avatar.file)
-    },
-    pendingAvatar () {
-      return _.find(this.$store.state.externalFile.pendingRecords, (externalFile) => { return externalFile.id === this.pendingAvatarId })
-    },
-    uploadedAvatar () {
-      return _.find(this.$store.state.externalFile.uploadedRecords, (externalFile) => { return externalFile.id === this.pendingAvatarId })
     }
   },
   watch: {
     value (v) {
       this.formModel = _.cloneDeep(v)
-    },
-    uploadedAvatar (externalFile) {
-      if (!externalFile) {
-        return
-      }
-
-      this.$store.dispatch('externalFile/popUploadedRecords', [externalFile])
-      this.formModel = _.merge({}, this.formModel, { avatar: externalFile })
-      this.updateValue()
     }
   },
   methods: {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
+    loadSelectableSkus: _.debounce(function (searchKeyword) {
+      this.$store.dispatch('productItem/loadSelectableSkus', { search: searchKeyword })
+    }, 300),
+    resetSelectableSkus () {
+      this.$store.dispatch('productItem/resetSelectableSkus')
+    },
+    loadSelectableUnlockables: _.debounce(function (searchKeyword) {
+      this.$store.dispatch('productItem/loadSelectableUnlockables', { search: searchKeyword })
+    }, 300),
+    resetSelectableUnlockables () {
+      this.$store.dispatch('productItem/resetSelectableUnlockables')
+    },
     clearSource () {
       let formModel = _.cloneDeep(this.formModel)
       delete formModel.sku
       delete formModel.unlockable
       this.formModel = formModel
       this.updateValue()
-    },
-    uploadAvatar (e) {
-      let file = e.file
-      let externalFile = { type: 'ExternalFile', name: file.name, sizeBytes: file.size, contentType: file.type, file: file }
-      this.$store.dispatch('externalFile/pushPendingRecords', [externalFile]).then(externalFiles => {
-        this.pendingAvatarId = externalFiles[0].id
-      })
     }
   }
 }
@@ -171,5 +180,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+.source-select {
+  width: 100%;
+}
 </style>

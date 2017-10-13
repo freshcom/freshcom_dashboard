@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="container">
+    <div v-if="isSessionReady" class="container">
       <div v-if="showLeftNav" class="left-col">
         <left-nav></left-nav>
       </div>
@@ -17,7 +17,7 @@ export default {
     this.spinner = this.$loading({ text: 'Loading...', lock: true })
   },
   created () {
-    return this.$store.dispatch('session/loadRecord').then(() => {
+    return this.$store.dispatch('session/loadToken').then(() => {
       this.spinner.close()
     }).catch(() => {
       this.$store.dispatch('pushRoute', { name: 'Login' })
@@ -27,6 +27,9 @@ export default {
   computed: {
     showLeftNav () {
       return this.$store.state.route.name !== 'Login'
+    },
+    isSessionReady () {
+      return this.$store.state.session.ready
     }
   }
 }

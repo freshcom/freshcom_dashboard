@@ -15,14 +15,11 @@ sync(store, router)
 import jsonapiAxios from './api/jsonapi-axios'
 
 jsonapiAxios.interceptors.request.use(function (config) {
-  let accessToken = store.state.session.record.access_token
-  // debugger
+  let accessToken = store.state.session.token.access_token
   config.headers = config.headers || {}
   config.headers['Authorization'] = `Bearer ${accessToken}`
-  // Do something before request is sent
   return config
 }, function (error) {
-  // Do something with request error
   return Promise.reject(error)
 })
 
@@ -56,7 +53,7 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
 Vue.use(ElementUI, {
   i18n (path, options) {
-    console.log(path, i18n.t(path))
+    // console.log(path, i18n.t(path))
     return i18n.t(path)
   }
 })

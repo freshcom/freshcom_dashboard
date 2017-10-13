@@ -148,7 +148,7 @@
                   </el-table-column>
                   <el-table-column label="" width="130px">
                     <template scope="scope">
-                      <el-button size="mini">
+                      <el-button @click="editLineItem(scope.row)" size="mini">
                         Edit
                       </el-button>
                       <delete-button @confirmed="deleteLineItem(scope.row.id)" size="mini">
@@ -250,6 +250,26 @@
         </el-card>
       </div>
     </div>
+
+    <div class="launchable">
+      <el-dialog title="收货地址" :visible.sync="isLineItemDialogVisiable">
+        <el-form :model="lineItemDialogFormModel">
+          <el-form-item label="活动名称">
+            <el-input v-model="lineItemDialogFormModel.name" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="活动区域">
+            <el-select v-model="lineItemDialogFormModel.region" placeholder="请选择活动区域">
+              <el-option label="区域一" value="shanghai"></el-option>
+              <el-option label="区域二" value="beijing"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="isLineItemDialogVisiable = false">取 消</el-button>
+          <el-button type="primary" @click="saveLineItem()">Save</el-button>
+        </div>
+      </el-dialog>
+    </div>
   </div>
 </div>
 
@@ -275,7 +295,9 @@ export default {
   },
   data () {
     return {
-      expandedLineItemIds: []
+      expandedLineItemIds: [],
+      lineItemDialogFormModel: {},
+      isLineItemDialogVisiable: false
     }
   },
   computed: {
@@ -316,6 +338,13 @@ export default {
         return
       }
       this.expandedLineItemIds = []
+    },
+    editLineItem (lineItem) {
+      this.lineItemDialogFormModel = _.cloneDeep(lineItem)
+      this.isLineItemDialogVisiable = true
+    },
+    saveLineItem () {
+
     }
   }
 }
