@@ -117,7 +117,7 @@
             </div>
             <div class="block">
               <div class="block-body full">
-                <el-table :data="lineItemTableData" @expand="lineItemExpanded" row-key="id" :expand-row-keys="expandedLineItemIds" class="nested-table block-table" style="width: 100%">
+                <!-- <el-table :data="lineItemTableData" @expand="lineItemExpanded" row-key="id" :expand-row-keys="expandedLineItemIds" class="nested-table block-table" style="width: 100%">
                   <el-table-column type="expand" width="40px">
                     <template scope="props">
                       <el-table :data="props.row.children" :show-header="false" style="width: 100%">
@@ -132,31 +132,24 @@
                       </el-table>
                     </template>
                   </el-table-column>
-                  <el-table-column
-                    width="300px"
-                    label="Name"
-                    prop="name">
+                  <el-table-column width="280px" label="Name" prop="name"></el-table-column>
+                  <el-table-column width="120px" label="Qty" prop="quantity"></el-table-column>
+                  <el-table-column width="200px" label="Sub | Tax | Grand" prop="total">
                   </el-table-column>
-                  <el-table-column
-                    width="150px"
-                    label="Qty"
-                    prop="quantity">
-                  </el-table-column>
-                  <el-table-column
-                    label="$"
-                    prop="subTotal">
-                  </el-table-column>
-                  <el-table-column label="" width="130px">
+                  <el-table-column label="">
                     <template scope="scope">
-                      <el-button @click="editLineItem(scope.row)" size="mini">
-                        Edit
+                      <el-button @click="editLineItem(scope.row.id)" size="mini">
+                        <icon name="pencil" scale="0.8" class="v-middle"></icon>
                       </el-button>
                       <delete-button @confirmed="deleteLineItem(scope.row.id)" size="mini">
-                        Delete
+                        <icon name="times" scale="0.8" class="v-middle"></icon>
                       </delete-button>
                     </template>
                   </el-table-column>
-                </el-table>
+                </el-table> -->
+
+                <order-line-item-table @delete="deleteLineItem" @edit="editLineItem" :records="record.rootLineItems" class="block-table">
+                </order-line-item-table>
               </div>
             </div>
 
@@ -252,23 +245,14 @@
     </div>
 
     <div class="launchable">
-      <el-dialog title="收货地址" :visible.sync="isLineItemDialogVisiable">
-        <el-form :model="lineItemDialogFormModel">
-          <el-form-item label="活动名称">
-            <el-input v-model="lineItemDialogFormModel.name" auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="活动区域">
-            <el-select v-model="lineItemDialogFormModel.region" placeholder="请选择活动区域">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
-            </el-select>
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="isLineItemDialogVisiable = false">取 消</el-button>
-          <el-button type="primary" @click="saveLineItem()">Save</el-button>
-        </div>
-      </el-dialog>
+      <order-line-item-dialog
+        v-model="lineItemDraft"
+        @save="saveLineItem"
+        @cancel="closeLineItemDialog"
+        :is-visible="isEditingLineItem"
+      >
+
+      </order-line-item-dialog>
     </div>
   </div>
 </div>
@@ -283,7 +267,9 @@ import 'vue-awesome/icons/plus'
 import _ from 'lodash'
 import ShowPage from '@/mixins/show-page'
 import DeleteButton from '@/components/delete-button'
+import OrderLineItemDialog from '@/components/order-line-item-dialog'
 import { dollar } from '@/helpers/filters'
+import OrderLineItemTable from '@/components/order-line-item-table'
 
 export default {
   name: 'ShowOrder',
@@ -291,60 +277,50 @@ export default {
     dollar
   },
   components: {
-    DeleteButton
+    DeleteButton,
+    OrderLineItemDialog,
+    OrderLineItemTable
   },
   data () {
     return {
       expandedLineItemIds: [],
-      lineItemDialogFormModel: {},
       isLineItemDialogVisiable: false
     }
   },
   computed: {
-    lineItemTableData () {
-      return _.reduce(this.record.rootLineItems, (acc, lineItem) => {
-        let quantity = `${lineItem.orderQuantity}`
-        if (lineItem.priceEstimateByDefault) {
-          quantity += ` (${lineItem.chargeQuantity}${lineItem.priceChargeUnit})`
-        }
-        let taxTotalCents = lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents
-        let grandTotalCents = lineItem.subTotalCents + lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents
-
-        return _.concat(acc, {
-          id: lineItem.id,
-          name: lineItem.name,
-          quantity: quantity,
-          children: lineItem.children,
-          subTotal: dollar(lineItem.subTotalCents),
-          taxTotal: dollar(taxTotalCents),
-          grandTotal: dollar(grandTotalCents),
-          expandable: !!lineItem.product
-        })
-      }, [])
+    isEditingLineItem () {
+      return this.$store.state.order.isEditingLineItem
+    },
+    lineItemDraft: {
+      get () {
+        return this.$store.state.order.lineItemDraft
+      },
+      set (value) {
+        this.$store.dispatch('order/setLineItemDraft', value)
+      }
     }
   },
-  mixins: [ShowPage({ storeNamespace: 'order', name: 'Order', include: 'rootLineItems.children,payments' })],
+  mixins: [ShowPage({ storeNamespace: 'order', name: 'Order', include: 'rootLineItems.children,rootLineItems.price,payments' })],
   methods: {
     editRecord () {
-      this.$store.dispatch('pushRoute', { name: 'EditOrder', params: { id: this.record.id }, query: { callbackPath: this.currentRoutePath } })
+      this.$router.push({ name: 'EditOrder', params: { id: this.record.id }, query: { callbackPath: this.currentRoutePath } })
     },
     recordDeleted () {
       this.$store.dispatch('product/resetRecord')
       this.$store.dispatch('popRoute', 1)
     },
-    lineItemExpanded (row) {
-      if (row.expandable && !_.includes(this.expandedLineItemIds, row.id)) {
-        this.expandedLineItemIds = [row.id]
-        return
-      }
-      this.expandedLineItemIds = []
-    },
-    editLineItem (lineItem) {
-      this.lineItemDialogFormModel = _.cloneDeep(lineItem)
-      this.isLineItemDialogVisiable = true
-    },
-    saveLineItem () {
+    deleteLineItem (lineItemId) {
 
+    },
+    editLineItem (lineItemId) {
+      let lineItem = _.find(this.record.rootLineItems, { id: lineItemId })
+      this.$store.dispatch('order/startLineItemEdit', lineItem)
+    },
+    closeLineItemDialog () {
+      this.$store.dispatch('order/endLineItemEdit')
+    },
+    saveLineItem (formModel) {
+      this.$store.dispatch('order/updateLineItem', formModel)
     }
   }
 }

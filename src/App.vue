@@ -168,8 +168,27 @@ a {
   text-decoration: none;
 }
 
-.nested-table .el-table__expanded-cell {
-  padding: 0px;
+.nested-table {
+  .el-table__expanded-cell {
+    padding: 0px;
+
+    .cell {
+      text-align: left;
+    }
+  }
+
+  .cell {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+
+  tbody tr td:last-child {
+    text-align: right;
+
+    .cell {
+      padding-right: 18px;
+    }
+  }
 }
 
 a:hover {
@@ -324,6 +343,10 @@ p.search-notice {
 
 .m-t-10 {
   margin-top: 10px;
+}
+
+.m-l-20 {
+  margin-left: 20px
 }
 /* END Utils */
 
@@ -632,5 +655,9 @@ small {
 
 /* END File Collection */
 
+/* Dialog */
 
+.fixed-width .el-dialog {
+  width: 750px;
+}
 </style>

@@ -123,50 +123,8 @@
     </div>
 
     <div v-if="isLineItemTableVisible" class="m-b-10">
-      <el-table :data="tableData" @expand="lineItemExpanded" row-key="id" :expand-row-keys="expandedLineItemIds" class="nested-table" style="width: 100%">
-        <el-table-column type="expand" width="40px">
-          <template scope="props">
-            <el-table :data="props.row.children" :show-header="false" style="width: 100%">
-              <el-table-column width="50px" label="" prop="">
-              </el-table-column>
-              <el-table-column width="300px" label="Name" prop="name">
-              </el-table-column>
-              <el-table-column width="150px" label="Qty" prop="orderQuantity">
-              </el-table-column>
-              <el-table-column label="$" prop="subTotal">
-              </el-table-column>
-            </el-table>
-          </template>
-        </el-table-column>
-        <el-table-column
-          width="300px"
-          label="Name"
-          prop="name">
-        </el-table-column>
-        <el-table-column
-          header-align="c"
-          width="150px"
-          label="Qty"
-          prop="quantity">
-        </el-table-column>
-        <el-table-column
-          header-align="center"
-          width="120px"
-          align="right"
-          label="Amount"
-          prop="subTotal">
-        </el-table-column>
-        <el-table-column label="" width="130px">
-          <template scope="scope">
-            <el-button size="mini">
-              Edit
-            </el-button>
-            <delete-button @confirmed="deleteLineItem(scope.row.id)" size="mini">
-              Delete
-            </delete-button>
-          </template>
-        </el-table-column>
-      </el-table>
+      <order-line-item-table :records="order.rootLineItems" @delete="deleteLineItem">
+      </order-line-item-table>
     </div>
 
     <div id="summary" class="m-b-10">
@@ -189,43 +147,14 @@
       </div>
     </div>
 
-<!--     <div class="text-right">
-      <p v-if="order.subTotalCents">
-        <span class="m-r-20">Sub Total:</span>
-        <span v-if="order.isEstimate">~</span> <span>{{order.subTotalCents | dollar}}</span>
-      </p>
-
-      <p v-if="order.taxOneCents">
-        <span class="m-r-20">Tax 1:</span>
-        <span>{{order.taxOneCents | dollar}}</span>
-      </p>
-
-      <p v-if="order.taxTwoCents">
-        <span class="m-r-20">Tax 2:</span>
-        <span>{{order.taxTwoCents | dollar}}</span>
-      </p>
-
-      <p v-if="order.taxThreeCents">
-        <span class="m-r-20">Tax 3:</span>
-        <span>{{order.taxThreeCents | dollar}}</span>
-      </p>
-
-      <p v-if="order.grandTotalCents">
-        <b class="m-r-20">Grand Total:</b>
-        <span v-if="order.isEstimate">~</span> <span>{{order.grandTotalCents | dollar}}</span>
-      </p>
-
-      <p v-if="order.isEstimate">
-        <b class="m-r-20">AA:</b>
-        <span>{{order.authorizationCents | dollar}}</span>
-      </p>
-    </div> -->
-
   </el-form>
 </div>
 </template>
 
 <script>
+import 'vue-awesome/icons/times'
+import 'vue-awesome/icons/pencil'
+
 import _ from 'lodash'
 import JSONAPI from '@/jsonapi'
 import ProductItemAPI from '@/api/product-item'
@@ -238,6 +167,7 @@ import ProductItemSelect from '@/components/product-item-select'
 import ProductSelect from '@/components/product-select'
 import PriceAmountInput from '@/components/price-amount-input'
 import DeleteButton from '@/components/delete-button'
+import OrderLineItemTable from '@/components/order-line-item-table'
 
 export default {
   name: 'OrderLineItemForm',
@@ -250,7 +180,8 @@ export default {
     ProductItemSelect,
     ProductSelect,
     PriceAmountInput,
-    DeleteButton
+    DeleteButton,
+    OrderLineItemTable
   },
   data () {
     return {
@@ -340,37 +271,38 @@ export default {
   },
   computed: {
     tableData () {
-      return _.reduce(this.order.rootLineItems, (acc, lineItem) => {
-        let quantity = `${lineItem.orderQuantity}`
-        if (lineItem.isEstimate) {
-          quantity += ` (~ ${lineItem.chargeQuantity}${lineItem.priceChargeUnit})`
-        } else if (lineItem.priceEstimateByDefault) {
-          quantity += ` (${lineItem.chargeQuantity}${lineItem.priceChargeUnit})`
-        }
+      return OrderLineItem.tableData(this.order.rootLineItems)
+      // return _.reduce(this.order.rootLineItems, (acc, lineItem) => {
+      //   let quantity = `${lineItem.orderQuantity}`
+      //   if (lineItem.isEstimate) {
+      //     quantity += ` (~ ${lineItem.chargeQuantity}${lineItem.priceChargeUnit})`
+      //   } else if (lineItem.priceEstimateByDefault) {
+      //     quantity += ` (${lineItem.chargeQuantity}${lineItem.priceChargeUnit})`
+      //   }
 
-        let taxTotalCents = lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents
-        let grandTotalCents = lineItem.subTotalCents + lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents
+      //   let taxTotalCents = lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents
+      //   let grandTotalCents = lineItem.subTotalCents + lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents
 
-        let subTotal = dollar(lineItem.subTotalCents)
-        if (lineItem.isEstimate) {
-          subTotal = `~ ${subTotal}`
-        }
+      //   let subTotal = dollar(lineItem.subTotalCents)
+      //   if (lineItem.isEstimate) {
+      //     subTotal = `~ ${subTotal}`
+      //   }
 
-        let grandTotal = dollar(grandTotalCents)
-        if (lineItem.isEstimate) {
-          grandTotal = `~ ${grandTotal}`
-        }
+      //   let grandTotal = dollar(grandTotalCents)
+      //   if (lineItem.isEstimate) {
+      //     grandTotal = `~ ${grandTotal}`
+      //   }
 
-        return _.concat(acc, {
-          id: lineItem.id,
-          name: lineItem.name,
-          quantity: quantity,
-          children: lineItem.children,
-          subTotal: subTotal,
-          taxTotal: dollar(taxTotalCents),
-          grandTotal: grandTotal
-        })
-      }, [])
+      //   return _.concat(acc, {
+      //     id: lineItem.id,
+      //     name: lineItem.name,
+      //     quantity: quantity,
+      //     children: lineItem.children,
+      //     subTotal: subTotal,
+      //     taxTotal: dollar(taxTotalCents),
+      //     grandTotal: grandTotal
+      //   })
+      // }, [])
     },
     isLineItemTableVisible () {
       return this.order.rootLineItems.length > 0

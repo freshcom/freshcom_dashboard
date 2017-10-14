@@ -1,10 +1,12 @@
 import _ from 'lodash'
 
 import OrderLineItemAPI from '@/api/order-line-item'
+import PriceAPI from '@/api/price'
 import OrderAPI from '@/api/order'
 import JSONAPI from '@/jsonapi'
 
 import Order from '@/models/order'
+import OrderLineItem from '@/models/order-line-item'
 
 const MT = {
   RECORD_CHANGED: 'RECORD_CHANGED',
@@ -12,7 +14,11 @@ const MT = {
   RECORD_RESET: 'RECORD_RESET',
   RECORD_LOADING: 'RECORD_LOADING',
   RECORDS_CHANGED: 'RECORDS_CHANGED',
-  RECORDS_LOADING: 'RECORDS_LOADING'
+  RECORDS_LOADING: 'RECORDS_LOADING',
+  LINE_ITEM_EDIT_STARTED: 'LINE_ITEM_EDIT_STARTED',
+  LINE_ITEM_EDIT_ENDED: 'LINE_ITEM_EDIT_ENDED',
+  LINE_ITEM_DRAFT_CHANGED: 'LINE_ITEM_DRAFT_CHANGED',
+  SELECTED_PRICES_CHANGED: 'SELECTED_PRICES_CHANGED'
 }
 
 export default {
@@ -22,7 +28,10 @@ export default {
     recordDraft: Order.objectWithDefaults(),
     isLoadingRecord: true,
     records: [],
-    isLoadingRecords: true
+    isLoadingRecords: true,
+    isEditingLineItem: false,
+    lineItemDraft: OrderLineItem.objectWithDefaults(),
+    selectablePrices: []
   },
   actions: {
     setRecord ({ commit }, record) {
@@ -139,6 +148,7 @@ export default {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
     },
+
     deleteLineItem ({ state, commit }, lineItem) {
       let order = lineItem.order
 
@@ -153,6 +163,36 @@ export default {
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
+    },
+
+    loadSelectablePricesForLineItem ({ commit, rootState }, lineItem) {
+      let filter = {}
+      if (lineItem.productItem) {
+        filter.productItemId = lineItem.productItem.id
+      }
+      if (lineItem.product) {
+        filter.productId = lineItem.product.id
+      }
+
+      PriceAPI.queryRecord({ filter: filter, locale: rootState.resourceLocale }).then(response => {
+        return { meta: response.data.meta, resources: JSONAPI.deserialize(response.data.data) }
+      }).then(response => {
+        commit(MT.SELECTED_PRICES_CHANGED, response.resources)
+
+        return response
+      })
+    },
+
+    startLineItemEdit ({ commit, dispatch }, lineItem) {
+      commit(MT.LINE_ITEM_EDIT_STARTED, lineItem)
+    },
+
+    endLineItemEdit ({ commit }) {
+      commit(MT.LINE_ITEM_EDIT_ENDED)
+    },
+
+    setLineItemDraft ({ commit }, lineItemDraft) {
+      commit(MT.LINE_ITEM_DRAFT_CHANGED, lineItemDraft)
     }
   },
 
@@ -183,6 +223,23 @@ export default {
 
     [MT.RECORDS_LOADING] (state, records) {
       state.isLoadingRecords = true
+    },
+
+    [MT.LINE_ITEM_EDIT_STARTED] (state, lineItem) {
+      state.lineItemDraft = lineItem
+      state.isEditingLineItem = true
+    },
+
+    [MT.LINE_ITEM_EDIT_ENDED] (state, lineItem) {
+      state.isEditingLineItem = false
+    },
+
+    [MT.LINE_ITEM_DRAFT_CHANGED] (state, lineItemDraft) {
+      state.lineItemDraft = lineItemDraft
+    },
+
+    [MT.SELECTED_PRICES_CHANGED] (state, prices) {
+      state.selectablePrices = prices
     }
   }
 }
