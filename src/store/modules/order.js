@@ -149,6 +149,24 @@ export default {
       })
     },
 
+    updateLineItem ({ state, commit, rootState }, actionPayload) {
+      let apiPayload = { data: JSONAPI.serialize(actionPayload.lineItemDraft) }
+      let order = actionPayload.lineItemDraft.order
+
+      let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
+      return OrderLineItemAPI.updateRecord(actionPayload.id, apiPayload, options).then(() => {
+        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children,payments' })
+      }).then(response => {
+        let apiPayload = response.data
+        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+        commit(MT.RECORD_CHANGED, record)
+
+        return record
+      }).catch(error => {
+        throw JSONAPI.deserializeErrors(error.response.data.errors)
+      })
+    },
+
     deleteLineItem ({ state, commit }, lineItem) {
       let order = lineItem.order
 

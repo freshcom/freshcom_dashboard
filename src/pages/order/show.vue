@@ -117,37 +117,6 @@
             </div>
             <div class="block">
               <div class="block-body full">
-                <!-- <el-table :data="lineItemTableData" @expand="lineItemExpanded" row-key="id" :expand-row-keys="expandedLineItemIds" class="nested-table block-table" style="width: 100%">
-                  <el-table-column type="expand" width="40px">
-                    <template scope="props">
-                      <el-table :data="props.row.children" :show-header="false" style="width: 100%">
-                        <el-table-column width="50px" label="" prop="">
-                        </el-table-column>
-                        <el-table-column width="300px" label="Name" prop="name">
-                        </el-table-column>
-                        <el-table-column width="150px" label="Qty" prop="orderQuantity">
-                        </el-table-column>
-                        <el-table-column label="$" prop="subTotal">
-                        </el-table-column>
-                      </el-table>
-                    </template>
-                  </el-table-column>
-                  <el-table-column width="280px" label="Name" prop="name"></el-table-column>
-                  <el-table-column width="120px" label="Qty" prop="quantity"></el-table-column>
-                  <el-table-column width="200px" label="Sub | Tax | Grand" prop="total">
-                  </el-table-column>
-                  <el-table-column label="">
-                    <template scope="scope">
-                      <el-button @click="editLineItem(scope.row.id)" size="mini">
-                        <icon name="pencil" scale="0.8" class="v-middle"></icon>
-                      </el-button>
-                      <delete-button @confirmed="deleteLineItem(scope.row.id)" size="mini">
-                        <icon name="times" scale="0.8" class="v-middle"></icon>
-                      </delete-button>
-                    </template>
-                  </el-table-column>
-                </el-table> -->
-
                 <order-line-item-table @delete="deleteLineItem" @edit="editLineItem" :records="record.rootLineItems" class="block-table">
                 </order-line-item-table>
               </div>
@@ -267,9 +236,9 @@ import 'vue-awesome/icons/plus'
 import _ from 'lodash'
 import ShowPage from '@/mixins/show-page'
 import DeleteButton from '@/components/delete-button'
+import OrderLineItemTable from '@/components/order-line-item-table'
 import OrderLineItemDialog from '@/components/order-line-item-dialog'
 import { dollar } from '@/helpers/filters'
-import OrderLineItemTable from '@/components/order-line-item-table'
 
 export default {
   name: 'ShowOrder',
@@ -300,7 +269,7 @@ export default {
       }
     }
   },
-  mixins: [ShowPage({ storeNamespace: 'order', name: 'Order', include: 'rootLineItems.children,rootLineItems.price,payments' })],
+  mixins: [ShowPage({ storeNamespace: 'order', name: 'Order', include: 'rootLineItems.children,payments' })],
   methods: {
     editRecord () {
       this.$router.push({ name: 'EditOrder', params: { id: this.record.id }, query: { callbackPath: this.currentRoutePath } })
@@ -309,8 +278,11 @@ export default {
       this.$store.dispatch('product/resetRecord')
       this.$store.dispatch('popRoute', 1)
     },
-    deleteLineItem (lineItemId) {
-
+    deleteLineItem (id) {
+      let orderLineItem = _.find(this.record.rootLineItems, { id: id })
+      orderLineItem = _.cloneDeep(orderLineItem)
+      orderLineItem.order = this.order
+      this.$store.dispatch('order/deleteLineItem', orderLineItem)
     },
     editLineItem (lineItemId) {
       let lineItem = _.find(this.record.rootLineItems, { id: lineItemId })
@@ -320,7 +292,8 @@ export default {
       this.$store.dispatch('order/endLineItemEdit')
     },
     saveLineItem (formModel) {
-      this.$store.dispatch('order/updateLineItem', formModel)
+      formModel.order = this.record
+      this.$store.dispatch('order/updateLineItem', { id: formModel.id, lineItemDraft: formModel })
     }
   }
 }

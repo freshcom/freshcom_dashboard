@@ -272,37 +272,6 @@ export default {
   computed: {
     tableData () {
       return OrderLineItem.tableData(this.order.rootLineItems)
-      // return _.reduce(this.order.rootLineItems, (acc, lineItem) => {
-      //   let quantity = `${lineItem.orderQuantity}`
-      //   if (lineItem.isEstimate) {
-      //     quantity += ` (~ ${lineItem.chargeQuantity}${lineItem.priceChargeUnit})`
-      //   } else if (lineItem.priceEstimateByDefault) {
-      //     quantity += ` (${lineItem.chargeQuantity}${lineItem.priceChargeUnit})`
-      //   }
-
-      //   let taxTotalCents = lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents
-      //   let grandTotalCents = lineItem.subTotalCents + lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents
-
-      //   let subTotal = dollar(lineItem.subTotalCents)
-      //   if (lineItem.isEstimate) {
-      //     subTotal = `~ ${subTotal}`
-      //   }
-
-      //   let grandTotal = dollar(grandTotalCents)
-      //   if (lineItem.isEstimate) {
-      //     grandTotal = `~ ${grandTotal}`
-      //   }
-
-      //   return _.concat(acc, {
-      //     id: lineItem.id,
-      //     name: lineItem.name,
-      //     quantity: quantity,
-      //     children: lineItem.children,
-      //     subTotal: subTotal,
-      //     taxTotal: dollar(taxTotalCents),
-      //     grandTotal: grandTotal
-      //   })
-      // }, [])
     },
     isLineItemTableVisible () {
       return this.order.rootLineItems.length > 0
@@ -432,9 +401,7 @@ export default {
       let orderLineItem = _.find(this.order.rootLineItems, { id: id })
       orderLineItem = _.cloneDeep(orderLineItem)
       orderLineItem.order = this.order
-      this.$store.dispatch('order/deleteLineItem', orderLineItem).then(() => {
-        console.log('success')
-      })
+      this.$store.dispatch('order/deleteLineItem', orderLineItem)
     }
   }
 }
