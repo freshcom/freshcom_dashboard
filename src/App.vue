@@ -244,6 +244,8 @@ a:hover {
   border: 1px solid #eaeefb;
   border-radius: 4px;
   margin-bottom: 20px;
+  width: 100%;
+  overflow: hidden;
 
   .block-body {
     padding: 20px;
@@ -284,12 +286,20 @@ a:hover {
       width: 0;
     }
 
+    // &:before {
+    //   height: 0px;
+    // }
+
     tr td {
       padding: 0;
 
       p {
         margin: 0;
       }
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
     }
 
     .actions {
