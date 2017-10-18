@@ -226,21 +226,23 @@ export default {
     resetSelectableProducts () {
       this.$store.dispatch('orderLineItem/resetSelectableProducts')
     },
-    refreshTaxAndGrandTotal () {
-      this.formModel.taxOneCents = this.formModel.subTotalCents * (this.formModel.priceTaxOnePercentage / 100)
-      this.formModel.taxTwoCents = this.formModel.subTotalCents * (this.formModel.priceTaxTwoPercentage / 100)
-      this.formModel.taxThreeCents = this.formModel.subTotalCents * (this.formModel.priceTaxThreePercentage / 100)
-      this.formModel.grandTotalCents = this.formModel.subTotalCents + this.formModel.taxOneCents + this.formModel.taxTwoCents + this.formModel.taxThreeCents
-    },
     reset () {
       this.formModel = OrderLineItem.objectWithDefaults()
       this.$emit('input', this.formModel)
+    },
+    refreshTaxAndGrandTotal () {
+      if (this.type === 'Product') {
+        this.formModel.taxOneCents = this.formModel.subTotalCents * (this.formModel.priceTaxOnePercentage / 100)
+        this.formModel.taxTwoCents = this.formModel.subTotalCents * (this.formModel.priceTaxTwoPercentage / 100)
+        this.formModel.taxThreeCents = this.formModel.subTotalCents * (this.formModel.priceTaxThreePercentage / 100)
+      }
+      this.formModel.grandTotalCents = this.formModel.subTotalCents + this.formModel.taxOneCents + this.formModel.taxTwoCents + this.formModel.taxThreeCents
     },
     typeChanged (type) {
       this.reset()
     },
     taxCentsChanged (taxCents) {
-      this.formModel.grandTotalCents = this.formModel.subTotalCents + this.formModel.taxOneCents + this.formModel.taxTwoCents + this.formModel.taxThreeCents
+      this.refreshTaxAndGrandTotal()
     },
     chargeQuantityChanged (chargeQuantity) {
       console.log('chargeQuantityChanged')
