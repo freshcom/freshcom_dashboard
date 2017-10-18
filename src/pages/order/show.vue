@@ -286,14 +286,20 @@ export default {
     },
     editLineItem (lineItemId) {
       let lineItem = _.find(this.record.rootLineItems, { id: lineItemId })
-      this.$store.dispatch('order/startLineItemEdit', lineItem)
+      this.$store.dispatch('order/startLineItemEdit', _.cloneDeep(lineItem))
     },
     closeLineItemDialog () {
       this.$store.dispatch('order/endLineItemEdit')
     },
     saveLineItem (formModel) {
       formModel.order = this.record
-      this.$store.dispatch('order/updateLineItem', { id: formModel.id, lineItemDraft: formModel })
+      this.$store.dispatch('order/updateLineItem', { id: formModel.id, lineItemDraft: formModel }).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Line Item saved successfully.`,
+          type: 'success'
+        })
+      })
     }
   }
 }

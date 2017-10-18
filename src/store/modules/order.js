@@ -160,6 +160,7 @@ export default {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
         commit(MT.RECORD_CHANGED, record)
+        commit(MT.LINE_ITEM_EDIT_ENDED)
 
         return record
       }).catch(error => {

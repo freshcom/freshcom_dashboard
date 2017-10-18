@@ -26,7 +26,7 @@
 
           <div class="data">
             <template v-if="activeStep === 0">
-              <order-line-item-form :order="orderDraft" :errors="errors">
+              <order-line-item-form v-model="orderLineItemDraft" :errors="errors">
               </order-line-item-form>
             </template>
 
@@ -110,6 +110,14 @@ export default {
       }
 
       return 'Place Order'
+    },
+    orderLineItemDraft: {
+      get () {
+        return this.$store.state.orderLineItem.recordDraft
+      },
+      set (value) {
+        this.$store.dispatch(`orderLineItem/setRecordDraft`, value)
+      }
     },
     orderDraft: {
       get () {

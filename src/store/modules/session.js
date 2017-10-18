@@ -22,6 +22,7 @@ export default {
     loadToken ({ commit, dispatch }) {
       let rawRecord = localStorage.getItem('state.session.token')
       if (!rawRecord) {
+        commit(MT.READY, true)
         return Promise.reject()
       }
 

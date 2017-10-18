@@ -2,16 +2,24 @@ import _ from 'lodash'
 
 import OrderLineItemAPI from '@/api/order-line-item'
 import OrderAPI from '@/api/order'
+import ProductAPI from '@/api/product'
+import ProductItemAPI from '@/api/product-item'
 import JSONAPI from '@/jsonapi'
 
 import Order from '@/models/order'
 import OrderLineItem from '@/models/order-line-item'
 
 const MT = {
-  SET_RECORD: 'SET_RECORD',
-  SET_RECORD_DRAFT: 'SET_RECORD_DRAFT',
-  RESET_RECORD: 'RESET_RECORD',
-  SET_RECORDS: 'SET_RECORDS'
+  RECORD_CHANGED: 'RECORD_CHANGED',
+  RECORD_DRAFT_CHANGED: 'RECORD_DRAFT_CHANGED',
+  RECORD_RESET: 'RECORD_RESET',
+  RECORDS_CHANGED: 'RECORDS_CHANGED',
+  SELECTABLE_PRODUCTS_CHANGED: 'SELECTABLE_PRODUCTS_CHANGED',
+  SELECTABLE_PRODUCTS_LOADING: 'SELECTABLE_PRODUCTS_LOADING',
+  SELECTABLE_PRODUCTS_RESET: 'SELECTABLE_PRODUCTS_RESET',
+  SELECTABLE_PRODUCT_ITEMS_CHANGED: 'SELECTABLE_PRODUCT_ITEMS_CHANGED',
+  SELECTABLE_PRODUCT_ITEMS_LOADING: 'SELECTABLE_PRODUCT_ITEMS_LOADING',
+  SELECTABLE_PRODUCT_ITEMS_RESET: 'SELECTABLE_PRODUCT_ITEMS_RESET'
 }
 
 export default {
@@ -19,19 +27,63 @@ export default {
   state: {
     record: OrderLineItem.objectWithDefaults(),
     recordDraft: OrderLineItem.objectWithDefaults(),
-    records: []
+    records: [],
+    selectableProducts: [],
+    isLoadingSelectableProducts: true,
+    selectableProductItems: [],
+    isLoadingSelectableProductItems: true
   },
   actions: {
     setRecord ({ commit }, record) {
-      commit(MT.SET_RECORD, record)
+      commit(MT.RECORD_CHANGED, record)
     },
 
     setRecordDraft ({ commit }, record) {
-      commit(MT.SET_RECORD_DRAFT, record)
+      commit(MT.RECORD_DRAFT_CHANGED, record)
     },
 
     resetRecord ({ commit }) {
-      commit(MT.RESET_RECORD)
+      commit(MT.RECORD_RESET)
+    },
+
+    loadSelectableProducts ({ state, commit, rootState }, actionPayload) {
+      commit(MT.SELECTABLE_PRODUCTS_LOADING)
+      actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
+
+      return ProductAPI.queryRecord(actionPayload).then(response => {
+        let apiPayload = response.data
+        return { meta: response.data.meta, resources: JSONAPI.deserialize(apiPayload.data, apiPayload.included) }
+      }).then(response => {
+        commit(MT.SELECTABLE_PRODUCTS_CHANGED, response.resources)
+
+        return response
+      }).catch(error => {
+        console.log(error)
+      })
+    },
+
+    resetSelectableProducts ({ commit }) {
+      commit(MT.SELECTABLE_PRODUCTS_RESET)
+    },
+
+    loadSelectableProductItems ({ state, commit, rootState }, actionPayload) {
+      commit(MT.SELECTABLE_PRODUCT_ITEMS_LOADING)
+      actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
+
+      return ProductItemAPI.queryRecord(actionPayload).then(response => {
+        let apiPayload = response.data
+        return { meta: response.data.meta, resources: JSONAPI.deserialize(apiPayload.data, apiPayload.included) }
+      }).then(response => {
+        commit(MT.SELECTABLE_PRODUCT_ITEMS_CHANGED, response.resources)
+
+        return response
+      }).catch(error => {
+        console.log(error)
+      })
+    },
+
+    resetSelectableProductItems ({ commit }) {
+      commit(MT.SELECTABLE_PRODUCT_ITEMS_RESET)
     },
 
     loadRecord ({ state, commit, rootState }, actionPayload) {
@@ -42,14 +94,14 @@ export default {
       }
 
       if (state.record.id !== actionPayload.id) {
-        commit(MT.RESET_RECORD)
+        commit(MT.RECORD_RESET)
       }
 
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
       return OrderLineItemAPI.getRecord(actionPayload.id, options).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.SET_RECORD, record)
+        commit(MT.RECORD_CHANGED, record)
 
         return record
       }).catch(error => {
@@ -79,16 +131,6 @@ export default {
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
-      // let apiPayload = { data: JSONAPI.serialize(recordDraft) }
-      // return OrderLineItemAPI.createRecord(apiPayload).then(response => {
-      //   return JSONAPI.deserialize(response.data.data)
-      // }).then(record => {
-      //   context.commit(MT.SET_RECORD, record)
-
-      //   return record
-      // }).catch(error => {
-      //   throw JSONAPI.deserializeErrors(error.response.data.errors)
-      // })
     },
 
     updateRecord ({ state, commit, rootState }, actionPayload) {
@@ -98,7 +140,7 @@ export default {
       return OrderLineItemAPI.updateRecord(actionPayload.id, apiPayload, options).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.SET_RECORD, record)
+        commit(MT.RECORD_CHANGED, record)
 
         return record
       }).catch(error => {
@@ -112,7 +154,7 @@ export default {
       return OrderLineItemAPI.queryRecord(actionPayload).then(response => {
         return { meta: response.data.meta, resources: JSONAPI.deserialize(response.data.data) }
       }).then(response => {
-        commit(MT.SET_RECORDS, response.resources)
+        commit(MT.RECORDS_CHANGED, response.resources)
 
         return response
       })
@@ -120,7 +162,7 @@ export default {
 
     deleteRecord ({ commit }, id) {
       return OrderLineItemAPI.deleteRecord(id).then(response => {
-        commit(MT.RESET_RECORD)
+        commit(MT.RECORD_RESET)
 
         return response
       })
@@ -128,22 +170,50 @@ export default {
   },
 
   mutations: {
-    [MT.RESET_RECORD] (state) {
+    [MT.RECORD_RESET] (state) {
       state.record = OrderLineItem.objectWithDefaults()
       state.recordDraft = OrderLineItem.objectWithDefaults()
     },
 
-    [MT.SET_RECORD] (state, record) {
+    [MT.RECORD_CHANGED] (state, record) {
       state.record = record
       state.recordDraft = record
     },
 
-    [MT.SET_RECORD_DRAFT] (state, recordDraft) {
+    [MT.RECORD_DRAFT_CHANGED] (state, recordDraft) {
       state.recordDraft = recordDraft
     },
 
-    [MT.SET_RECORDS] (state, records) {
+    [MT.RECORDS_CHANGED] (state, records) {
       state.records = records
+    },
+
+    [MT.SELECTABLE_PRODUCTS_CHANGED] (state, products) {
+      state.selectableProducts = products
+      state.isLoadingSelectableProducts = false
+    },
+
+    [MT.SELECTABLE_PRODUCTS_LOADING] (state) {
+      state.isLoadingSelectableProducts = true
+    },
+
+    [MT.SELECTABLE_PRODUCTS_RESET] (state) {
+      state.isLoadingSelectableProducts = true
+      state.selectableProducts = []
+    },
+
+    [MT.SELECTABLE_PRODUCT_ITEMS_CHANGED] (state, productItems) {
+      state.selectableProductItems = productItems
+      state.isLoadingSelectableProductItems = false
+    },
+
+    [MT.SELECTABLE_PRODUCT_ITEMS_LOADING] (state) {
+      state.isLoadingSelectableProductItems = true
+    },
+
+    [MT.SELECTABLE_PRODUCT_ITEMS_RESET] (state) {
+      state.isLoadingSelectableProductItems = true
+      state.selectableProducts = []
     }
   }
 }

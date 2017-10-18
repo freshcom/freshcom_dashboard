@@ -26,7 +26,6 @@
   </el-form-item>
 
   <el-form-item v-if="sourceType == 'unlockable' && !record.id" label="Unlockable" :error="unlockableErrorMessage" required>
-    <!-- <unlockable-select @input="updateValue" v-model="formModel.unlockable"></unlockable-select> -->
     <remote-select
       v-model="formModel.unlockable"
       @filter="loadSelectableUnlockables"

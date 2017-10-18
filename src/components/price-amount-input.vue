@@ -24,8 +24,10 @@ export default {
         let valueInt = Math.round(parseFloat(value) * 100)
         if (isNaN(valueInt)) {
           this.$emit('input', 0)
+          this.$emit('change', 0)
         } else {
           this.$emit('input', valueInt)
+          this.$emit('change', valueInt)
         }
       }
     }

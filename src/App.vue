@@ -356,11 +356,23 @@ p.search-notice {
 }
 
 .m-l-20 {
-  margin-left: 20px
+  margin-left: 20px;
+}
+
+.p-r-10 {
+  padding-right: 10px;
+}
+
+.p-l-10 {
+  padding-left: 10px;
 }
 /* END Utils */
 
 /* START Common Overwrite */
+.el-dialog__body {
+  padding: 20px;
+}
+
 .el-pagination {
   padding: 0px;
 }

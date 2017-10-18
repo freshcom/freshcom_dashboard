@@ -11,12 +11,20 @@ export default {
       printName: '',
       orderQuantity: 1,
       isEstimate: false,
-      subTotalCents: null,
+      subTotalCents: 0,
+      taxOneCents: 0,
+      taxTwoCents: 0,
+      taxThreeCents: 0,
+      grandTotalCents: 0,
 
       product: null,
       productItem: null,
       sku: null,
       unlockable: null,
+
+      priceTaxOnePercentage: 0,
+      priceTaxTwoPercentage: 0,
+      priceTaxThreePercentage: 0,
 
       children: []
     }
