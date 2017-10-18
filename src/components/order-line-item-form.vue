@@ -1,6 +1,6 @@
 <template>
 <el-form :model="formModel" label-position="top">
-  <el-row v-if="!formModel.id">
+  <el-row v-if="!formModel.id" class="m-b-20">
     <el-form-item label="Type">
       <el-radio-group @change="typeChanged" v-model="type">
         <el-radio-button label="Product"></el-radio-button>
@@ -19,10 +19,10 @@
     </el-form-item>
   </el-row>
 
-  <el-row v-if="formModel.id">
+  <el-row v-if="formModel.id" class="m-b-20">
     <p><b>Name: </b> {{formModel.name}}</p>
   </el-row>
-  <el-row v-if="!formModel.id && type === 'Product'" class="m-b-10">
+  <el-row v-if="!formModel.id && type === 'Product'" class="m-b-20">
     <el-col :span="12" class="p-r-10">
       <el-form-item label="Product" class="full">
         <remote-select
@@ -48,13 +48,13 @@
       </el-form-item>
     </el-col>
   </el-row>
-  <el-row v-if="!formModel.id && type === 'Custom'" class="m-b-10">
+  <el-row v-if="!formModel.id && type === 'Custom'" class="m-b-20">
     <el-form-item label="Name" class="name full">
       <el-input v-model="formModel.name" @change="updateValue"></el-input>
     </el-form-item>
   </el-row>
 
-  <el-row v-if="type === 'Product'">
+  <el-row v-if="type === 'Product'" class="m-b-20">
     <el-form-item label="Order Quantity" class="order-quantity">
       <el-input-number v-model="formModel.orderQuantity" @change="orderQuantityChanged" :min="1" :step="1" :disabled="!formModel.price"></el-input-number>
     </el-form-item>
@@ -89,34 +89,34 @@
     </el-form-item>
   </el-row>
 
-  <el-row>
+  <el-row class="m-b-20">
     <el-form-item label="Sub Total" class="sub-total-left">
       <el-tag type="gray" v-if="type === 'Product'" :close-transition="true">{{formModel.subTotalCents | dollar}}</el-tag>
       <price-amount-input v-else @input="subTotalCentsChanged" v-model="formModel.subTotalCents"></price-amount-input>
     </el-form-item>
 
-    <span class="m-l-10 m-r-10">+</span>
+    <span class="m-l-5 m-r-5">+</span>
 
     <el-form-item label="Tax 1" class="tax">
       <el-tag v-if="type === 'Product'" :close-transition="true">{{formModel.taxOneCents | dollar}}</el-tag>
       <price-amount-input v-else @input="taxCentsChanged" v-model="formModel.taxOneCents"></price-amount-input>
     </el-form-item>
 
-    <span class="m-l-10 m-r-10">+</span>
+    <span class="m-l-5 m-r-5">+</span>
 
     <el-form-item label="Tax 2" class="tax">
       <el-tag v-if="type === 'Product'" :close-transition="true">{{formModel.taxTwoCents | dollar}}</el-tag>
       <price-amount-input v-else @input="taxCentsChanged" v-model="formModel.taxTwoCents"></price-amount-input>
     </el-form-item>
 
-    <span class="m-l-10 m-r-10">+</span>
+    <span class="m-l-5 m-r-5">+</span>
 
     <el-form-item label="Tax 3" class="tax">
       <el-tag v-if="type === 'Product'" :close-transition="true">{{formModel.taxThreeCents | dollar}}</el-tag>
       <price-amount-input v-else @input="taxCentsChanged" v-model="formModel.taxThreeCents"></price-amount-input>
     </el-form-item>
 
-    <span class="m-l-10 m-r-10">=</span>
+    <span class="m-l-5 m-r-5">=</span>
 
     <el-form-item label="Grand Total" class="grand-total">
       <el-tag type="primary">{{formModel.grandTotalCents | dollar}}</el-tag>
@@ -324,7 +324,7 @@ export default {
 <style lang="scss" scoped>
 .el-form-item {
   display: inline-block;
-  margin: 10px 0px;
+  margin: 0px;
 
   &.full {
     width: 100%;

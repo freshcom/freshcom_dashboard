@@ -343,6 +343,10 @@ p.search-notice {
   margin-right: 10px;
 }
 
+.m-b-20 {
+  margin-bottom: 20px;
+}
+
 .m-r-20 {
   margin-right: 20px;
 }
@@ -357,6 +361,14 @@ p.search-notice {
 
 .m-l-20 {
   margin-left: 20px;
+}
+
+.m-l-5 {
+  margin-left: 5px;
+}
+
+.m-r-5 {
+  margin-right: 5px;
 }
 
 .p-r-10 {

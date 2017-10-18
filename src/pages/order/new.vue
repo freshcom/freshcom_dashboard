@@ -26,8 +26,21 @@
 
           <div class="data">
             <template v-if="activeStep === 0">
-              <order-line-item-form v-model="orderLineItemDraft" :errors="errors">
-              </order-line-item-form>
+              <div class="m-b-20 form-border">
+                <order-line-item-form v-model="orderLineItemDraft" :errors="errors">
+                </order-line-item-form>
+
+                <div class="text-right">
+                  <el-button @click="createLineItem">
+                    Save Line Item
+                  </el-button>
+                </div>
+              </div>
+
+              <div class="m-b-20">
+                <order-line-item-table :records="order.rootLineItems" @delete="deleteLineItem">
+                </order-line-item-table>
+              </div>
             </template>
 
             <template v-if="activeStep === 1">
@@ -85,11 +98,13 @@ import PaymentForm from '@/components/payment-form'
 import OrderForm from '@/components/order-form'
 import { createToken as createStripeToken } from 'vue-stripe-elements'
 import errorI18nKey from '@/utils/error-i18n-key'
+import OrderLineItemTable from '@/components/order-line-item-table'
 
 export default {
   name: 'NewOrder',
   components: {
     OrderLineItemForm,
+    OrderLineItemTable,
     OrderForm,
     PaymentForm
   },
@@ -163,6 +178,19 @@ export default {
         })
       }
     },
+    createLineItem (lineItemDraft) {
+      // If not order create order first
+      lineItemDraft.order = this.order
+      this.$store.dispatch('orderLineItem/createOrder', lineItemDraft).then(() => {
+
+      })
+    },
+    deleteLineItem (id) {
+      let orderLineItem = _.find(this.order.rootLineItems, { id: id })
+      orderLineItem = _.cloneDeep(orderLineItem)
+      orderLineItem.order = this.order
+      this.$store.dispatch('order/deleteLineItem', orderLineItem)
+    },
     createPayment (paymentDraft, order) {
       this.isLoading = true
 
@@ -209,5 +237,10 @@ export default {
 .step-indicator {
   margin-left: 175px;
   margin-top: 20px;
+}
+
+.form-border {
+  border: 1px solid #dfe6ec;
+  padding: 20px;
 }
 </style>
