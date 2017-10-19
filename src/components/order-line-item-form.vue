@@ -232,9 +232,9 @@ export default {
     },
     refreshTaxAndGrandTotal () {
       if (this.type === 'Product') {
-        this.formModel.taxOneCents = this.formModel.subTotalCents * (this.formModel.priceTaxOnePercentage / 100)
-        this.formModel.taxTwoCents = this.formModel.subTotalCents * (this.formModel.priceTaxTwoPercentage / 100)
-        this.formModel.taxThreeCents = this.formModel.subTotalCents * (this.formModel.priceTaxThreePercentage / 100)
+        this.formModel.taxOneCents = Math.round(this.formModel.subTotalCents * (this.formModel.priceTaxOnePercentage / 100))
+        this.formModel.taxTwoCents = Math.round(this.formModel.subTotalCents * (this.formModel.priceTaxTwoPercentage / 100))
+        this.formModel.taxThreeCents = Math.round(this.formModel.subTotalCents * (this.formModel.priceTaxThreePercentage / 100))
       }
       this.formModel.grandTotalCents = this.formModel.subTotalCents + this.formModel.taxOneCents + this.formModel.taxTwoCents + this.formModel.taxThreeCents
     },

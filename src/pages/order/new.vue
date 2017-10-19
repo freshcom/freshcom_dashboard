@@ -26,12 +26,12 @@
 
           <div class="data">
             <template v-if="activeStep === 0">
-              <div class="m-b-20 form-border">
+              <div v-loading="isLineItemLoading" class="m-b-20 form-border">
                 <order-line-item-form v-model="orderLineItemDraft" :errors="errors">
                 </order-line-item-form>
 
                 <div class="text-right">
-                  <el-button @click="createLineItem">
+                  <el-button @click="createLineItem(orderLineItemDraft)">
                     Save Line Item
                   </el-button>
                 </div>
@@ -126,6 +126,9 @@ export default {
 
       return 'Place Order'
     },
+    isLineItemLoading () {
+      return this.$store.state.orderLineItem.isRecordLoading
+    },
     orderLineItemDraft: {
       get () {
         return this.$store.state.orderLineItem.recordDraft
@@ -179,10 +182,20 @@ export default {
       }
     },
     createLineItem (lineItemDraft) {
-      // If not order create order first
-      lineItemDraft.order = this.order
-      this.$store.dispatch('orderLineItem/createOrder', lineItemDraft).then(() => {
+      let orderCreated = new Promise((resolve, reject) => {
+        resolve(this.order)
+      })
 
+      if (!this.order.id) {
+        orderCreated = this.$store.dispatch('order/createRecord', this.orderDraft)
+      }
+
+      orderCreated.then(order => {
+        lineItemDraft.order = order
+        return this.$store.dispatch('orderLineItem/createRecord', lineItemDraft)
+      }).then(lineItem => {
+        this.$store.dispatch('order/loadRecord', { id: lineItem.order.id, include: 'rootLineItems.children' })
+        this.$store.dispatch('orderLineItem/resetRecord')
       })
     },
     deleteLineItem (id) {

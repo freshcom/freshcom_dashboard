@@ -1,18 +1,17 @@
 import _ from 'lodash'
 
 import OrderLineItemAPI from '@/api/order-line-item'
-import OrderAPI from '@/api/order'
 import ProductAPI from '@/api/product'
 import ProductItemAPI from '@/api/product-item'
 import JSONAPI from '@/jsonapi'
 
-import Order from '@/models/order'
 import OrderLineItem from '@/models/order-line-item'
 
 const MT = {
   RECORD_CHANGED: 'RECORD_CHANGED',
   RECORD_DRAFT_CHANGED: 'RECORD_DRAFT_CHANGED',
   RECORD_RESET: 'RECORD_RESET',
+  RECORD_LOADING: 'RECORD_LOADING',
   RECORDS_CHANGED: 'RECORDS_CHANGED',
   SELECTABLE_PRODUCTS_CHANGED: 'SELECTABLE_PRODUCTS_CHANGED',
   SELECTABLE_PRODUCTS_LOADING: 'SELECTABLE_PRODUCTS_LOADING',
@@ -27,6 +26,7 @@ export default {
   state: {
     record: OrderLineItem.objectWithDefaults(),
     recordDraft: OrderLineItem.objectWithDefaults(),
+    isRecordLoading: false,
     records: [],
     selectableProducts: [],
     isLoadingSelectableProducts: true,
@@ -110,24 +110,18 @@ export default {
     },
 
     createRecord (context, recordDraft) {
-      let orderCreated = new Promise((resolve, reject) => {
-        resolve(recordDraft.order)
-      })
-      if (!recordDraft.order.id) {
-        let order = Order.objectWithDefaults()
-        let payload = { data: JSONAPI.serialize(order) }
-        orderCreated = OrderAPI.createRecord(payload)
-      }
+      context.commit(MT.RECORD_LOADING)
 
-      orderCreated.then(response => {
-        let order = JSONAPI.deserialize(response.data.data)
-        let apiPayload = { data: JSONAPI.serialize(recordDraft) }
-        return OrderLineItemAPI.createRecord(order.id, apiPayload)
-      }).then(response => {
+      let apiPayload = { data: JSONAPI.serialize(recordDraft) }
+      return OrderLineItemAPI.createRecord(recordDraft.order.id, apiPayload).then(response => {
         let apiPayload = response.data
-        let lineItem = JSONAPI.deserialize(apiPayload.data)
+        let record = JSONAPI.deserialize(apiPayload.data)
 
-        return lineItem
+        return record
+      }).then(record => {
+        context.commit(MT.RECORD_CHANGED, record)
+
+        return record
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
@@ -177,7 +171,7 @@ export default {
 
     [MT.RECORD_CHANGED] (state, record) {
       state.record = record
-      state.recordDraft = record
+      state.isRecordLoading = false
     },
 
     [MT.RECORD_DRAFT_CHANGED] (state, recordDraft) {
@@ -214,6 +208,10 @@ export default {
     [MT.SELECTABLE_PRODUCT_ITEMS_RESET] (state) {
       state.isLoadingSelectableProductItems = true
       state.selectableProducts = []
+    },
+
+    [MT.RECORD_LOADING] (state) {
+      state.isRecordLoading = true
     }
   }
 }
