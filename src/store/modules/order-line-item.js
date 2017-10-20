@@ -207,7 +207,7 @@ export default {
 
     [MT.SELECTABLE_PRODUCT_ITEMS_RESET] (state) {
       state.isLoadingSelectableProductItems = true
-      state.selectableProducts = []
+      state.selectableProductItems = []
     },
 
     [MT.RECORD_LOADING] (state) {

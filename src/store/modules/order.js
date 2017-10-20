@@ -3,6 +3,7 @@ import _ from 'lodash'
 import OrderLineItemAPI from '@/api/order-line-item'
 import PriceAPI from '@/api/price'
 import OrderAPI from '@/api/order'
+import CustomerAPI from '@/api/customer'
 import JSONAPI from '@/jsonapi'
 
 import Order from '@/models/order'
@@ -17,8 +18,13 @@ const MT = {
   RECORDS_LOADING: 'RECORDS_LOADING',
   LINE_ITEM_EDIT_STARTED: 'LINE_ITEM_EDIT_STARTED',
   LINE_ITEM_EDIT_ENDED: 'LINE_ITEM_EDIT_ENDED',
-  LINE_ITEM_DRAFT_CHANGED: 'LINE_ITEM_DRAFT_CHANGED',
-  SELECTED_PRICES_CHANGED: 'SELECTED_PRICES_CHANGED'
+  LINE_ITEM_DRAFT_FOR_CREATE_CHANGED: 'LINE_ITEM_DRAFT_FOR_CREATE_CHANGED',
+  LINE_ITEM_DRAFT_FOR_UPDATE_CHANGED: 'LINE_ITEM_DRAFT_FOR_UPDATE_CHANGED',
+  LINE_ITEM_DRAFT_FOR_CREATE_RESET: 'LINE_ITEM_DRAFT_FOR_CREATE_RESET',
+  SELECTED_PRICES_CHANGED: 'SELECTED_PRICES_CHANGED',
+  SELECTABLE_CUSTOMERS_CHANGED: 'SELECTABLE_CUSTOMERS_CHANGED',
+  SELECTABLE_CUSTOMERS_LOADING: 'SELECTABLE_CUSTOMERS_LOADING',
+  SELECTABLE_CUSTOMERS_RESET: 'SELECTABLE_CUSTOMERS_RESET'
 }
 
 export default {
@@ -30,8 +36,11 @@ export default {
     records: [],
     isLoadingRecords: true,
     isEditingLineItem: false,
-    lineItemDraft: OrderLineItem.objectWithDefaults(),
-    selectablePrices: []
+    lineItemDraftForCreate: OrderLineItem.objectWithDefaults(),
+    lineItemDraftForUpdate: OrderLineItem.objectWithDefaults(),
+    selectablePrices: [],
+    isLoadingSelectableCustomers: true,
+    selectableCustomers: []
   },
   actions: {
     setRecord ({ commit }, record) {
@@ -119,6 +128,26 @@ export default {
       })
     },
 
+    loadSelectableCustomers ({ state, commit, rootState }, actionPayload) {
+      commit(MT.SELECTABLE_CUSTOMERS_LOADING)
+      actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
+
+      return CustomerAPI.queryRecord(actionPayload).then(response => {
+        let apiPayload = response.data
+        return { meta: response.data.meta, resources: JSONAPI.deserialize(apiPayload.data, apiPayload.included) }
+      }).then(response => {
+        commit(MT.SELECTABLE_CUSTOMERS_CHANGED, response.resources)
+
+        return response
+      }).catch(error => {
+        console.log(error)
+      })
+    },
+
+    resetSelectableCustomers ({ commit }) {
+      commit(MT.SELECTABLE_CUSTOMERS_RESET)
+    },
+
     createLineItem ({ state, commit }, lineItemDraft) {
       let orderCreated = new Promise((resolve, reject) => {
         resolve(lineItemDraft.order)
@@ -142,6 +171,7 @@ export default {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
         commit(MT.RECORD_CHANGED, record)
+        commit(MT.LINE_ITEM_DRAFT_FOR_CREATE_RESET)
 
         return record
       }).catch(error => {
@@ -210,8 +240,8 @@ export default {
       commit(MT.LINE_ITEM_EDIT_ENDED)
     },
 
-    setLineItemDraft ({ commit }, lineItemDraft) {
-      commit(MT.LINE_ITEM_DRAFT_CHANGED, lineItemDraft)
+    setLineItemDraftForCreate ({ commit }, lineItemDraft) {
+      commit(MT.LINE_ITEM_DRAFT_FOR_CREATE_CHANGED, lineItemDraft)
     }
   },
 
@@ -245,7 +275,7 @@ export default {
     },
 
     [MT.LINE_ITEM_EDIT_STARTED] (state, lineItem) {
-      state.lineItemDraft = lineItem
+      state.lineItemDraftForUpdate = lineItem
       state.isEditingLineItem = true
     },
 
@@ -253,12 +283,34 @@ export default {
       state.isEditingLineItem = false
     },
 
-    [MT.LINE_ITEM_DRAFT_CHANGED] (state, lineItemDraft) {
-      state.lineItemDraft = lineItemDraft
+    [MT.LINE_ITEM_DRAFT_FOR_CREATE_CHANGED] (state, lineItemDraftForCreate) {
+      state.lineItemDraftForCreate = lineItemDraftForCreate
+    },
+
+    [MT.LINE_ITEM_DRAFT_FOR_UPDATE_CHANGED] (state, lineItemDraftForUpdate) {
+      state.lineItemDraftForUpdate = lineItemDraftForUpdate
     },
 
     [MT.SELECTED_PRICES_CHANGED] (state, prices) {
       state.selectablePrices = prices
+    },
+
+    [MT.LINE_ITEM_DRAFT_FOR_CREATE_RESET] (state, prices) {
+      state.lineItemDraftForCreate = OrderLineItem.objectWithDefaults()
+    },
+
+    [MT.SELECTABLE_CUSTOMERS_CHANGED] (state, customers) {
+      state.selectableCustomers = customers
+      state.isLoadingSelectableCustomers = false
+    },
+
+    [MT.SELECTABLE_CUSTOMERS_LOADING] (state) {
+      state.isLoadingSelectableCustomers = true
+    },
+
+    [MT.SELECTABLE_CUSTOMERS_RESET] (state) {
+      state.isLoadingSelectableCustomers = true
+      state.selectableCustomers = []
     }
   }
 }

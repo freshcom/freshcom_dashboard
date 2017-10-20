@@ -2,7 +2,16 @@
 <el-form @input.native="updateValue" label-width="180px">
 
   <el-form-item label="Customer" :error="errorMessages.customer">
-    <customer-select @input="updateValue" v-model="formModel.customer" :filter="{ status: ['internal', 'registered'] }"></customer-select>
+    <remote-select
+      v-model="formModel.customer"
+      @filter="loadSelectableCustomers"
+      @reset="resetSelectableCustomers"
+      :records="selectableCustomers"
+      :isLoading="isLoadingSelectableCustomers"
+      placeholder="Search for customer..."
+      class="customer-select"
+    >
+    </remote-select>
   </el-form-item>
 
   <hr>
@@ -65,13 +74,15 @@
 <script>
 import _ from 'lodash'
 import errorI18nKey from '@/utils/error-i18n-key'
+import RemoteSelect from '@/components/remote-select'
 import CustomerSelect from '@/components/customer-select'
 
 export default {
   name: 'OrderForm',
   props: ['value', 'errors', 'record'],
   components: {
-    CustomerSelect
+    CustomerSelect,
+    RemoteSelect
   },
   data () {
     return {
@@ -79,6 +90,12 @@ export default {
     }
   },
   computed: {
+    selectableCustomers () {
+      return this.$store.state.order.selectableCustomers
+    },
+    isLoadingSelectableCustomers () {
+      return this.$store.state.order.isLoadingSelectableCustomers
+    },
     errorMessages () {
       return _.reduce(this.errors, (result, v, k) => {
         result[k] = this.$t(errorI18nKey('ProductItem', k, v[0]), { name: _.startCase(k) })
@@ -101,7 +118,13 @@ export default {
   methods: {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
-    }, 300)
+    }, 300),
+    loadSelectableCustomers: _.debounce(function (searchKeyword) {
+      this.$store.dispatch('order/loadSelectableCustomers', { search: searchKeyword })
+    }, 300),
+    resetSelectableCustomers () {
+      this.$store.dispatch('order/resetSelectableCustomers')
+    }
   }
 }
 </script>

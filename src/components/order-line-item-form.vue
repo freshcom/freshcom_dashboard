@@ -1,7 +1,7 @@
 <template>
 <el-form :model="formModel" label-position="top">
-  <el-row v-if="!formModel.id" class="m-b-20">
-    <el-form-item label="Type">
+  <el-row class="m-b-20">
+    <el-form-item v-if="!formModel.id" label="Type" class="type">
       <el-radio-group @change="typeChanged" v-model="type">
         <el-radio-button label="Product"></el-radio-button>
         <el-radio-button label="Custom"></el-radio-button>
@@ -331,8 +331,8 @@ export default {
   }
 }
 
-.el-form-item.is-estimate {
-  margin-left: 20px;
+.el-form-item.type {
+  margin-right: 20px;
 }
 
 .product-select {
