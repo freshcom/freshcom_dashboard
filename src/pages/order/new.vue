@@ -213,6 +213,9 @@ export default {
       if (this.activeStep === 1) {
         this.isLoading = true
         this.$store.dispatch('order/updateRecord', { id: recordDraft.id, recordDraft: recordDraft }).then(order => {
+          let paymentDraft = _.cloneDeep(this.paymentDraft)
+          paymentDraft.order = order
+          this.$store.dispatch('payment/setRecordDraft', paymentDraft)
           this.isLoading = false
           this.activeStep += 1
         }).catch(errors => {
@@ -257,12 +260,20 @@ export default {
     createPayment (paymentDraft, order) {
       this.isLoading = true
 
-      createStripeToken().then(data => {
-        paymentDraft = _.cloneDeep(paymentDraft)
+      let paymentCreated
+      if (paymentDraft.gateway === 'online' && paymentDraft.status === 'paid') {
+        paymentCreated = createStripeToken().then(data => {
+          paymentDraft = _.cloneDeep(paymentDraft)
+          paymentDraft.order = order
+          paymentDraft.source = data.token.id
+          return this.$store.dispatch('payment/createRecord', paymentDraft)
+        })
+      } else {
         paymentDraft.order = order
-        paymentDraft.source = data.token.id
-        return this.$store.dispatch('payment/createRecord', paymentDraft)
-      }).then(payment => {
+        paymentCreated = this.$store.dispatch('payment/createRecord', paymentDraft)
+      }
+
+      paymentCreated.then(payment => {
         this.$message({
           showClose: true,
           message: `Order placed successfully.`,

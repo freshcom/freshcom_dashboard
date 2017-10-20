@@ -1,72 +1,110 @@
 <template>
-<el-form @input.native="updateValue" label-width="180px">
+<el-form @input.native="updateValue" label-position="top" label-width="180px" class="m-b-10">
 
-  <el-form-item label="Customer" :error="errorMessages.customer">
-    <remote-select
-      v-model="formModel.customer"
-      @filter="loadSelectableCustomers"
-      @reset="resetSelectableCustomers"
-      :records="selectableCustomers"
-      :isLoading="isLoadingSelectableCustomers"
-      placeholder="Search for customer..."
-      class="customer-select"
-    >
-    </remote-select>
-  </el-form-item>
+  <el-row :gutter="20">
+    <el-col :span="12">
+      <el-form-item label="Customer" :error="errorMessages.customer">
+        <remote-select
+          v-model="formModel.customer"
+          @filter="loadSelectableCustomers"
+          @reset="resetSelectableCustomers"
+          @input="updateValue"
+          :records="selectableCustomers"
+          :isLoading="isLoadingSelectableCustomers"
+          :record-to-option="customerToOption"
+          placeholder="Search for customer..."
+          class="customer-select"
+        >
+        </remote-select>
+      </el-form-item>
+    </el-col>
+  </el-row>
 
-  <hr>
+  <el-row :gutter="20">
+    <el-col :span="12">
+      <el-form-item label="Code" :error="errorMessages.code">
+        <el-input v-model="formModel.code"></el-input>
+      </el-form-item>
+    </el-col>
+  </el-row>
 
-  <el-form-item label="Code" :error="errorMessages.code">
-    <el-input v-model="formModel.code"></el-input>
-  </el-form-item>
+  <el-row :gutter="20">
+    <el-col :span="12">
+      <el-form-item label="Email" :error="errorMessages.email" required>
+        <el-input v-model="formModel.email"></el-input>
+      </el-form-item>
+    </el-col>
+    <el-col :span="12">
+      <el-form-item label="Phone Number" :error="errorMessages.phoneNumber">
+        <el-input v-model="formModel.phoneNumber"></el-input>
+      </el-form-item>
+    </el-col>
+  </el-row>
 
-  <el-form-item label="Email" :error="errorMessages.email" required>
-    <el-input v-model="formModel.email"></el-input>
-  </el-form-item>
+  <el-row :gutter="20">
+    <el-col :span="12">
+      <el-form-item label="First Name" :error="errorMessages.firstName" required>
+        <el-input v-model="formModel.firstName"></el-input>
+      </el-form-item>
+    </el-col>
+    <el-col :span="12">
+      <el-form-item label="Last Name" :error="errorMessages.lastName" required>
+        <el-input v-model="formModel.lastName"></el-input>
+      </el-form-item>
+    </el-col>
+  </el-row>
 
-  <el-form-item label="Name" :error="errorMessages.firstName" required>
-    <el-input v-model="formModel.firstName" placeholder="First Name" class="name-input"></el-input>
-    <el-input v-model="formModel.lastName" placeholder="Last Name" class="name-input"></el-input>
-  </el-form-item>
+  <hr class="m-t-10 m-b-10">
 
-  <el-form-item label="Phone Number" :error="errorMessages.phoneNumber">
-    <el-input v-model="formModel.phoneNumber"></el-input>
-  </el-form-item>
-
-  <hr>
-
-  <el-form-item label="Fulfillment Method" :error="errorMessages.fulfillmentMethod" required>
-    <el-select @change="updateValue" v-model="formModel.fulfillmentMethod">
-      <el-option label="Ship" value="ship"></el-option>
-      <el-option label="Pick Up" value="pickup"></el-option>
-      <el-option label="Digital" value="digital"></el-option>
-    </el-select>
-  </el-form-item>
+  <el-row>
+    <el-form-item label="Fulfillment Method" :error="errorMessages.fulfillmentMethod" required>
+      <el-select @change="updateValue" v-model="formModel.fulfillmentMethod">
+        <el-option label="Ship" value="ship"></el-option>
+        <el-option label="Pick Up" value="pickup"></el-option>
+        <el-option label="Digital" value="digital"></el-option>
+      </el-select>
+    </el-form-item>
+  </el-row>
 
   <template v-if="formModel.fulfillmentMethod === 'ship'">
-    <el-form-item label="Street Address 1" :error="errorMessages.deliveryAddressLineOne" required>
-      <el-input v-model="formModel.deliveryAddressLineOne"></el-input>
-    </el-form-item>
+    <el-row :gutter="10">
+      <el-col :span="12">
+        <el-form-item label="Street Address 1" :error="errorMessages.deliveryAddressLineOne" required>
+          <el-input v-model="formModel.deliveryAddressLineOne"></el-input>
+        </el-form-item>
+      </el-col>
+    </el-row>
 
-    <el-form-item label="Street Address 2" :error="errorMessages.deliveryAddressLineTwo">
-      <el-input v-model="formModel.deliveryAddressLineTwo"></el-input>
-    </el-form-item>
+    <el-row :gutter="10">
+      <el-col :span="12">
+        <el-form-item label="Street Address 2" :error="errorMessages.deliveryAddressLineTwo">
+          <el-input v-model="formModel.deliveryAddressLineTwo"></el-input>
+        </el-form-item>
+      </el-col>
+    </el-row>
 
-    <el-form-item label="Province" :error="errorMessages.deliveryAddressProvince" required>
-      <el-input v-model="formModel.deliveryAddressProvince"></el-input>
-    </el-form-item>
-
-    <el-form-item label="City" :error="errorMessages.deliveryAddressCity" required>
-      <el-input v-model="formModel.deliveryAddressCity"></el-input>
-    </el-form-item>
-
-    <el-form-item label="Country" :error="errorMessages.deliveryAddressCountryCode" required>
-      <el-input v-model="formModel.deliveryAddressCountryCode"></el-input>
-    </el-form-item>
-
-    <el-form-item label="Postal Code" :error="errorMessages.deliveryAddressPostalCode" required>
-      <el-input v-model="formModel.deliveryAddressPostalCode"></el-input>
-    </el-form-item>
+    <el-row :gutter="10">
+      <el-col :span="6">
+        <el-form-item label="City" :error="errorMessages.deliveryAddressCity" required>
+          <el-input v-model="formModel.deliveryAddressCity"></el-input>
+        </el-form-item>
+      </el-col>
+      <el-col :span="6">
+        <el-form-item label="Province" :error="errorMessages.deliveryAddressProvince" required>
+          <el-input v-model="formModel.deliveryAddressProvince"></el-input>
+        </el-form-item>
+      </el-col>
+      <el-col :span="6">
+        <el-form-item label="Country" :error="errorMessages.deliveryAddressCountryCode" required>
+          <el-input v-model="formModel.deliveryAddressCountryCode"></el-input>
+        </el-form-item>
+      </el-col>
+      <el-col :span="6">
+        <el-form-item label="Postal Code" :error="errorMessages.deliveryAddressPostalCode" required>
+          <el-input v-model="formModel.deliveryAddressPostalCode"></el-input>
+        </el-form-item>
+      </el-col>
+    </el-row>
   </template>
 </el-form>
 </template>
@@ -124,6 +162,24 @@ export default {
     }, 300),
     resetSelectableCustomers () {
       this.$store.dispatch('order/resetSelectableCustomers')
+    },
+    customerToOption (customer) {
+      if (!customer) {
+        return { value: undefined }
+      }
+
+      let info = ''
+      if (customer.code) {
+        info += `[${customer.code}] `
+      }
+      if (!customer.firstName && !customer.lastName) {
+        info += `Anonymous`
+      } else {
+        info += [customer.firstName, customer.lastName].join(' ')
+      }
+
+      info += ' :: ' + customer.status
+      return { value: customer.id, label: info }
     }
   }
 }
@@ -131,6 +187,14 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.el-form-item {
+  margin: 10px 0;
+}
+
+.customer-select {
+  width: 100%;
+}
+
 .name-input {
   width: 49.6%;
 }
