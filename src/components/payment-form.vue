@@ -6,12 +6,12 @@
       <el-form-item label="Gateway" :error="errorMessages.gateway" required>
         <el-select @change="updateValue" v-model="formModel.gateway">
           <el-option label="Online" value="online"></el-option>
-          <el-option label="In Person" value="in_person"></el-option>
+          <el-option label="Offline" value="offline"></el-option>
         </el-select>
       </el-form-item>
     </el-col>
     <el-col :span="8">
-      <el-form-item v-if="formModel.gateway === 'in_person'" label="Status" :error="errorMessages.status" required>
+      <el-form-item v-if="formModel.gateway === 'offline'" label="Status" :error="errorMessages.status" required>
         <el-select @change="updateValue" v-model="formModel.status">
           <el-option label="Pending" value="pending"></el-option>
           <el-option label="Paid" value="paid"></el-option>
@@ -25,7 +25,7 @@
       </el-form-item>
     </el-col>
     <el-col :span="8">
-      <el-form-item v-if="formModel.gateway === 'in_person'" label="Method" :error="errorMessages.method" required>
+      <el-form-item v-if="formModel.gateway === 'offline' && formModel.status === 'paid'" label="Method" :error="errorMessages.method" required>
         <el-select @change="updateValue" v-model="formModel.method">
           <el-option label="Credit" value="credit"></el-option>
           <el-option label="Debit" value="debit"></el-option>

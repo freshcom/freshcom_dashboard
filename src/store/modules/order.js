@@ -16,6 +16,8 @@ const MT = {
   RECORD_LOADING: 'RECORD_LOADING',
   RECORDS_CHANGED: 'RECORDS_CHANGED',
   RECORDS_LOADING: 'RECORDS_LOADING',
+  LINE_ITEM_ADD_STARTED: 'LINE_ITEM_ADD_STARTED',
+  LINE_ITEM_ADD_ENDED: 'LINE_ITEM_ADD_ENDED',
   LINE_ITEM_EDIT_STARTED: 'LINE_ITEM_EDIT_STARTED',
   LINE_ITEM_EDIT_ENDED: 'LINE_ITEM_EDIT_ENDED',
   LINE_ITEM_DRAFT_FOR_CREATE_CHANGED: 'LINE_ITEM_DRAFT_FOR_CREATE_CHANGED',
@@ -36,6 +38,7 @@ export default {
     records: [],
     isLoadingRecords: true,
     isEditingLineItem: false,
+    isAddingLineItem: false,
     lineItemDraftForCreate: OrderLineItem.objectWithDefaults(),
     lineItemDraftForUpdate: OrderLineItem.objectWithDefaults(),
     selectablePrices: [],
@@ -166,11 +169,12 @@ export default {
         return Promise.all([OrderLineItemAPI.createRecord(order.id, apiPayload), order])
       }).then(responses => {
         let order = responses[1]
-        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children' })
+        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children,payments' })
       }).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
         commit(MT.RECORD_CHANGED, record)
+        commit(MT.LINE_ITEM_ADD_ENDED)
         commit(MT.LINE_ITEM_DRAFT_FOR_CREATE_RESET)
 
         return record
@@ -201,8 +205,10 @@ export default {
     deleteLineItem ({ state, commit }, lineItem) {
       let order = lineItem.order
 
+      console.log(order)
       OrderLineItemAPI.deleteRecord(lineItem.id).then(() => {
-        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children' })
+        console.log(order)
+        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children,payments' })
       }).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
@@ -232,11 +238,19 @@ export default {
       })
     },
 
-    startLineItemEdit ({ commit, dispatch }, lineItem) {
+    startAddLineItem ({ commit, dispatch }, lineItem) {
+      commit(MT.LINE_ITEM_ADD_STARTED, lineItem)
+    },
+
+    endAddLineItem ({ commit }) {
+      commit(MT.LINE_ITEM_ADD_ENDED)
+    },
+
+    startEditLineItem ({ commit, dispatch }, lineItem) {
       commit(MT.LINE_ITEM_EDIT_STARTED, lineItem)
     },
 
-    endLineItemEdit ({ commit }) {
+    endEditLineItem ({ commit }) {
       commit(MT.LINE_ITEM_EDIT_ENDED)
     },
 
@@ -272,6 +286,14 @@ export default {
 
     [MT.RECORDS_LOADING] (state, records) {
       state.isLoadingRecords = true
+    },
+
+    [MT.LINE_ITEM_ADD_STARTED] (state, lineItem) {
+      state.isAddingLineItem = true
+    },
+
+    [MT.LINE_ITEM_ADD_ENDED] (state, lineItem) {
+      state.isAddingLineItem = false
     },
 
     [MT.LINE_ITEM_EDIT_STARTED] (state, lineItem) {

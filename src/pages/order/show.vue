@@ -43,7 +43,12 @@
 
                   <dt>Status</dt>
                   <dd>
-                    {{$t(`attributes.order.status.${record.status}`)}}
+                    <el-tag v-if="record.status === 'opened'" type="primary">
+                      {{$t(`attributes.order.status.${record.status}`)}}
+                    </el-tag>
+                    <el-tag v-else type="gray">
+                      {{$t(`attributes.order.status.${record.status}`)}}
+                    </el-tag>
                   </dd>
 
                   <dt>Name</dt>
@@ -109,10 +114,10 @@
               <h3>Line Items</h3>
 
               <span class="block-title-actions pull-right">
-                <router-link :to="{ name: 'NewOrderLineItem', query: { orderId: record.id, callbackPath: currentRoutePath } }">
+                <a @click="addLineItem()" href="javascript:;">
                   <icon name="plus" scale="0.8" class="v-middle"></icon>
                   <span>Add</span>
-                </router-link>
+                </a>
               </span>
             </div>
             <div class="block">
@@ -136,34 +141,50 @@
             <div class="block">
               <div class="block-body full">
                 <el-table :data="record.payments" stripe class="block-table" :show-header="false" style="width: 100%">
-                  <el-table-column width="250">
+                  <el-table-column>
                     <template scope="scope">
                       <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }">
-                        <template v-if="scope.row.status === 'authorized'">
-                          {{scope.row.authorizedAmountCents | dollar}}
-                        </template>
+                        <b>
+                          <template v-if="scope.row.status === 'pending'">
+                            {{scope.row.pendingAmountCents | dollar}}
+                          </template>
 
-                        <template v-if="scope.row.status === 'paid'">
-                          {{scope.row.paidAmountCents | dollar}}
-                        </template>
+                          <template v-if="scope.row.status === 'authorized'">
+                            {{scope.row.authorizedAmountCents | dollar}}
+                          </template>
 
-                        <el-tag v-if="scope.row.status != 'active'" type="gray">
+                          <template v-if="scope.row.status === 'paid'">
+                            {{scope.row.paidAmountCents | dollar}}
+                          </template>
+                        </b>
+
+                        <el-tag type="gray" class="m-l-20">
                           {{$t(`attributes.payment.status.${scope.row.status}`)}}
                         </el-tag>
                       </router-link>
                     </template>
                   </el-table-column>
 
-                  <el-table-column width="350">
+                  <el-table-column width="150">
                     <template scope="scope">
                       <span>{{scope.row.insertedAt | moment("MMM Do YYYY")}}</span>
                     </template>
                   </el-table-column>
 
-                  <el-table-column>
+                  <el-table-column width="200">
                     <template scope="scope">
                       <p class="text-right actions">
+                        <el-button v-if="scope.row.status === 'pending'" size="mini">
+                          Pay
+                        </el-button>
 
+                        <el-button v-if="scope.row.status === 'authorized'" size="mini">
+                          Capture
+                        </el-button>
+
+                        <el-button v-if="scope.row.status === 'authorized' || scope.row.status === 'paid'" size="mini">
+                          Refund
+                        </el-button>
                       </p>
                     </template>
                   </el-table-column>
@@ -215,12 +236,21 @@
 
     <div class="launchable">
       <order-line-item-dialog
-        v-model="lineItemDraft"
-        @save="saveLineItem"
-        @cancel="closeLineItemDialog"
+        v-model="lineItemDraftForUpdate"
+        @save="updateLineItem"
+        @cancel="closeEditLineItemDialog"
         :is-visible="isEditingLineItem"
+        title="Edit Line Item"
       >
+      </order-line-item-dialog>
 
+      <order-line-item-dialog
+        v-model="lineItemDraftForCreate"
+        @save="createLineItem"
+        @cancel="closeAddLineItemDialog"
+        :is-visible="isAddingLineItem"
+        title="Add Line Item"
+      >
       </order-line-item-dialog>
     </div>
   </div>
@@ -252,20 +282,30 @@ export default {
   },
   data () {
     return {
-      expandedLineItemIds: [],
-      isLineItemDialogVisiable: false
+      expandedLineItemIds: []
     }
   },
   computed: {
     isEditingLineItem () {
       return this.$store.state.order.isEditingLineItem
     },
-    lineItemDraft: {
+    lineItemDraftForUpdate: {
       get () {
-        return this.$store.state.order.lineItemDraft
+        return this.$store.state.order.lineItemDraftForUpdate
       },
       set (value) {
-        this.$store.dispatch('order/setLineItemDraft', value)
+        this.$store.dispatch('order/setLineItemDraftForUpdate', value)
+      }
+    },
+    isAddingLineItem () {
+      return this.$store.state.order.isAddingLineItem
+    },
+    lineItemDraftForCreate: {
+      get () {
+        return this.$store.state.order.lineItemDraftForCreate
+      },
+      set (value) {
+        this.$store.dispatch('order/setLineItemDraftForCreate', value)
       }
     }
   },
@@ -281,22 +321,44 @@ export default {
     deleteLineItem (id) {
       let orderLineItem = _.find(this.record.rootLineItems, { id: id })
       orderLineItem = _.cloneDeep(orderLineItem)
-      orderLineItem.order = this.order
-      this.$store.dispatch('order/deleteLineItem', orderLineItem)
+      orderLineItem.order = this.record
+      this.$store.dispatch('order/deleteLineItem', orderLineItem).then(() => {
+        this.$message({
+          showClose: true,
+          message: 'Line Item deleted successfully.',
+          type: 'success'
+        })
+      })
+    },
+    addLineItem () {
+      this.$store.dispatch('order/startAddLineItem')
+    },
+    closeAddLineItemDialog () {
+      this.$store.dispatch('order/endAddLineItem')
+    },
+    createLineItem (formModel) {
+      formModel.order = this.record
+      this.$store.dispatch('order/createLineItem', formModel).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Line Item created successfully.`,
+          type: 'success'
+        })
+      })
     },
     editLineItem (lineItemId) {
       let lineItem = _.find(this.record.rootLineItems, { id: lineItemId })
-      this.$store.dispatch('order/startLineItemEdit', _.cloneDeep(lineItem))
+      this.$store.dispatch('order/startEditLineItem', _.cloneDeep(lineItem))
     },
-    closeLineItemDialog () {
-      this.$store.dispatch('order/endLineItemEdit')
+    closeEditLineItemDialog () {
+      this.$store.dispatch('order/endEditLineItem')
     },
-    saveLineItem (formModel) {
+    updateLineItem (formModel) {
       formModel.order = this.record
       this.$store.dispatch('order/updateLineItem', { id: formModel.id, lineItemDraft: formModel }).then(() => {
         this.$message({
           showClose: true,
-          message: `Line Item saved successfully.`,
+          message: `Line Item updated successfully.`,
           type: 'success'
         })
       })

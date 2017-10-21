@@ -44,6 +44,7 @@ export default {
   attributes: {
     payment: {
       status: {
+        pending: 'Pending',
         authorized: 'Authorized',
         paid: 'Paid'
       }

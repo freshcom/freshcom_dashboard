@@ -1,5 +1,5 @@
 <template>
-<el-dialog title="Edit Line Item" :show-close="false" :visible="isVisible" class="fixed-width">
+<el-dialog :title="title" :show-close="false" :visible="isVisible" class="fixed-width">
   <order-line-item-form v-model="recordDraft"></order-line-item-form>
 
   <div slot="footer" class="dialog-footer">
@@ -17,7 +17,7 @@ import OrderLineItemForm from '@/components/order-line-item-form'
 
 export default {
   name: 'OrderLineItemDialog',
-  props: ['value', 'errors', 'isVisible'],
+  props: ['value', 'errors', 'isVisible', 'title'],
   components: {
     PriceAmountInput,
     OrderLineItemForm

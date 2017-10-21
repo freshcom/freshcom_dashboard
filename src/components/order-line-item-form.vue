@@ -12,6 +12,7 @@
       <b>Is Estimate?</b>
       <el-switch
         v-model="formModel.isEstimate"
+        @change="updateValue"
         :disabled="!isIsEstimateTogglable"
         on-text="Yes"
         off-text="No">

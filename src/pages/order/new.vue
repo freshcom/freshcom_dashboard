@@ -32,7 +32,7 @@
 
                 <div class="text-right">
                   <el-button @click="createLineItem(lineItemDraftForCreate)">
-                    Save Line Item
+                    Add to Order
                   </el-button>
                 </div>
               </div>
@@ -232,7 +232,7 @@ export default {
     },
     editLineItem (lineItemId) {
       let lineItem = _.find(this.record.rootLineItems, { id: lineItemId })
-      this.$store.dispatch('order/startLineItemEdit', _.cloneDeep(lineItem))
+      this.$store.dispatch('order/startEditLineItem', _.cloneDeep(lineItem))
     },
     createLineItem (lineItemDraft) {
       lineItemDraft.order = this.record
@@ -255,7 +255,7 @@ export default {
       this.$store.dispatch('order/deleteLineItem', orderLineItem)
     },
     closeLineItemDialog () {
-      this.$store.dispatch('order/endLineItemEdit')
+      this.$store.dispatch('order/endEditLineItem')
     },
     createPayment (paymentDraft, order) {
       this.isLoading = true
@@ -269,6 +269,7 @@ export default {
           return this.$store.dispatch('payment/createRecord', paymentDraft)
         })
       } else {
+        paymentDraft = _.cloneDeep(paymentDraft)
         paymentDraft.order = order
         paymentCreated = this.$store.dispatch('payment/createRecord', paymentDraft)
       }
@@ -285,6 +286,7 @@ export default {
         return this.$store.dispatch('pushRoute', { name: 'ListOrder' })
       }).catch(errors => {
         this.isLoading = false
+        this.errors = errors
         if (errors.source) {
           let errorCode = errors.source[0]
           this.$message({
