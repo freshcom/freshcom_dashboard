@@ -247,7 +247,7 @@ export default {
     },
     chargeQuantityChanged (chargeQuantity) {
       console.log('chargeQuantityChanged')
-      this.formModel.subTotalCents = this.formModel.chargeQuantity * this.formModel.priceChargeCents
+      this.formModel.subTotalCents = Math.round(this.formModel.chargeQuantity * this.formModel.priceChargeCents)
 
       this.refreshTaxAndGrandTotal()
       this.updateValue()

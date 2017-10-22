@@ -33,10 +33,11 @@ export default {
   tableData (lineItems) {
     return _.reduce(lineItems, (acc, lineItem) => {
       let quantity = `${lineItem.orderQuantity}`
+      let chargeQuantity = Number(lineItem.chargeQuantity).toFixed(2)
       if (lineItem.isEstimate) {
-        quantity += ` (~ ${lineItem.chargeQuantity}${lineItem.priceChargeUnit})`
+        quantity += ` (~ ${chargeQuantity}${lineItem.priceChargeUnit})`
       } else if (lineItem.priceEstimateByDefault) {
-        quantity += ` (${lineItem.chargeQuantity}${lineItem.priceChargeUnit})`
+        quantity += ` (${chargeQuantity}${lineItem.priceChargeUnit})`
       }
 
       let taxTotalCents = lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents
