@@ -46,7 +46,9 @@ export default {
       status: {
         pending: 'Pending',
         authorized: 'Authorized',
-        paid: 'Paid'
+        paid: 'Paid',
+        partially_refunded: 'Partially Refunded',
+        fully_refunded: 'Fully Refunded'
       }
     },
     customer: {

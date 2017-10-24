@@ -1,10 +1,14 @@
 <template>
-<el-dialog :title="title" :show-close="false" :visible="isVisible" class="fw-lg">
-  <order-line-item-form v-model="recordDraft"></order-line-item-form>
+<el-dialog :title="title" :show-close="false" :visible="isVisible" class="fw-sm">
+  <el-form :model="formModel">
+    <el-form-item :error="errorMessages.amountCents" label="Refund Amount" class="refund-amount">
+      <price-amount-input v-model="formModel.amountCents"></price-amount-input>
+    </el-form-item>
+  </el-form>
 
   <div slot="footer" class="dialog-footer">
     <el-button @click="cancel">Cancel</el-button>
-    <el-button @click="save" type="primary">Save</el-button>
+    <el-button @click="refund" type="primary">Refund</el-button>
   </div>
 </el-dialog>
 </template>
@@ -13,34 +17,41 @@
 import _ from 'lodash'
 import { dollar } from '@/helpers/filters'
 import PriceAmountInput from '@/components/price-amount-input'
-import OrderLineItemForm from '@/components/order-line-item-form'
+import errorI18nKey from '@/utils/error-i18n-key'
 
 export default {
-  name: 'OrderLineItemDialog',
+  name: 'RefundDialog',
   props: ['value', 'errors', 'isVisible', 'title'],
   components: {
-    PriceAmountInput,
-    OrderLineItemForm
+    PriceAmountInput
   },
   filters: {
     dollar
   },
   data () {
     return {
-      recordDraft: _.cloneDeep(this.value)
+      formModel: _.cloneDeep(this.value)
+    }
+  },
+  computed: {
+    errorMessages () {
+      return _.reduce(this.errors, (result, v, k) => {
+        result[k] = this.$t(errorI18nKey('payment', k, v[0]), { name: _.startCase(k) })
+        return result
+      }, {})
     }
   },
   watch: {
     value (v) {
-      this.recordDraft = _.cloneDeep(v)
+      this.formModel = _.cloneDeep(v)
     }
   },
   methods: {
     cancel () {
       this.$emit('cancel')
     },
-    save () {
-      this.$emit('save', this.recordDraft)
+    refund () {
+      this.$emit('refund', this.formModel)
     }
   }
 }

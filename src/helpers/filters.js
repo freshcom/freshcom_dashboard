@@ -11,6 +11,10 @@ export function chargeDollar (price) {
 
 export function dollar (cents) {
   if (cents === undefined || cents === '') { return '' }
-  let str = (cents / 100).toFixed(2)
-  return `$${str}`
+  let str = (Math.abs(cents) / 100).toFixed(2)
+  if (cents < 0) {
+    return `-$${str}`
+  } else {
+    return `$${str}`
+  }
 }

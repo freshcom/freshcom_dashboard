@@ -4,10 +4,14 @@ import OrderLineItemAPI from '@/api/order-line-item'
 import PriceAPI from '@/api/price'
 import OrderAPI from '@/api/order'
 import CustomerAPI from '@/api/customer'
+import PaymentAPI from '@/api/payment'
+import RefundAPI from '@/api/refund'
 import JSONAPI from '@/jsonapi'
 
 import Order from '@/models/order'
 import OrderLineItem from '@/models/order-line-item'
+import Payment from '@/models/payment'
+import Refund from '@/models/refund'
 
 const MT = {
   RECORD_CHANGED: 'RECORD_CHANGED',
@@ -26,7 +30,11 @@ const MT = {
   SELECTED_PRICES_CHANGED: 'SELECTED_PRICES_CHANGED',
   SELECTABLE_CUSTOMERS_CHANGED: 'SELECTABLE_CUSTOMERS_CHANGED',
   SELECTABLE_CUSTOMERS_LOADING: 'SELECTABLE_CUSTOMERS_LOADING',
-  SELECTABLE_CUSTOMERS_RESET: 'SELECTABLE_CUSTOMERS_RESET'
+  SELECTABLE_CUSTOMERS_RESET: 'SELECTABLE_CUSTOMERS_RESET',
+  PAYMENT_CAPTURE_STARTED: 'PAYMENT_CAPTURE_STARTED',
+  PAYMENT_CAPTURE_ENDED: 'PAYMENT_CAPTURE_ENDED',
+  REFUND_ADD_STARTED: 'REFUND_ADD_STARTED',
+  REFUND_ADD_ENDED: 'REFUND_ADD_ENDED'
 }
 
 export default {
@@ -41,9 +49,13 @@ export default {
     isAddingLineItem: false,
     lineItemDraftForCreate: OrderLineItem.objectWithDefaults(),
     lineItemDraftForUpdate: OrderLineItem.objectWithDefaults(),
+    paymentDraftForCapture: Payment.objectWithDefaults(),
     selectablePrices: [],
     isLoadingSelectableCustomers: true,
-    selectableCustomers: []
+    selectableCustomers: [],
+    isCapturingPayment: false,
+    isAddingRefund: false,
+    refundDraftForCreate: Refund.objectWithDefaults()
   },
   actions: {
     setRecord ({ commit }, record) {
@@ -205,14 +217,52 @@ export default {
     deleteLineItem ({ state, commit }, lineItem) {
       let order = lineItem.order
 
-      console.log(order)
-      OrderLineItemAPI.deleteRecord(lineItem.id).then(() => {
+      return OrderLineItemAPI.deleteRecord(lineItem.id).then(() => {
         console.log(order)
         return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children,payments' })
       }).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
         commit(MT.RECORD_CHANGED, record)
+
+        return record
+      }).catch(error => {
+        throw JSONAPI.deserializeErrors(error.response.data.errors)
+      })
+    },
+
+    capturePayment ({ state, commit, rootState }, actionPayload) {
+      let apiPayload = { data: JSONAPI.serialize(actionPayload.paymentDraft) }
+      let order = actionPayload.paymentDraft.order
+      let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
+
+      return PaymentAPI.updateRecord(actionPayload.id, apiPayload, options).then(() => {
+        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children,payments' })
+      }).then(response => {
+        let apiPayload = response.data
+        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+
+        commit(MT.RECORD_CHANGED, record)
+        commit(MT.PAYMENT_CAPTURE_ENDED)
+
+        return record
+      }).catch(error => {
+        throw JSONAPI.deserializeErrors(error.response.data.errors)
+      })
+    },
+
+    createRefund ({ state, commit }, refundDraft) {
+      let apiPayload = { data: JSONAPI.serialize(refundDraft) }
+      let order = refundDraft.payment.order
+
+      return RefundAPI.createRecord(refundDraft.payment.id, apiPayload).then(() => {
+        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children,payments' })
+      }).then(response => {
+        let apiPayload = response.data
+        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+
+        commit(MT.RECORD_CHANGED, record)
+        commit(MT.REFUND_ADD_ENDED)
 
         return record
       }).catch(error => {
@@ -246,6 +296,10 @@ export default {
       commit(MT.LINE_ITEM_ADD_ENDED)
     },
 
+    setLineItemDraftForCreate ({ commit }, lineItemDraft) {
+      commit(MT.LINE_ITEM_DRAFT_FOR_CREATE_CHANGED, lineItemDraft)
+    },
+
     startEditLineItem ({ commit, dispatch }, lineItem) {
       commit(MT.LINE_ITEM_EDIT_STARTED, lineItem)
     },
@@ -254,8 +308,24 @@ export default {
       commit(MT.LINE_ITEM_EDIT_ENDED)
     },
 
-    setLineItemDraftForCreate ({ commit }, lineItemDraft) {
-      commit(MT.LINE_ITEM_DRAFT_FOR_CREATE_CHANGED, lineItemDraft)
+    setLineItemDraftForUpdate ({ commit }, lineItemDraft) {
+      commit(MT.LINE_ITEM_DRAFT_FOR_UPDATE_CHANGED, lineItemDraft)
+    },
+
+    startCapturePayment ({ commit }, payment) {
+      commit(MT.PAYMENT_CAPTURE_STARTED, payment)
+    },
+
+    endCapturePayment ({ commit }) {
+      commit(MT.PAYMENT_CAPTURE_ENDED)
+    },
+
+    startAddRefund ({ commit }, refund) {
+      commit(MT.REFUND_ADD_STARTED, refund)
+    },
+
+    endAddRefund ({ commit }) {
+      commit(MT.REFUND_ADD_ENDED)
     }
   },
 
@@ -333,6 +403,24 @@ export default {
     [MT.SELECTABLE_CUSTOMERS_RESET] (state) {
       state.isLoadingSelectableCustomers = true
       state.selectableCustomers = []
+    },
+
+    [MT.PAYMENT_CAPTURE_STARTED] (state, payment) {
+      state.paymentDraftForCapture = payment
+      state.isCapturingPayment = true
+    },
+
+    [MT.PAYMENT_CAPTURE_ENDED] (state, lineItem) {
+      state.isCapturingPayment = false
+    },
+
+    [MT.REFUND_ADD_STARTED] (state, refund) {
+      state.refundDraftForCreate = refund
+      state.isAddingRefund = true
+    },
+
+    [MT.REFUND_ADD_ENDED] (state) {
+      state.isAddingRefund = false
     }
   }
 }

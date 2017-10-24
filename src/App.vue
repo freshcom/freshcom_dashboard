@@ -691,7 +691,11 @@ small {
 
 /* Dialog */
 
-.fixed-width .el-dialog {
+.fw-lg .el-dialog {
   width: 750px;
+}
+
+.fw-sm .el-dialog {
+  width: 400px;
 }
 </style>

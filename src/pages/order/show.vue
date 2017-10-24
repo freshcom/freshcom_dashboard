@@ -114,7 +114,7 @@
               <h3>Line Items</h3>
 
               <span class="block-title-actions pull-right">
-                <a @click="addLineItem()" href="javascript:;">
+                <a @click="openAddLineItemDialog()" href="javascript:;">
                   <icon name="plus" scale="0.8" class="v-middle"></icon>
                   <span>Add</span>
                 </a>
@@ -122,7 +122,7 @@
             </div>
             <div class="block">
               <div class="block-body full">
-                <order-line-item-table @delete="deleteLineItem" @edit="editLineItem" :records="record.rootLineItems" class="block-table">
+                <order-line-item-table @delete="deleteLineItem" @edit="openEditLineItemDialog" :records="record.rootLineItems" class="block-table">
                 </order-line-item-table>
               </div>
             </div>
@@ -156,9 +156,13 @@
                           <template v-if="scope.row.status === 'paid'">
                             {{scope.row.paidAmountCents | dollar}}
                           </template>
+
+                          <template v-if="scope.row.status === 'partially_refunded' || scope.row.status === 'fully_refunded'">
+                            {{scope.row.paidAmountCents | dollar}} ({{-scope.row.refundedAmountCents | dollar}})
+                          </template>
                         </b>
 
-                        <el-tag type="gray" class="m-l-20">
+                        <el-tag type="gray" class="m-l-10">
                           {{$t(`attributes.payment.status.${scope.row.status}`)}}
                         </el-tag>
                       </router-link>
@@ -178,11 +182,11 @@
                           Pay
                         </el-button>
 
-                        <el-button v-if="scope.row.status === 'authorized'" size="mini">
+                        <el-button v-if="scope.row.status === 'authorized'" @click="openCapturePaymentDialog(scope.row)" size="mini">
                           Capture
                         </el-button>
 
-                        <el-button v-if="scope.row.status === 'authorized' || scope.row.status === 'paid'" size="mini">
+                        <el-button v-if="canRefundPayment(scope.row)" @click="openAddRefundDialog(scope.row)" size="mini">
                           Refund
                         </el-button>
                       </p>
@@ -252,6 +256,26 @@
         title="Add Line Item"
       >
       </order-line-item-dialog>
+
+      <capture-payment-dialog
+        v-model="paymentDraftForCapture"
+        @capture="capturePayment"
+        @cancel="closeCapturePaymentDialog"
+        :errors="errors"
+        :is-visible="isCapturingPayment"
+        title="Capture Payment"
+      >
+      </capture-payment-dialog>
+
+      <refund-dialog
+        v-model="refundDraftForCreate"
+        @refund="createRefund"
+        @cancel="closeAddRefundDialog"
+        :errors="errors"
+        :is-visible="isAddingRefund"
+        title="Refund Payment"
+      >
+      </refund-dialog>
     </div>
   </div>
 </div>
@@ -268,6 +292,8 @@ import ShowPage from '@/mixins/show-page'
 import DeleteButton from '@/components/delete-button'
 import OrderLineItemTable from '@/components/order-line-item-table'
 import OrderLineItemDialog from '@/components/order-line-item-dialog'
+import CapturePaymentDialog from '@/components/capture-payment-dialog'
+import RefundDialog from '@/components/refund-dialog'
 import { dollar } from '@/helpers/filters'
 
 export default {
@@ -278,11 +304,14 @@ export default {
   components: {
     DeleteButton,
     OrderLineItemDialog,
-    OrderLineItemTable
+    OrderLineItemTable,
+    CapturePaymentDialog,
+    RefundDialog
   },
   data () {
     return {
-      expandedLineItemIds: []
+      expandedLineItemIds: [],
+      errors: {}
     }
   },
   computed: {
@@ -307,10 +336,35 @@ export default {
       set (value) {
         this.$store.dispatch('order/setLineItemDraftForCreate', value)
       }
+    },
+    paymentDraftForCapture: {
+      get () {
+        return this.$store.state.order.paymentDraftForCapture
+      },
+      set (value) {
+        this.$store.dispatch('order/setPaymentDraftForCapture', value)
+      }
+    },
+    isCapturingPayment () {
+      return this.$store.state.order.isCapturingPayment
+    },
+    refundDraftForCreate: {
+      get () {
+        return this.$store.state.order.refundDraftForCreate
+      },
+      set (value) {
+        this.$store.dispatch('order/setRefundDraftForCreate', value)
+      }
+    },
+    isAddingRefund () {
+      return this.$store.state.order.isAddingRefund
     }
   },
   mixins: [ShowPage({ storeNamespace: 'order', name: 'Order', include: 'rootLineItems.children,payments' })],
   methods: {
+    canRefundPayment (payment) {
+      return payment.status === 'partially_refunded' || payment.status === 'paid'
+    },
     editRecord () {
       this.$router.push({ name: 'EditOrder', params: { id: this.record.id }, query: { callbackPath: this.currentRoutePath } })
     },
@@ -330,7 +384,7 @@ export default {
         })
       })
     },
-    addLineItem () {
+    openAddLineItemDialog () {
       this.$store.dispatch('order/startAddLineItem')
     },
     closeAddLineItemDialog () {
@@ -346,7 +400,7 @@ export default {
         })
       })
     },
-    editLineItem (lineItemId) {
+    openEditLineItemDialog (lineItemId) {
       let lineItem = _.find(this.record.rootLineItems, { id: lineItemId })
       this.$store.dispatch('order/startEditLineItem', _.cloneDeep(lineItem))
     },
@@ -362,6 +416,45 @@ export default {
           type: 'success'
         })
       })
+    },
+    openCapturePaymentDialog (payment) {
+      let paymentDraft = _.cloneDeep(payment)
+      paymentDraft.paidAmountCents = this.record.grandTotalCents
+      this.$store.dispatch('order/startCapturePayment', paymentDraft)
+    },
+    closeCapturePaymentDialog () {
+      this.$store.dispatch('order/endCapturePayment')
+    },
+    capturePayment (formModel) {
+      formModel.order = this.record
+      this.$store.dispatch('order/capturePayment', { id: formModel.id, paymentDraft: formModel }).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Payment captured successfully.`,
+          type: 'success'
+        })
+      }).catch(errors => {
+        console.log(errors)
+        this.errors = errors
+      })
+    },
+    createRefund (formModel) {
+      this.$store.dispatch('order/createRefund', formModel).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Refund created successfully.`,
+          type: 'success'
+        })
+      })
+    },
+    openAddRefundDialog (payment) {
+      let refundDraft = _.cloneDeep(this.refundDraftForCreate)
+      refundDraft.payment = payment
+      refundDraft.amountCents = payment.paidAmountCents - payment.refundedAmountCents
+      this.$store.dispatch('order/startAddRefund', refundDraft)
+    },
+    closeAddRefundDialog () {
+      this.$store.dispatch('order/endAddRefund')
     }
   }
 }
