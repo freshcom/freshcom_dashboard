@@ -4,6 +4,7 @@
     <div class="secondary-nav">
       <el-menu :router="true" default-active="/orders" mode="horizontal">
         <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">Orders</el-menu-item>
+        <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">Payments</el-menu-item>
       </el-menu>
       <locale-selector @change="loadRecord"></locale-selector>
     </div>
@@ -106,6 +107,9 @@
 
                   <dt>Grand Total</dt>
                   <dd>{{record.grandTotalCents | dollar}}</dd>
+
+                  <dt>Authorization Total</dt>
+                  <dd>{{record.authorizationCents | dollar}}</dd>
                 </dl>
               </div>
             </div>
@@ -128,7 +132,17 @@
             </div>
 
             <div class="block-title">
-              <h3>Payments</h3>
+              <h3>
+                Payments
+              </h3>
+              <span>
+                <el-tag v-if="record.isPaymentBalanced" type="primary">
+                  Balanced
+                </el-tag>
+                <el-tag v-else type="danger">
+                  Not Balanced
+                </el-tag>
+              </span>
 
               <span class="block-title-actions pull-right">
                 <router-link :to="{ name: 'NewPayment', query: { orderId: record.id, callbackPath: currentRoutePath } }">
@@ -157,7 +171,7 @@
                             {{scope.row.paidAmountCents | dollar}}
                           </template>
 
-                          <template v-if="scope.row.status === 'partially_refunded' || scope.row.status === 'fully_refunded'">
+                          <template v-if="scope.row.status === 'partially_refunded' || scope.row.status === 'refunded'">
                             {{scope.row.paidAmountCents | dollar}} ({{-scope.row.refundedAmountCents | dollar}})
                           </template>
                         </b>
@@ -169,20 +183,20 @@
                     </template>
                   </el-table-column>
 
-                  <el-table-column width="150">
+                  <el-table-column width="200">
                     <template scope="scope">
-                      <span>{{scope.row.insertedAt | moment("MMM Do YYYY")}}</span>
+                      <span>{{scope.row.insertedAt | moment("MMM Do YYYY, hh:mm:ss")}}</span>
                     </template>
                   </el-table-column>
 
                   <el-table-column width="200">
                     <template scope="scope">
                       <p class="text-right actions">
-                        <el-button v-if="scope.row.status === 'pending'" size="mini">
+                        <el-button v-if="scope.row.status === 'pending'" @click="openEditPaymentDialog(scope.row)" size="mini">
                           Pay
                         </el-button>
 
-                        <el-button v-if="scope.row.status === 'authorized'" @click="openCapturePaymentDialog(scope.row)" size="mini">
+                        <el-button v-if="scope.row.status === 'authorized'" @click="openEditPaymentDialog(scope.row)" size="mini">
                           Capture
                         </el-button>
 
@@ -257,15 +271,16 @@
       >
       </order-line-item-dialog>
 
-      <capture-payment-dialog
-        v-model="paymentDraftForCapture"
-        @capture="capturePayment"
-        @cancel="closeCapturePaymentDialog"
+      <payment-dialog
+        v-model="paymentDraftForEdit"
+        @save="updatePayment"
+        @cancel="closeEditPaymentDialog"
+        :record="paymentForEdit"
         :errors="errors"
-        :is-visible="isCapturingPayment"
-        title="Capture Payment"
+        :is-visible="isEditingPayment"
+        title="Payment"
       >
-      </capture-payment-dialog>
+      </payment-dialog>
 
       <refund-dialog
         v-model="refundDraftForCreate"
@@ -292,7 +307,7 @@ import ShowPage from '@/mixins/show-page'
 import DeleteButton from '@/components/delete-button'
 import OrderLineItemTable from '@/components/order-line-item-table'
 import OrderLineItemDialog from '@/components/order-line-item-dialog'
-import CapturePaymentDialog from '@/components/capture-payment-dialog'
+import PaymentDialog from '@/components/payment-dialog'
 import RefundDialog from '@/components/refund-dialog'
 import { dollar } from '@/helpers/filters'
 
@@ -305,13 +320,14 @@ export default {
     DeleteButton,
     OrderLineItemDialog,
     OrderLineItemTable,
-    CapturePaymentDialog,
+    PaymentDialog,
     RefundDialog
   },
   data () {
     return {
       expandedLineItemIds: [],
-      errors: {}
+      errors: {},
+      paymentDialogTitle: ''
     }
   },
   computed: {
@@ -337,16 +353,19 @@ export default {
         this.$store.dispatch('order/setLineItemDraftForCreate', value)
       }
     },
-    paymentDraftForCapture: {
+    paymentDraftForEdit: {
       get () {
-        return this.$store.state.order.paymentDraftForCapture
+        return this.$store.state.order.paymentDraftForEdit
       },
       set (value) {
         this.$store.dispatch('order/setPaymentDraftForCapture', value)
       }
     },
-    isCapturingPayment () {
-      return this.$store.state.order.isCapturingPayment
+    paymentForEdit () {
+      return this.$store.state.order.paymentForEdit
+    },
+    isEditingPayment () {
+      return this.$store.state.order.isEditingPayment
     },
     refundDraftForCreate: {
       get () {
@@ -417,17 +436,17 @@ export default {
         })
       })
     },
-    openCapturePaymentDialog (payment) {
+    openEditPaymentDialog (payment) {
       let paymentDraft = _.cloneDeep(payment)
       paymentDraft.paidAmountCents = this.record.grandTotalCents
-      this.$store.dispatch('order/startCapturePayment', paymentDraft)
+      this.$store.dispatch('order/startEditPayment', paymentDraft)
     },
-    closeCapturePaymentDialog () {
-      this.$store.dispatch('order/endCapturePayment')
+    closeEditPaymentDialog () {
+      this.$store.dispatch('order/endEditPayment')
     },
-    capturePayment (formModel) {
+    updatePayment (formModel) {
       formModel.order = this.record
-      this.$store.dispatch('order/capturePayment', { id: formModel.id, paymentDraft: formModel }).then(() => {
+      this.$store.dispatch('order/updatePayment', { id: formModel.id, paymentDraft: formModel }).then(() => {
         this.$message({
           showClose: true,
           message: `Payment captured successfully.`,

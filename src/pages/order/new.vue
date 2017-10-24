@@ -68,7 +68,7 @@
             </template>
 
             <template v-if="activeStep === 2">
-              <payment-form v-model="paymentDraft" :errors="errors"></payment-form>
+              <payment-form v-model="paymentDraft" :record="payment" :errors="errors"></payment-form>
             </template>
           </div>
 
@@ -194,12 +194,15 @@ export default {
     record () {
       return this.$store.state.order.record
     },
+    payment () {
+      return this.$store.state.order.paymentForCreate
+    },
     paymentDraft: {
       get () {
-        return this.$store.state.payment.recordDraft
+        return this.$store.state.order.paymentDraftForCreate
       },
       set (value) {
-        this.$store.dispatch(`payment/setRecordDraft`, value)
+        this.$store.dispatch(`order/setPaymentDraftForCreate`, value)
       }
     }
   },

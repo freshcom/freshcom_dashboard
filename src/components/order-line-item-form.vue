@@ -246,14 +246,12 @@ export default {
       this.refreshTaxAndGrandTotal()
     },
     chargeQuantityChanged (chargeQuantity) {
-      console.log('chargeQuantityChanged')
       this.formModel.subTotalCents = Math.round(this.formModel.chargeQuantity * this.formModel.priceChargeCents)
 
       this.refreshTaxAndGrandTotal()
       this.updateValue()
     },
     orderQuantityChanged (orderQuantity) {
-      console.log('orderQuantityChanged')
       if (this.formModel.priceEstimateByDefault) {
         this.formModel.chargeQuantity = orderQuantity * (this.formModel.priceEstimateAveragePercentage / 100)
       } else {
@@ -263,7 +261,6 @@ export default {
       this.chargeQuantityChanged(this.formModel.chargeQuantity)
     },
     subTotalCentsChanged (subTotalCents) {
-      console.log('subTotalCentsChanged')
       if (this.formModel.isEstimate) {
         this.formModel.chargeQuantity = subTotalCents / this.formModel.priceChargeCents
       }
@@ -272,7 +269,6 @@ export default {
       this.updateValue()
     },
     priceChanged (price) {
-      console.log('priceChanged')
       if (!price) { return }
 
       this.formModel.priceEstimateAveragePercentage = price.estimateAveragePercentage

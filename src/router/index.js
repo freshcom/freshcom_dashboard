@@ -49,6 +49,8 @@ import ShowCustomerPage from '@/pages/customer/show'
 import NewCustomerPage from '@/pages/customer/new'
 import EditCustomerPage from '@/pages/customer/edit'
 
+import ShowPaymentPage from '@/pages/payment/show'
+
 Vue.use(Router)
 
 function extractPagination (route) {
@@ -398,6 +400,14 @@ export default new Router({
         let query = qs.parse(queryString)
 
         return { id: route.params.id, callbackPath: query.callbackPath }
+      }
+    },
+    {
+      path: '/payments/:id',
+      name: 'ShowPayment',
+      component: ShowPaymentPage,
+      props (route) {
+        return { id: route.params.id }
       }
     }
   ]

@@ -7,7 +7,9 @@ export default {
 
       gateway: 'online',
       processor: 'stripe',
-      method: ''
+      method: '',
+
+      order: {}
     }
   }
 }

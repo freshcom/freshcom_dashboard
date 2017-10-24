@@ -1,14 +1,15 @@
 <template>
 <el-dialog :title="title" :show-close="false" :visible="isVisible" class="fw-sm">
-  <el-form :model="formModel">
-    <el-form-item :error="errorMessages.paidAmountCents" label="Capture Amount" class="capture-amount">
-      <price-amount-input v-model="formModel.paidAmountCents"></price-amount-input>
-    </el-form-item>
-  </el-form>
+  <payment-form
+    v-model="formModel"
+    :record="record"
+  >
+
+  </payment-form>
 
   <div slot="footer" class="dialog-footer">
     <el-button @click="cancel">Cancel</el-button>
-    <el-button @click="capture" type="primary">Capture</el-button>
+    <el-button @click="save" type="primary">Save</el-button>
   </div>
 </el-dialog>
 </template>
@@ -17,13 +18,15 @@
 import _ from 'lodash'
 import { dollar } from '@/helpers/filters'
 import PriceAmountInput from '@/components/price-amount-input'
+import PaymentForm from '@/components/payment-form'
 import errorI18nKey from '@/utils/error-i18n-key'
 
 export default {
-  name: 'CapturePaymentDialog',
-  props: ['value', 'errors', 'isVisible', 'title'],
+  name: 'PaymentDialog',
+  props: ['value', 'errors', 'isVisible', 'title', 'record'],
   components: {
-    PriceAmountInput
+    PriceAmountInput,
+    PaymentForm
   },
   filters: {
     dollar
@@ -50,8 +53,8 @@ export default {
     cancel () {
       this.$emit('cancel')
     },
-    capture () {
-      this.$emit('capture', this.formModel)
+    save () {
+      this.$emit('save', this.formModel)
     }
   }
 }

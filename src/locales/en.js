@@ -48,7 +48,7 @@ export default {
         authorized: 'Authorized',
         paid: 'Paid',
         partially_refunded: 'Partially Refunded',
-        fully_refunded: 'Fully Refunded'
+        refunded: 'Refunded'
       }
     },
     customer: {
@@ -58,7 +58,8 @@ export default {
     },
     order: {
       status: {
-        opened: 'Opened'
+        opened: 'Opened',
+        cart: 'Cart'
       },
       fulfillmentMethod: {
         pickup: 'Pick Up',

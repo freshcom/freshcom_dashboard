@@ -3,7 +3,7 @@
 
   <el-row :gutter="10">
     <el-col :span="8">
-      <el-form-item label="Gateway" :error="errorMessages.gateway" required>
+      <el-form-item v-if="canSelectGateway" label="Gateway" :error="errorMessages.gateway" required>
         <el-select @change="updateValue" v-model="formModel.gateway">
           <el-option label="Online" value="online"></el-option>
           <el-option label="Offline" value="offline"></el-option>
@@ -18,7 +18,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item v-if="formModel.gateway === 'online'" label="Processor" :error="errorMessages.processor" required>
+      <el-form-item v-if="canSelectProcessor" label="Processor" :error="errorMessages.processor" required>
         <el-select @change="updateValue" v-model="formModel.processor">
           <el-option label="Stripe" value="stripe"></el-option>
         </el-select>
@@ -38,7 +38,7 @@
 
   <el-row>
     <el-col :span="12">
-      <el-form-item v-if="formModel.gateway === 'online'" :error="errorMessages.status" required>
+      <el-form-item v-if="canSelectAction" :error="errorMessages.status" required>
         <b class="m-r-20">Action</b>
         <el-radio-group @change="updateValue" v-model="formModel.status">
           <el-radio label="paid">Pay Now</el-radio>
@@ -51,9 +51,14 @@
     </el-col>
   </el-row>
 
-  <template v-if="formModel.gateway === 'online' && formModel.status === 'paid'">
-    <hr>
+  <el-row>
+    <el-form-item v-if="canEnterCaptureAmount" :error="errorMessages.paidAmountCents" label="Capture Amount" class="capture-amount">
+      <price-amount-input v-model="formModel.paidAmountCents"></price-amount-input>
+    </el-form-item>
+  </el-row>
 
+  <template v-if="canEnterCreditCard">
+    <hr>
     <el-row>
       <el-col :span="12">
         <el-form-item label="Card" required>
@@ -119,6 +124,7 @@
 <script>
 import _ from 'lodash'
 import errorI18nKey from '@/utils/error-i18n-key'
+import PriceAmountInput from '@/components/price-amount-input'
 import { Card } from 'vue-stripe-elements'
 import { STRIPE_PUBLISHABLE_KEY } from '@/env'
 
@@ -126,7 +132,8 @@ export default {
   name: 'PaymentForm',
   props: ['value', 'errors', 'record'],
   components: {
-    Card
+    Card,
+    PriceAmountInput
   },
   data () {
     return {
@@ -140,6 +147,21 @@ export default {
     }
   },
   computed: {
+    canEnterCreditCard () {
+      return (!this.record.id || (this.record.id && this.record.gateway === 'offline')) && (this.formModel.gateway === 'online' && this.formModel.status === 'paid')
+    },
+    canEnterCaptureAmount () {
+      return this.record.id && this.record.status === 'authorized'
+    },
+    canSelectProcessor () {
+      return (!this.record.id || (this.record && this.record.gateway === 'offline')) && this.formModel.gateway === 'online'
+    },
+    canSelectAction () {
+      return !this.record.id && this.formModel.gateway === 'online'
+    },
+    canSelectGateway () {
+      return !this.record.id || (this.formModel.id && this.formModel.gateway === 'offline')
+    },
     canEnterBillingAddress () {
       if (this.formModel.order && this.formModel.order.fulfillmentMethod === 'ship' && this.isBillingAndShippingAddressSame) {
         return false
