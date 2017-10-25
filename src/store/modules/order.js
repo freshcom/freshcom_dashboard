@@ -27,13 +27,14 @@ const MT = {
   LINE_ITEM_EDIT_ENDED: 'LINE_ITEM_EDIT_ENDED',
   LINE_ITEM_DRAFT_FOR_CREATE_CHANGED: 'LINE_ITEM_DRAFT_FOR_CREATE_CHANGED',
   LINE_ITEM_DRAFT_FOR_UPDATE_CHANGED: 'LINE_ITEM_DRAFT_FOR_UPDATE_CHANGED',
-  LINE_ITEM_DRAFT_FOR_CREATE_RESET: 'LINE_ITEM_DRAFT_FOR_CREATE_RESET',
   SELECTED_PRICES_CHANGED: 'SELECTED_PRICES_CHANGED',
   SELECTABLE_CUSTOMERS_CHANGED: 'SELECTABLE_CUSTOMERS_CHANGED',
   SELECTABLE_CUSTOMERS_LOADING: 'SELECTABLE_CUSTOMERS_LOADING',
   SELECTABLE_CUSTOMERS_RESET: 'SELECTABLE_CUSTOMERS_RESET',
   PAYMENT_EDIT_STARTED: 'PAYMENT_EDIT_STARTED',
   PAYMENT_EDIT_ENDED: 'PAYMENT_EDIT_ENDED',
+  PAYMENT_ADD_STARTED: 'PAYMENT_ADD_STARTED',
+  PAYMENT_ADD_ENDED: 'PAYMENT_ADD_ENDED',
   REFUND_ADD_STARTED: 'REFUND_ADD_STARTED',
   REFUND_ADD_ENDED: 'REFUND_ADD_ENDED'
 }
@@ -44,28 +45,33 @@ export default {
     record: Order.objectWithDefaults(),
     recordDraft: Order.objectWithDefaults(),
     isLoadingRecord: true,
+
     records: [],
     isLoadingRecords: true,
+
     isEditingLineItem: false,
+    lineItemDraftForUpdate: OrderLineItem.objectWithDefaults(),
+
     isAddingLineItem: false,
     lineItemDraftForCreate: OrderLineItem.objectWithDefaults(),
-    lineItemDraftForUpdate: OrderLineItem.objectWithDefaults(),
+
+    isEditingPayment: false,
     paymentDraftForEdit: Payment.objectWithDefaults(),
     paymentForEdit: Payment.objectWithDefaults(),
-    selectablePrices: [],
+
+    isAddingPayment: false,
+    paymentDraftForCreate: Payment.objectWithDefaults(),
+    paymentForCreate: Payment.objectWithDefaults(),
+
     isLoadingSelectableCustomers: true,
     selectableCustomers: [],
-    isEditingPayment: false,
+
+    selectablePrices: [],
+
     isAddingRefund: false,
-    refundDraftForCreate: Refund.objectWithDefaults(),
-    paymentDraftForCreate: Payment.objectWithDefaults(),
-    paymentForCreate: Payment.objectWithDefaults()
+    refundDraftForCreate: Refund.objectWithDefaults()
   },
   actions: {
-    setPaymentDraftForCreate ({ commit }, paymentDraft) {
-      commit(MT.PAYMENT_DRAFT_FOR_CREATE_CHANGED, paymentDraft)
-    },
-
     setRecord ({ commit }, record) {
       commit(MT.RECORD_CHANGED, record)
     },
@@ -151,6 +157,10 @@ export default {
       })
     },
 
+    setPaymentDraftForCreate ({ commit }, paymentDraft) {
+      commit(MT.PAYMENT_DRAFT_FOR_CREATE_CHANGED, paymentDraft)
+    },
+
     loadSelectableCustomers ({ state, commit, rootState }, actionPayload) {
       commit(MT.SELECTABLE_CUSTOMERS_LOADING)
       actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
@@ -195,7 +205,6 @@ export default {
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
         commit(MT.RECORD_CHANGED, record)
         commit(MT.LINE_ITEM_ADD_ENDED)
-        commit(MT.LINE_ITEM_DRAFT_FOR_CREATE_RESET)
 
         return record
       }).catch(error => {
@@ -234,6 +243,25 @@ export default {
         commit(MT.RECORD_CHANGED, record)
 
         return record
+      }).catch(error => {
+        throw JSONAPI.deserializeErrors(error.response.data.errors)
+      })
+    },
+
+    createPayment ({ commit }, paymentDraft) {
+      let apiPayload = { data: JSONAPI.serialize(paymentDraft) }
+      let order = paymentDraft.order
+
+      return PaymentAPI.createRecord(paymentDraft.order.id, apiPayload).then(response => {
+        return JSONAPI.deserialize(response.data.data)
+      }).then(response => {
+        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children,payments' })
+      }).then(response => {
+        let apiPayload = response.data
+        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+
+        commit(MT.RECORD_CHANGED, record)
+        commit(MT.PAYMENT_ADD_ENDED)
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
@@ -296,8 +324,24 @@ export default {
       })
     },
 
-    startAddLineItem ({ commit, dispatch }, lineItem) {
-      commit(MT.LINE_ITEM_ADD_STARTED, lineItem)
+    deletePayment ({ state, commit }, payment) {
+      let order = payment.order
+
+      return PaymentAPI.deleteRecord(payment.id).then(() => {
+        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children,payments' })
+      }).then(response => {
+        let apiPayload = response.data
+        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+        commit(MT.RECORD_CHANGED, record)
+
+        return record
+      }).catch(error => {
+        throw JSONAPI.deserializeErrors(error.response.data.errors)
+      })
+    },
+
+    startAddLineItem ({ commit, dispatch }) {
+      commit(MT.LINE_ITEM_ADD_STARTED)
     },
 
     endAddLineItem ({ commit }) {
@@ -318,6 +362,14 @@ export default {
 
     setLineItemDraftForUpdate ({ commit }, lineItemDraft) {
       commit(MT.LINE_ITEM_DRAFT_FOR_UPDATE_CHANGED, lineItemDraft)
+    },
+
+    startAddPayment ({ commit }, paymentDraft) {
+      commit(MT.PAYMENT_ADD_STARTED, paymentDraft)
+    },
+
+    endAddPayment ({ commit }, payment) {
+      commit(MT.PAYMENT_ADD_ENDED)
     },
 
     startEditPayment ({ commit }, payment) {
@@ -372,6 +424,7 @@ export default {
 
     [MT.LINE_ITEM_ADD_ENDED] (state, lineItem) {
       state.isAddingLineItem = false
+      state.lineItemDraftForCreate = OrderLineItem.objectWithDefaults()
     },
 
     [MT.LINE_ITEM_EDIT_STARTED] (state, lineItem) {
@@ -381,6 +434,7 @@ export default {
 
     [MT.LINE_ITEM_EDIT_ENDED] (state, lineItem) {
       state.isEditingLineItem = false
+      state.lineItemDraftForEdit = OrderLineItem.objectWithDefaults()
     },
 
     [MT.LINE_ITEM_DRAFT_FOR_CREATE_CHANGED] (state, lineItemDraftForCreate) {
@@ -393,10 +447,6 @@ export default {
 
     [MT.SELECTED_PRICES_CHANGED] (state, prices) {
       state.selectablePrices = prices
-    },
-
-    [MT.LINE_ITEM_DRAFT_FOR_CREATE_RESET] (state, prices) {
-      state.lineItemDraftForCreate = OrderLineItem.objectWithDefaults()
     },
 
     [MT.SELECTABLE_CUSTOMERS_CHANGED] (state, customers) {
@@ -423,8 +473,8 @@ export default {
       state.isEditingPayment = false
     },
 
-    [MT.REFUND_ADD_STARTED] (state, refund) {
-      state.refundDraftForCreate = refund
+    [MT.REFUND_ADD_STARTED] (state, refundDraft) {
+      state.refundDraftForCreate = refundDraft
       state.isAddingRefund = true
     },
 
@@ -434,6 +484,18 @@ export default {
 
     [MT.PAYMENT_DRAFT_FOR_CREATE_CHANGED] (state, paymentDraft) {
       state.paymentDraftForCreate = paymentDraft
+    },
+
+    [MT.PAYMENT_ADD_STARTED] (state, paymentDraft) {
+      if (paymentDraft) {
+        state.paymentDraftForCreate = paymentDraft
+      }
+      state.isAddingPayment = true
+    },
+
+    [MT.PAYMENT_ADD_ENDED] (state) {
+      state.paymentDraftForCreate = Payment.objectWithDefaults()
+      state.isAddingPayment = false
     }
   }
 }

@@ -2,8 +2,8 @@
 <el-form @input.native="updateValue" label-width="180px" label-position="top" class="m-b-10">
 
   <el-row :gutter="10">
-    <el-col :span="8">
-      <el-form-item v-if="canSelectGateway" label="Gateway" :error="errorMessages.gateway" required>
+    <el-col v-if="canSelectGateway" :span="8">
+      <el-form-item label="Gateway" :error="errorMessages.gateway" required>
         <el-select @change="updateValue" v-model="formModel.gateway">
           <el-option label="Online" value="online"></el-option>
           <el-option label="Offline" value="offline"></el-option>
@@ -11,7 +11,7 @@
       </el-form-item>
     </el-col>
     <el-col :span="8">
-      <el-form-item v-if="formModel.gateway === 'offline'" label="Status" :error="errorMessages.status" required>
+      <el-form-item v-if="canSelectStatus" label="Status" :error="errorMessages.status" required>
         <el-select @change="updateValue" v-model="formModel.status">
           <el-option label="Pending" value="pending"></el-option>
           <el-option label="Paid" value="paid"></el-option>
@@ -32,6 +32,11 @@
           <el-option label="Cash" value="cash"></el-option>
           <el-option label="Cheque" value="cheque"></el-option>
         </el-select>
+      </el-form-item>
+    </el-col>
+    <el-col :span="8">
+      <el-form-item v-if="canEnterPaidAmount" :error="errorMessages.paidAmountCents" label="Paid Amount" class="paid-amount">
+        <price-amount-input v-model="formModel.paidAmountCents"></price-amount-input>
       </el-form-item>
     </el-col>
   </el-row>
@@ -147,20 +152,26 @@ export default {
     }
   },
   computed: {
-    canEnterCreditCard () {
-      return (!this.record.id || (this.record.id && this.record.gateway === 'offline')) && (this.formModel.gateway === 'online' && this.formModel.status === 'paid')
+    canSelectStatus () {
+      return !this.record.id && this.formModel.gateway === 'offline'
+    },
+    canEnterPaidAmount () {
+      return this.record.id && this.formModel.gateway === 'offline' && this.formModel.status === 'paid'
     },
     canEnterCaptureAmount () {
       return this.record.id && this.record.status === 'authorized'
     },
+    canEnterCreditCard () {
+      return !this.record.id && this.formModel.gateway === 'online' && this.formModel.status === 'paid'
+    },
     canSelectProcessor () {
-      return (!this.record.id || (this.record && this.record.gateway === 'offline')) && this.formModel.gateway === 'online'
+      return !this.record.id && this.formModel.gateway === 'online'
     },
     canSelectAction () {
       return !this.record.id && this.formModel.gateway === 'online'
     },
     canSelectGateway () {
-      return !this.record.id || (this.formModel.id && this.formModel.gateway === 'offline')
+      return !this.record.id
     },
     canEnterBillingAddress () {
       if (this.formModel.order && this.formModel.order.fulfillmentMethod === 'ship' && this.isBillingAndShippingAddressSame) {

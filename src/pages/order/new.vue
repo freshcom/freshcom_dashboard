@@ -269,12 +269,12 @@ export default {
           paymentDraft = _.cloneDeep(paymentDraft)
           paymentDraft.order = order
           paymentDraft.source = data.token.id
-          return this.$store.dispatch('payment/createRecord', paymentDraft)
+          return this.$store.dispatch('order/createPayment', paymentDraft)
         })
       } else {
         paymentDraft = _.cloneDeep(paymentDraft)
         paymentDraft.order = order
-        paymentCreated = this.$store.dispatch('payment/createRecord', paymentDraft)
+        paymentCreated = this.$store.dispatch('order/createPayment', paymentDraft)
       }
 
       paymentCreated.then(payment => {

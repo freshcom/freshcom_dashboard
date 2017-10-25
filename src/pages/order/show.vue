@@ -145,10 +145,10 @@
               </span>
 
               <span class="block-title-actions pull-right">
-                <router-link :to="{ name: 'NewPayment', query: { orderId: record.id, callbackPath: currentRoutePath } }">
+                <a @click="openAddPaymentDialog()" href="javascript:;">
                   <icon name="plus" scale="0.8" class="v-middle"></icon>
                   <span>Add</span>
-                </router-link>
+                </a>
               </span>
             </div>
 
@@ -203,6 +203,10 @@
                         <el-button v-if="canRefundPayment(scope.row)" @click="openAddRefundDialog(scope.row)" size="mini">
                           Refund
                         </el-button>
+
+                        <delete-button v-if="scope.row.status === 'pending'" @confirmed="deletePayment(scope.row)" size="mini">
+                          Delete
+                        </delete-button>
                       </p>
                     </template>
                   </el-table-column>
@@ -279,6 +283,17 @@
         :errors="errors"
         :is-visible="isEditingPayment"
         title="Payment"
+      >
+      </payment-dialog>
+
+      <payment-dialog
+        v-model="paymentDraftForCreate"
+        @save="createPayment"
+        @cancel="closeAddPaymentDialog"
+        :record="paymentForCreate"
+        :errors="errors"
+        :is-visible="isAddingPayment"
+        title="Add Payment"
       >
       </payment-dialog>
 
@@ -367,6 +382,20 @@ export default {
     isEditingPayment () {
       return this.$store.state.order.isEditingPayment
     },
+    paymentDraftForCreate: {
+      get () {
+        return this.$store.state.order.paymentDraftForCreate
+      },
+      set (value) {
+        this.$store.dispatch('order/setPaymentDraftForCreate', value)
+      }
+    },
+    paymentForCreate () {
+      return this.$store.state.order.paymentForCreate
+    },
+    isAddingPayment () {
+      return this.$store.state.order.isAddingPayment
+    },
     refundDraftForCreate: {
       get () {
         return this.$store.state.order.refundDraftForCreate
@@ -438,6 +467,11 @@ export default {
     },
     openEditPaymentDialog (payment) {
       let paymentDraft = _.cloneDeep(payment)
+
+      if (paymentDraft.status === 'pending') {
+        paymentDraft.status = 'paid'
+      }
+
       paymentDraft.paidAmountCents = this.record.grandTotalCents
       this.$store.dispatch('order/startEditPayment', paymentDraft)
     },
@@ -453,8 +487,34 @@ export default {
           type: 'success'
         })
       }).catch(errors => {
-        console.log(errors)
         this.errors = errors
+      })
+    },
+    deletePayment (payment) {
+      this.$store.dispatch('order/deletePayment', payment).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Payment deleted successfully.`,
+          type: 'success'
+        })
+      })
+    },
+    openAddPaymentDialog () {
+      let paymentDraft = _.cloneDeep(this.paymentDraftForCreate)
+      paymentDraft.order = this.record
+
+      this.$store.dispatch('order/startAddPayment', paymentDraft)
+    },
+    closeAddPaymentDialog () {
+      this.$store.dispatch('order/endAddPayment')
+    },
+    createPayment (formModel) {
+      this.$store.dispatch('order/createPayment', formModel).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Payment created successfully.`,
+          type: 'success'
+        })
       })
     },
     createRefund (formModel) {

@@ -1,8 +1,9 @@
 <template>
-<el-dialog :title="title" :show-close="false" :visible="isVisible" class="fw-sm">
+<el-dialog :title="title" :show-close="false" :visible="isVisible" v-bind:class="{'fw-sm': record.id, 'fw-lg': !record.id}">
   <payment-form
     v-model="formModel"
     :record="record"
+    :errors="errors"
   >
 
   </payment-form>
@@ -19,7 +20,6 @@ import _ from 'lodash'
 import { dollar } from '@/helpers/filters'
 import PriceAmountInput from '@/components/price-amount-input'
 import PaymentForm from '@/components/payment-form'
-import errorI18nKey from '@/utils/error-i18n-key'
 
 export default {
   name: 'PaymentDialog',
@@ -34,14 +34,6 @@ export default {
   data () {
     return {
       formModel: _.cloneDeep(this.value)
-    }
-  },
-  computed: {
-    errorMessages () {
-      return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(errorI18nKey('payment', k, v[0]), { name: _.startCase(k) })
-        return result
-      }, {})
     }
   },
   watch: {
