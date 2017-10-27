@@ -66,8 +66,32 @@
     <hr>
     <el-row>
       <el-col :span="12">
-        <el-form-item label="Card" required>
+        <el-form-item class="card-from" required>
+          <b class="m-r-20">Card</b>
+          <el-radio-group v-model="useCardFrom">
+            <el-radio label="savedCard">Select from saved cards</el-radio>
+            <el-radio label="newCard">Enter a new card</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-col>
+    </el-row>
+
+    <el-row v-if="useCardFrom === 'newCard'">
+      <el-col :span="12">
+        <el-form-item class="card" required>
           <card class="stripe-card" :class="{ complete }" :stripe="stripePk" :options="stripeOptions" @change="complete = $event.complete"></card>
+        </el-form-item>
+      </el-col>
+    </el-row>
+
+    <el-row v-if="useCardFrom === 'savedCard'">
+      <el-col :span="12">
+        <el-form-item class="card" required>
+          <el-select @change="updateValue" v-model="formModel.source" class="full">
+            <el-option v-for="card in selectableCards" :key="card.id" :label="`${card.brand} ****${card.lastFourDigit}`" :value="card.stripeCardId">
+              <span>{{card.brand}} ****{{card.lastFourDigit}}</span>
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-col>
     </el-row>
@@ -148,10 +172,28 @@ export default {
         // see https://stripe.com/docs/stripe.js#element-options for details
       },
       stripePk: STRIPE_PUBLISHABLE_KEY,
-      isBillingAndShippingAddressSame: false
+      isBillingAndShippingAddressSame: false,
+      useCardFrom: 'newCard'
+    }
+  },
+  created () {
+    if (this.record.order && this.record.order.customer) {
+      this.$store.dispatch('payment/loadSelectableCards', { customerId: this.record.order.customer.id }).then(response => {
+        let cards = response.resources
+        console.log(cards)
+        if (cards.length > 0) {
+          this.useCardFrom = 'savedCard'
+        }
+      })
     }
   },
   computed: {
+    selectableCards () {
+      return this.$store.state.payment.selectableCards
+    },
+    isLoadingSelectableCards () {
+      return this.$store.state.payment.isLoadingSelectableCards
+    },
     canSelectStatus () {
       return !this.record.id && this.formModel.gateway === 'offline'
     },
@@ -190,6 +232,12 @@ export default {
   watch: {
     value (v) {
       this.formModel = _.cloneDeep(v)
+    },
+    record (record) {
+      console.log(record)
+      if (record.order && record.order.customer) {
+        this.$store.dispatch('payment/loadSelectableCards', { customer_id: record.order.customer.id })
+      }
     }
   },
   methods: {
@@ -204,6 +252,18 @@ export default {
 <style scoped>
 .el-form-item {
   margin: 10px 0;
+}
+
+.card {
+  margin-top: 0px;
+}
+
+.card-from {
+  margin-bottom: 0px;
+}
+
+.full {
+  width: 100%;
 }
 
 .stripe-card {

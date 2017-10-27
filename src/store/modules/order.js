@@ -20,6 +20,7 @@ const MT = {
   RECORD_LOADING: 'RECORD_LOADING',
   RECORDS_CHANGED: 'RECORDS_CHANGED',
   RECORDS_LOADING: 'RECORDS_LOADING',
+  PAYMENT_FOR_CREATE_CHANGED: 'PAYMENT_FOR_CREATE_CHANGED',
   PAYMENT_DRAFT_FOR_CREATE_CHANGED: 'PAYMENT_DRAFT_FOR_CREATE_CHANGED',
   LINE_ITEM_ADD_STARTED: 'LINE_ITEM_ADD_STARTED',
   LINE_ITEM_ADD_ENDED: 'LINE_ITEM_ADD_ENDED',
@@ -159,6 +160,10 @@ export default {
 
     setPaymentDraftForCreate ({ commit }, paymentDraft) {
       commit(MT.PAYMENT_DRAFT_FOR_CREATE_CHANGED, paymentDraft)
+    },
+
+    setPaymentForCreate ({ commit }, payment) {
+      commit(MT.PAYMENT_FOR_CREATE_CHANGED, payment)
     },
 
     loadSelectableCustomers ({ state, commit, rootState }, actionPayload) {
@@ -484,6 +489,11 @@ export default {
 
     [MT.PAYMENT_DRAFT_FOR_CREATE_CHANGED] (state, paymentDraft) {
       state.paymentDraftForCreate = paymentDraft
+    },
+
+    [MT.PAYMENT_FOR_CREATE_CHANGED] (state, payment) {
+      state.paymentForCreate = payment
+      state.paymentDraftForCreate = payment
     },
 
     [MT.PAYMENT_ADD_STARTED] (state, paymentDraft) {

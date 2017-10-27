@@ -2,14 +2,17 @@ import _ from 'lodash'
 
 import PaymentAPI from '@/api/payment'
 import JSONAPI from '@/jsonapi'
-
+import CardAPI from '@/api/card'
 import Payment from '@/models/payment'
 
 const MT = {
   SET_RECORD: 'SET_RECORD',
   SET_RECORD_DRAFT: 'SET_RECORD_DRAFT',
   RESET_RECORD: 'RESET_RECORD',
-  SET_RECORDS: 'SET_RECORDS'
+  SET_RECORDS: 'SET_RECORDS',
+  SELECTABLE_CARDS_LOADING: 'SELECTABLE_CARDS_LOADING',
+  SELECTABLE_CARDS_CHANGED: 'SELECTABLE_CARDS_CHANGED',
+  SELECTABLE_CARDS_RESET: 'SELECTABLE_CARDS_RESET'
 }
 
 export default {
@@ -17,7 +20,8 @@ export default {
   state: {
     record: Payment.objectWithDefaults(),
     recordDraft: Payment.objectWithDefaults(),
-    records: []
+    records: [],
+    selectableCards: []
   },
   actions: {
     setRecordDraft ({ commit }, record) {
@@ -97,6 +101,22 @@ export default {
 
         return response
       })
+    },
+
+    loadSelectableCards ({ commit, rootState }, actionPayload) {
+      commit(MT.SELECTABLE_CARDS_LOADING)
+      actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
+
+      return CardAPI.queryRecord(actionPayload.customerId, actionPayload).then(response => {
+        let apiPayload = response.data
+        return { meta: response.data.meta, resources: JSONAPI.deserialize(apiPayload.data, apiPayload.included) }
+      }).then(response => {
+        commit(MT.SELECTABLE_CARDS_CHANGED, response.resources)
+
+        return response
+      }).catch(error => {
+        console.log(error)
+      })
     }
   },
 
@@ -117,6 +137,20 @@ export default {
 
     [MT.SET_RECORDS] (state, records) {
       state.records = records
+    },
+
+    [MT.SELECTABLE_CARDS_CHANGED] (state, cards) {
+      state.selectableCards = cards
+      state.isLoadingSelectableCards = false
+    },
+
+    [MT.SELECTABLE_CARDS_LOADING] (state) {
+      state.isLoadingSelectableCards = true
+    },
+
+    [MT.SELECTABLE_CARDS_RESET] (state) {
+      state.isLoadingSelectableCards = true
+      state.selectableCards = []
     }
   }
 }

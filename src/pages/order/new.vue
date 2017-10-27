@@ -202,6 +202,7 @@ export default {
         return this.$store.state.order.paymentDraftForCreate
       },
       set (value) {
+        console.log(value)
         this.$store.dispatch(`order/setPaymentDraftForCreate`, value)
       }
     }
@@ -216,9 +217,10 @@ export default {
       if (this.activeStep === 1) {
         this.isLoading = true
         this.$store.dispatch('order/updateRecord', { id: recordDraft.id, recordDraft: recordDraft }).then(order => {
-          let paymentDraft = _.cloneDeep(this.paymentDraft)
-          paymentDraft.order = order
-          this.$store.dispatch('payment/setRecordDraft', paymentDraft)
+          let payment = _.cloneDeep(this.paymentDraft)
+          payment.order = order
+          this.$store.dispatch('order/setPaymentForCreate', payment)
+
           this.isLoading = false
           this.activeStep += 1
         }).catch(errors => {

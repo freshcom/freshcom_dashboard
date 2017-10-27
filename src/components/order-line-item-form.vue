@@ -75,7 +75,7 @@
     <el-form-item label="Price" class="price">
       <el-tag v-if="formModel.id" :close-transition="true">{{formModel.priceChargeCents | dollar}}/{{formModel.priceChargeUnit}}</el-tag>
       <el-select v-else @select="priceChanged" v-model="formModel.price" value-key="id" placeholder="" :disabled="!formModel.price">
-        <el-option v-for="price in selectablePrices" :key="price.id" v-bind:label="price | chargeDollar" :value="formModel.price">
+        <el-option v-for="price in selectablePrices" :key="price.id" v-bind:label="price | chargeDollar" :value="price">
           <span v-if="price.name">{{price.name}} -</span>
           <span>{{price | chargeDollar}}</span>
         </el-option>

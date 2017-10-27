@@ -3,11 +3,12 @@ export default {
     return {
       id: undefined,
       type: 'Payment',
-      status: 'pending',
+      status: 'paid',
 
       gateway: 'online',
       processor: 'stripe',
       method: '',
+      source: '',
 
       order: {}
     }
