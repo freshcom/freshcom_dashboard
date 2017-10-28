@@ -83,6 +83,13 @@
         </el-form-item>
       </el-col>
     </el-row>
+     <el-row v-if="useCardFrom === 'newCard'">
+      <el-col :span="12">
+        <el-form-item class="card" required>
+          <el-checkbox v-model="formModel.saveSource">Save this card</el-checkbox>
+        </el-form-item>
+      </el-col>
+    </el-row>
 
     <el-row v-if="useCardFrom === 'savedCard'">
       <el-col :span="12">
@@ -180,9 +187,11 @@ export default {
     if (this.record.order && this.record.order.customer) {
       this.$store.dispatch('payment/loadSelectableCards', { customerId: this.record.order.customer.id }).then(response => {
         let cards = response.resources
-        console.log(cards)
         if (cards.length > 0) {
           this.useCardFrom = 'savedCard'
+          let primaryCard = _.find(cards, { primary: true })
+          this.formModel.source = primaryCard.stripeCardId
+          this.updateValue()
         }
       })
     }

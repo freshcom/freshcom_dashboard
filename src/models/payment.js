@@ -9,6 +9,7 @@ export default {
       processor: 'stripe',
       method: '',
       source: '',
+      saveSource: true,
 
       order: {}
     }
