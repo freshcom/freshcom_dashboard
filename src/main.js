@@ -21,7 +21,7 @@ import en from '@/locales/en'
 import zh from '@/locales/zh-CN'
 
 import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-default/index.css'
+import 'element-ui/lib/theme-chalk/index.css'
 
 import vueMoment from 'vue-moment'
 

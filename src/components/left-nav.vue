@@ -5,7 +5,6 @@
     </div>
     <div class="primary-nav-scroller">
       <el-menu mode="vertical" :router="true" :default-active="selected" class="primary-nav">
-
         <el-menu-item :route="{ name: 'Home' }" index="/">
           <icon name="home" scale="1"></icon>
           <a>Home</a>
@@ -179,16 +178,35 @@ export default {
 </script>
 
 <style lang="scss">
+.primary-nav .el-menu-item, .primary-nav .el-submenu__title {
+  height: 40px;
+  line-height: 40px;
+
+  svg {
+    margin-right: 3px;
+  }
+}
+
+.primary-nav .el-submenu .el-menu-item {
+  height: 40px;
+  line-height: 40px;
+}
+
+.primary-nav.el-menu, .primary-nav .el-menu {
+  border-right: none;
+  background-color: inherit;
+}
+
+.primary-nav .el-submenu__title:hover, .primary-nav .el-menu-item:focus, .primary-nav .el-menu-item:hover {
+  background-color: inherit;
+  font-weight: 500;
+}
+
 .account {
   margin: 10px;
   height: 50px;
   line-height: 50px;
   vertical-align: middle;
-}
-
-.primary-nav-scroller {
-  height: calc(100vh - 70px);
-  overflow-y: scroll;
 }
 
 .primary-nav {

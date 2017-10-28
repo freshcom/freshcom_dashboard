@@ -1,13 +1,31 @@
 <template>
-  <div id="app">
-    <div v-if="isSessionReady" class="container">
-      <div v-if="showLeftNav" class="left-col">
-        <left-nav></left-nav>
-      </div>
+<div class="wrapper">
 
-      <router-view></router-view>
-    </div>
-  </div>
+  <el-container v-if="isSessionReady">
+    <el-aside width="200px" v-if="shouldShowAside">
+      <left-nav></left-nav>
+    </el-aside>
+
+    <el-container>
+      <el-header style="text-align: right; font-size: 12px">
+        <el-dropdown>
+          <i class="el-icon-setting" style="margin-right: 15px"></i>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item>查看</el-dropdown-item>
+            <el-dropdown-item>新增</el-dropdown-item>
+            <el-dropdown-item>删除</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+        <span>王小虎</span>
+      </el-header>
+
+      <el-main>
+        <router-view></router-view>
+      </el-main>
+    </el-container>
+  </el-container>
+
+</div>
 </template>
 
 <script>
@@ -25,7 +43,7 @@ export default {
     })
   },
   computed: {
-    showLeftNav () {
+    shouldShowAside () {
       return this.$store.state.route.name !== 'Login'
     },
     isSessionReady () {
@@ -55,92 +73,58 @@ input::-webkit-inner-spin-button {
     margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
 
-/* START Left Nav */
-.el-menu-item a {
-  text-decoration: none;
-  color: #48576a;
-
-  &:hover {
-    color: #48576a;
-  }
+.el-container {
+  max-width: 1024px;
 }
 
-.el-menu-item-group__title {
-  padding-bottom: 10px;
+.el-aside {
+  min-width: 200px;
 }
 
-.el-menu-item.is-active a {
-  font-weight: 500;
-  color: #20a0ff;
+.wrapper {
+  min-width: 1024px;
+  display: flex;
+  justify-content: center;
 }
 
-.el-submenu .el-menu {
-  background-color: #eef1f6;
+.el-main {
+  padding-left: 5px;
 }
 
-.el-menu-item, .el-submenu__title, .el-submenu .el-menu-item {
-  height: 35px;
-  line-height: 35px;
-}
-
-.el-menu-item .fa-icon, .el-submenu .fa-icon {
-  width: 20px;
-}
-
-.el-menu-item:hover, .el-submenu .el-menu-item:hover, .el-submenu__title:hover {
-  background-color: inherit;
-  font-weight: 500;
-}
-/* END Left Nav */
-
-
-/* START Secondary Nav */
 .secondary-nav {
-  margin-top: 25px;
+  display: inline-block;
+  border-bottom: none;
 
-  .el-menu--horizontal {
-    display: inline-block;
-
-    & > .el-menu-item:hover, .el-menu--horizontal > .el-submenu.is-active .el-submenu__title, .el-menu--horizontal > .el-submenu:hover .el-submenu__title {
-      border: none;
-    }
-
-    .el-menu-item {
-      border: none;
-      line-height: 35px;
-      height: 35px;
-
-      &.is-active {
-        font-weight: 500;
-      }
-    }
-
-    .el-submenu .el-submenu__title {
-      height: 35px;
-      line-height: 35px;
-      border: none;
-    }
-
-    .el-submenu {
-      line-height: 35px;
-      height: 35px;
-
-      & > .el-menu {
-        top: 35px;
-      }
-    }
+  &.el-menu--horizontal > .el-menu-item {
+    height: 36px;
+    line-height: 36px;
+    border-bottom: none;
   }
 
-}
-/* END Secondary Nav */
+  &.el-menu {
+    border-right: none;
+    background-color: inherit;
+  }
 
+  .el-menu-item:focus, .el-menu-item:hover {
+    background-color: inherit;
+  }
 
-/* START Locale */
-.secondary-nav .el-dropdown.locale-selector {
-  float: right;
-  margin-right: 20px;
+  .el-menu-item.is-active {
+    font-weight: 500;
+    color: #409EFF;
+  }
+
+  .el-menu-item:first-child {
+    padding-left: 10px;
+  }
 }
-/* END Locale */
+
+.el-input-group__prepend {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
 
 
 /* START Util Class */
@@ -158,6 +142,14 @@ input::-webkit-inner-spin-button {
 
 .pull-right {
   float: right;
+}
+
+.clearfix:before, .clearfix:after {
+  display: table;
+  content: "";
+}
+.clearfix:after {
+  clear: both
 }
 /* END Util Class */
 
@@ -193,30 +185,6 @@ a {
 
 a:hover {
   color: #1D8CE0;
-}
-
-.container {
-  min-width: 1024px;
-  margin: 0 auto;
-}
-
-.left-col {
-  float: left;
-  width: 200px;
-}
-
-.main-col {
-  overflow: hidden;
-  margin-left: 10px;
-
-  .main {
-    padding: 5px 20px 30px 5px;
-  }
-
-  .content .main-scroller {
-    height: calc(100vh - 63px);
-    overflow-y: scroll;
-  }
 }
 
 .block-title {
@@ -489,35 +457,16 @@ small {
     }
   }
 
-  .el-table.full {
-    border: 0;
-
-    &:after {
-      width: 0;
+  .data.full .el-table {
+    th {
+      background-color: #f5f7fa;
+      padding-top: 5px;
+      padding-bottom: 5px;
     }
 
-    &.el-table--striped {
-
-      .el-table__body {
-
-        tr:nth-child(2n) td {
-          background-color: white;
-        }
-
-        tr td {
-          background-color: #FAFAFA;
-        }
-
-      }
-
-    }
-
-    &.el-table--enable-row-hover .el-table__body tr:hover > td {
-      background-color: #eef1f6;
-    }
-
-    .el-table__header th, .el-table__header th > div {
-       background-color: white;
+    td {
+      padding-top: 10px;
+      padding-bottom: 10px;
     }
 
     .el-table__header th:first-child > div, .el-table__body tr td:first-child > div {

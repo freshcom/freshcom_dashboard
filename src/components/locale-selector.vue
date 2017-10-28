@@ -59,7 +59,7 @@ export default {
 
 <style scoped>
 .el-dropdown {
-  line-height: 35px;
+  line-height: 36px;
   cursor: pointer
 }
 </style>
