@@ -23,7 +23,7 @@ export default {
       let rawRecord = localStorage.getItem('state.session.token')
       if (!rawRecord) {
         commit(MT.READY, true)
-        return Promise.reject()
+        return Promise.reject(new Error('no token'))
       }
 
       let token = JSON.parse(rawRecord)

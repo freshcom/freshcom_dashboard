@@ -72,7 +72,6 @@ export default {
       let record = _.cloneDeep(this.record)
       record.product = { id: this.productId, type: 'Product' }
       this.$store.dispatch('externalFileCollection/setRecord', record)
-      return
     }
   },
   methods: {

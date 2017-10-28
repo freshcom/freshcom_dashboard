@@ -143,8 +143,6 @@ export default {
     skuErrorMessage () {
       if (this.errorMessages['relationships']) {
         return 'SKU is invalid'
-      } else {
-        return
       }
     }
   },
