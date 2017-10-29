@@ -42,6 +42,11 @@ export default {
     }
   },
   attributes: {
+    sku: {
+      status: {
+        active: 'Active'
+      }
+    },
     payment: {
       status: {
         pending: 'Pending',

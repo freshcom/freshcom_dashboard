@@ -29,7 +29,7 @@ export default {
     isRecordLoading: false,
     records: [],
     selectableProducts: [],
-    isLoadingSelectableProducts: true,
+    isLoadingSelectableProducts: false,
     selectableProductItems: [],
     isLoadingSelectableProductItems: true
   },

@@ -56,7 +56,6 @@ export default {
 <style lang="scss">
 html, body {
   background-color: #eef1f6;
-  overflow-y: hidden;
   height: 100%;
   margin: 0px;
 
@@ -73,18 +72,21 @@ input::-webkit-inner-spin-button {
     margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
 
-.el-container {
-  max-width: 1024px;
-}
-
-.el-aside {
-  min-width: 200px;
-}
-
 .wrapper {
   min-width: 1024px;
   display: flex;
-  justify-content: center;
+  justify-content: center
+}
+
+.wrapper > .el-container {
+  max-width: 1280px;
+  height: 100vh;
+
+  .el-container {
+    width: 100vh;
+    min-width: 824px;
+    max-width: 1080px;
+  }
 }
 
 .el-main {
@@ -374,6 +376,10 @@ small {
 .el-autocomplete {
   width: 100%;
 }
+
+.el-form-item > .el-form-item__label {
+  line-height: inherit;
+}
 /* END Common Overwrite */
 
 
@@ -441,7 +447,7 @@ small {
   }
 
   .el-card__header {
-    padding: 18px 30px;
+    padding: 20px;
   }
 
   .el-card__body {
@@ -470,11 +476,11 @@ small {
     }
 
     .el-table__header th:first-child > div, .el-table__body tr td:first-child > div {
-      padding-left: 30px;
+      padding-left: 20px;
     }
 
     .el-table__header th:last-child > div, .el-table__body tr td:last-child > div {
-      padding-right: 30px
+      padding-right: 20px
     }
 
     tbody tr {
@@ -518,8 +524,7 @@ small {
   }
 
   .footer {
-    margin: 0px 0px 20px 0px;
-    padding: 20px 30px 0px 30px;
+    padding: 20px;
     border-top: 1px solid #d1dbe5;
   }
 

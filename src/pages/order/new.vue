@@ -1,32 +1,31 @@
 <template>
-<div class="main-col">
-  <div class="content">
+<div class="page-wrapper">
 
-    <div class="secondary-nav">
-      <el-menu :router="true" default-active="/orders" mode="horizontal">
+    <div>
+      <el-menu :router="true" default-active="/orders" mode="horizontal" class="secondary-nav">
         <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">Orders</el-menu-item>
       </el-menu>
-      <locale-selector></locale-selector>
+      <locale-selector class="pull-right"></locale-selector>
     </div>
 
-    <div class="main-scroller">
-      <div class="main">
-        <el-card v-loading="isLoading" class="main-card">
-          <div slot="header">
-            <span style="line-height: 36px;">Create a Order</span>
-          </div>
+    <div>
+      <el-card v-loading="isLoading" class="main-card">
+        <div slot="header">
+          <span>Create a Order</span>
+        </div>
 
-          <div class="step-indicator">
-            <el-steps :space="200" :active="activeStep" :align-center="true" finish-status="success">
-              <el-step title="Line Items"></el-step>
-              <el-step title="Information"></el-step>
-              <el-step title="Payment"></el-step>
-            </el-steps>
-          </div>
+        <div>
+          <el-steps :active="activeStep" finish-status="success" simple>
+            <el-step title="Line Items"></el-step>
+            <el-step title="Information"></el-step>
+            <el-step title="Payment"></el-step>
+          </el-steps>
+        </div>
 
-          <div class="data">
-            <template v-if="activeStep === 0">
-              <div v-loading="isLineItemLoading" class="m-b-20 form-border">
+        <div class="data">
+          <template v-if="activeStep === 0">
+            <div v-loading="isLineItemLoading" class="block">
+              <div class="block-body">
                 <order-line-item-form v-model="lineItemDraftForCreate" :errors="errors">
                 </order-line-item-form>
 
@@ -36,76 +35,77 @@
                   </el-button>
                 </div>
               </div>
+            </div>
 
-              <div class="m-b-20">
-                <order-line-item-table @delete="deleteLineItem" @edit="editLineItem" :records="record.rootLineItems">
-                </order-line-item-table>
+            <div class="m-b-20">
+              <order-line-item-table @delete="deleteLineItem" @edit="editLineItem" :records="record.rootLineItems">
+              </order-line-item-table>
+            </div>
+
+            <div id="summary">
+              <div id="summary-labels" style="width: 490px; float: left;" class="text-right">
+                <p v-if="record.subTotalCents">Sub Total</p>
+                <p v-if="record.taxOneCents">Tax 1</p>
+                <p v-if="record.taxTwoCents">Tax 2</p>
+                <p v-if="record.taxThreeCents">Tax 3</p>
+                <p v-if="record.grandTotalCents"><b>Grand Total</b></p>
+                <p v-if="record.isEstimate"><b>Authorization Amount</b></p>
               </div>
 
-              <div id="summary">
-                <div id="summary-labels" style="width: 490px; float: left;" class="text-right">
-                  <p v-if="record.subTotalCents">Sub Total</p>
-                  <p v-if="record.taxOneCents">Tax 1</p>
-                  <p v-if="record.taxTwoCents">Tax 2</p>
-                  <p v-if="record.taxThreeCents">Tax 3</p>
-                  <p v-if="record.grandTotalCents"><b>Grand Total</b></p>
-                  <p v-if="record.isEstimate"><b>Authorization Amount</b></p>
-                </div>
-
-                <div id="summary-values" style="overflow: hidden; width: 103px;" class="text-right">
-                  <p v-if="record.subTotalCents"><span v-if="record.isEstimate">~</span> <span>{{record.subTotalCents | dollar}}</span></p>
-                  <p v-if="record.taxOneCents"><span>{{record.taxOneCents | dollar}}</span></p>
-                  <p v-if="record.taxTwoCents"><span>{{record.taxTwoCents | dollar}}</span></p>
-                  <p v-if="record.taxThreeCents"><span>{{record.taxThreeCents | dollar}}</span></p>
-                  <p v-if="record.grandTotalCents"><span v-if="record.isEstimate">~</span> <span>{{record.grandTotalCents | dollar}}</span></p>
-                  <p v-if="record.isEstimate">{{record.authorizationCents | dollar}}</p>
-                </div>
+              <div id="summary-values" style="overflow: hidden; width: 103px;" class="text-right">
+                <p v-if="record.subTotalCents"><span v-if="record.isEstimate">~</span> <span>{{record.subTotalCents | dollar}}</span></p>
+                <p v-if="record.taxOneCents"><span>{{record.taxOneCents | dollar}}</span></p>
+                <p v-if="record.taxTwoCents"><span>{{record.taxTwoCents | dollar}}</span></p>
+                <p v-if="record.taxThreeCents"><span>{{record.taxThreeCents | dollar}}</span></p>
+                <p v-if="record.grandTotalCents"><span v-if="record.isEstimate">~</span> <span>{{record.grandTotalCents | dollar}}</span></p>
+                <p v-if="record.isEstimate">{{record.authorizationCents | dollar}}</p>
               </div>
-            </template>
+            </div>
+          </template>
 
-            <template v-if="activeStep === 1">
-              <order-form v-model="recordDraft" :errors="errors"></order-form>
-            </template>
+          <template v-if="activeStep === 1">
+            <order-form v-model="recordDraft" :errors="errors"></order-form>
+          </template>
 
-            <template v-if="activeStep === 2">
-              <payment-form v-model="paymentDraft" :record="payment" :errors="errors"></payment-form>
-            </template>
-          </div>
+          <template v-if="activeStep === 2">
+            <payment-form v-model="paymentDraft" :record="payment" :errors="errors"></payment-form>
+          </template>
+        </div>
 
-          <div class="footer">
-            <template v-if="activeStep === 0">
-              <el-button @click="cancel">
-                Cancel
-              </el-button>
+        <div class="footer">
+          <template v-if="activeStep === 0">
+            <el-button @click="cancel">
+              Cancel
+            </el-button>
 
-              <el-button @click="nextStep(recordDraft)" type="primary" class="pull-right">
-                Next
-              </el-button>
-            </template>
+            <el-button @click="nextStep(recordDraft)" type="primary" class="pull-right">
+              Next
+            </el-button>
+          </template>
 
-            <template v-if="activeStep === 1">
-              <el-button @click="back">
-                Back
-              </el-button>
+          <template v-if="activeStep === 1">
+            <el-button @click="back">
+              Back
+            </el-button>
 
-              <el-button @click="nextStep(recordDraft)" type="primary" class="pull-right">
-                Next
-              </el-button>
-            </template>
+            <el-button @click="nextStep(recordDraft)" type="primary" class="pull-right">
+              Next
+            </el-button>
+          </template>
 
-            <template v-if="activeStep === 2">
-              <el-button @click="back">
-                Back
-              </el-button>
+          <template v-if="activeStep === 2">
+            <el-button @click="back">
+              Back
+            </el-button>
 
-              <el-button @click="createPayment(paymentDraft, record)" type="primary" class="pull-right">
-                Place Order
-              </el-button>
-            </template>
-          </div>
-        </el-card>
-      </div>
+            <el-button @click="createPayment(paymentDraft, record)" type="primary" class="pull-right">
+              Place Order
+            </el-button>
+          </template>
+        </div>
+      </el-card>
     </div>
+
     <div class="launchable">
       <order-line-item-dialog
         v-model="lineItemDraftForUpdate"
@@ -116,7 +116,7 @@
 
       </order-line-item-dialog>
     </div>
-  </div>
+
 </div>
 </template>
 
@@ -315,9 +315,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.step-indicator {
-  margin-left: 175px;
-  margin-top: 20px;
+.el-steps {
+  border-raidus: 0px;
 }
 
 .form-border {

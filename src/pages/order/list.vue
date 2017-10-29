@@ -33,11 +33,20 @@
         </p>
         <el-table v-if="hasSearchResult" @row-click="viewRecord" :data="tableData">
           <el-table-column prop="name" label="Order"></el-table-column>
-          <el-table-column prop="status" label="Status" width="100"></el-table-column>
+          <el-table-column prop="status" label="Status" width="100">
+            <template slot-scope="scope">
+              <el-tag v-if="scope.row.status === 'opened'" size="mini" type="primary">
+                {{$t(`attributes.order.status.${scope.row.status}`)}}
+              </el-tag>
+              <el-tag v-else type="gray">
+                {{$t(`attributes.order.status.${scope.row.status}`)}}
+              </el-tag>
+            </template>
+          </el-table-column>
           <el-table-column prop="id" label="ID" width="120">
             <template slot-scope="scope">
               <el-popover trigger="hover" placement="top">
-                <p>{{ scope.row.id }}</p>
+                <span>{{ scope.row.id }}</span>
                 <div slot="reference" class="name-wrapper">
                   {{ scope.row.idLastPart }}
                 </div>
@@ -79,6 +88,7 @@ export default {
         let name = record.firstName + ' ' + record.lastName
         if (record.code) { name = `[${record.code}] ` + name }
         let idLastPart = _.last(record.id.split('-'))
+
         return {
           name: name,
           status: record.status,

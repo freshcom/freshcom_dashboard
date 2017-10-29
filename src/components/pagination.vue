@@ -5,8 +5,9 @@
   @current-change="setPageNumber"
   :current-page="number"
   :page-size="size"
+  :total="total"
   layout="prev, pager, next"
-  :total="total">
+>
 </el-pagination>
 
 </template>
