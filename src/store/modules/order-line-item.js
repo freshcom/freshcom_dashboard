@@ -31,7 +31,7 @@ export default {
     selectableProducts: [],
     isLoadingSelectableProducts: false,
     selectableProductItems: [],
-    isLoadingSelectableProductItems: true
+    isLoadingSelectableProductItems: false
   },
   actions: {
     setRecord ({ commit }, record) {
@@ -192,7 +192,7 @@ export default {
     },
 
     [MT.SELECTABLE_PRODUCTS_RESET] (state) {
-      state.isLoadingSelectableProducts = true
+      state.isLoadingSelectableProducts = false
       state.selectableProducts = []
     },
 
@@ -206,7 +206,7 @@ export default {
     },
 
     [MT.SELECTABLE_PRODUCT_ITEMS_RESET] (state) {
-      state.isLoadingSelectableProductItems = true
+      state.isLoadingSelectableProductItems = false
       state.selectableProductItems = []
     },
 

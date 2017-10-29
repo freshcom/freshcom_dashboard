@@ -1,10 +1,11 @@
 <template>
   <el-select
     v-model="selectedOption"
-    @visible-change="dropdownToggled"
+    @clear="clear"
     :loading="isLoading"
-    :filter-method="filter"
+    :remote-method="filter"
     :placeholder="placeholder"
+    remote
     filterable
     clearable
   >
@@ -64,26 +65,11 @@ export default {
     }
   },
   methods: {
-    dropdownToggled (isVisible) {
-      this.isDropdownVisible = isVisible
-
-      if (isVisible) {
-        console.log('dropdownToggled')
-        return this.$emit('filter', this.selectedOption)
-      }
-
-      // Let the animation finish first then emit
-      setTimeout(() => {
-        this.$emit('reset')
-      }, 300)
+    clear () {
+      this.$emit('clear')
     },
     filter (input) {
-      // Use setTimeout to let dropdownToggled execute first
-      setTimeout(() => {
-        if (this.isDropdownVisible) {
-          this.$emit('filter', input)
-        }
-      })
+      this.$emit('filter', input)
     }
   }
 }

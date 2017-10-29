@@ -1,5 +1,5 @@
 <template>
-<el-form :model="formModel" label-position="top">
+<el-form :model="formModel" label-position="top" size="small">
   <el-row class="m-b-20">
     <el-form-item v-if="!formModel.id" label="Type" class="type">
       <el-radio-group @change="typeChanged" v-model="type">
@@ -29,7 +29,7 @@
         <remote-select
           v-model="formModel.product"
           @filter="loadSelectableProducts"
-          @reset="resetSelectableProducts"
+          @clear="resetSelectableProducts"
           @input="productChanged"
           :records="selectableProducts"
           :isLoading="isLoadingSelectableProducts"
@@ -39,6 +39,7 @@
         </remote-select>
       </el-form-item>
     </el-col>
+
     <el-col :span="12" class="p-l-10">
       <el-form-item label="Product Item" class="full">
         <el-select @select="productItemChanged" :disabled="!isProductItemSelectable" :placeholder="productItemSelectPlaceholder" v-model="formModel.productItem" value-key="id" class="product-item-select">
@@ -222,7 +223,9 @@ export default {
       this.$emit('input', this.formModel)
     }, 300),
     loadSelectableProducts: _.debounce(function (searchKeyword) {
-      this.$store.dispatch('orderLineItem/loadSelectableProducts', { search: searchKeyword, filter: { status: ['active', 'internal'] }, include: 'prices,defaultPrice' })
+      if (searchKeyword) {
+        this.$store.dispatch('orderLineItem/loadSelectableProducts', { search: searchKeyword, filter: { status: ['active', 'internal'] }, include: 'prices,defaultPrice' })
+      }
     }, 300),
     resetSelectableProducts () {
       this.$store.dispatch('orderLineItem/resetSelectableProducts')
