@@ -455,7 +455,7 @@ small {
 
     .data {
       min-height: 100px;
-      padding: 20px 30px 0px 30px;
+      padding: 20px 20px 0px 20px;
 
       &.full {
         padding: 0;

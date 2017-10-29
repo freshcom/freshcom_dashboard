@@ -316,7 +316,9 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .el-steps {
-  border-raidus: 0px;
+  border-radius: 0px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .form-border {
