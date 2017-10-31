@@ -30,7 +30,7 @@
           v-model="formModel.product"
           @filter="loadSelectableProducts"
           @clear="resetSelectableProducts"
-          @input="productChanged"
+          @input="productChanged($event, formModel)"
           :records="selectableProducts"
           :isLoading="isLoadingSelectableProducts"
           placeholder="Search for product..."
@@ -58,7 +58,16 @@
 
   <el-row v-if="type === 'Product'" class="m-b-20">
     <el-form-item label="Order Quantity" class="order-quantity">
-      <el-input-number v-model="formModel.orderQuantity" @change="orderQuantityChanged" :min="1" :step="1" :disabled="!formModel.price"></el-input-number>
+      {{formModel.orderQuantity}}
+      <el-input-number
+        v-model="formModel.orderQuantity"
+        @change="orderQuantityChanged"
+        :min="1"
+        :step="1"
+        :disabled="!formModel.price"
+        controls-position="right"
+      >
+      </el-input-number>
     </el-form-item>
 
     <span v-if="formModel.priceOrderUnit">{{formModel.priceOrderUnit}}</span>
@@ -74,7 +83,7 @@
     <span class="m-r-20 m-l-20">x</span>
 
     <el-form-item label="Price" class="price">
-      <el-tag v-if="formModel.id" :close-transition="true">{{formModel.priceChargeCents | dollar}}/{{formModel.priceChargeUnit}}</el-tag>
+      <el-tag v-if="formModel.id" :disable-transitions="true">{{formModel.priceChargeCents | dollar}}/{{formModel.priceChargeUnit}}</el-tag>
       <el-select v-else @select="priceChanged" v-model="formModel.price" value-key="id" placeholder="" :disabled="!formModel.price">
         <el-option v-for="price in selectablePrices" :key="price.id" v-bind:label="price | chargeDollar" :value="price">
           <span v-if="price.name">{{price.name}} -</span>
@@ -86,35 +95,40 @@
     <span class="m-r-20 m-l-20">=</span>
 
     <el-form-item label="Sub Total" class="sub-total-right">
-      <price-amount-input @input="subTotalCentsChanged" v-model="formModel.subTotalCents" :disabled="!formModel.priceEstimateByDefault">
-      </price-amount-input>
+      <money-input
+        v-if="formModel.priceEstimateByDefault"
+        v-model="formModel.subTotalCents"
+        v-money="{}" class="price-amount"
+      >
+      </money-input>
+      <el-tag v-else :disable-transitions="true">{{formModel.subTotalCents | dollar}}</el-tag>
     </el-form-item>
   </el-row>
 
   <el-row class="m-b-20">
     <el-form-item label="Sub Total" class="sub-total-left">
-      <el-tag type="gray" v-if="type === 'Product'" :close-transition="true">{{formModel.subTotalCents | dollar}}</el-tag>
+      <el-tag v-if="type === 'Product'" :disable-transitions="true">{{formModel.subTotalCents | dollar}}</el-tag>
       <price-amount-input v-else @input="subTotalCentsChanged" v-model="formModel.subTotalCents"></price-amount-input>
     </el-form-item>
 
     <span class="m-l-5 m-r-5">+</span>
 
     <el-form-item label="Tax 1" class="tax">
-      <el-tag v-if="type === 'Product'" :close-transition="true">{{formModel.taxOneCents | dollar}}</el-tag>
+      <el-tag v-if="type === 'Product'" :disable-transitions="true">{{formModel.taxOneCents | dollar}}</el-tag>
       <price-amount-input v-else @input="taxCentsChanged" v-model="formModel.taxOneCents"></price-amount-input>
     </el-form-item>
 
     <span class="m-l-5 m-r-5">+</span>
 
     <el-form-item label="Tax 2" class="tax">
-      <el-tag v-if="type === 'Product'" :close-transition="true">{{formModel.taxTwoCents | dollar}}</el-tag>
+      <el-tag v-if="type === 'Product'" :disable-transitions="true">{{formModel.taxTwoCents | dollar}}</el-tag>
       <price-amount-input v-else @input="taxCentsChanged" v-model="formModel.taxTwoCents"></price-amount-input>
     </el-form-item>
 
     <span class="m-l-5 m-r-5">+</span>
 
     <el-form-item label="Tax 3" class="tax">
-      <el-tag v-if="type === 'Product'" :close-transition="true">{{formModel.taxThreeCents | dollar}}</el-tag>
+      <el-tag v-if="type === 'Product'" :disable-transitions="true">{{formModel.taxThreeCents | dollar}}</el-tag>
       <price-amount-input v-else @input="taxCentsChanged" v-model="formModel.taxThreeCents"></price-amount-input>
     </el-form-item>
 
@@ -135,13 +149,15 @@ import Price from '@/models/price'
 import OrderLineItem from '@/models/order-line-item'
 import PriceAmountInput from '@/components/price-amount-input'
 import RemoteSelect from '@/components/remote-select'
+import MoneyInput from '@/components/money-input'
 
 export default {
   name: 'OrderLineItemForm',
   props: ['value', 'errors', 'isVisible'],
   components: {
     RemoteSelect,
-    PriceAmountInput
+    PriceAmountInput,
+    MoneyInput
   },
   filters: {
     dollar,
@@ -150,7 +166,8 @@ export default {
   data () {
     return {
       formModel: _.cloneDeep(this.value),
-      type: 'Product'
+      type: 'Product',
+      moneyConfig: { precision: 2, masked: false, prefix: '$ ' }
     }
   },
   computed: {
@@ -294,13 +311,13 @@ export default {
       this.chargeQuantityChanged(this.formModel.chargeQuantity)
     },
     productItemChanged (productItem) {
-      console.log('productItemChanged')
       if (productItem) {
         this.formModel.price = productItem.defaultPrice
         this.priceChanged(this.formModel.price)
       }
     },
-    productChanged (product) {
+    productChanged (product, formModel) {
+      OrderLineItem.balanceByProduct(formModel)
       if (!product) {
         return this.reset()
       }
@@ -344,7 +361,7 @@ export default {
 }
 
 .el-form-item.order-quantity .el-input-number {
-  width: 120px;
+  width: 100px;
 }
 
 .el-form-item.charge-quantity .el-input {
@@ -359,18 +376,33 @@ export default {
   width: 150px;
 }
 
-.el-form-item.price .el-tag, .el-form-item.tax .el-tag, .el-form-item.sub-total-left .el-tag, .el-form-item.grand-total .el-tag {
-  font-size: 18px;
-  padding: 6px 15px;
-  height: 36px;
-  width: 110px;
+.el-form-item.sub-total-right .el-tag {
+  width: 100px;
+}
+
+.el-tag {
+  font-size: 13px;
+  text-align: right;
+  // padding: 6px 15px;
+  // height: 36px;
+  width: 70px;
 }
 
 .el-form-item.sub-total-right, .el-form-item.grand-total {
   float: right;
 }
 
-.el-form-item.sub-total-right .el-input, .el-form-item.sub-total-left .el-input {
-  width: 100px;
+.el-form-item.sub-total-right, .el-form-item.sub-total-left {
+  .el-tag {
+    width: 100px;
+  }
+
+  .el-input {
+    width: 100px;
+  }
+
+  input {
+    text-align: right;
+  }
 }
 </style>

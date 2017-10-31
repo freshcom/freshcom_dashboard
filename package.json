@@ -23,7 +23,8 @@
     "vue-router": "^3.0.1",
     "vue-stripe-elements": "^0.2.3",
     "vuex": "^3.0.0",
-    "vuex-router-sync": "^5.0.0"
+    "vuex-router-sync": "^5.0.0",
+    "v-money": "0.8.1"
   },
   "devDependencies": {
     "@kazupon/vue-i18n-loader": "^0.2.1",

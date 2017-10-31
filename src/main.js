@@ -24,6 +24,7 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
 import vueMoment from 'vue-moment'
+import money from 'v-money'
 
 // -- Sync Store & Router --
 sync(store, router)
@@ -63,6 +64,7 @@ Vue.use(ElementUI, {
 
 // -- Moment.js --
 Vue.use(vueMoment)
+Vue.use(money, { precision: 2, masked: false, prefix: '$ ' })
 
 Vue.config.productionTip = false
 

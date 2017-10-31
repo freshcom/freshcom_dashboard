@@ -11,7 +11,7 @@ export default {
       printName: '',
       orderQuantity: 1,
       isEstimate: false,
-      subTotalCents: 0,
+      subTotalCents: 19300,
       taxOneCents: 0,
       taxTwoCents: 0,
       taxThreeCents: 0,
@@ -27,6 +27,81 @@ export default {
       priceTaxThreePercentage: 0,
 
       children: []
+    }
+  },
+
+  balanceByChargeQuantity (sourceLineItem) {
+    if (!sourceLineItem.chargeQuantity || !sourceLineItem.priceChargeCents) {
+      return sourceLineItem
+    }
+
+    let lineItem = _.cloneDeep(sourceLineItem)
+
+    lineItem.subTotalCents = Math.round(lineItem.chargeQuantity * lineItem.priceChargeCents)
+    lineItem.taxOneCents = Math.round(lineItem.subTotalCents * (lineItem.priceTaxOnePercentage / 100))
+    lineItem.taxTwoCents = Math.round(lineItem.subTotalCents * (lineItem.priceTaxTwoPercentage / 100))
+    lineItem.taxThreeCents = Math.round(lineItem.subTotalCents * (lineItem.priceTaxThreePercentage / 100))
+    lineItem.grandTotalCents = lineItem.subTotalCents + lineItem.taxOneCents + lineItem.taxTwoCents + this.formModel.taxThreeCents
+
+    return lineItem
+  },
+
+  balanceByPrice (sourceLineItem) {
+    if (!sourceLineItem.price) {
+      return sourceLineItem
+    }
+
+    let lineItem = _.cloneDeep(sourceLineItem)
+    let price = lineItem.price
+
+    lineItem.priceEstimateAveragePercentage = price.estimateAveragePercentage
+    lineItem.priceEstimateByDefault = price.estimateByDefault
+    lineItem.priceChargeCents = price.chargeCents
+    lineItem.priceTaxOnePercentage = price.taxOnePercentage
+    lineItem.priceTaxTwoPercentage = price.taxTwoPercentage
+    lineItem.priceTaxThreePercentage = price.taxThreePercentage
+    lineItem.priceChargeUnit = price.chargeUnit
+    lineItem.priceOrderUnit = price.orderUnit
+
+    if (lineItem.priceEstimateByDefault) {
+      lineItem.chargeQuantity = lineItem.orderQuantity * (lineItem.priceEstimateAveragePercentage / 100)
+      lineItem.isEstimate = true
+    } else {
+      lineItem.chargeQuantity = lineItem.orderQuantity
+      lineItem.isEstimate = false
+    }
+
+    return this.balanceByChargeQuantity(lineItem)
+  },
+
+  balanceByProductItem (sourceLineItem) {
+    if (!sourceLineItem.productItem) {
+      return sourceLineItem
+    }
+
+    let lineItem = _.cloneDeep(sourceLineItem)
+    let productItem = lineItem.productItem
+
+    lineItem.price = productItem.defaultPrice
+    return this.balanceByPrice(lineItem)
+  },
+
+  // Expects product.defaultPrice and product.items be loaded
+  balanceByProduct (sourceLineItem) {
+    if (!sourceLineItem.product) {
+      return sourceLineItem
+    }
+
+    let lineItem = _.cloneDeep(sourceLineItem)
+    let product = lineItem.product
+
+    if (product.itemMode === 'all') {
+      lineItem.price = product.defaultPrice
+      return this.balanceByPrice(lineItem)
+    } else {
+      let primaryItem = _.find(product.items, { primary: true })
+      lineItem.productItem = primaryItem
+      return this.balanceByProductItem(lineItem)
     }
   },
 
