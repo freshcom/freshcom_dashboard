@@ -1,35 +1,22 @@
 <template>
 <el-form :model="formModel" label-position="top" size="small">
-  <el-row class="m-b-20">
-    <el-form-item v-if="!formModel.id" label="Source Type" class="type">
-      <el-radio-group @change="typeChanged" v-model="type">
+  <el-row v-if="!formModel.id" class="m-b-20">
+    <el-form-item label="Source Type" class="type">
+      <el-radio-group @change="reset()" v-model="type">
         <el-radio-button label="Product"></el-radio-button>
         <el-radio-button label="None"></el-radio-button>
       </el-radio-group>
     </el-form-item>
-
-    <el-form-item label="Sub Total is" class="is-estimate">
-      <el-switch
-        v-model="formModel.isEstimate"
-        @change="updateValue()"
-        :disabled="!isIsEstimateTogglable"
-        active-text="Estimate"
-        inactive-text="Exact">
-      </el-switch>
-    </el-form-item>
   </el-row>
 
-  <el-row v-if="formModel.id" class="m-b-20">
-    <p><b>Name: </b> {{formModel.name}}</p>
-  </el-row>
-  <el-row v-if="!formModel.id && type === 'Product'" class="m-b-20">
-    <el-col :span="12" class="p-r-10">
+  <el-row class="m-b-20">
+    <el-col v-if="!formModel.id && type === 'Product'" :span="9" class="p-r-10">
       <el-form-item label="Product" class="full">
         <remote-select
           v-model="formModel.product"
           @filter="loadSelectableProducts"
           @clear="resetSelectableProducts"
-          @input="balanceByProduct"
+          @input="balanceByProduct()"
           :records="selectableProducts"
           :isLoading="isLoadingSelectableProducts"
           placeholder="Search for product..."
@@ -39,27 +26,40 @@
       </el-form-item>
     </el-col>
 
-    <el-col :span="12" class="p-l-10">
+    <el-col v-if="!formModel.id && type === 'Product'" :span="9" class="p-l-10">
       <el-form-item label="Product Item" class="full">
-        <el-select @change="balanceByProductItem" :disabled="!isProductItemSelectable" :placeholder="productItemSelectPlaceholder" v-model="formModel.productItem" value-key="id" class="product-item-select">
+        <el-select @change="balanceByProductItem()" :disabled="!isProductItemSelectable" :placeholder="productItemSelectPlaceholder" v-model="formModel.productItem" value-key="id" class="product-item-select">
           <el-option v-for="item in selectableProductItems" :key="item.id" :label="item.name" :value="item">
             {{item.name}}
           </el-option>
         </el-select>
       </el-form-item>
     </el-col>
-  </el-row>
-  <el-row v-if="!formModel.id && type === 'None'" class="m-b-20">
-    <el-form-item label="Name" class="name full">
-      <el-input v-model="formModel.name" @change="updateValue()"></el-input>
-    </el-form-item>
+
+    <el-col v-if="type === 'None' || formModel.id" :span="18">
+      <el-form-item label="Name" class="name full">
+        <el-input v-model="formModel.name" @change="updateValue()" :disabled="!!formModel.id"></el-input>
+      </el-form-item>
+    </el-col>
+
+    <el-col :span="6">
+      <el-form-item label="Sub Total is" class="is-estimate">
+        <el-switch
+          v-model="formModel.isEstimate"
+          @change="updateValue()"
+          :disabled="!isIsEstimateTogglable"
+          active-text="Estimate"
+          inactive-text="Exact">
+        </el-switch>
+      </el-form-item>
+    </el-col>
   </el-row>
 
   <el-row v-if="type === 'Product'" class="m-b-20">
     <el-form-item label="Order Qty" class="order-quantity">
       <el-input-number
         v-model="formModel.orderQuantity"
-        @input="balanceByOrderQuantity"
+        @input="balanceByOrderQuantity()"
         :min="1"
         :step="1"
         :disabled="!formModel.price"
@@ -73,7 +73,7 @@
     <el-form-item label="Charge Qty" class="charge-quantity">
       <el-input-number
         v-model="formModel.chargeQuantity"
-        @input="balanceByChargeQuantity"
+        @input="balanceByChargeQuantity()"
         @focus="$event.target.select()"
         :controls="false"
         :disabled="!formModel.priceEstimateByDefault"
@@ -88,7 +88,7 @@
 
     <el-form-item label="Price" class="price">
       <el-tag v-if="formModel.id" :disable-transitions="true">{{formModel.priceChargeCents | dollar}}/{{formModel.priceChargeUnit}}</el-tag>
-      <el-select v-else @change="balanceByPrice" v-model="formModel.price" value-key="id" placeholder="" :disabled="!formModel.price">
+      <el-select v-else @change="balanceByPrice()" v-model="formModel.price" value-key="id" placeholder="" :disabled="!formModel.price">
         <el-option v-for="price in selectablePrices" :key="price.id" v-bind:label="price | chargeDollar" :value="price">
           <span v-if="price.name">{{price.name}} -</span>
           <span>{{price | chargeDollar}}</span>
@@ -107,7 +107,7 @@
     </el-form-item>
   </el-row>
 
-  <el-row class="m-b-20">
+  <el-row>
     <el-form-item label="Sub Total" class="sub-total-left">
       <money-input
       v-model="formModel.subTotalCents"
@@ -122,7 +122,7 @@
     <el-form-item label="Tax 1" class="tax">
       <money-input
         v-model="formModel.taxOneCents"
-        @input="taxCentsChanged"
+        @input="balanceByTax()"
         :disabled="type === 'Product'"
       >
       </money-input>
@@ -133,7 +133,7 @@
     <el-form-item label="Tax 2" class="tax">
       <money-input
         v-model="formModel.taxTwoCents"
-        @input="taxCentsChanged"
+        @input="balanceByTax()"
         :disabled="type === 'Product'"
       >
       </money-input>
@@ -144,7 +144,7 @@
     <el-form-item label="Tax 3" class="tax">
       <money-input
         v-model="formModel.taxThreeCents"
-        @input="taxCentsChanged"
+        @input="balanceByTax()"
         :disabled="type === 'Product'"
       >
       </money-input>
@@ -270,45 +270,34 @@ export default {
       this.formModel = OrderLineItem.objectWithDefaults()
       this.$emit('input', this.formModel)
     },
-    refreshTaxAndGrandTotal () {
-      if (this.type === 'Product') {
-        this.formModel.taxOneCents = Math.round(this.formModel.subTotalCents * (this.formModel.priceTaxOnePercentage / 100))
-        this.formModel.taxTwoCents = Math.round(this.formModel.subTotalCents * (this.formModel.priceTaxTwoPercentage / 100))
-        this.formModel.taxThreeCents = Math.round(this.formModel.subTotalCents * (this.formModel.priceTaxThreePercentage / 100))
-      }
-      this.formModel.grandTotalCents = this.formModel.subTotalCents + this.formModel.taxOneCents + this.formModel.taxTwoCents + this.formModel.taxThreeCents
+    balanceByTax () {
+      this.updateValue(OrderLineItem.balanceByTax(this.formModel))
     },
-    typeChanged (type) {
-      this.reset()
-    },
-    taxCentsChanged (taxCents) {
-      this.refreshTaxAndGrandTotal()
-    },
-    balanceByChargeQuantity (chargeQuantity) {
+    balanceByChargeQuantity () {
       this.updateValue(OrderLineItem.balanceByChargeQuantity(this.formModel))
     },
-    balanceByOrderQuantity (orderQuantity) {
+    balanceByOrderQuantity () {
       this.updateValue(OrderLineItem.balanceByOrderQuantity(this.formModel))
     },
-    balanceBySubTotalCents (subTotalCents) {
+    balanceBySubTotalCents () {
       this.updateValue(OrderLineItem.balanceBySubTotalCents(this.formModel))
     },
-    balanceByPrice (price) {
+    balanceByPrice () {
       this.updateValue(OrderLineItem.balanceByPrice(this.formModel))
     },
-    balanceByProductItem (productItem) {
+    balanceByProductItem () {
       this.updateValue(OrderLineItem.balanceByProductItem(this.formModel))
     },
-    balanceByProduct (product) {
-      if (!product) {
+    balanceByProduct () {
+      if (!this.formModel.product) {
         return this.reset()
       }
 
-      if (product.itemMode === 'all') {
+      if (this.formModel.product.itemMode === 'all') {
         this.updateValue(OrderLineItem.balanceByProduct(this.formModel))
       } else {
         this.$store.dispatch('orderLineItem/loadSelectableProductItems', {
-          filter: { productId: product.id, status: ['active', 'internal'] },
+          filter: { productId: this.formModel.product.id, status: ['active', 'internal'] },
           include: 'prices,defaultPrice'
         }).then(response => {
           let primaryItem = _.find(response.resources, { primary: true })

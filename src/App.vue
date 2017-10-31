@@ -162,7 +162,16 @@ a {
   text-decoration: none;
 }
 
-.nested-table {
+.el-table.nested-table {
+  th, td {
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  th {
+    background-color: #f5f7fa;
+  }
+
   .el-table__expanded-cell {
     padding: 0px;
 
@@ -171,17 +180,12 @@ a {
     }
   }
 
-  .cell {
-    padding-left: 0px;
+  .el-table__expand-column .cell {
     padding-right: 0px;
   }
 
   tbody tr td:last-child {
     text-align: right;
-
-    .cell {
-      padding-right: 18px;
-    }
   }
 }
 
@@ -190,7 +194,6 @@ a:hover {
 }
 
 .block-title {
-
   h3 {
     display: inline-block;
     margin: 0 0 5px 0;
@@ -207,7 +210,6 @@ a:hover {
       vertical-align: middle;
     }
   }
-
 }
 
 .block {
@@ -226,7 +228,7 @@ a:hover {
   }
 
   .block-footer {
-    padding: 10px;
+    padding: 10px 20px;
     border-top: 1px solid #eaeefb;
 
     &.no-divider {
@@ -255,10 +257,6 @@ a:hover {
     &:after {
       width: 0;
     }
-
-    // &:before {
-    //   height: 0px;
-    // }
 
     tr td {
       padding: 0;
@@ -351,6 +349,18 @@ p.search-notice {
 /* END Utils */
 
 /* START Common Overwrite */
+.el-table {
+  th {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  td {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+}
+
 .el-input__inner {
   text-align: inherit;
 }
@@ -361,6 +371,10 @@ p.search-notice {
 
 .el-dialog__body {
   padding: 20px;
+}
+
+.el-dialog__header {
+  border-bottom: 1px solid #eaeefb;
 }
 
 .el-pagination {
@@ -476,11 +490,6 @@ small {
       background-color: #f5f7fa;
       padding-top: 5px;
       padding-bottom: 5px;
-    }
-
-    td {
-      padding-top: 10px;
-      padding-bottom: 10px;
     }
 
     .el-table__header th:first-child > div, .el-table__body tr td:first-child > div {

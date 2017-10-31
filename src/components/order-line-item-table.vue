@@ -8,7 +8,7 @@
   style="width: 100%"
 >
   <el-table-column type="expand" width="30px">
-    <template scope="props">
+    <template slot-scope="props">
       <el-table :data="props.row.children" :show-header="false" style="width: 100%">
         <el-table-column width="40px" label="" prop=""></el-table-column>
         <el-table-column width="260px" label="Name" prop="name"></el-table-column>
@@ -22,7 +22,7 @@
   <el-table-column width="200px" label="Sub | Tax | Grand" prop="amount" header-align="right" align="right"></el-table-column>
 
   <el-table-column label="">
-    <template scope="scope">
+    <template slot-scope="scope">
       <el-button @click="editLineItem(scope.row.id)" size="mini">
         <icon name="pencil" scale="0.8" class="v-middle"></icon>
       </el-button>

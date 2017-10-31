@@ -1,10 +1,10 @@
 <template>
-<el-dialog :title="title" :show-close="false" :visible="isVisible" class="fw-lg">
+<el-dialog :title="title" :show-close="false" :visible="isVisible" width="750px">
   <order-line-item-form v-model="recordDraft"></order-line-item-form>
 
   <div slot="footer" class="dialog-footer">
-    <el-button @click="cancel">Cancel</el-button>
-    <el-button @click="save" type="primary">Save</el-button>
+    <el-button @click="cancel" plain size="small">Cancel</el-button>
+    <el-button @click="save" type="primary" size="small">Save</el-button>
   </div>
 </el-dialog>
 </template>

@@ -28,12 +28,12 @@
               <div class="block-body">
                 <order-line-item-form v-model="lineItemDraftForCreate" :errors="errors">
                 </order-line-item-form>
+              </div>
 
-                <div class="text-right">
-                  <el-button @click="createLineItem(lineItemDraftForCreate)" size="small">
-                    Add to Order
-                  </el-button>
-                </div>
+              <div class="block-footer text-right">
+                <el-button @click="createLineItem(lineItemDraftForCreate)" :loading="isSubmittingLineItemForCreate" plain size="small">
+                  Add to Order
+                </el-button>
               </div>
             </div>
 
@@ -74,11 +74,11 @@
 
         <div class="footer">
           <template v-if="activeStep === 0">
-            <el-button @click="cancel">
+            <el-button @click="cancel" plain size="medium">
               Cancel
             </el-button>
 
-            <el-button @click="nextStep(recordDraft)" type="primary" class="pull-right">
+            <el-button @click="nextStep(recordDraft)" size="medium" type="primary" class="pull-right">
               Next
             </el-button>
           </template>
@@ -88,7 +88,7 @@
               Back
             </el-button>
 
-            <el-button @click="nextStep(recordDraft)" type="primary" class="pull-right">
+            <el-button @click="nextStep(recordDraft)" size="medium" type="primary" class="pull-right">
               Next
             </el-button>
           </template>
@@ -98,7 +98,7 @@
               Back
             </el-button>
 
-            <el-button @click="createPayment(paymentDraft, record)" type="primary" class="pull-right">
+            <el-button @click="createPayment(paymentDraft, record)" size="medimum" type="primary" class="pull-right">
               Place Order
             </el-button>
           </template>
@@ -112,6 +112,7 @@
         @save="saveLineItem"
         @cancel="closeLineItemDialog"
         :is-visible="isEditingLineItem"
+        title="Edit Line Item"
       >
 
       </order-line-item-dialog>
@@ -154,6 +155,9 @@ export default {
     }
   },
   computed: {
+    isSubmittingLineItemForCreate () {
+      return this.$store.state.order.isSubmittingLineItemForCreate
+    },
     isEditingLineItem () {
       return this.$store.state.order.isEditingLineItem
     },

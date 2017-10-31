@@ -28,6 +28,7 @@ const MT = {
   LINE_ITEM_EDIT_ENDED: 'LINE_ITEM_EDIT_ENDED',
   LINE_ITEM_DRAFT_FOR_CREATE_CHANGED: 'LINE_ITEM_DRAFT_FOR_CREATE_CHANGED',
   LINE_ITEM_DRAFT_FOR_UPDATE_CHANGED: 'LINE_ITEM_DRAFT_FOR_UPDATE_CHANGED',
+  LINE_ITEM_FOR_CREATE_SUBMITTING: 'LINE_ITEM_FOR_CREATE_SUBMITTING',
   SELECTED_PRICES_CHANGED: 'SELECTED_PRICES_CHANGED',
   SELECTABLE_CUSTOMERS_CHANGED: 'SELECTABLE_CUSTOMERS_CHANGED',
   SELECTABLE_CUSTOMERS_LOADING: 'SELECTABLE_CUSTOMERS_LOADING',
@@ -55,6 +56,7 @@ export default {
 
     isAddingLineItem: false,
     lineItemDraftForCreate: OrderLineItem.objectWithDefaults(),
+    isSubmittingLineItemForCreate: false,
 
     isEditingPayment: false,
     paymentDraftForEdit: Payment.objectWithDefaults(),
@@ -187,6 +189,7 @@ export default {
     },
 
     createLineItem ({ state, commit }, lineItemDraft) {
+      commit(MT.LINE_ITEM_FOR_CREATE_SUBMITTING)
       let orderCreated = new Promise((resolve, reject) => {
         resolve(lineItemDraft.order)
       })
@@ -428,6 +431,7 @@ export default {
     },
 
     [MT.LINE_ITEM_ADD_ENDED] (state, lineItem) {
+      state.isSubmittingLineItemForCreate = false
       state.isAddingLineItem = false
       state.lineItemDraftForCreate = OrderLineItem.objectWithDefaults()
     },
@@ -506,6 +510,10 @@ export default {
     [MT.PAYMENT_ADD_ENDED] (state) {
       state.paymentDraftForCreate = Payment.objectWithDefaults()
       state.isAddingPayment = false
+    },
+
+    [MT.LINE_ITEM_FOR_CREATE_SUBMITTING] (state) {
+      state.isSubmittingLineItemForCreate = true
     }
   }
 }

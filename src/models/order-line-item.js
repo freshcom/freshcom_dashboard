@@ -30,6 +30,17 @@ export default {
     }
   },
 
+  balanceByTax (sourceLineItem) {
+    if (isNaN(sourceLineItem.taxOneCents) || isNaN(sourceLineItem.taxTwoCents) || isNaN(sourceLineItem.taxThreeCents)) {
+      return sourceLineItem
+    }
+
+    let lineItem = _.cloneDeep(sourceLineItem)
+    lineItem.grandTotalCents = lineItem.subTotalCents + lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents
+
+    return lineItem
+  },
+
   balanceBySubTotalCents (sourceLineItem) {
     if (isNaN(sourceLineItem.subTotalCents)) {
       return sourceLineItem
