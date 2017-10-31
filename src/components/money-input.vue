@@ -5,12 +5,19 @@
 </template>
 
 <script>
+import _ from 'lodash'
+
 export default {
   name: 'MoneyInput',
   props: {
     placeholder: String,
     value: Number,
     disabled: Boolean
+  },
+  methods: {
+    updateValue: _.debounce(function (value) {
+      this.$emit('input', value)
+    })
   },
   computed: {
     model: {
@@ -20,9 +27,9 @@ export default {
       set (model) {
         let dollarValue = Number(model.replace(/[^0-9.]/g, ''))
         if (dollarValue) {
-          this.$emit('input', dollarValue * 100)
+          this.updateValue(dollarValue * 100)
         } else {
-          this.$emit('input', 0)
+          this.updateValue(0)
         }
       }
     }

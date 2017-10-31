@@ -30,8 +30,44 @@ export default {
     }
   },
 
+  balanceBySubTotalCents (sourceLineItem) {
+    if (isNaN(sourceLineItem.subTotalCents)) {
+      return sourceLineItem
+    }
+
+    let lineItem = _.cloneDeep(sourceLineItem)
+    if (lineItem.isEstimate && lineItem.price) {
+      lineItem.chargeQuantity = lineItem.subTotalCents / lineItem.priceChargeCents
+    }
+
+    if (lineItem.price) {
+      lineItem.taxOneCents = Math.round(lineItem.subTotalCents * (lineItem.priceTaxOnePercentage / 100))
+      lineItem.taxTwoCents = Math.round(lineItem.subTotalCents * (lineItem.priceTaxTwoPercentage / 100))
+      lineItem.taxThreeCents = Math.round(lineItem.subTotalCents * (lineItem.priceTaxThreePercentage / 100))
+    }
+
+    lineItem.grandTotalCents = lineItem.subTotalCents + lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents
+
+    return lineItem
+  },
+
+  balanceByOrderQuantity (sourceLineItem) {
+    if (isNaN(sourceLineItem.orderQuantity)) {
+      return sourceLineItem
+    }
+
+    let lineItem = _.cloneDeep(sourceLineItem)
+    if (lineItem.priceEstimateByDefault) {
+      lineItem.chargeQuantity = lineItem.orderQuantity * (lineItem.priceEstimateAveragePercentage / 100)
+    } else {
+      lineItem.chargeQuantity = lineItem.orderQuantity
+    }
+
+    return this.balanceByChargeQuantity(lineItem)
+  },
+
   balanceByChargeQuantity (sourceLineItem) {
-    if (!sourceLineItem.chargeQuantity || !sourceLineItem.priceChargeCents) {
+    if (isNaN(sourceLineItem.chargeQuantity) || isNaN(sourceLineItem.priceChargeCents)) {
       return sourceLineItem
     }
 

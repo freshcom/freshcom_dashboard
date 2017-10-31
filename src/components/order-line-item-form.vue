@@ -59,7 +59,7 @@
     <el-form-item label="Order Qty" class="order-quantity">
       <el-input-number
         v-model="formModel.orderQuantity"
-        @change="balanceByOrderQuantity"
+        @input="balanceByOrderQuantity"
         :min="1"
         :step="1"
         :disabled="!formModel.price"
@@ -71,7 +71,15 @@
     <span class="m-r-20 m-l-20">=</span>
 
     <el-form-item label="Charge Qty" class="charge-quantity">
-      <el-input-number v-model="formModel.chargeQuantity" @input="balanceByChargeQuantity" @focus="$event.target.select()" :controls="false" :disabled="!formModel.priceEstimateByDefault"></el-input-number>
+      <el-input-number
+        v-model="formModel.chargeQuantity"
+        @input="balanceByChargeQuantity"
+        @focus="$event.target.select()"
+        :controls="false"
+        :disabled="!formModel.priceEstimateByDefault"
+        :min="0"
+      >
+      </el-input-number>
     </el-form-item>
 
     <span v-if="formModel.priceChargeUnit">{{formModel.priceChargeUnit}}</span>
@@ -90,14 +98,23 @@
 
     <span class="m-r-20 m-l-20">=</span>
     <el-form-item label="Sub Total" class="sub-total-right">
-      <money-input v-model="formModel.subTotalCents" :disabled="!formModel.priceEstimateByDefault">
+      <money-input
+        v-model="formModel.subTotalCents"
+        @input="balanceBySubTotalCents()"
+        :disabled="!formModel.priceEstimateByDefault"
+        >
       </money-input>
     </el-form-item>
   </el-row>
 
   <el-row class="m-b-20">
     <el-form-item label="Sub Total" class="sub-total-left">
-      <money-input v-model="formModel.subTotalCents" :disabled="type === 'Product'"></money-input>
+      <money-input
+      v-model="formModel.subTotalCents"
+      @input="balanceBySubTotalCents()"
+      :disabled="type === 'Product'"
+      >
+      </money-input>
     </el-form-item>
 
     <span class="m-l-5 m-r-5">+</span>
@@ -271,15 +288,10 @@ export default {
       this.updateValue(OrderLineItem.balanceByChargeQuantity(this.formModel))
     },
     balanceByOrderQuantity (orderQuantity) {
-
+      this.updateValue(OrderLineItem.balanceByOrderQuantity(this.formModel))
     },
-    subTotalCentsChanged (subTotalCents) {
-      if (this.formModel.isEstimate) {
-        this.formModel.chargeQuantity = subTotalCents / this.formModel.priceChargeCents
-      }
-
-      this.refreshTaxAndGrandTotal()
-      this.updateValue()
+    balanceBySubTotalCents (subTotalCents) {
+      this.updateValue(OrderLineItem.balanceBySubTotalCents(this.formModel))
     },
     balanceByPrice (price) {
       this.updateValue(OrderLineItem.balanceByPrice(this.formModel))
@@ -341,7 +353,7 @@ export default {
   width: 100px;
 }
 
-.el-form-item.charge-quantity .el-input {
+.el-form-item.charge-quantity .el-input-number {
   width: 100px;
 }
 
