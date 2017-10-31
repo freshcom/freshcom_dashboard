@@ -11,7 +11,7 @@ export default {
       printName: '',
       orderQuantity: 1,
       isEstimate: false,
-      subTotalCents: 19300,
+      subTotalCents: 0,
       taxOneCents: 0,
       taxTwoCents: 0,
       taxThreeCents: 0,

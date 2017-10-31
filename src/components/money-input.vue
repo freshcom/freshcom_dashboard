@@ -1,21 +1,24 @@
 <template>
-  <el-input v-model="dollarStr" v-money="{}" :disabled="disabled" :placeholder="placeholder">
-  </el-input>
+  <div class="el-input el-input--small" :class="{ 'is-disabled': disabled }">
+    <input v-model.lazy="model" v-money="{}" :disabled="disabled" autocomplete="off" type="text" rows="2" validateevent="true" class="el-input__inner">
+  </div>
 </template>
 
 <script>
 export default {
   name: 'MoneyInput',
-  props: ['placeholder', 'value', 'disabled'],
+  props: {
+    placeholder: String,
+    value: Number,
+    disabled: Boolean
+  },
   computed: {
-    dollarStr: {
+    model: {
       get () {
         return this.value
       },
-
-      set (value) {
-        let dollarValue = Number(value.replace(/[^0-9.]/g, ''))
-
+      set (model) {
+        let dollarValue = Number(model.replace(/[^0-9.]/g, ''))
         if (dollarValue) {
           this.$emit('input', dollarValue * 100)
         } else {

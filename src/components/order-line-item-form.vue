@@ -29,7 +29,7 @@
           v-model="formModel.product"
           @filter="loadSelectableProducts"
           @clear="resetSelectableProducts"
-          @input="productChanged"
+          @input="balanceByProduct"
           :records="selectableProducts"
           :isLoading="isLoadingSelectableProducts"
           placeholder="Search for product..."
@@ -41,7 +41,7 @@
 
     <el-col :span="12" class="p-l-10">
       <el-form-item label="Product Item" class="full">
-        <el-select @select="productItemChanged" :disabled="!isProductItemSelectable" :placeholder="productItemSelectPlaceholder" v-model="formModel.productItem" value-key="id" class="product-item-select">
+        <el-select @change="balanceByProductItem" :disabled="!isProductItemSelectable" :placeholder="productItemSelectPlaceholder" v-model="formModel.productItem" value-key="id" class="product-item-select">
           <el-option v-for="item in selectableProductItems" :key="item.id" :label="item.name" :value="item">
             {{item.name}}
           </el-option>
@@ -56,10 +56,10 @@
   </el-row>
 
   <el-row v-if="type === 'Product'" class="m-b-20">
-    <el-form-item label="Order Quantity" class="order-quantity">
+    <el-form-item label="Order Qty" class="order-quantity">
       <el-input-number
         v-model="formModel.orderQuantity"
-        @change="orderQuantityChanged"
+        @change="balanceByOrderQuantity"
         :min="1"
         :step="1"
         :disabled="!formModel.price"
@@ -68,21 +68,19 @@
       </el-input-number>
     </el-form-item>
 
-    <span v-if="formModel.priceOrderUnit">{{formModel.priceOrderUnit}}</span>
+    <span class="m-r-20 m-l-20">=</span>
 
-    <span v-if="formModel.priceEstimateByDefault" class="m-r-20 m-l-20">=</span>
-
-    <el-form-item v-if="formModel.priceEstimateByDefault" label="Charge Quantity" class="charge-quantity">
-      <el-input v-model="formModel.chargeQuantity" @change="chargeQuantityChanged" @focus="$event.target.select()" type="number"></el-input>
+    <el-form-item label="Charge Qty" class="charge-quantity">
+      <el-input-number v-model="formModel.chargeQuantity" @input="balanceByChargeQuantity" @focus="$event.target.select()" :controls="false" :disabled="!formModel.priceEstimateByDefault"></el-input-number>
     </el-form-item>
 
-    <span v-if="formModel.priceEstimateByDefault && formModel.priceChargeUnit">{{formModel.priceChargeUnit}}</span>
+    <span v-if="formModel.priceChargeUnit">{{formModel.priceChargeUnit}}</span>
 
     <span class="m-r-20 m-l-20">x</span>
 
     <el-form-item label="Price" class="price">
       <el-tag v-if="formModel.id" :disable-transitions="true">{{formModel.priceChargeCents | dollar}}/{{formModel.priceChargeUnit}}</el-tag>
-      <el-select v-else @select="priceChanged" v-model="formModel.price" value-key="id" placeholder="" :disabled="!formModel.price">
+      <el-select v-else @change="balanceByPrice" v-model="formModel.price" value-key="id" placeholder="" :disabled="!formModel.price">
         <el-option v-for="price in selectablePrices" :key="price.id" v-bind:label="price | chargeDollar" :value="price">
           <span v-if="price.name">{{price.name}} -</span>
           <span>{{price | chargeDollar}}</span>
@@ -91,7 +89,6 @@
     </el-form-item>
 
     <span class="m-r-20 m-l-20">=</span>
-
     <el-form-item label="Sub Total" class="sub-total-right">
       <money-input v-model="formModel.subTotalCents" :disabled="!formModel.priceEstimateByDefault">
       </money-input>
@@ -240,10 +237,6 @@ export default {
     }
   },
   methods: {
-    testd (v) {
-      console.log(v)
-      console.log(this.formModel)
-    },
     updateValue: _.debounce(function (formModel) {
       formModel = formModel || this.formModel
       this.$emit('input', formModel)
@@ -274,20 +267,11 @@ export default {
     taxCentsChanged (taxCents) {
       this.refreshTaxAndGrandTotal()
     },
-    chargeQuantityChanged (chargeQuantity) {
-      this.formModel.subTotalCents = Math.round(this.formModel.chargeQuantity * this.formModel.priceChargeCents)
-
-      this.refreshTaxAndGrandTotal()
-      this.updateValue()
+    balanceByChargeQuantity (chargeQuantity) {
+      this.updateValue(OrderLineItem.balanceByChargeQuantity(this.formModel))
     },
-    orderQuantityChanged (orderQuantity) {
-      if (this.formModel.priceEstimateByDefault) {
-        this.formModel.chargeQuantity = orderQuantity * (this.formModel.priceEstimateAveragePercentage / 100)
-      } else {
-        this.formModel.chargeQuantity = orderQuantity
-      }
+    balanceByOrderQuantity (orderQuantity) {
 
-      this.chargeQuantityChanged(this.formModel.chargeQuantity)
     },
     subTotalCentsChanged (subTotalCents) {
       if (this.formModel.isEstimate) {
@@ -297,35 +281,13 @@ export default {
       this.refreshTaxAndGrandTotal()
       this.updateValue()
     },
-    priceChanged (price) {
-      if (!price) { return }
-
-      this.formModel.priceEstimateAveragePercentage = price.estimateAveragePercentage
-      this.formModel.priceEstimateByDefault = price.estimateByDefault
-      this.formModel.priceChargeCents = price.chargeCents
-      this.formModel.priceTaxOnePercentage = price.taxOnePercentage
-      this.formModel.priceTaxTwoPercentage = price.taxTwoPercentage
-      this.formModel.priceTaxThreePercentage = price.taxThreePercentage
-      this.formModel.priceChargeUnit = price.chargeUnit
-      this.formModel.priceOrderUnit = price.orderUnit
-
-      if (this.formModel.priceEstimateByDefault) {
-        this.formModel.chargeQuantity = this.formModel.orderQuantity * (this.formModel.priceEstimateAveragePercentage / 100)
-        this.formModel.isEstimate = true
-      } else {
-        this.formModel.chargeQuantity = this.formModel.orderQuantity
-        this.formModel.isEstimate = false
-      }
-
-      this.chargeQuantityChanged(this.formModel.chargeQuantity)
+    balanceByPrice (price) {
+      this.updateValue(OrderLineItem.balanceByPrice(this.formModel))
     },
-    productItemChanged (productItem) {
-      if (productItem) {
-        this.formModel.price = productItem.defaultPrice
-        this.priceChanged(this.formModel.price)
-      }
+    balanceByProductItem (productItem) {
+      this.updateValue(OrderLineItem.balanceByProductItem(this.formModel))
     },
-    productChanged (product) {
+    balanceByProduct (product) {
       if (!product) {
         return this.reset()
       }
@@ -338,7 +300,6 @@ export default {
           include: 'prices,defaultPrice'
         }).then(response => {
           let primaryItem = _.find(response.resources, { primary: true })
-          // this.formModel.productItem = primaryItem
           let formModel = _.cloneDeep(this.formModel)
           formModel.productItem = primaryItem
           this.updateValue(OrderLineItem.balanceByProductItem(formModel))
