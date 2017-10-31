@@ -8,7 +8,7 @@
       </el-radio-group>
     </el-form-item>
 
-    <el-form-item label="Charge Quantity is" class="is-estimate">
+    <el-form-item label="Sub Total is" class="is-estimate">
       <el-switch
         v-model="formModel.isEstimate"
         @change="updateValue()"
