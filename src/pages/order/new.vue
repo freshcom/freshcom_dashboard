@@ -30,7 +30,7 @@
                 </order-line-item-form>
 
                 <div class="text-right">
-                  <el-button @click="createLineItem(lineItemDraftForCreate)">
+                  <el-button @click="createLineItem(lineItemDraftForCreate)" size="small">
                     Add to Order
                   </el-button>
                 </div>

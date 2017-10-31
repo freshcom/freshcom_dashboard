@@ -351,6 +351,14 @@ p.search-notice {
 /* END Utils */
 
 /* START Common Overwrite */
+.el-input__inner {
+  text-align: inherit;
+}
+
+.el-input.is-disabled .el-input__inner {
+  color: #878d99;
+}
+
 .el-dialog__body {
   padding: 20px;
 }

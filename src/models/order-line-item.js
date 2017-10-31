@@ -41,7 +41,7 @@ export default {
     lineItem.taxOneCents = Math.round(lineItem.subTotalCents * (lineItem.priceTaxOnePercentage / 100))
     lineItem.taxTwoCents = Math.round(lineItem.subTotalCents * (lineItem.priceTaxTwoPercentage / 100))
     lineItem.taxThreeCents = Math.round(lineItem.subTotalCents * (lineItem.priceTaxThreePercentage / 100))
-    lineItem.grandTotalCents = lineItem.subTotalCents + lineItem.taxOneCents + lineItem.taxTwoCents + this.formModel.taxThreeCents
+    lineItem.grandTotalCents = lineItem.subTotalCents + lineItem.taxOneCents + lineItem.taxTwoCents + lineItem.taxThreeCents
 
     return lineItem
   },
