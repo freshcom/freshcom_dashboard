@@ -51,6 +51,8 @@ import EditCustomerPage from '@/pages/customer/edit'
 
 import ShowPaymentPage from '@/pages/payment/show'
 
+import ShowPayoutSettingPage from '@/pages/payout/show-settings'
+
 Vue.use(Router)
 
 function extractPagination (route) {
@@ -408,6 +410,17 @@ export default new Router({
       component: ShowPaymentPage,
       props (route) {
         return { id: route.params.id }
+      }
+    },
+    {
+      path: '/payouts/settings',
+      name: 'ShowPayoutSettings',
+      component: ShowPayoutSettingPage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { stripeCode: query.code, stripeScope: query.scope }
       }
     }
   ]

@@ -1,14 +1,14 @@
 <template>
 <el-dialog :title="title" :show-close="false" :visible="isVisible" class="fw-sm">
   <el-form :model="formModel">
-    <el-form-item :error="errorMessages.amountCents" label="Refund Amount" class="refund-amount">
-      <price-amount-input v-model="formModel.amountCents"></price-amount-input>
+    <el-form-item :error="errorMessages.amountCents" label="Refund Amount" size="small" class="refund-amount">
+      <money-input v-model="formModel.amountCents"></money-input>
     </el-form-item>
   </el-form>
 
   <div slot="footer" class="dialog-footer">
-    <el-button @click="cancel">Cancel</el-button>
-    <el-button @click="refund" type="primary">Refund</el-button>
+    <el-button @click="cancel" plain size="small">Cancel</el-button>
+    <el-button @click="refund" type="primary" size="small">Refund</el-button>
   </div>
 </el-dialog>
 </template>
@@ -16,14 +16,14 @@
 <script>
 import _ from 'lodash'
 import { dollar } from '@/helpers/filters'
-import PriceAmountInput from '@/components/price-amount-input'
+import MoneyInput from '@/components/money-input'
 import errorI18nKey from '@/utils/error-i18n-key'
 
 export default {
   name: 'RefundDialog',
   props: ['value', 'errors', 'isVisible', 'title'],
   components: {
-    PriceAmountInput
+    MoneyInput
   },
   filters: {
     dollar

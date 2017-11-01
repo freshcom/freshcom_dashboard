@@ -9,7 +9,7 @@
         <span>Please login to continue</span>
       </div>
 
-      <el-form :model="form" label-position="right" label-width="80px">
+      <el-form :model="form" label-width="80px" size="small">
         <el-form-item label="Email">
           <el-input v-model="form.username"></el-input>
         </el-form-item>
@@ -23,7 +23,7 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" size="large" @click="attemptLogin(form)">Login to your account</el-button>
+          <el-button type="primary" size="medium" @click="attemptLogin(form)">Login to your account</el-button>
         </el-form-item>
 
       </el-form>

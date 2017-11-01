@@ -194,7 +194,7 @@
                       Pay
                     </el-button>
 
-                    <el-button v-if="scope.row.status === 'authorized'" @click="openEditPaymentDialog(scope.row)" size="mini">
+                    <el-button v-if="scope.row.status === 'authorized'" @click="openEditPaymentDialog(scope.row)" plain size="mini">
                       Capture
                     </el-button>
 

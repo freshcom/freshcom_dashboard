@@ -436,7 +436,7 @@ small {
   width: 100%;
 }
 
-.el-form-item > .el-form-item__label {
+.el-form.el-form--label-top .el-form-item > .el-form-item__label {
   line-height: inherit;
 }
 /* END Common Overwrite */

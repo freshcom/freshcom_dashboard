@@ -14,6 +14,9 @@ export default {
     }
 
     _.forEach(object, (value, key) => {
+      // Ignore type attribute
+      if (key === 'type') { return }
+
       // Match relationship base on key
       if (key.endsWith('Id')) {
         let relationshipKey = _.trimEnd(key, 'Id')

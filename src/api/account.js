@@ -7,5 +7,16 @@ export default {
     }
 
     return axios.get('/account')
+  },
+
+  updateRecord (payload, options) {
+    let params = {}
+
+    let include = options.include
+    if (include) {
+      params.include = include
+    }
+
+    return axios.patch(`/account`, payload, { params: params })
   }
 }

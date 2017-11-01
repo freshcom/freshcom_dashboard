@@ -36,7 +36,7 @@
     </el-col>
     <el-col :span="8">
       <el-form-item v-if="canEnterPaidAmount" :error="errorMessages.paidAmountCents" label="Paid Amount" class="paid-amount">
-        <price-amount-input v-model="formModel.paidAmountCents"></price-amount-input>
+        <money-input v-model="formModel.paidAmountCents"></money-input>
       </el-form-item>
     </el-col>
   </el-row>
@@ -58,7 +58,7 @@
 
   <el-row>
     <el-form-item v-if="canEnterCaptureAmount" :error="errorMessages.paidAmountCents" label="Capture Amount" class="capture-amount">
-      <price-amount-input v-model="formModel.paidAmountCents"></price-amount-input>
+      <money-input v-model="formModel.paidAmountCents"></money-input>
     </el-form-item>
   </el-row>
 
@@ -69,7 +69,7 @@
         <el-form-item class="card-from" required>
           <b class="m-r-20">Card</b>
           <el-radio-group v-model="useCardFrom">
-            <el-radio label="savedCard">Select from saved cards</el-radio>
+            <el-radio v-if="orderHasCustomer" label="savedCard">Select from saved cards</el-radio>
             <el-radio label="newCard">Enter a new card</el-radio>
           </el-radio-group>
         </el-form-item>
@@ -83,7 +83,7 @@
         </el-form-item>
       </el-col>
     </el-row>
-     <el-row v-if="useCardFrom === 'newCard'">
+     <el-row v-if="useCardFrom === 'newCard' && orderHasCustomer">
       <el-col :span="12">
         <el-form-item class="card" required>
           <el-checkbox v-model="formModel.saveSource">Save this card</el-checkbox>
@@ -160,7 +160,7 @@
 <script>
 import _ from 'lodash'
 import errorI18nKey from '@/utils/error-i18n-key'
-import PriceAmountInput from '@/components/price-amount-input'
+import MoneyInput from '@/components/money-input'
 import { Card } from 'vue-stripe-elements'
 import { STRIPE_PUBLISHABLE_KEY } from '@/env'
 
@@ -169,7 +169,7 @@ export default {
   props: ['value', 'errors', 'record'],
   components: {
     Card,
-    PriceAmountInput
+    MoneyInput
   },
   data () {
     return {
@@ -197,6 +197,9 @@ export default {
     }
   },
   computed: {
+    orderHasCustomer () {
+      return !!this.record.order.customer
+    },
     selectableCards () {
       return this.$store.state.payment.selectableCards
     },
@@ -287,7 +290,7 @@ export default {
   color: #1f2d3d;
   font-size: inherit;
   height: 32px;
-  line-height: 1;
+  line-height: 24px;
   outline: 0;
   padding: 4px 10px;
   transition: border-color .2s cubic-bezier(.645,.045,.355,1);

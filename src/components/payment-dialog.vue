@@ -9,8 +9,8 @@
   </payment-form>
 
   <div slot="footer" class="dialog-footer">
-    <el-button @click="cancel">Cancel</el-button>
-    <el-button @click="save" type="primary">Save</el-button>
+    <el-button @click="cancel" plain size="small">Cancel</el-button>
+    <el-button @click="save" type="primary" size="small">Save</el-button>
   </div>
 </el-dialog>
 </template>

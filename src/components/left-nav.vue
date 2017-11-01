@@ -90,6 +90,11 @@
           </el-menu-item>
         </el-submenu>
 
+        <el-menu-item :route="{ name: 'ShowPayoutSettings' }" index="/payouts">
+          <icon name="id-card" scale="0.8"></icon>
+          <span>Payouts</span>
+        </el-menu-item>
+
         <el-menu-item index="operators">
           <icon name="id-card" scale="0.8"></icon>
           <span>Operators</span>
@@ -158,7 +163,7 @@ export default {
       if (routePath.startsWith('/product_items')) { return '/products' }
       if (routePath.startsWith('/prices')) { return '/products' }
       if (routePath.startsWith('/product_collections')) { return '/products' }
-      if (routePath.startsWith('/orders')) { return '/orders' }
+      if (routePath.startsWith('/orders') || routePath.startsWith('/payments')) { return '/orders' }
 
       return routePath
     },

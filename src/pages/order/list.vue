@@ -4,6 +4,7 @@
   <div>
     <el-menu :router="true" default-active="/orders" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">Orders</el-menu-item>
+      <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">Payments</el-menu-item>
     </el-menu>
     <locale-selector @change="search" class="pull-right"></locale-selector>
   </div>
