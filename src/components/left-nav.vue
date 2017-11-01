@@ -158,6 +158,7 @@ export default {
       if (routePath.startsWith('/product_items')) { return '/products' }
       if (routePath.startsWith('/prices')) { return '/products' }
       if (routePath.startsWith('/product_collections')) { return '/products' }
+      if (routePath.startsWith('/orders')) { return '/orders' }
 
       return routePath
     },

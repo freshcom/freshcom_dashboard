@@ -17,7 +17,6 @@
           :records="selectableProducts"
           :is-loading="isLoadingSelectableProducts"
           @filter="loadSelectableProducts"
-          @clear="resetSelectableProducts"
           @change="balanceByProduct($event)"
           no-data-text="No matching product"
           placeholder="Type to start searching..."
@@ -275,8 +274,12 @@ export default {
     }
   },
   watch: {
-    value (v) {
-      this.formModel = _.cloneDeep(v)
+    value (newValue, oldValue) {
+      if (!newValue.product && oldValue.product) {
+        this.resetSelectableProducts()
+      }
+
+      this.formModel = _.cloneDeep(newValue)
       if (!this.formModel.id) {
         return
       }
@@ -306,11 +309,11 @@ export default {
       this.$store.dispatch('orderLineItem/resetSelectableProducts')
     },
     reset () {
+      this.resetSelectableProducts()
       this.formModel = OrderLineItem.objectWithDefaults()
       this.$emit('input', this.formModel)
     },
     balanceByTax () {
-      console.log('balanceByTax')
       this.updateValue(OrderLineItem.balanceByTax(this.formModel))
     },
     balanceByChargeQuantity (chargeQuantity) {
@@ -342,14 +345,12 @@ export default {
       this.updateValue(OrderLineItem.balanceByProductItem(this.formModel))
     },
     balanceByProduct (product) {
-      console.log('balanceByProduct')
       if (!product) {
         return this.reset()
       }
 
       this.formModel.product = product
       if (this.formModel.product.itemMode === 'all') {
-        console.log('balanceByProduct')
         this.updateValue(OrderLineItem.balanceByProduct(this.formModel))
       } else {
         this.$store.dispatch('orderLineItem/loadSelectableProductItems', {

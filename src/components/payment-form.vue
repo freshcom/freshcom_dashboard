@@ -1,5 +1,5 @@
 <template>
-<el-form @input.native="updateValue" label-width="180px" label-position="top" class="m-b-10">
+<el-form @input.native="updateValue" label-position="top" size="small" class="m-b-10">
 
   <el-row :gutter="10">
     <el-col v-if="canSelectGateway" :span="8">
@@ -286,10 +286,10 @@ export default {
   box-sizing: border-box;
   color: #1f2d3d;
   font-size: inherit;
-  height: 36px;
+  height: 32px;
   line-height: 1;
   outline: 0;
-  padding: 6px 10px;
+  padding: 4px 10px;
   transition: border-color .2s cubic-bezier(.645,.045,.355,1);
 }
 </style>

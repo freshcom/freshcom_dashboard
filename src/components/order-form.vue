@@ -1,18 +1,18 @@
 <template>
-<el-form @input.native="updateValue" label-position="top" label-width="180px" class="m-b-10">
+<el-form @input.native="updateValue" label-position="top" size="small" class="m-b-10">
 
   <el-row :gutter="20">
     <el-col :span="12">
       <el-form-item label="Customer" :error="errorMessages.customer">
         <remote-select
           v-model="formModel.customer"
-          @filter="loadSelectableCustomers"
-          @reset="resetSelectableCustomers"
-          @input="updateValue"
           :records="selectableCustomers"
           :isLoading="isLoadingSelectableCustomers"
           :record-to-option="customerToOption"
-          placeholder="Search for customer..."
+          @filter="loadSelectableCustomers"
+          @reset="resetSelectableCustomers"
+          @input="updateValue"
+          placeholder="Type to start searching..."
           class="customer-select"
         >
         </remote-select>

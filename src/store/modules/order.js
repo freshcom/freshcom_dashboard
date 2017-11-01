@@ -243,7 +243,6 @@ export default {
       let order = lineItem.order
 
       return OrderLineItemAPI.deleteRecord(lineItem.id).then(() => {
-        console.log(order)
         return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children,payments' })
       }).then(response => {
         let apiPayload = response.data

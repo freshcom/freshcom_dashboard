@@ -1,312 +1,312 @@
 <template>
-<div class="main-col">
-  <div class="content">
-    <div class="secondary-nav">
-      <el-menu :router="true" default-active="/orders" mode="horizontal">
-        <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">Orders</el-menu-item>
-        <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">Payments</el-menu-item>
-      </el-menu>
-      <locale-selector @change="loadRecord"></locale-selector>
-    </div>
+<div class="page-wrapper">
+  <div>
+    <el-menu :router="true" default-active="/orders" mode="horizontal" class="secondary-nav">
+      <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">Orders</el-menu-item>
+      <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">Payments</el-menu-item>
+    </el-menu>
+    <locale-selector @change="loadRecord" class="pull-right"></locale-selector>
+  </div>
 
-    <div class="main-scroller">
-      <div class="main">
-        <el-card v-loading="isLoading" class="main-card">
-          <div slot="header">
+  <div>
+    <el-card v-loading="isLoading" class="main-card">
+      <div slot="header">
 
-            <div class="brief no-avatar">
-              <div class="detail">
-                <p>Order {{record.code}}</p>
-                <h2>{{record.firstName}} {{record.lastName}}</h2>
-                <p class="id">{{record.id}}</p>
-              </div>
-            </div>
-
-            <div class="header-actions">
-              <el-button @click="editRecord()">Edit</el-button>
-            </div>
+        <div class="brief no-avatar">
+          <div class="detail">
+            <p>Order {{record.code}}</p>
+            <h2>{{record.firstName}} {{record.lastName}}</h2>
+            <p class="id">{{record.id}}</p>
           </div>
+        </div>
 
-          <div class="data">
-            <div class="block-title">
-              <h3>Details</h3>
-            </div>
-            <div class="block">
-              <div class="block-body">
-                <dl>
-                  <dt>ID</dt>
-                  <dd>{{record.id}}</dd>
-
-                  <template v-if="record.code">
-                    <dt>Code</dt>
-                    <dd>{{record.code}}</dd>
-                  </template>
-
-                  <dt>Status</dt>
-                  <dd>
-                    <el-tag v-if="record.status === 'opened'" type="primary">
-                      {{$t(`attributes.order.status.${record.status}`)}}
-                    </el-tag>
-                    <el-tag v-else type="gray">
-                      {{$t(`attributes.order.status.${record.status}`)}}
-                    </el-tag>
-                  </dd>
-
-                  <dt>Name</dt>
-                  <dd>{{record.firstName}} {{record.lastName}}</dd>
-
-                  <dt>Email</dt>
-                  <dd>{{record.email}}</dd>
-
-                  <template v-if="record.phoneNumber">
-                    <dt>Phone</dt>
-                    <dd>{{record.phoneNumber}}</dd>
-                  </template>
-
-                  <hr>
-
-                  <dt>Fulfillment Method</dt>
-                  <dd>{{$t(`attributes.order.fulfillmentMethod.${record.fulfillmentMethod}`)}}</dd>
-
-                  <template v-if="record.fulfillmentMethod === 'ship'">
-                    <dt>Delivery Address</dt>
-                    <dd>
-                      {{record.deliveryAddressLineOne}}
-                      <template v-if="record.deliveryAddressLineTwo">
-                        <br>
-                        {{record.deliveryAddressLineTwo}}
-                      </template>
-                      <br>
-                      {{record.deliveryAddressCity}}, {{record.deliveryAddressProvince}}, {{record.deliveryAddressCountryCode}}
-                      <br>
-                      {{record.deliveryAddressPostalCode}}
-                    </dd>
-                  </template>
-
-                  <hr>
-
-                  <template v-if="record.SubTotalCents != record.grandTotalCents">
-                    <dt>Sub Total</dt>
-                    <dd>{{record.subTotalCents | dollar}}</dd>
-                  </template>
-
-                  <template v-if="record.taxOneCents > 0">
-                    <dt>Tax 1</dt>
-                    <dd>{{record.taxOneCents | dollar}}</dd>
-                  </template>
-
-                  <template v-if="record.taxTwoCents > 0">
-                    <dt>Tax 2</dt>
-                    <dd>{{record.taxTwoCents | dollar}}</dd>
-                  </template>
-
-                  <template v-if="record.taxThreeCents > 0">
-                    <dt>Tax 3</dt>
-                    <dd>{{record.taxThreeCents | dollar}}</dd>
-                  </template>
-
-                  <dt>Grand Total</dt>
-                  <dd>{{record.grandTotalCents | dollar}}</dd>
-
-                  <dt>Authorization Total</dt>
-                  <dd>{{record.authorizationCents | dollar}}</dd>
-                </dl>
-              </div>
-            </div>
-
-            <div class="block-title">
-              <h3>Line Items</h3>
-
-              <span class="block-title-actions pull-right">
-                <a @click="openAddLineItemDialog()" href="javascript:;">
-                  <icon name="plus" scale="0.8" class="v-middle"></icon>
-                  <span>Add</span>
-                </a>
-              </span>
-            </div>
-            <div class="block">
-              <div class="block-body full">
-                <order-line-item-table @delete="deleteLineItem" @edit="openEditLineItemDialog" :records="record.rootLineItems" class="block-table">
-                </order-line-item-table>
-              </div>
-            </div>
-
-            <div class="block-title">
-              <h3>
-                Payments
-              </h3>
-              <span>
-                <el-tag v-if="record.isPaymentBalanced" type="primary">
-                  Balanced
-                </el-tag>
-                <el-tag v-else type="danger">
-                  Not Balanced
-                </el-tag>
-              </span>
-
-              <span class="block-title-actions pull-right">
-                <a @click="openAddPaymentDialog()" href="javascript:;">
-                  <icon name="plus" scale="0.8" class="v-middle"></icon>
-                  <span>Add</span>
-                </a>
-              </span>
-            </div>
-
-            <div class="block">
-              <div class="block-body full">
-                <el-table :data="record.payments" stripe class="block-table" :show-header="false" style="width: 100%">
-                  <el-table-column>
-                    <template scope="scope">
-                      <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }">
-                        <b>
-                          <template v-if="scope.row.status === 'pending'">
-                            {{scope.row.pendingAmountCents | dollar}}
-                          </template>
-
-                          <template v-if="scope.row.status === 'authorized'">
-                            {{scope.row.authorizedAmountCents | dollar}}
-                          </template>
-
-                          <template v-if="scope.row.status === 'paid'">
-                            {{scope.row.paidAmountCents | dollar}}
-                          </template>
-
-                          <template v-if="scope.row.status === 'partially_refunded' || scope.row.status === 'refunded'">
-                            {{scope.row.paidAmountCents | dollar}} ({{-scope.row.refundedAmountCents | dollar}})
-                          </template>
-                        </b>
-
-                        <el-tag type="gray" class="m-l-10">
-                          {{$t(`attributes.payment.status.${scope.row.status}`)}}
-                        </el-tag>
-                      </router-link>
-                    </template>
-                  </el-table-column>
-
-                  <el-table-column width="200">
-                    <template scope="scope">
-                      <span>{{scope.row.insertedAt | moment("MMM Do YYYY, hh:mm:ss")}}</span>
-                    </template>
-                  </el-table-column>
-
-                  <el-table-column width="200">
-                    <template scope="scope">
-                      <p class="text-right actions">
-                        <el-button v-if="scope.row.status === 'pending'" @click="openEditPaymentDialog(scope.row)" size="mini">
-                          Pay
-                        </el-button>
-
-                        <el-button v-if="scope.row.status === 'authorized'" @click="openEditPaymentDialog(scope.row)" size="mini">
-                          Capture
-                        </el-button>
-
-                        <el-button v-if="canRefundPayment(scope.row)" @click="openAddRefundDialog(scope.row)" size="mini">
-                          Refund
-                        </el-button>
-
-                        <delete-button v-if="scope.row.status === 'pending'" @confirmed="deletePayment(scope.row)" size="mini">
-                          Delete
-                        </delete-button>
-                      </p>
-                    </template>
-                  </el-table-column>
-                </el-table>
-              </div>
-
-
-              <div class="block-footer no-divider text-center">
-                <a class="view-more" href="#">View More</a>
-              </div>
-            </div>
-
-            <div class="block-title">
-              <h3>Custom Data</h3>
-            </div>
-            <div class="block">
-              <div class="block-body">
-                {{record.customData}}
-              </div>
-            </div>
-
-            <h3>Related Resources</h3>
-            <div class="block">
-              <div class="block-body">
-              </div>
-            </div>
-
-            <h3>Logs</h3>
-            <div class="block">
-              <div class="block-body">
-
-              </div>
-            </div>
-
-            <h3>Events</h3>
-            <div class="block">
-              <div class="block-body">
-
-              </div>
-            </div>
-          </div>
-
-          <div class="footer text-right">
-            <delete-button @confirmed="deleteRecord">Delete</delete-button>
-          </div>
-        </el-card>
+        <div class="header-actions">
+          <el-button @click="editRecord()" size="medium">Edit</el-button>
+        </div>
       </div>
-    </div>
 
-    <div class="launchable">
-      <order-line-item-dialog
-        v-model="lineItemDraftForUpdate"
-        @save="updateLineItem"
-        @cancel="closeEditLineItemDialog"
-        :is-visible="isEditingLineItem"
-        title="Edit Line Item"
-      >
-      </order-line-item-dialog>
+      <div class="data">
+        <div class="block-title">
+          <h3>Details</h3>
+        </div>
+        <div class="block">
+          <div class="block-body">
+            <dl>
+              <dt>ID</dt>
+              <dd>{{record.id}}</dd>
 
-      <order-line-item-dialog
-        v-model="lineItemDraftForCreate"
-        @save="createLineItem"
-        @cancel="closeAddLineItemDialog"
-        :is-visible="isAddingLineItem"
-        title="Add Line Item"
-      >
-      </order-line-item-dialog>
+              <template v-if="record.code">
+                <dt>Code</dt>
+                <dd>{{record.code}}</dd>
+              </template>
 
-      <payment-dialog
-        v-model="paymentDraftForEdit"
-        @save="updatePayment"
-        @cancel="closeEditPaymentDialog"
-        :record="paymentForEdit"
-        :errors="errors"
-        :is-visible="isEditingPayment"
-        title="Payment"
-      >
-      </payment-dialog>
+              <dt>Status</dt>
+              <dd>
+                <el-tag v-if="record.status === 'opened'" type="primary" size="mini">
+                  {{$t(`attributes.order.status.${record.status}`)}}
+                </el-tag>
+                <el-tag v-else type="gray" size="mini">
+                  {{$t(`attributes.order.status.${record.status}`)}}
+                </el-tag>
+              </dd>
 
-      <payment-dialog
-        v-model="paymentDraftForCreate"
-        @save="createPayment"
-        @cancel="closeAddPaymentDialog"
-        :record="paymentForCreate"
-        :errors="errors"
-        :is-visible="isAddingPayment"
-        title="Add Payment"
-      >
-      </payment-dialog>
+              <dt>Name</dt>
+              <dd>{{record.firstName}} {{record.lastName}}</dd>
 
-      <refund-dialog
-        v-model="refundDraftForCreate"
-        @refund="createRefund"
-        @cancel="closeAddRefundDialog"
-        :errors="errors"
-        :is-visible="isAddingRefund"
-        title="Refund Payment"
-      >
-      </refund-dialog>
-    </div>
+              <dt>Email</dt>
+              <dd>{{record.email}}</dd>
+
+              <template v-if="record.phoneNumber">
+                <dt>Phone</dt>
+                <dd>{{record.phoneNumber}}</dd>
+              </template>
+
+              <hr>
+
+              <dt>Fulfillment Method</dt>
+              <dd>{{$t(`attributes.order.fulfillmentMethod.${record.fulfillmentMethod}`)}}</dd>
+
+              <template v-if="record.fulfillmentMethod === 'ship'">
+                <dt>Delivery Address</dt>
+                <dd>
+                  {{record.deliveryAddressLineOne}}
+                  <template v-if="record.deliveryAddressLineTwo">
+                    <br>
+                    {{record.deliveryAddressLineTwo}}
+                  </template>
+                  <br>
+                  {{record.deliveryAddressCity}}, {{record.deliveryAddressProvince}}, {{record.deliveryAddressCountryCode}}
+                  <br>
+                  {{record.deliveryAddressPostalCode}}
+                </dd>
+              </template>
+
+              <hr>
+
+              <template v-if="record.SubTotalCents != record.grandTotalCents">
+                <dt>Sub Total</dt>
+                <dd>{{record.subTotalCents | dollar}}</dd>
+              </template>
+
+              <template v-if="record.taxOneCents > 0">
+                <dt>Tax 1</dt>
+                <dd>{{record.taxOneCents | dollar}}</dd>
+              </template>
+
+              <template v-if="record.taxTwoCents > 0">
+                <dt>Tax 2</dt>
+                <dd>{{record.taxTwoCents | dollar}}</dd>
+              </template>
+
+              <template v-if="record.taxThreeCents > 0">
+                <dt>Tax 3</dt>
+                <dd>{{record.taxThreeCents | dollar}}</dd>
+              </template>
+
+              <dt>Grand Total</dt>
+              <dd>{{record.grandTotalCents | dollar}}</dd>
+
+              <dt>Authorization Total</dt>
+              <dd>{{record.authorizationCents | dollar}}</dd>
+            </dl>
+          </div>
+        </div>
+
+        <div class="block-title">
+          <h3>Line Items</h3>
+
+          <span class="block-title-actions pull-right">
+            <a @click="openAddLineItemDialog()" href="javascript:;">
+              <icon name="plus" scale="0.8" class="v-middle"></icon>
+              <span>Add</span>
+            </a>
+          </span>
+        </div>
+        <div class="block">
+          <div class="block-body full">
+            <order-line-item-table @delete="deleteLineItem" @edit="openEditLineItemDialog" :records="record.rootLineItems">
+            </order-line-item-table>
+          </div>
+        </div>
+
+        <div class="block-title">
+          <h3>
+            Payments
+          </h3>
+          <span>
+            <el-tag v-if="record.isPaymentBalanced" type="primary" size="mini">
+              Balanced
+            </el-tag>
+            <el-tag v-else type="danger" size="mini">
+              Not Balanced
+            </el-tag>
+          </span>
+
+          <span class="block-title-actions pull-right">
+            <a @click="openAddPaymentDialog()" href="javascript:;">
+              <icon name="plus" scale="0.8" class="v-middle"></icon>
+              <span>Add</span>
+            </a>
+          </span>
+        </div>
+
+        <div class="block">
+          <div class="block-body full">
+            <el-table :data="record.payments" stripe class="block-table" :show-header="false" style="width: 100%">
+              <el-table-column>
+                <template scope="scope">
+                  <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }">
+                    <b>
+                      <template v-if="scope.row.status === 'pending'">
+                        {{scope.row.pendingAmountCents | dollar}}
+                      </template>
+
+                      <template v-if="scope.row.status === 'authorized'">
+                        {{scope.row.authorizedAmountCents | dollar}}
+                      </template>
+
+                      <template v-if="scope.row.status === 'paid'">
+                        {{scope.row.paidAmountCents | dollar}}
+                      </template>
+
+                      <template v-if="scope.row.status === 'partially_refunded' || scope.row.status === 'refunded'">
+                        {{scope.row.paidAmountCents | dollar}} ({{-scope.row.refundedAmountCents | dollar}})
+                      </template>
+                    </b>
+
+                    <el-tag type="gray" class="m-l-10" size="mini">
+                      {{$t(`attributes.payment.status.${scope.row.status}`)}}
+                    </el-tag>
+                  </router-link>
+                </template>
+              </el-table-column>
+
+              <el-table-column width="200">
+                <template scope="scope">
+                  <span>{{scope.row.insertedAt | moment("MMM Do YYYY hh:mm:ss")}}</span>
+                </template>
+              </el-table-column>
+
+              <el-table-column width="200">
+                <template scope="scope">
+                  <p class="text-right actions">
+                    <el-button v-if="scope.row.status === 'pending'" @click="openEditPaymentDialog(scope.row)" size="mini">
+                      Pay
+                    </el-button>
+
+                    <el-button v-if="scope.row.status === 'authorized'" @click="openEditPaymentDialog(scope.row)" size="mini">
+                      Capture
+                    </el-button>
+
+                    <el-button v-if="canRefundPayment(scope.row)" @click="openAddRefundDialog(scope.row)" plain size="mini">
+                      Refund
+                    </el-button>
+
+                    <delete-button v-if="scope.row.status === 'pending'" @confirmed="deletePayment(scope.row)" size="mini">
+                      Delete
+                    </delete-button>
+                  </p>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+
+
+          <div class="block-footer text-center">
+            <a class="view-more" href="#">View More</a>
+          </div>
+        </div>
+
+        <div class="block-title">
+          <h3>Custom Data</h3>
+        </div>
+        <div class="block">
+          <div class="block-body">
+            {{record.customData}}
+          </div>
+        </div>
+
+        <h3>Related Resources</h3>
+        <div class="block">
+          <div class="block-body">
+             <dl>
+                <dt v-if="record.customer">Customer</dt>
+                <dd v-if="record.customer"><a href="#">{{record.customer.id}}</a></dd>
+              </dl>
+          </div>
+        </div>
+
+        <h3>Logs</h3>
+        <div class="block">
+          <div class="block-body">
+
+          </div>
+        </div>
+
+        <h3>Events</h3>
+        <div class="block">
+          <div class="block-body">
+
+          </div>
+        </div>
+      </div>
+
+      <div class="footer text-right">
+        <delete-button @confirmed="deleteRecord" size="medium">Delete</delete-button>
+      </div>
+    </el-card>
+  </div>
+
+  <div class="launchable">
+    <order-line-item-dialog
+      v-model="lineItemDraftForUpdate"
+      @save="updateLineItem"
+      @cancel="closeEditLineItemDialog"
+      :is-visible="isEditingLineItem"
+      title="Edit Line Item"
+    >
+    </order-line-item-dialog>
+
+    <order-line-item-dialog
+      v-model="lineItemDraftForCreate"
+      @save="createLineItem"
+      @cancel="closeAddLineItemDialog"
+      :is-visible="isAddingLineItem"
+      title="Add Line Item"
+    >
+    </order-line-item-dialog>
+
+    <payment-dialog
+      v-model="paymentDraftForEdit"
+      @save="updatePayment"
+      @cancel="closeEditPaymentDialog"
+      :record="paymentForEdit"
+      :errors="errors"
+      :is-visible="isEditingPayment"
+      title="Payment"
+    >
+    </payment-dialog>
+
+    <payment-dialog
+      v-model="paymentDraftForCreate"
+      @save="createPayment"
+      @cancel="closeAddPaymentDialog"
+      :record="paymentForCreate"
+      :errors="errors"
+      :is-visible="isAddingPayment"
+      title="Add Payment"
+    >
+    </payment-dialog>
+
+    <refund-dialog
+      v-model="refundDraftForCreate"
+      @refund="createRefund"
+      @cancel="closeAddRefundDialog"
+      :errors="errors"
+      :is-visible="isAddingRefund"
+      title="Refund Payment"
+    >
+    </refund-dialog>
   </div>
 </div>
 

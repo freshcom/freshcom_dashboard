@@ -1,122 +1,128 @@
 <template>
 <div class="page-wrapper">
 
-    <div>
-      <el-menu :router="true" default-active="/orders" mode="horizontal" class="secondary-nav">
-        <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">Orders</el-menu-item>
-      </el-menu>
-      <locale-selector class="pull-right"></locale-selector>
-    </div>
+  <div>
+    <el-menu :router="true" default-active="/orders" mode="horizontal" class="secondary-nav">
+      <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">Orders</el-menu-item>
+    </el-menu>
+    <locale-selector class="pull-right"></locale-selector>
+  </div>
 
-    <div>
-      <el-card v-loading="isLoading" class="main-card">
-        <div slot="header">
-          <span>Create a Order</span>
-        </div>
+  <div>
+    <el-card v-loading="isLoading" class="main-card">
+      <div slot="header">
+        <span>Create a Order</span>
+      </div>
 
-        <div>
-          <el-steps :active="activeStep" finish-status="success" simple>
-            <el-step title="Line Items"></el-step>
-            <el-step title="Information"></el-step>
-            <el-step title="Payment"></el-step>
-          </el-steps>
-        </div>
+      <div>
+        <el-steps :active="activeStep" finish-status="success" simple>
+          <el-step title="Line Items"></el-step>
+          <el-step title="Information"></el-step>
+          <el-step title="Payment"></el-step>
+        </el-steps>
+      </div>
 
-        <div class="data">
-          <template v-if="activeStep === 0">
-            <div v-loading="isLineItemLoading" class="block">
-              <div class="block-body">
-                <order-line-item-form v-model="lineItemDraftForCreate" :errors="errors">
-                </order-line-item-form>
-              </div>
-
-              <div class="block-footer text-right">
-                <el-button @click="createLineItem(lineItemDraftForCreate)" :loading="isSubmittingLineItemForCreate" plain size="small">
-                  Add to Order
-                </el-button>
-              </div>
+      <div class="data">
+        <template v-if="activeStep === 0">
+          <div v-loading="isLineItemLoading" class="block">
+            <div class="block-body">
+              <order-line-item-form v-model="lineItemDraftForCreate" :errors="errors">
+              </order-line-item-form>
             </div>
 
-            <div>
-              <order-line-item-table @delete="deleteLineItem" @edit="editLineItem" :records="record.rootLineItems">
-              </order-line-item-table>
+            <div class="block-footer text-right">
+              <el-button @click="createLineItem(lineItemDraftForCreate)" :loading="isSubmittingLineItemForCreate" plain size="small">
+                Add to Order
+              </el-button>
+            </div>
+          </div>
+
+          <div class="block">
+            <div class="block-body full">
+                <order-line-item-table
+                  :records="record.rootLineItems"
+                  @delete="deleteLineItem"
+                  @edit="editLineItem"
+                >
+                </order-line-item-table>
+            </div>
+          </div>
+
+          <div id="summary" class="m-b-10">
+            <div id="summary-labels" style="width: 560px; float: left;" class="text-right">
+              <p>Sub Total</p>
+              <p>Tax 1</p>
+              <p>Tax 2</p>
+              <p>Tax 3</p>
+              <p><b>Grand Total</b></p>
+              <p v-if="record.isEstimate"><b>Authorization Amount</b></p>
             </div>
 
-            <div id="summary" class="m-b-10">
-              <div id="summary-labels" style="width: 560px; float: left;" class="text-right">
-                <p>Sub Total</p>
-                <p>Tax 1</p>
-                <p>Tax 2</p>
-                <p>Tax 3</p>
-                <p><b>Grand Total</b></p>
-                <p v-if="record.isEstimate"><b>Authorization Amount</b></p>
-              </div>
-
-              <div id="summary-values" style="overflow: hidden; width: 120px;" class="text-right">
-                <p><span v-if="record.isEstimate">~</span> <span>{{record.subTotalCents | dollar}}</span></p>
-                <p><span>{{record.taxOneCents | dollar}}</span></p>
-                <p><span>{{record.taxTwoCents | dollar}}</span></p>
-                <p><span>{{record.taxThreeCents | dollar}}</span></p>
-                <p><span v-if="record.isEstimate">~</span> <span>{{record.grandTotalCents | dollar}}</span></p>
-                <p v-if="record.isEstimate">{{record.authorizationCents | dollar}}</p>
-              </div>
+            <div id="summary-values" style="overflow: hidden; width: 120px;" class="text-right">
+              <p><span v-if="record.isEstimate">~</span> <span>{{record.subTotalCents | dollar}}</span></p>
+              <p><span>{{record.taxOneCents | dollar}}</span></p>
+              <p><span>{{record.taxTwoCents | dollar}}</span></p>
+              <p><span>{{record.taxThreeCents | dollar}}</span></p>
+              <p><span v-if="record.isEstimate">~</span> <span>{{record.grandTotalCents | dollar}}</span></p>
+              <p v-if="record.isEstimate">{{record.authorizationCents | dollar}}</p>
             </div>
-          </template>
+          </div>
+        </template>
 
-          <template v-if="activeStep === 1">
-            <order-form v-model="recordDraft" :errors="errors"></order-form>
-          </template>
+        <template v-if="activeStep === 1">
+          <order-form v-model="recordDraft" :errors="errors"></order-form>
+        </template>
 
-          <template v-if="activeStep === 2">
-            <payment-form v-model="paymentDraft" :record="payment" :errors="errors"></payment-form>
-          </template>
-        </div>
+        <template v-if="activeStep === 2">
+          <payment-form v-model="paymentDraft" :record="payment" :errors="errors"></payment-form>
+        </template>
+      </div>
 
-        <div class="footer">
-          <template v-if="activeStep === 0">
-            <el-button @click="cancel" plain size="medium">
-              Cancel
-            </el-button>
+      <div class="footer">
+        <template v-if="activeStep === 0">
+          <el-button @click="cancel" plain size="medium">
+            Cancel
+          </el-button>
 
-            <el-button @click="nextStep(recordDraft)" size="medium" type="primary" class="pull-right">
-              Next
-            </el-button>
-          </template>
+          <el-button :disabled="record.rootLineItems.length === 0" @click="nextStep(recordDraft)" size="medium" type="primary" class="pull-right">
+            Next
+          </el-button>
+        </template>
 
-          <template v-if="activeStep === 1">
-            <el-button @click="back">
-              Back
-            </el-button>
+        <template v-if="activeStep === 1">
+          <el-button @click="back" plain size="medium">
+            Back
+          </el-button>
 
-            <el-button @click="nextStep(recordDraft)" size="medium" type="primary" class="pull-right">
-              Next
-            </el-button>
-          </template>
+          <el-button @click="nextStep(recordDraft)" size="medium" type="primary" class="pull-right">
+            Next
+          </el-button>
+        </template>
 
-          <template v-if="activeStep === 2">
-            <el-button @click="back">
-              Back
-            </el-button>
+        <template v-if="activeStep === 2">
+          <el-button @click="back" plain size="medium">
+            Back
+          </el-button>
 
-            <el-button @click="createPayment(paymentDraft, record)" size="medimum" type="primary" class="pull-right">
-              Place Order
-            </el-button>
-          </template>
-        </div>
-      </el-card>
-    </div>
+          <el-button @click="createPayment(paymentDraft, record)" size="medium" type="primary" class="pull-right">
+            Place Order
+          </el-button>
+        </template>
+      </div>
+    </el-card>
+  </div>
 
-    <div class="launchable">
-      <order-line-item-dialog
-        v-model="lineItemDraftForUpdate"
-        @save="saveLineItem"
-        @cancel="closeLineItemDialog"
-        :is-visible="isEditingLineItem"
-        title="Edit Line Item"
-      >
+  <div class="launchable">
+    <order-line-item-dialog
+      v-model="lineItemDraftForUpdate"
+      :is-visible="isEditingLineItem"
+      @save="saveLineItem"
+      @cancel="closeLineItemDialog"
+      title="Edit Line Item"
+    >
 
-      </order-line-item-dialog>
-    </div>
+    </order-line-item-dialog>
+  </div>
 
 </div>
 </template>
