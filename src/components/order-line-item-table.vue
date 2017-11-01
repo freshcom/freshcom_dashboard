@@ -4,7 +4,7 @@
   :data="tableData"
   :expand-row-keys="expandedLineItemIds"
   row-key="id"
-  class="nested-table"
+  class="nested-table column-compact"
   style="width: 100%"
 >
   <el-table-column type="expand" width="30px">
@@ -17,16 +17,18 @@
       </el-table>
     </template>
   </el-table-column>
-  <el-table-column width="260px" label="Name" prop="name"></el-table-column>
-  <el-table-column width="120px" label="Qty" prop="quantity"></el-table-column>
-  <el-table-column width="200px" label="Sub | Tax | Grand" prop="amount" header-align="right" align="right"></el-table-column>
+  <el-table-column label="Name" prop="name"></el-table-column>
+  <el-table-column width="120px" label="Qty" prop="quantity" align="center"></el-table-column>
+  <el-table-column width="100px" label="ST Amt." prop="subTotal" align="right"></el-table-column>
+  <el-table-column width="80px" label="Tax" prop="taxTotal" align="right"></el-table-column>
+  <el-table-column width="100px" label="GT Amt." prop="grandTotal" align="right"></el-table-column>
 
-  <el-table-column label="">
+  <el-table-column width="80">
     <template slot-scope="scope">
-      <el-button @click="editLineItem(scope.row.id)" size="mini">
+      <el-button @click="editLineItem(scope.row.id)" plain size="mini" class="icon">
         <icon name="pencil" scale="0.8" class="v-middle"></icon>
       </el-button>
-      <delete-button @confirmed="deleteLineItem(scope.row.id)" size="mini">
+      <delete-button @confirmed="deleteLineItem(scope.row.id)" icon-only size="mini" class="icon">
         <icon name="times" scale="0.8" class="v-middle"></icon>
       </delete-button>
     </template>

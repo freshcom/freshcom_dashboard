@@ -10,6 +10,7 @@ export default {
       name: '',
       printName: '',
       orderQuantity: 1,
+      chargeQuantity: 1,
       isEstimate: false,
       subTotalCents: 0,
       taxOneCents: 0,
@@ -17,10 +18,10 @@ export default {
       taxThreeCents: 0,
       grandTotalCents: 0,
 
-      product: null,
-      productItem: null,
-      sku: null,
-      unlockable: null,
+      product: undefined,
+      productItem: undefined,
+      sku: undefined,
+      unlockable: undefined,
 
       priceTaxOnePercentage: 0,
       priceTaxTwoPercentage: 0,
@@ -144,6 +145,7 @@ export default {
 
     if (product.itemMode === 'all') {
       lineItem.price = product.defaultPrice
+      lineItem.productItem = undefined
       return this.balanceByPrice(lineItem)
     } else {
       let primaryItem = _.find(product.items, { primary: true })
@@ -182,6 +184,9 @@ export default {
         name: lineItem.name,
         quantity: quantity,
         children: lineItem.children,
+        subTotal: subTotal,
+        taxTotal: taxTotal,
+        grandTotal: grandTotal,
         amount: `${subTotal} | ${taxTotal} | ${grandTotal}`
       })
     }, [])

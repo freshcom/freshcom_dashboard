@@ -2,9 +2,12 @@
   <el-select
     v-model="selectedOption"
     @clear="clear"
+    @change="changeHandler"
+    @visible-change="visibleChangeHandler"
     :loading="isLoading"
     :remote-method="filter"
     :placeholder="placeholder"
+    :no-data-text="noDataText"
     remote
     filterable
     clearable
@@ -28,6 +31,7 @@ export default {
     records: Array,
     placeholder: String,
     isLoading: Boolean,
+    noDataText: String,
     recordToOption: {
       type: Function,
       default: function (record) {
@@ -70,6 +74,14 @@ export default {
     },
     filter (input) {
       this.$emit('filter', input)
+    },
+    changeHandler (value) {
+      this.$emit('change', _.find(this.records, { id: value }))
+    },
+    visibleChangeHandler (isVisible) {
+      if (!isVisible && !this.selectedOption) {
+        this.clear()
+      }
     }
   }
 }

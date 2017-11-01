@@ -17,7 +17,11 @@ export default {
   methods: {
     updateValue: _.debounce(function (value) {
       this.$emit('input', value)
-    })
+
+      if (value !== this.value) {
+        this.$emit('change', value)
+      }
+    }, 300)
   },
   computed: {
     model: {
@@ -25,9 +29,9 @@ export default {
         return this.value
       },
       set (model) {
-        let dollarValue = Number(model.replace(/[^0-9.]/g, ''))
+        let dollarValue = Number(model.replace(/[^0-9.-]/g, ''))
         if (dollarValue) {
-          this.updateValue(dollarValue * 100)
+          this.updateValue(Math.round(dollarValue * 100))
         } else {
           this.updateValue(0)
         }

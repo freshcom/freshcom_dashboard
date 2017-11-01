@@ -37,27 +37,27 @@
               </div>
             </div>
 
-            <div class="m-b-20">
+            <div>
               <order-line-item-table @delete="deleteLineItem" @edit="editLineItem" :records="record.rootLineItems">
               </order-line-item-table>
             </div>
 
-            <div id="summary">
-              <div id="summary-labels" style="width: 490px; float: left;" class="text-right">
-                <p v-if="record.subTotalCents">Sub Total</p>
-                <p v-if="record.taxOneCents">Tax 1</p>
-                <p v-if="record.taxTwoCents">Tax 2</p>
-                <p v-if="record.taxThreeCents">Tax 3</p>
-                <p v-if="record.grandTotalCents"><b>Grand Total</b></p>
+            <div id="summary" class="m-b-10">
+              <div id="summary-labels" style="width: 560px; float: left;" class="text-right">
+                <p>Sub Total</p>
+                <p>Tax 1</p>
+                <p>Tax 2</p>
+                <p>Tax 3</p>
+                <p><b>Grand Total</b></p>
                 <p v-if="record.isEstimate"><b>Authorization Amount</b></p>
               </div>
 
-              <div id="summary-values" style="overflow: hidden; width: 103px;" class="text-right">
-                <p v-if="record.subTotalCents"><span v-if="record.isEstimate">~</span> <span>{{record.subTotalCents | dollar}}</span></p>
-                <p v-if="record.taxOneCents"><span>{{record.taxOneCents | dollar}}</span></p>
-                <p v-if="record.taxTwoCents"><span>{{record.taxTwoCents | dollar}}</span></p>
-                <p v-if="record.taxThreeCents"><span>{{record.taxThreeCents | dollar}}</span></p>
-                <p v-if="record.grandTotalCents"><span v-if="record.isEstimate">~</span> <span>{{record.grandTotalCents | dollar}}</span></p>
+              <div id="summary-values" style="overflow: hidden; width: 120px;" class="text-right">
+                <p><span v-if="record.isEstimate">~</span> <span>{{record.subTotalCents | dollar}}</span></p>
+                <p><span>{{record.taxOneCents | dollar}}</span></p>
+                <p><span>{{record.taxTwoCents | dollar}}</span></p>
+                <p><span>{{record.taxThreeCents | dollar}}</span></p>
+                <p><span v-if="record.isEstimate">~</span> <span>{{record.grandTotalCents | dollar}}</span></p>
                 <p v-if="record.isEstimate">{{record.authorizationCents | dollar}}</p>
               </div>
             </div>
@@ -328,5 +328,11 @@ export default {
 .form-border {
   border: 1px solid #dfe6ec;
   padding: 20px;
+}
+
+#summary p {
+  margin: 5px;
+  color: #5a5e66;
+  font-size: 14px;
 }
 </style>

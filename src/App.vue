@@ -162,6 +162,15 @@ a {
   text-decoration: none;
 }
 
+.el-table.column-compact {
+  th, td {
+    .cell {
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+  }
+}
+
 .el-table.nested-table {
   th, td {
     padding-top: 5px;
@@ -290,6 +299,10 @@ a:hover {
 
 p.search-notice {
   margin-top: 60px;
+}
+
+.el-button.icon {
+  padding: 5px;
 }
 /* END Layout */
 

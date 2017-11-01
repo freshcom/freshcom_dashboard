@@ -11,6 +11,12 @@ export default {
       status: 'cart',
 
       fulfillmentMethod: 'ship',
+      subTotalCents: 0,
+      taxOneCents: 0,
+      taxTwoCents: 0,
+      taxThreeCents: 0,
+      grandTotalCents: 0,
+      authorizationCents: 0,
 
       rootLineItems: []
     }
