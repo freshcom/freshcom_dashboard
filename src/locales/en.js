@@ -39,6 +39,11 @@ export default {
         requireAtLeastOneActivePrice: 'A Product with Item Mode set to All require at least one Active Price in order to be marked Active.',
         requireAtLeastOneInternalPrice: 'A Product with Item Mode set to All require at least one Active/Internal Price in order to be marked Internal.'
       }
+    },
+    account: {
+      stripeCode: {
+        invalidGrant: 'Unable to connect to Stripe, please try again.'
+      }
     }
   },
   attributes: {

@@ -306,7 +306,6 @@ export default {
           let errorCode = errors.source[0]
           this.$message({
             showClose: true,
-            duration: 0,
             message: this.$t(errorI18nKey('payment', 'source', errorCode)),
             type: 'error'
           })

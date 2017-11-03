@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import TokenAPI from '@/api/token'
 import UserAPI from '@/api/user'
 import AccountAPI from '@/api/account'
@@ -90,6 +91,20 @@ export default {
         commit(MT.ACCOUNT_CHANGED, account)
 
         return account
+      }).catch(error => {
+        throw JSONAPI.deserializeErrors(error.response.data.errors)
+      })
+    },
+    updateAccount ({ state, commit, rootState }, actionPayload) {
+      let apiPayload = { data: JSONAPI.serialize(actionPayload.recordDraft) }
+
+      let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
+      return AccountAPI.updateRecord(apiPayload, options).then(response => {
+        let apiPayload = response.data
+        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+        commit(MT.ACCOUNT_CHANGED, record)
+
+        return record
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })

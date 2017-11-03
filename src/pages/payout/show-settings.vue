@@ -14,7 +14,10 @@
       </div>
 
       <div class="data full">
-        <a :href="stripeAuthorizeUrl">Connect with Stripe</a>
+        <p class="text-center">
+          <a v-if="!account.stripeUserId" :href="stripeAuthorizeUrl">Connect with Stripe</a>
+          <span v-if="account.stripeUserId">Stripe Connected</span>
+        </p>
       </div>
     </el-card>
   </div>
@@ -24,16 +27,29 @@
 
 <script>
 import { STRIPE_CLIENT_ID } from '@/env'
+import errorI18nKey from '@/utils/error-i18n-key'
 
 export default {
   name: 'ShowPayoutSettings',
   props: ['stripeCode', 'stripeScope'],
   created () {
     if (this.stripeCode) {
-      this.$store.dispatch('account/updateRecord', { recordDraft: { stripeCode: this.stripeCode, type: 'Account' } })
+      this.$store.dispatch('session/updateAccount', {
+        recordDraft: { stripeCode: this.stripeCode, type: 'Account' }
+      }).catch(errors => {
+        let errorCode = errors.stripeCode[0]
+        this.$message({
+          showClose: true,
+          message: this.$t(errorI18nKey('account', 'stripeCode', errorCode)),
+          type: 'error'
+        })
+      })
     }
   },
   computed: {
+    account () {
+      return this.$store.state.session.account
+    },
     stripeAuthorizeUrl () {
       return `https://connect.stripe.com/oauth/authorize?response_type=code&client_id=${STRIPE_CLIENT_ID}&scope=read_write`
     }
