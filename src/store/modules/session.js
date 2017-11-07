@@ -48,7 +48,7 @@ export default {
     },
 
     createToken ({ commit, dispatch }, form) {
-      let payload = { username: form.username, password: form.password, scope: 'type:user', grant_type: 'password' }
+      let payload = { username: form.username, password: form.password, grant_type: 'password' }
 
       return TokenAPI.createRecord(payload).then(response => {
         let token = response.data

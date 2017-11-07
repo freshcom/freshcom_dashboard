@@ -1,52 +1,46 @@
 <template>
 <div class="main-col">
-  <div class="content">
+  <div>
+    <el-menu :router="true" default-active="/unlockables" mode="horizontal" class="secondary-nav">
+      <el-menu-item :route="{ name: 'ListUnlockable' }" index="/unlockables">Unlockables</el-menu-item>
+    </el-menu>
+    <locale-selector @change="search" class="pull-right"></locale-selector>
+  </div>
 
-    <div class="secondary-nav">
-      <el-menu :router="true" default-active="/unlockables" mode="horizontal">
-        <el-menu-item :route="{ name: 'ListUnlockable' }" index="/unlockables">Unlockables</el-menu-item>
-      </el-menu>
-      <locale-selector @change="search"></locale-selector>
-    </div>
+  <div>
+    <el-card class="main-card">
+      <div slot="header" class="clearfix">
+        <el-button size="small"><icon name="filter" scale="0.7" class="v-middle"></icon> Filter</el-button>
+        <div class="search">
+          <el-input :value="searchKeyword" @input="enteringKeyword" size="small" placeholder="Search...">
+            <template slot="prepend"><icon name="search" scale="1" class="v-middle"></icon></template>
+          </el-input>
+        </div>
 
-    <div class="main-scroller">
-      <div class="main">
-        <el-card class="main-card">
-          <div slot="header" class="clearfix">
-            <el-button><icon name="filter" scale="0.7" class="v-middle"></icon> Filter</el-button>
-            <div class="search">
-              <el-input :value="searchKeyword" @input="enteringKeyword" placeholder="Search...">
-                <template slot="prepend"><icon name="search" scale="1" class="v-middle"></icon></template>
-              </el-input>
-            </div>
-
-            <el-button @click="goTo({ name: 'NewUnlockable' })" class="pull-right">
-              <icon name="plus" scale="0.7" class="v-middle"></icon> New
-            </el-button>
-          </div>
-
-          <div class="data full" v-loading="isLoading">
-            <p v-if="noSearchResult" class="search-notice text-center">
-              There is no result that matches "{{searchKeyword}}"
-            </p>
-            <p v-if="isEnteringSearchKeyword" class="search-notice text-center">
-              Stop typing to search...
-            </p>
-            <el-table v-if="hasSearchResult" @row-click="viewRecord" :data="tableData" stripe class="full">
-              <el-table-column prop="name" label="Unlockable" width="350"></el-table-column>
-              <el-table-column prop="status" label="Status" width="100"></el-table-column>
-              <el-table-column prop="id" label="ID"></el-table-column>
-            </el-table>
-
-            <div v-if="hasSearchResult" class="footer">
-              <span class="total">around {{resultCount}} results</span>
-              <pagination :number="page.number" :size="page.size" :total="resultCount"></pagination>
-            </div>
-          </div>
-        </el-card>
+        <el-button @click="goTo({ name: 'NewUnlockable' })" class="pull-right" size="small">
+          <icon name="plus" scale="0.7" class="v-middle"></icon> New
+        </el-button>
       </div>
-    </div>
 
+      <div class="data full" v-loading="isLoading">
+        <p v-if="noSearchResult" class="search-notice text-center">
+          There is no result that matches "{{searchKeyword}}"
+        </p>
+        <p v-if="isEnteringSearchKeyword" class="search-notice text-center">
+          Stop typing to search...
+        </p>
+        <el-table v-if="hasSearchResult" @row-click="viewRecord" :data="tableData" stripe class="full">
+          <el-table-column prop="name" label="Unlockable" width="350"></el-table-column>
+          <el-table-column prop="status" label="Status" width="100"></el-table-column>
+          <el-table-column prop="id" label="ID"></el-table-column>
+        </el-table>
+
+        <div v-if="hasSearchResult" class="footer">
+          <span class="total">around {{resultCount}} results</span>
+          <pagination :number="page.number" :size="page.size" :total="resultCount"></pagination>
+        </div>
+      </div>
+    </el-card>
   </div>
 </div>
 </template>

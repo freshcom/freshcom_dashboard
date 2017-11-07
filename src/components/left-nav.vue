@@ -157,6 +157,7 @@ export default {
       let routePath = this.$store.state.route.fullPath
 
       if (routePath.startsWith('/skus')) { return '/skus' }
+      if (routePath.startsWith('/unlockables')) { return '/unlockables' }
       if (routePath.startsWith('/file_collections')) { return '/file_collections' }
       if (routePath.startsWith('/files')) { return '/files' }
       if (routePath.startsWith('/products')) { return '/products' }

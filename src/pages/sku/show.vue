@@ -25,7 +25,7 @@
         </div>
 
         <div class="header-actions">
-          <el-button @click="editRecord()" size="small">Edit</el-button>
+          <el-button @click="editRecord()" size="medium">Edit</el-button>
         </div>
       </div>
 

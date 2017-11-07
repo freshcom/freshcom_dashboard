@@ -1,48 +1,42 @@
 <template>
-<div class="main-col">
-  <div class="content">
+<div class="page-wrapper">
+  <div>
+    <el-menu :router="true" default-active="/skus" mode="horizontal" class="secondary-nav">
+      <el-menu-item :route="{ name: 'ListSku' }" index="/skus">SKUs</el-menu-item>
+    </el-menu>
+    <locale-selector class="pull-right"></locale-selector>
+  </div>
 
-    <div class="secondary-nav">
-      <el-menu :router="true" default-active="/skus" mode="horizontal">
-        <el-menu-item :route="{ name: 'ListSku' }" index="/skus">SKUs</el-menu-item>
-      </el-menu>
-      <locale-selector></locale-selector>
-    </div>
+  <div>
+    <el-card v-loading="isLoading" class="main-card">
+      <div slot="header">
+        <span style="line-height: 36px;">Create a SKU</span>
 
-    <div class="main-scroller">
-      <div class="main">
-        <el-card v-loading="isLoading" class="main-card">
-          <div slot="header">
-            <span style="line-height: 36px;">Create a SKU</span>
+        <div class="pull-right">
+          <el-button @click="cancel" plain size="medium">
+            Cancel
+          </el-button>
 
-            <div class="pull-right">
-              <el-button @click="cancel">
-                Cancel
-              </el-button>
-
-              <el-button @click="submit(recordDraft)" type="primary">
-                Save
-              </el-button>
-            </div>
-          </div>
-
-          <div class="data">
-            <sku-form v-model="recordDraft" :errors="errors"></sku-form>
-          </div>
-
-          <div class="footer">
-            <el-button @click="cancel">
-              Cancel
-            </el-button>
-
-            <el-button @click="submit(recordDraft)" type="primary" class="pull-right">
-              Save
-            </el-button>
-          </div>
-        </el-card>
+          <el-button @click="submit(recordDraft)" type="primary" size="medium">
+            Save
+          </el-button>
+        </div>
       </div>
-    </div>
 
+      <div class="data">
+        <sku-form v-model="recordDraft" :errors="errors"></sku-form>
+      </div>
+
+      <div class="footer">
+        <el-button @click="cancel" plain size="medium">
+          Cancel
+        </el-button>
+
+        <el-button @click="submit(recordDraft)" type="primary" class="pull-right" size="medium">
+          Save
+        </el-button>
+      </div>
+    </el-card>
   </div>
 </div>
 </template>

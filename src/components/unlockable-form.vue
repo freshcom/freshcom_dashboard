@@ -1,5 +1,5 @@
 <template>
-<el-form @input.native="updateValue" label-width="150px">
+<el-form :model="formModel" @input.native="updateValue" label-width="150px" size="small">
   <div class="file-uploader">
     <el-upload :http-request="uploadAvatar" action="" :show-file-list="false">
       <img v-if="avatarUrl" :src="avatarUrl" class="file">
