@@ -1,12 +1,12 @@
 <template>
-<el-form @input.native="updateValue" label-width="150px">
+<el-form :model="formModel" @input.native="updateValue" label-width="150px" size="small" class="efc-form">
 
-  <el-form-item v-if="formModel.sku" label="SKU ID" :error="errorMessages.sku">
-    {{formModel.sku.id}}
+  <el-form-item v-if="formModel.owner.type === 'Sku'" label="SKU ID" :error="errorMessages.owner">
+    {{formModel.owner.id}}
   </el-form-item>
 
-  <el-form-item v-if="formModel.product" label="Product ID" :error="errorMessages.product">
-    {{formModel.product.id}}
+  <el-form-item v-if="formModel.owner.type === 'Product'" label="Product ID" :error="errorMessages.owner">
+    {{formModel.owner.id}}
   </el-form-item>
 
   <el-form-item label="Name" :error="errorMessages.name">
@@ -17,63 +17,25 @@
     <el-input v-model="formModel.label"></el-input>
   </el-form-item>
 
-  <div class="block-title">
-    <h3 v-if="isUploading">Uploading...</h3>
-    <h3 v-else>Upload files</h3>
-  </div>
-  <div class="block">
-    <div class="block-body">
-      <template v-for="pendingEf in pendingExternalFiles">
-        <div class="file-thumbnail">
-          <div>
-            <div class="wrapper">
-              <img v-if="isImage(pendingEf)" :src="previewUrl(pendingEf)">
-              <icon v-else name="file" class="file-icon"></icon>
-            </div>
-          </div>
-          <div class="caption">
-            <el-progress :show-text="false" :percentage="pendingEf.percentage"></el-progress>
-          </div>
-        </div>
-      </template>
-
-      <div class="file-uploader file-thumbnail">
-        <el-upload :http-request="uploadExternalFile" action="" :multiple="true " :show-file-list="false" :file-list="[]">
-          <icon name="plus" class="file-uploader-icon"></icon>
+  <el-form-item>
+    <div class="block-title">
+      <h3>Files</h3>
+    </div>
+    <div class="block">
+      <div class="block-body">
+        <el-upload
+          :http-request="uploadExternalFile"
+          :file-list="fileList"
+          :on-remove="deleteExternalFile"
+          action=""
+          multiple
+          >
+          <el-button size="small">Choose File</el-button>
         </el-upload>
       </div>
     </div>
-  </div>
 
-  <div class="block-title">
-    <h3>Uploaded files</h3>
-  </div>
-  <div class="block">
-    <div class="block-body">
-      <template v-for="ef in formModel.files">
-        <div class="file-thumbnail">
-          <div>
-            <div class="wrapper">
-              <img v-if="isImage(ef)" :src="ef.url">
-              <icon v-else name="file" class="file-icon"></icon>
-
-              <span class="file-actions">
-                <a href="javascript:;" class="file-detail">
-                  <i class="el-icon-view"></i>
-                </a>
-                <a @click="deleteExternalFile(ef)" href="javascript:;" class="file-delete">
-                  <i class="el-icon-delete2"></i>
-                </a>
-              </span>
-            </div>
-          </div>
-          <div class="caption">
-            <span>{{ef.name}}</span>
-          </div>
-        </div>
-      </template>
-    </div>
-  </div>
+  </el-form-item>
 </el-form>
 </template>
 
@@ -91,7 +53,6 @@ export default {
   data () {
     return {
       formModel: _.cloneDeep(this.value),
-      imageUrl: '',
       pendingAvatarId: ''
     }
   },
@@ -101,6 +62,11 @@ export default {
         result[k] = this.$t(errorI18nKey('ExternalFileCollection', k, v[0]), { name: _.startCase(k) })
         return result
       }, {})
+    },
+    fileList () {
+      return _.reduce(this.formModel.files, (result, item) => {
+        return result.concat({ id: item.id, name: item.name, url: item.url, percentage: 20, status: 'uploading' })
+      }, [])
     },
     pendingExternalFiles () {
       return this.$store.state.externalFile.pendingRecords
@@ -141,20 +107,12 @@ export default {
     },
     deleteExternalFile (targetEf) {
       this.formModel.files = _.reject(this.formModel.files, (ef) => { return ef.id === targetEf.id })
-      console.log(this.formModel.files)
       this.updateValue()
-    },
-    isImage (externalFile) {
-      return externalFile.contentType.startsWith('image/')
-    },
-    previewUrl (externalFile) {
-      return URL.createObjectURL(externalFile.file)
     }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-
+<style>
 </style>

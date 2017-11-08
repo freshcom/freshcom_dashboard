@@ -42,17 +42,17 @@
             <icon name="unlock-alt" scale="0.8"></icon>
             <span>Unlockables</span>
           </el-menu-item>
-          <el-menu-item index="stockTransfers">
+<!--           <el-menu-item index="stockTransfers">
             <icon name="exchange" scale="0.8"></icon>
             <span>Stock Transfers</span>
           </el-menu-item>
           <el-menu-item index="branches">
             <icon name="bank" scale="0.8"></icon>
             <span>Branches</span>
-          </el-menu-item>
+          </el-menu-item> -->
         </el-submenu>
 
-        <el-submenu index="distribution">
+<!--         <el-submenu index="distribution">
           <template slot="title">
             <icon name="globe" scale="1"></icon>
             <span>Distribution</span>
@@ -73,7 +73,7 @@
             <icon name="truck" scale="0.8"></icon>
             <span>Vehicles</span>
           </el-menu-item>
-        </el-submenu>
+        </el-submenu> -->
 
         <el-submenu index="fileStorage">
           <template slot="title">

@@ -7,9 +7,7 @@ export default {
       name: '',
       label: '',
       files: [],
-      sku: null,
-      product: null,
-      unlockable: null
+      owner: {}
     }
   }
 }

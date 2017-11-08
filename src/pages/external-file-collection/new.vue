@@ -1,49 +1,43 @@
 <template>
-<div class="main-col">
-  <div class="content">
+<div class="page-warpper">
+  <div>
+    <el-menu :router="true" default-active="file_collections" mode="horizontal" class="secondary-nav">
+      <el-menu-item :route="{ name: 'ListExternalFile' }" index="files">Files</el-menu-item>
+      <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="file_collections">Collections</el-menu-item>
+    </el-menu>
+    <locale-selector class="pull-right"></locale-selector>
+  </div>
 
-    <div class="secondary-nav">
-      <el-menu :router="true" default-active="file_collections" mode="horizontal">
-        <el-menu-item :route="{ name: 'ListExternalFile' }" index="files">Files</el-menu-item>
-        <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="file_collections">Collections</el-menu-item>
-      </el-menu>
-      <locale-selector></locale-selector>
-    </div>
+  <div>
+    <el-card v-loading="isLoading" class="main-card">
+      <div slot="header">
+        <span style="line-height: 36px;">Create a File Collection</span>
 
-    <div class="main-scroller">
-      <div class="main">
-        <el-card v-loading="isLoading" class="main-card">
-          <div slot="header">
-            <span style="line-height: 36px;">Create a File Collection</span>
+        <div class="pull-right">
+          <el-button @click="cancel" plain size="medium">
+            Cancel
+          </el-button>
 
-            <div class="pull-right">
-              <el-button @click="cancel">
-                Cancel
-              </el-button>
-
-              <el-button @click="submit(recordDraft)" type="primary">
-                Save
-              </el-button>
-            </div>
-          </div>
-
-          <div class="data">
-            <external-file-collection-form v-model="recordDraft" :errors="errors"></external-file-collection-form>
-          </div>
-
-          <div class="footer">
-            <el-button @click="cancel">
-              Cancel
-            </el-button>
-
-            <el-button @click="submit(recordDraft)" type="primary" class="pull-right">
-              Save
-            </el-button>
-          </div>
-        </el-card>
+          <el-button @click="submit(recordDraft)" type="primary" size="medium">
+            Save
+          </el-button>
+        </div>
       </div>
-    </div>
 
+      <div class="data">
+        <external-file-collection-form v-model="recordDraft" :errors="errors"></external-file-collection-form>
+      </div>
+
+      <div class="footer">
+        <el-button @click="cancel" plain size="medium">
+          Cancel
+        </el-button>
+
+        <el-button @click="submit(recordDraft)" type="primary" class="pull-right" size="medium">
+          Save
+        </el-button>
+      </div>
+    </el-card>
   </div>
 </div>
 </template>
@@ -63,24 +57,24 @@ export default {
   created () {
     if (this.skuId) {
       let record = _.cloneDeep(this.record)
-      record.sku = { id: this.skuId, type: 'Sku' }
+      record.owner = { id: this.skuId, type: 'Sku' }
       this.$store.dispatch('externalFileCollection/setRecord', record)
       return
     }
 
     if (this.productId) {
       let record = _.cloneDeep(this.record)
-      record.product = { id: this.productId, type: 'Product' }
+      record.owner = { id: this.productId, type: 'Product' }
       this.$store.dispatch('externalFileCollection/setRecord', record)
     }
   },
   methods: {
     recordCreated (record) {
-      if (record.sku) {
+      if (this.props.skuId) {
         this.$store.dispatch('sku/resetRecord')
       }
 
-      if (record.product) {
+      if (this.props.productId) {
         this.$store.dispatch('product/resetRecord')
       }
 

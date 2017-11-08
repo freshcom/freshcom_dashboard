@@ -52,6 +52,11 @@ export default {
         active: 'Active'
       }
     },
+    unlockable: {
+      status: {
+        active: 'Active'
+      }
+    },
     payment: {
       status: {
         pending: 'Pending',

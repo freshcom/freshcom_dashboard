@@ -1,5 +1,5 @@
 <template>
-<div class="main-col">
+<div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="skus" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListSku' }" index="skus">SKUs</el-menu-item>
