@@ -15,8 +15,8 @@ export default {
       },
       status: {
         canOnlyActiveOnePerMoq: 'There is already an Active Price that have the same Minimum Order Quantity.',
-        cannotChangeStatusOfOnlyActivePriceOfActiveProductItem: 'Can not change status of the only Active Price of a Active Product Item. Please update the status of the corresponding Product Item first, then try again.',
-        cannotChangeStatusOfOnlyInternalPriceOfInternalProductItem: 'Can not change status of the only Active/Internal Price of a Internal Product Item. Please update the status of the corresponding Product Item first, then try again.'
+        cannotChangeStatusOfOnlyActivePriceOfActiveProduct: 'Can not change status of the only Active Price of a Active Product.',
+        cannotChangeStatusOfOnlyInternalPriceOfInternalProduct: 'Can not change status of the only Active/Internal Price of a Internal Product.'
       }
     },
     productItem: {

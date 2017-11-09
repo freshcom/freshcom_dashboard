@@ -1,6 +1,8 @@
 import _ from 'lodash'
 
 import ProductAPI from '@/api/product'
+import SkuAPI from '@/api/sku'
+import UnlockableAPI from '@/api/unlockable'
 import JSONAPI from '@/jsonapi'
 
 import Product from '@/models/product'
@@ -10,7 +12,14 @@ const MT = {
   RECORD_DRAFT_CHANGED: 'RECORD_DRAFT_CHANGED',
   RECORD_RESET: 'RECORD_RESET',
   RECORDS_CHANGED: 'RECORDS_CHANGED',
-  RECORDS_LOADING: 'RECORDS_LOADING'
+  RECORDS_LOADING: 'RECORDS_LOADING',
+
+  SELECTABLE_SKUS_CHANGED: 'SELECTABLE_SKUS_CHANGED',
+  SELECTABLE_SKUS_LOADING: 'SELECTABLE_SKUS_LOADING',
+  SELECTABLE_SKUS_RESET: 'SELECTABLE_SKUS_RESET',
+  SELECTABLE_UNLOCKABLES_CHANGED: 'SELECTABLE_UNLOCKABLES_CHANGED',
+  SELECTABLE_UNLOCKABLES_LOADING: 'SELECTABLE_UNLOCKABLES_LOADING',
+  SELECTABLE_UNLOCKABLES_RESET: 'SELECTABLE_UNLOCKABLES_RESET'
 }
 
 export default {
@@ -19,9 +28,48 @@ export default {
     record: Product.objectWithDefaults(),
     recordDraft: Product.objectWithDefaults(),
     records: [],
-    isLoadingRecords: true
+    isLoadingRecords: true,
+
+    selectableSkus: [],
+    isLoadingSelectableSkus: false,
+    selectableUnlockables: [],
+    isLoadingSelectableUnlockables: false
   },
   actions: {
+    loadSelectableSkus ({ state, commit, rootState }, actionPayload) {
+      commit(MT.SELECTABLE_SKUS_LOADING)
+      actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
+
+      return SkuAPI.queryRecord(actionPayload).then(response => {
+        return { meta: response.data.meta, resources: JSONAPI.deserialize(response.data.data) }
+      }).then(response => {
+        commit(MT.SELECTABLE_SKUS_CHANGED, response.resources)
+
+        return response
+      })
+    },
+
+    resetSelectableSkus ({ commit }) {
+      commit(MT.SELECTABLE_SKUS_RESET)
+    },
+
+    loadSelectableUnlockables ({ state, commit, rootState }, actionPayload) {
+      commit(MT.SELECTABLE_UNLOCKABLES_LOADING)
+      actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
+
+      return UnlockableAPI.queryRecord(actionPayload).then(response => {
+        return { meta: response.data.meta, resources: JSONAPI.deserialize(response.data.data) }
+      }).then(response => {
+        commit(MT.SELECTABLE_UNLOCKABLES_CHANGED, response.resources)
+
+        return response
+      })
+    },
+
+    resetSelectableUnlockables ({ commit }) {
+      commit(MT.SELECTABLE_UNLOCKABLES_RESET)
+    },
+
     setRecord ({ commit }, record) {
       commit(MT.RECORD_CHANGED, record)
     },
@@ -129,6 +177,34 @@ export default {
 
     [MT.RECORDS_LOADING] (state, records) {
       state.isLoadingRecords = true
+    },
+
+    [MT.SELECTABLE_SKUS_CHANGED] (state, skus) {
+      state.selectableSkus = skus
+      state.isLoadingSelectableSkus = false
+    },
+
+    [MT.SELECTABLE_SKUS_LOADING] (state) {
+      state.isLoadingSelectableSkus = true
+    },
+
+    [MT.SELECTABLE_SKUS_RESET] (state) {
+      state.isLoadingSelectableSkus = true
+      state.selectableSkus = []
+    },
+
+    [MT.SELECTABLE_UNLOCKABLES_CHANGED] (state, unlockables) {
+      state.selectableUnlockables = unlockables
+      state.isLoadingSelectableUnlockables = false
+    },
+
+    [MT.SELECTABLE_UNLOCKABLES_LOADING] (state) {
+      state.isLoadingSelectableUnlockables = true
+    },
+
+    [MT.SELECTABLE_UNLOCKABLES_RESET] (state) {
+      state.isLoadingSelectableUnlockables = true
+      state.selectableUnlockables = []
     }
   }
 }

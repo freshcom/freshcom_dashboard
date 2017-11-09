@@ -5,6 +5,10 @@ export function startCase (string = '') {
 }
 
 export function chargeDollar (price) {
+  if (!price) {
+    return ''
+  }
+
   let str = (price.chargeCents / 100).toFixed(2)
   return `$${str}/${price.chargeUnit}`
 }

@@ -7,8 +7,12 @@ export default function (options) {
 
   return {
     props: ['id'],
+    beforeRouteUpdate (to, from, next) {
+      this.loadRecord(to.params.id)
+      next()
+    },
     created () {
-      this.loadRecord()
+      this.loadRecord(this.id)
     },
     computed: {
       isLoading () {
@@ -25,8 +29,8 @@ export default function (options) {
       goTo (route) {
         this.$router.push(route)
       },
-      loadRecord () {
-        this.$store.dispatch(`${storeNamespace}/loadRecord`, { id: this.id, include: include })
+      loadRecord (id) {
+        this.$store.dispatch(`${storeNamespace}/loadRecord`, { id: id, include: include })
       },
       deleteRecord () {
         let targetRecord = this.record

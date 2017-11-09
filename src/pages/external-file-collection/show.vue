@@ -1,5 +1,5 @@
 <template>
-<div class="page-warpper">
+<div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="/file_collections" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="/file_collections">Collections</el-menu-item>

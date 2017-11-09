@@ -1,50 +1,46 @@
 <template>
-<div class="main-col">
-  <div class="content">
+<div class="page-wrapper">
 
-    <div class="secondary-nav">
-      <el-menu :router="true" default-active="/products" mode="horizontal">
-        <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
-        <el-menu-item :route="{ name: 'ListProductItem' }" index="/product_items">Items</el-menu-item>
-      </el-menu>
-      <locale-selector :before-change="confirmResourceLocaleChange" @change="loadRecord"></locale-selector>
-    </div>
-
-    <div class="main-scroller">
-      <div class="main">
-        <el-card class="main-card">
-          <div slot="header">
-            <span style="line-height: 36px;">Edit Product</span>
-
-            <div style="float: right;">
-              <el-button @click="cancel">
-                Cancel
-              </el-button>
-
-              <el-button @click="submit(recordDraft)" type="primary">
-                Save
-              </el-button>
-            </div>
-          </div>
-
-          <div class="data">
-            <product-form v-model="recordDraft" :errors="errors"></product-form>
-          </div>
-
-          <div class="footer">
-            <el-button @click="cancel">
-              Cancel
-            </el-button>
-
-            <el-button @click="submit(recordDraft)" type="primary" class="pull-right">
-              Save
-            </el-button>
-          </div>
-        </el-card>
-      </div>
-    </div>
-
+  <div>
+    <el-menu :router="true" default-active="/products" mode="horizontal" class="secondary-nav">
+      <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
+      <el-menu-item :route="{ name: 'ListProductItem' }" index="/product_items">Items</el-menu-item>
+    </el-menu>
+    <locale-selector :before-change="confirmResourceLocaleChange" @change="loadRecord" class="pull-right"></locale-selector>
   </div>
+
+  <div>
+    <el-card class="main-card">
+      <div slot="header">
+        <span style="line-height: 36px;">Edit Product</span>
+
+        <div style="float: right;">
+          <el-button @click="cancel" plain size="medium">
+            Cancel
+          </el-button>
+
+          <el-button @click="submit(recordDraft)" type="primary" size="medium">
+            Save
+          </el-button>
+        </div>
+      </div>
+
+      <div class="data">
+        <product-form v-model="recordDraft" :errors="errors"></product-form>
+      </div>
+
+      <div class="footer">
+        <el-button @click="cancel" plain size="medium">
+          Cancel
+        </el-button>
+
+        <el-button @click="submit(recordDraft)" type="primary" size="medium" class="pull-right">
+          Save
+        </el-button>
+      </div>
+    </el-card>
+  </div>
+
 </div>
 </template>
 

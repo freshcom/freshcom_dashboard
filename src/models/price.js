@@ -24,7 +24,7 @@ export default {
       startTime: '',
       endTime: '',
 
-      productItem: null,
+      product: {},
       children: []
     }
   },

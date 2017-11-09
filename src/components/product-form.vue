@@ -1,5 +1,5 @@
 <template>
-<el-form @input.native="updateValue" label-width="150px">
+<el-form :model="formModel" @input.native="updateValue" size="small" label-width="170px">
   <div class="file-uploader">
     <el-upload :http-request="uploadAvatar" action="" :show-file-list="false">
       <img v-if="avatarUrl" :src="avatarUrl" class="file">
@@ -21,15 +21,84 @@
     </el-select>
   </el-form-item>
 
-  <el-form-item v-if="!formModel.id" label="Item Mode" :error="errorMessages.itemMode" required>
-    <el-select @change="updateValue" v-model="formModel.itemMode">
-      <el-option label="Any" value="any"></el-option>
-      <el-option label="All" value="all"></el-option>
+  <el-form-item :error="errorMessages.kind" label="Kind" required>
+    <el-select v-model="formModel.kind" :disabled="!canSelectKind(formModel)" @change="updateValue">
+      <el-option label="Simple" value="simple"></el-option>
+      <el-option label="With Variants" value="withVariants"></el-option>
+      <el-option label="Combo" value="combo"></el-option>
+      <el-option label="Variant" value="variant" :disabled="true"></el-option>
+      <el-option label="Item" value="item" :disabled="true"></el-option>
     </el-select>
   </el-form-item>
 
-  <el-form-item label="Name" :error="errorMessages.name" required>
+  <template v-if="formModel.kind === 'simple' || formModel.kind === 'item' || formModel.kind === 'variant'">
+    <el-form-item :error="errorMessages.source" label="Source" required>
+      <el-row>
+        <el-col :span="6">
+          <el-select v-model="sourceType" @change="clearSource()">
+            <el-option label="SKU" value="Sku"></el-option>
+            <el-option label="Unlockable" value="Unlockable"></el-option>
+          </el-select>
+        </el-col>
+        <el-col v-if="sourceType === 'Sku'" :span="18">
+          <div class="source-select-wrapper">
+            <remote-select
+              v-model="formModel.source"
+              :records="selectableSkus"
+              :is-loading="isLoadingSelectableSkus"
+              @filter="loadSelectableSkus"
+              @reset="resetSelectableSkus"
+              @input="updateValue"
+              no-data-text="No matching SKU"
+              placeholder="Type to search for SKU..."
+              class="source-select"
+            >
+            </remote-select>
+          </div>
+        </el-col>
+
+        <el-col v-if="sourceType === 'Unlockable'" :span="18">
+          <div class="source-select-wrapper">
+            <remote-select
+              v-model="formModel.source"
+              :records="selectableUnlockables"
+              :isLoading="isLoadingSelectableUnlockables"
+              @filter="loadSelectableUnlockables"
+              @reset="resetSelectableUnlockables"
+              @input="updateValue"
+              no-data-text="No matching Unlockable"
+              placeholder="Type to search for Unlockable..."
+              class="source-select"
+            >
+            </remote-select>
+          </div>
+        </el-col>
+      </el-row>
+    </el-form-item>
+
+    <el-form-item label="Source Quantity" :error="errorMessages.sourceQuantity" required>
+      <el-input-number @change="updateValue" v-model="formModel.sourceQuantity" :min="1" :step="1"></el-input-number>
+    </el-form-item>
+
+    <el-form-item label="Name Sync" required>
+      <el-radio-group @change="updateValue" v-model="formModel.nameSync">
+        <el-radio label="disabled">Disabled</el-radio>
+        <el-radio label="syncWithSource">Sync with Source</el-radio>
+      </el-radio-group>
+    </el-form-item>
+
+  </template>
+
+  <el-form-item v-if="formModel.nameSync == 'disabled'" label="Name" :error="errorMessages.name" required>
     <el-input v-model="formModel.name"></el-input>
+  </el-form-item>
+
+  <el-form-item v-if="formModel.kind === 'simple' || formModel.kind === 'combo' || formModel.kind === 'variant'" label="Maximum PO Quantity" :error="errorMessages.maximumPublicOrderQuantity" required>
+    <el-input-number @change="updateValue" v-model="formModel.maximumPublicOrderQuantity" :min="1" :step="1"></el-input-number>
+  </el-form-item>
+
+  <el-form-item v-if="formModel.kind === 'item' || formModel.kind === 'variant'" label="Sort Index" :error="errorMessages.sortIndex" required>
+    <el-input-number @change="updateValue" v-model="formModel.sortIndex" :min="0" :step="100"></el-input-number>
   </el-form-item>
 
   <el-form-item v-if="formModel.itemMode == 'all'" label="Print Name" :error="errorMessages.printName" required>
@@ -48,19 +117,36 @@
 
 <script>
 import _ from 'lodash'
+import RemoteSelect from '@/components/remote-select'
 import errorI18nKey from '@/utils/error-i18n-key'
 
 export default {
   name: 'ProductForm',
-  props: ['value', 'errors'],
+  components: {
+    RemoteSelect
+  },
+  props: ['value', 'errors', 'record'],
   data () {
     return {
       formModel: _.cloneDeep(this.value),
+      sourceType: 'Sku',
       imageUrl: '',
       pendingAvatarId: ''
     }
   },
   computed: {
+    isLoadingSelectableSkus () {
+      return this.$store.state.product.isLoadingSelectableSkus
+    },
+    selectableSkus () {
+      return this.$store.state.product.selectableSkus
+    },
+    isLoadingSelectableUnlockables () {
+      return this.$store.state.product.isLoadingSelectableUnlockables
+    },
+    selectableUnlockables () {
+      return this.$store.state.product.selectableUnlockables
+    },
     errorMessages () {
       return _.reduce(this.errors, (result, v, k) => {
         result[k] = this.$t(errorI18nKey('Product', k, v[0]), { name: _.startCase(k) })
@@ -103,11 +189,17 @@ export default {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
-    beforeAvatarUpload () {
-
+    loadSelectableSkus: _.debounce(function (searchKeyword) {
+      this.$store.dispatch('product/loadSelectableSkus', { search: searchKeyword })
+    }, 300),
+    resetSelectableSkus () {
+      this.$store.dispatch('product/resetSelectableSkus')
     },
-    handleAvatarSuccess () {
-
+    loadSelectableUnlockables: _.debounce(function (searchKeyword) {
+      this.$store.dispatch('product/loadSelectableUnlockables', { search: searchKeyword })
+    }, 300),
+    resetSelectableUnlockables () {
+      this.$store.dispatch('product/resetSelectableUnlockables')
     },
     uploadAvatar (e) {
       let file = e.file
@@ -115,6 +207,19 @@ export default {
       this.$store.dispatch('externalFile/pushPendingRecords', [externalFile]).then(externalFiles => {
         this.pendingAvatarId = externalFiles[0].id
       })
+    },
+    clearSource () {
+      let formModel = _.cloneDeep(this.formModel)
+      formModel.source = {}
+      this.formModel = formModel
+      this.updateValue()
+    },
+    canSelectKind (formModel) {
+      if (formModel.kind === 'item' || formModel.kind === 'variant') {
+        return false
+      }
+
+      return true
     }
   }
 }
@@ -122,5 +227,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+.source-select {
+  width: 100%;
+}
+.source-select-wrapper {
+  padding-left: 10px;
+}
 </style>

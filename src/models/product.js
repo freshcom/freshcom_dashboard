@@ -5,16 +5,24 @@ export default {
       type: 'Product',
 
       code: '',
+      status: 'draft',
+      kind: 'simple',
+
+      nameSync: 'disabled',
       name: '',
       printName: '',
-      status: 'draft',
-      itemMode: 'any',
+
+      sourceQuantity: 1,
+      sortIndex: 0,
+      maximumPublicOrderQuantity: 9999,
 
       caption: '',
       description: '',
 
       avatar: null,
-      items: []
+      items: [],
+      variants: [],
+      source: {}
     }
   }
 }

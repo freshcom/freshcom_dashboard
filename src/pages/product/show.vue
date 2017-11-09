@@ -1,284 +1,327 @@
 <template>
-<div class="main-col">
-  <div class="content">
-    <div class="secondary-nav">
-      <el-menu :router="true" default-active="/products" mode="horizontal">
-        <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
-        <el-menu-item :route="{ name: 'ListProductItem' }" index="/product_items">Items</el-menu-item>
-        <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">Collections</el-menu-item>
-      </el-menu>
-      <locale-selector @change="loadRecord"></locale-selector>
-    </div>
+<div class="page-wrapper">
+  <div>
+    <el-menu :router="true" default-active="/products" mode="horizontal" class="secondary-nav">
+      <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
+      <el-menu-item :route="{ name: 'ListProductItem' }" index="/product_items">Items</el-menu-item>
+      <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">Collections</el-menu-item>
+    </el-menu>
+    <locale-selector @change="loadRecord" class="pull-right"></locale-selector>
+  </div>
 
-    <div class="main-scroller">
-      <div class="main">
-        <el-card v-loading="isLoading" class="main-card">
-          <div slot="header">
+  <div>
+    <el-card v-loading="isLoading" class="main-card">
+      <div slot="header">
 
-            <div class="brief">
-              <div class="avatar">
-                <img :src="avatarUrl">
-              </div>
-
-              <div class="detail">
-                <p>Product {{record.code}}</p>
-                <h2>{{record.name}}</h2>
-                <p class="id">{{record.id}}</p>
-              </div>
-            </div>
-
-            <div class="header-actions">
-              <el-button @click="editRecord()">Edit</el-button>
-            </div>
+        <div class="brief">
+          <div class="avatar">
+            <img :src="avatarUrl">
           </div>
 
-          <div class="data">
-            <div class="block-title">
-              <h3>Details</h3>
-            </div>
-            <div class="block">
-              <div class="block-body">
-                <dl>
-                  <dt>ID</dt>
-                  <dd>{{record.id}}</dd>
-
-                  <dt>Code</dt>
-                  <dd>{{record.code}}</dd>
-
-                  <dt>Status</dt>
-                  <dd>
-                    {{$t(`attributes.product.status.${record.status}`)}}
-                  </dd>
-
-                  <dt>Item Mode</dt>
-                  <dd>{{record.itemMode}}</dd>
-
-                  <dt>Name</dt>
-                  <dd>{{record.name}}</dd>
-
-                  <dt>Print Name</dt>
-                  <dd>{{record.printName}}</dd>
-
-                  <dt>Caption</dt>
-                  <dd>{{record.caption}}</dd>
-
-                  <dt>Description</dt>
-                  <dd>{{record.description}}</dd>
-                </dl>
-              </div>
-            </div>
-
-            <div class="block-title">
-              <h3>Items</h3>
-
-              <span class="block-title-actions pull-right">
-                <router-link :to="{ name: 'NewProductItem', query: { productId: record.id, callbackPath: currentRoutePath } }">
-                  <icon name="plus" scale="0.8" class="v-middle"></icon>
-                  <span>Add</span>
-                </router-link>
-              </span>
-            </div>
-
-            <div class="block">
-              <div class="block-body full">
-                <el-table :data="record.items" stripe class="block-table" :show-header="false" style="width: 100%">
-                  <el-table-column width="320">
-                    <template scope="scope">
-                      <router-link :to="{ name: 'ShowProductItem', params: { id: scope.row.id } }">
-                        <span>{{scope.row.name}}</span>
-                        <el-tag v-if="scope.row.status != 'active'" type="gray">
-                          {{$t(`attributes.productItem.status.${scope.row.status}`)}}
-                        </el-tag>
-
-                        <el-tag v-if="scope.row.primary">
-                          Primary
-                        </el-tag>
-                      </router-link>
-                    </template>
-                  </el-table-column>
-
-                  <el-table-column width="150">
-                    <template scope="scope">
-                      <template v-if="isProductItemPriceVisiable(scope.row)">
-                        {{scope.row.defaultPrice | chargeDollar}}
-                      </template>
-                    </template>
-                  </el-table-column>
-
-                  <el-table-column>
-                    <template scope="scope">
-                      <p class="text-right actions">
-                        <el-button v-if="isMarkItemPrimaryVisible(scope.row)" @click="markItemPrimary(scope.row)" size="mini">
-                          Mark Primary
-                        </el-button>
-
-                        <el-button v-if="scope.row.status == 'draft'" type="primary" @click="markItemActive(scope.row)" size="mini">
-                          Mark Active
-                        </el-button>
-
-                        <el-button @click="goTo({ name: 'EditProductItem', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } })" size="mini">
-                          Edit
-                        </el-button>
-                      </p>
-                    </template>
-                  </el-table-column>
-                </el-table>
-              </div>
-
-
-              <div class="block-footer no-divider text-center">
-                <a class="view-more" href="#">View More</a>
-              </div>
-            </div>
-
-            <div v-if="record.itemMode === 'all'" class="block-title">
-              <h3>Prices</h3>
-
-              <span class="block-title-actions pull-right">
-                <router-link :to="{ name: 'NewPrice', query: { productId: record.id, callbackPath: currentRoutePath } }">
-                  <icon name="plus" scale="0.8" class="v-middle"></icon>
-                  <span>Add</span>
-                </router-link>
-              </span>
-            </div>
-
-            <div v-if="record.itemMode === 'all'" class="block">
-              <div class="block-body full">
-                <el-table :data="record.prices" stripe class="block-table" :show-header="false" style="width: 100%">
-                  <el-table-column width="300">
-                    <template scope="scope">
-                      <router-link :to="{ name: 'ShowPrice', params: { id: scope.row.id } }">
-                        <span v-if="scope.row.name">{{scope.row.name}}</span>
-                        <span v-if="!scope.row.name">{{scope.row.label}}</span>
-                        <el-tag v-if="scope.row.status != 'active'" type="gray">
-                          {{$t(`attributes.price.status.${scope.row.status}`)}}
-                        </el-tag>
-                      </router-link>
-                    </template>
-                  </el-table-column>
-
-                  <el-table-column width="100">
-                    <template scope="scope">
-                      <span>{{scope.row.minimumOrderQuantity}}+</span>
-                    </template>
-                  </el-table-column>
-
-                  <el-table-column width="150">
-                    <template scope="scope">
-                      <span>${{scope.row.chargeCents / 100}}/{{scope.row.chargeUnit}}</span>
-                    </template>
-                  </el-table-column>
-
-                  <el-table-column>
-                    <template scope="scope">
-                      <p class="text-right actions">
-                        <el-button v-if="scope.row.status == 'draft'" type="primary" @click="markPriceActive(scope.row)" size="mini">
-                          Mark Active
-                        </el-button>
-
-                        <el-button @click="goTo({ name: 'EditPrice', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } })" size="mini">
-                          Edit
-                        </el-button>
-                      </p>
-                    </template>
-                  </el-table-column>
-                </el-table>
-              </div>
-
-              <div class="block-footer no-divider text-center">
-                <a class="view-more" href="#">View More</a>
-              </div>
-            </div>
-
-            <div class="block-title">
-              <h3>File Collections</h3>
-
-              <span class="block-title-actions pull-right">
-                <router-link :to="{ name: 'NewExternalFileCollection', query: { productId: record.id, callbackPath: currentRoutePath } }">
-                  <icon name="plus" scale="0.8" class="v-middle"></icon>
-                  <span>Add</span>
-                </router-link>
-              </span>
-            </div>
-
-            <div class="block">
-              <div class="block-body full">
-                <el-table :data="record.externalFileCollections" stripe class="block-table" :show-header="false" style="width: 100%">
-                  <el-table-column width="500">
-                    <template scope="scope">
-                      <router-link :to="{ name: 'ShowExternalFileCollection', params: { id: scope.row.id } }">
-                        <span>{{scope.row.name}}</span>
-                        <span v-if="scope.row.name"> - </span>
-                        <span>{{scope.row.label}}</span>
-                      </router-link>
-                    </template>
-                  </el-table-column>
-
-                  <el-table-column width="100">
-                    <template scope="scope">
-                      <span>{{scope.row.fileCount}} files</span>
-                    </template>
-                  </el-table-column>
-
-                  <el-table-column>
-                    <template scope="scope">
-                      <p class="text-right actions">
-                        <router-link :to="{ name: 'EditExternalFileCollection', params: { id: scope.row.id }}">
-                          <icon name="pencil" scale="0.8" class="v-middle"></icon>
-                          <span class="v-middle">Edit</span>
-                        </router-link>
-                      </p>
-                    </template>
-                  </el-table-column>
-                </el-table>
-              </div>
-
-              <div class="block-footer no-divider text-center">
-                <a class="view-more" href="#">View More</a>
-              </div>
-            </div>
-
-
-            <div class="block-title">
-              <h3>Custom Data</h3>
-            </div>
-            <div class="block">
-              <div class="block-body">
-                {{record.customData}}
-              </div>
-            </div>
-
-            <h3>Related Resources</h3>
-            <div class="block">
-              <div class="block-body">
-                <dl>
-                  <dt v-if="record.avatar">Avatar</dt>
-                  <dd v-if="record.avatar"><a href="#">{{record.avatar.id}}</a></dd>
-                </dl>
-              </div>
-            </div>
-
-            <h3>Logs</h3>
-            <div class="block">
-              <div class="block-body">
-
-              </div>
-            </div>
-
-            <h3>Events</h3>
-            <div class="block">
-              <div class="block-body">
-
-              </div>
-            </div>
+          <div class="detail">
+            <p>Product {{record.code}}</p>
+            <h2>{{record.name}}</h2>
+            <p class="id">{{record.id}}</p>
           </div>
+        </div>
 
-          <div class="footer text-right">
-            <delete-button @confirmed="deleteRecord">Delete</delete-button>
-          </div>
-        </el-card>
+        <div class="header-actions">
+          <el-button @click="editRecord()" size="medium">Edit</el-button>
+        </div>
       </div>
-    </div>
+
+      <div class="data">
+        <div class="block-title">
+          <h3>Details</h3>
+        </div>
+        <div class="block">
+          <div class="block-body">
+            <dl>
+              <dt>ID</dt>
+              <dd>{{record.id}}</dd>
+
+              <dt>Code</dt>
+              <dd>{{record.code}}</dd>
+
+              <dt>Status</dt>
+              <dd>
+                {{$t(`attributes.product.status.${record.status}`)}}
+              </dd>
+
+              <dt>Kind</dt>
+              <dd>{{record.kind}}</dd>
+
+              <dt>Name</dt>
+              <dd>{{record.name}}</dd>
+
+              <dt>Print Name</dt>
+              <dd>{{record.printName}}</dd>
+
+              <dt>Caption</dt>
+              <dd>{{record.caption}}</dd>
+
+              <dt>Description</dt>
+              <dd>{{record.description}}</dd>
+            </dl>
+          </div>
+        </div>
+
+        <template v-if="record.kind === 'combo'">
+          <div class="block-title">
+            <h3>Items</h3>
+
+            <span class="block-title-actions pull-right">
+              <router-link :to="{ name: 'NewProduct', query: { parentId: record.id, callbackPath: currentRoutePath } }">
+                <icon name="plus" scale="0.8" class="v-middle"></icon>
+                <span>Add</span>
+              </router-link>
+            </span>
+          </div>
+
+          <div class="block">
+            <div class="block-body full">
+              <el-table :data="record.items" :show-header="false" class="block-table" style="width: 100%">
+                <el-table-column>
+                  <template scope="scope">
+                    <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id } }">
+                      <span>{{scope.row.name}}</span>
+                      <el-tag v-if="scope.row.status != 'active'" type="gray" size="mini">
+                        {{$t(`attributes.productItem.status.${scope.row.status}`)}}
+                      </el-tag>
+                    </router-link>
+                  </template>
+                </el-table-column>
+
+                <el-table-column width="300">
+                  <template scope="scope">
+                    <p class="text-right actions">
+                      <el-button @click="goTo({ name: 'EditProduct', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } })" size="mini">
+                        Edit
+                      </el-button>
+                    </p>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+
+
+            <div class="block-footer text-center">
+              <a class="view-more" href="#">View More</a>
+            </div>
+          </div>
+        </template>
+
+        <template v-if="record.kind === 'withVariants'">
+          <div class="block-title">
+            <h3>Variants</h3>
+
+            <span class="block-title-actions pull-right">
+              <router-link :to="{ name: 'NewProduct', query: { parentId: record.id, callbackPath: currentRoutePath } }">
+                <icon name="plus" scale="0.8" class="v-middle"></icon>
+                <span>Add</span>
+              </router-link>
+            </span>
+          </div>
+
+          <div class="block">
+            <div class="block-body full">
+              <el-table :data="record.variants" :show-header="false" class="block-table" style="width: 100%">
+                <el-table-column>
+                  <template scope="scope">
+                    <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id } }">
+                      <span>{{scope.row.name}}</span>
+                      <el-tag v-if="scope.row.status != 'active'" type="gray" size="mini">
+                        {{$t(`attributes.productItem.status.${scope.row.status}`)}}
+                      </el-tag>
+
+                      <el-tag v-if="scope.row.primary" size="mini">
+                        Primary
+                      </el-tag>
+                    </router-link>
+                  </template>
+                </el-table-column>
+
+                <el-table-column width="150">
+                  <template scope="scope">
+                    {{scope.row.defaultPrice | chargeDollar}}
+                  </template>
+                </el-table-column>
+
+                <el-table-column width="300">
+                  <template scope="scope">
+                    <p class="text-right actions">
+                      <el-button v-if="isMarkItemPrimaryVisible(scope.row)" @click="markItemPrimary(scope.row)" size="mini">
+                        Mark Primary
+                      </el-button>
+
+                      <el-button v-if="scope.row.status == 'draft'" type="primary" @click="markItemActive(scope.row)" size="mini">
+                        Mark Active
+                      </el-button>
+
+                      <el-button @click="goTo({ name: 'EditProduct', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } })" size="mini">
+                        Edit
+                      </el-button>
+                    </p>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+
+
+            <div class="block-footer text-center">
+              <a class="view-more" href="#">View More</a>
+            </div>
+          </div>
+        </template>
+
+        <template v-if="record.kind != 'item'">
+          <div class="block-title">
+            <h3>Prices</h3>
+
+            <span class="block-title-actions pull-right">
+              <router-link :to="{ name: 'NewPrice', query: { productKind: record.kind, productId: record.id, callbackPath: currentRoutePath } }">
+                <icon name="plus" scale="0.8" class="v-middle"></icon>
+                <span>Add</span>
+              </router-link>
+            </span>
+          </div>
+
+          <div class="block">
+            <div class="block-body full">
+              <el-table :data="record.prices" stripe class="block-table" :show-header="false" style="width: 100%">
+                <el-table-column width="300">
+                  <template scope="scope">
+                    <router-link :to="{ name: 'ShowPrice', params: { id: scope.row.id } }">
+                      <span v-if="scope.row.name">{{scope.row.name}}</span>
+                      <span v-if="!scope.row.name">{{scope.row.label}}</span>
+                      <el-tag v-if="scope.row.status != 'active'" type="gray" size="mini">
+                        {{$t(`attributes.price.status.${scope.row.status}`)}}
+                      </el-tag>
+                    </router-link>
+                  </template>
+                </el-table-column>
+
+                <el-table-column width="100">
+                  <template scope="scope">
+                    <span>{{scope.row.minimumOrderQuantity}}+</span>
+                  </template>
+                </el-table-column>
+
+                <el-table-column width="150">
+                  <template scope="scope">
+                    <span>${{scope.row.chargeCents / 100}}/{{scope.row.chargeUnit}}</span>
+                  </template>
+                </el-table-column>
+
+                <el-table-column>
+                  <template scope="scope">
+                    <p class="text-right actions">
+                      <el-button v-if="scope.row.status == 'draft'" type="primary" @click="markPriceActive(scope.row)" size="mini">
+                        Mark Active
+                      </el-button>
+
+                      <el-button @click="goTo({ name: 'EditPrice', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } })" plain size="mini">
+                        Edit
+                      </el-button>
+                    </p>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+
+            <div class="block-footer text-center">
+              <a class="view-more" href="#">View More</a>
+            </div>
+          </div>
+        </template>
+
+        <div class="block-title">
+          <h3>File Collections</h3>
+
+          <span class="block-title-actions pull-right">
+            <router-link :to="{ name: 'NewExternalFileCollection', query: { productId: record.id, callbackPath: currentRoutePath } }">
+              <icon name="plus" scale="0.8" class="v-middle"></icon>
+              <span>Add</span>
+            </router-link>
+          </span>
+        </div>
+
+        <div class="block">
+          <div class="block-body full">
+            <el-table :data="record.externalFileCollections" stripe class="block-table" :show-header="false" style="width: 100%">
+              <el-table-column width="500">
+                <template scope="scope">
+                  <router-link :to="{ name: 'ShowExternalFileCollection', params: { id: scope.row.id } }">
+                    <span>{{scope.row.name}}</span>
+                    <span v-if="scope.row.name"> - </span>
+                    <span>{{scope.row.label}}</span>
+                  </router-link>
+                </template>
+              </el-table-column>
+
+              <el-table-column width="100">
+                <template scope="scope">
+                  <span>{{scope.row.fileCount}} files</span>
+                </template>
+              </el-table-column>
+
+              <el-table-column>
+                <template scope="scope">
+                  <p class="text-right actions">
+                    <router-link :to="{ name: 'EditExternalFileCollection', params: { id: scope.row.id }}">
+                      <icon name="pencil" scale="0.8" class="v-middle"></icon>
+                      <span class="v-middle">Edit</span>
+                    </router-link>
+                  </p>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+
+          <div class="block-footer text-center">
+            <a class="view-more" href="#">View More</a>
+          </div>
+        </div>
+
+
+        <div class="block-title">
+          <h3>Custom Data</h3>
+        </div>
+        <div class="block">
+          <div class="block-body">
+            {{record.customData}}
+          </div>
+        </div>
+
+        <h3>Related Resources</h3>
+        <div class="block">
+          <div class="block-body">
+            <dl>
+              <dt v-if="record.avatar">Avatar</dt>
+              <dd v-if="record.avatar"><a href="#">{{record.avatar.id}}</a></dd>
+            </dl>
+          </div>
+        </div>
+
+        <h3>Logs</h3>
+        <div class="block">
+          <div class="block-body">
+
+          </div>
+        </div>
+
+        <h3>Events</h3>
+        <div class="block">
+          <div class="block-body">
+
+          </div>
+        </div>
+      </div>
+
+      <div class="footer text-right">
+        <delete-button @confirmed="deleteRecord" size="medium">Delete</delete-button>
+      </div>
+    </el-card>
   </div>
 </div>
 
@@ -303,7 +346,7 @@ export default {
   filters: {
     chargeDollar
   },
-  mixins: [ShowPage({ storeNamespace: 'product', name: 'Product', include: 'avatar,items.defaultPrice,externalFileCollections,prices' })],
+  mixins: [ShowPage({ storeNamespace: 'product', name: 'Product', include: 'prices,avatar,items,variants.defaultPrice,externalFileCollections' })],
   computed: {
     avatarUrl () {
       if (this.record.avatar) {

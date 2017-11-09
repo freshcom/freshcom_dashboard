@@ -1,5 +1,5 @@
 <template>
-<el-form @input.native="updateValue" label-width="180px">
+<el-form :model="formModel" @input.native="updateValue" size="small" label-width="180px">
   <el-form-item v-if="record.product" label="Product">
     {{formModel.product.id}}
   </el-form-item>

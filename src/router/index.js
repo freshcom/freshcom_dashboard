@@ -191,7 +191,13 @@ export default new Router({
     {
       path: '/products/new',
       name: 'NewProduct',
-      component: NewProductPage
+      component: NewProductPage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { kind: query.kind, parentId: query.parentId, callbackPath: query.callbackPath }
+      }
     },
     {
       path: '/products/:id',
@@ -259,7 +265,7 @@ export default new Router({
         let queryString = route.fullPath.split('?')[1]
         let query = qs.parse(queryString)
 
-        return { productItemId: query.productItemId, productId: query.productId, callbackPath: query.callbackPath }
+        return { productKind: query.productKind, productId: query.productId, callbackPath: query.callbackPath }
       }
     },
     {

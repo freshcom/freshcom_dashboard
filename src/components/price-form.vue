@@ -1,10 +1,6 @@
 <template>
-<el-form @input.native="updateValue" label-width="180px">
-  <el-form-item v-if="record.productItem" label="Product Item">
-    {{formModel.productItem.id}}
-  </el-form-item>
-
-  <el-form-item v-if="record.product" label="Product">
+<el-form :model="formModel" @input.native="updateValue" size="small" label-width="180px">
+  <el-form-item label="Product">
     {{formModel.product.id}}
   </el-form-item>
 
@@ -31,18 +27,18 @@
     <el-input v-model="formModel.label"></el-input>
   </el-form-item>
 
-  <el-form-item v-if="formModel.productItem" label="Charge Amount" :error="chargeAmountError" required>
-    <price-amount-input @change="updateValue" v-model="formModel.chargeCents">
-    </price-amount-input>
+  <el-form-item v-if="isRootPrice(formModel)" label="Charge Amount" :error="chargeAmountError" required>
+    <money-input v-model="formModel.chargeCents" @change="updateValue" class="charge-amount-input">
+    </money-input>
     <span> / </span>
     <el-input v-model="formModel.chargeUnit" class="unit-input" placeholder="Unit"></el-input>
   </el-form-item>
 
-  <el-form-item v-if="formModel.product" label="Unit" :error="errorMessages.chargeUnit" required>
+  <el-form-item v-if="!isRootPrice(formModel)" label="Unit" :error="errorMessages.chargeUnit" required>
     <el-input v-model="formModel.chargeUnit" class="unit-input" placeholder="Unit"></el-input>
   </el-form-item>
 
-  <el-form-item v-if="formModel.productItem" label="Estimate By Default" :error="errorMessages.estimateByDefault" required>
+  <el-form-item v-if="isRootPrice(formModel)" label="Estimate By Default" :error="errorMessages.estimateByDefault" required>
     <el-switch
       @change="updateValue"
       v-model="formModel.estimateByDefault"
@@ -84,15 +80,15 @@
     </percentage-input>
   </el-form-item>
 
-  <div class="children-form" v-if="formModel.product">
+  <div class="children-form" v-if="!isRootPrice(formModel)">
     <div v-for="child in formModel.children" class="child-row">
       <hr>
 
       <div class="product-item">{{child.productItem.name}}</div>
 
       <div class="price">
-        <price-amount-input v-model="child.chargeCents" class="child-price-input">
-        </price-amount-input>
+        <money-input v-model="child.chargeCents" class="child-price-input">
+        </money-input>
       </div>
     </div>
 
@@ -108,7 +104,7 @@
 
 <script>
 import _ from 'lodash'
-import PriceAmountInput from '@/components/price-amount-input'
+import MoneyInput from '@/components/money-input'
 import PercentageInput from '@/components/percentage-input'
 import errorI18nKey from '@/utils/error-i18n-key'
 import ProductItemSelect from '@/components/product-item-select'
@@ -119,7 +115,7 @@ import Price from '@/models/price'
 export default {
   name: 'PriceForm',
   components: {
-    PriceAmountInput,
+    MoneyInput,
     PercentageInput,
     ProductItemSelect
   },
@@ -197,6 +193,13 @@ export default {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
+    isRootPrice (formModel) {
+      if (formModel.product.kind === 'simple' || formModel.product.kind === 'variant') {
+        return true
+      }
+
+      return false
+    },
     setPriceChildren () {
       if (this.formModel.id) { return }
       ProductItemAPI.queryRecord({ filter: { productId: this.formModel.product.id } }).then(response => {
@@ -275,5 +278,9 @@ export default {
 .children-form {
   margin-right: 30px;
   margin-left: 30px;
+}
+
+.charge-amount-input {
+  width: 150px;
 }
 </style>

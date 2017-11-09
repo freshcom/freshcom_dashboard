@@ -124,7 +124,7 @@
             </el-table>
           </div>
 
-          <div class="block-footer no-divider text-center">
+          <div class="block-footer text-center">
             <a class="view-more" href="#">View More</a>
           </div>
         </div>

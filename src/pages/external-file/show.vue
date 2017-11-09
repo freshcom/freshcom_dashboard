@@ -1,106 +1,101 @@
 <template>
-<div class="main-col">
-  <div class="content">
+<div class="page-wrapper">
+  <div>
+    <el-menu :router="true" default-active="/files" mode="horizontal" class="secondary-nav">
+      <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">Files</el-menu-item>
+    </el-menu>
+    <locale-selector class="pull-right"></locale-selector>
+  </div>
 
-    <div class="secondary-nav">
-      <el-menu :router="true" default-active="/files" mode="horizontal">
-        <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">Files</el-menu-item>
-      </el-menu>
-      <locale-selector></locale-selector>
-    </div>
+  <div>
+    <el-card v-loading="isLoading" class="main-card">
+        <div slot="header">
 
-    <div class="main-scroller">
-      <div class="main">
-        <el-card v-loading="isLoading" class="main-card">
-          <div slot="header">
+          <div class="brief">
+            <div class="avatar">
+              <img v-if="isImage(record)" :src="record.url">
+              <icon v-else name="file" class="avatar-icon"></icon>
+            </div>
 
-            <div class="brief">
-              <div class="avatar">
-                <img v-if="isImage(record)" :src="record.url">
-                <icon v-else name="file" class="avatar-icon"></icon>
-              </div>
+            <div class="detail">
+              <p>{{record.code}}</p>
+              <h2>{{record.name}}</h2>
+              <p class="id">{{record.id}}</p>
+            </div>
+          </div>
+        </div>
 
-              <div class="detail">
-                <p>{{record.code}}</p>
-                <h2>{{record.name}}</h2>
-                <p class="id">{{record.id}}</p>
-              </div>
+
+        <div class="data">
+          <div class="block-title">
+            <h3>Details</h3>
+          </div>
+          <div class="block">
+            <div class="block-body">
+              <dl>
+                <dt>ID</dt>
+                <dd>{{record.id}}</dd>
+
+                <dt>Status</dt>
+                <dd>{{record.status}}</dd>
+
+                <dt>Name</dt>
+                <dd>{{record.name}}</dd>
+
+                <dt>Content Type</dt>
+                <dd>{{record.contentType}}</dd>
+
+                <dt>Size</dt>
+                <dd>{{record.sizeBytes}} bytes</dd>
+
+                <dt>Public Readable</dt>
+                <dd>{{record.publicReadable}}</dd>
+
+                <dt>Version Name</dt>
+                <dd>{{record.versionName}}</dd>
+
+                <dt>Version Label</dt>
+                <dd>{{record.versionLabel}}</dd>
+
+                <dt>URL</dt>
+                <dd><a :href="record.url" target="_blank">Click to open</a></dd>
+              </dl>
             </div>
           </div>
 
+          <h3>Custom Data</h3>
+          <div class="block">
+            <div class="block-body">
 
-          <div class="data">
-            <div class="block-title">
-              <h3>Details</h3>
-            </div>
-            <div class="block">
-              <div class="block-body">
-                <dl>
-                  <dt>ID</dt>
-                  <dd>{{record.id}}</dd>
-
-                  <dt>Status</dt>
-                  <dd>{{record.status}}</dd>
-
-                  <dt>Name</dt>
-                  <dd>{{record.name}}</dd>
-
-                  <dt>Content Type</dt>
-                  <dd>{{record.contentType}}</dd>
-
-                  <dt>Size</dt>
-                  <dd>{{record.sizeBytes}} bytes</dd>
-
-                  <dt>Public Readable</dt>
-                  <dd>{{record.publicReadable}}</dd>
-
-                  <dt>Version Name</dt>
-                  <dd>{{record.versionName}}</dd>
-
-                  <dt>Version Label</dt>
-                  <dd>{{record.versionLabel}}</dd>
-
-                  <dt>URL</dt>
-                  <dd><a :href="record.url" target="_blank">Click to open</a></dd>
-                </dl>
-              </div>
-            </div>
-
-            <h3>Custom Data</h3>
-            <div class="block">
-              <div class="block-body">
-
-              </div>
-            </div>
-
-            <h3>Related Resources</h3>
-            <div class="block">
-              <div class="block-body">
-
-              </div>
-            </div>
-
-            <h3>Logs</h3>
-            <div class="block">
-              <div class="block-body">
-
-              </div>
-            </div>
-
-            <h3>Events</h3>
-            <div class="block">
-              <div class="block-body">
-
-              </div>
             </div>
           </div>
 
-          <div class="footer text-right">
-            <delete-button @confirmed="deleteRecord">Delete</delete-button>
+          <h3>Related Resources</h3>
+          <div class="block">
+            <div class="block-body">
+
+            </div>
           </div>
-        </el-card>
-      </div>
-    </div>
+
+          <h3>Logs</h3>
+          <div class="block">
+            <div class="block-body">
+
+            </div>
+          </div>
+
+          <h3>Events</h3>
+          <div class="block">
+            <div class="block-body">
+
+            </div>
+          </div>
+        </div>
+
+        <div class="footer text-right">
+          <delete-button @confirmed="deleteRecord" size="medium">Delete</delete-button>
+        </div>
+    </el-card>
   </div>
 </div>
 

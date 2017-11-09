@@ -1,49 +1,43 @@
 <template>
-<div class="main-col">
-  <div class="content">
+<div class="page-wrapper">
+  <div>
+    <el-menu :router="true" default-active="/products" mode="horizontal" class="secondary-nav">
+      <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
+      <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">Collections</el-menu-item>
+    </el-menu>
+    <locale-selector class="pull-right"></locale-selector>
+  </div>
 
-    <div class="secondary-nav">
-      <el-menu :router="true" default-active="/product_items" mode="horizontal">
-        <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
-        <el-menu-item :route="{ name: 'ListProductItem' }" index="/product_items">Items</el-menu-item>
-      </el-menu>
-      <locale-selector></locale-selector>
-    </div>
+  <div>
+    <el-card v-loading="isLoading" class="main-card">
+      <div slot="header">
+        <span style="line-height: 36px;">Create a Price</span>
 
-    <div class="main-scroller">
-      <div class="main">
-        <el-card v-loading="isLoading" class="main-card">
-          <div slot="header">
-            <span style="line-height: 36px;">Create a Price</span>
+        <div class="pull-right">
+          <el-button @click="cancel" plain size="medium">
+            Cancel
+          </el-button>
 
-            <div class="pull-right">
-              <el-button @click="cancel">
-                Cancel
-              </el-button>
-
-              <el-button @click="submit(recordDraft)" type="primary">
-                Save
-              </el-button>
-            </div>
-          </div>
-
-          <div class="data">
-            <price-form v-model="recordDraft" :record="record" :errors="errors"></price-form>
-          </div>
-
-          <div class="footer">
-            <el-button @click="cancel">
-              Cancel
-            </el-button>
-
-            <el-button @click="submit(recordDraft)" type="primary" class="pull-right">
-              Save
-            </el-button>
-          </div>
-        </el-card>
+          <el-button @click="submit(recordDraft)" type="primary" size="medium">
+            Save
+          </el-button>
+        </div>
       </div>
-    </div>
 
+      <div class="data">
+        <price-form v-model="recordDraft" :record="record" :errors="errors"></price-form>
+      </div>
+
+      <div class="footer">
+        <el-button @click="cancel" plain size="medium">
+          Cancel
+        </el-button>
+
+        <el-button @click="submit(recordDraft)" type="primary" size="medium" class="pull-right">
+          Save
+        </el-button>
+      </div>
+    </el-card>
   </div>
 </div>
 </template>
@@ -59,17 +53,11 @@ export default {
     PriceForm
   },
   mixins: [NewPage({ storeNamespace: 'price', name: 'Price' })],
-  props: ['productItemId', 'productId'],
+  props: ['productKind', 'productId'],
   created () {
-    if (this.productItemId) {
-      let record = _.cloneDeep(this.record)
-      record.productItem = { id: this.productItemId, type: 'ProductItem' }
-      this.$store.dispatch('price/setRecord', record)
-    }
-
     if (this.productId) {
       let record = _.cloneDeep(this.record)
-      record.product = { id: this.productId, type: 'Product' }
+      record.product = { id: this.productId, type: 'Product', kind: this.productKind }
       this.$store.dispatch('price/setRecord', record)
     }
   },

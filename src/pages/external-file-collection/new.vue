@@ -70,11 +70,11 @@ export default {
   },
   methods: {
     recordCreated (record) {
-      if (this.props.skuId) {
+      if (this.skuId) {
         this.$store.dispatch('sku/resetRecord')
       }
 
-      if (this.props.productId) {
+      if (this.productId) {
         this.$store.dispatch('product/resetRecord')
       }
 

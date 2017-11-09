@@ -308,6 +308,11 @@ a:hover {
       }
 
       .actions {
+        .el-button {
+          padding: 5px 10px;
+          font-size: 11px;
+        }
+
         a {
           margin-left: 10px;
         }
@@ -400,6 +405,10 @@ p.search-notice {
 
 .el-input__inner {
   text-align: inherit;
+}
+
+.el-input-group__append {
+  padding: 0 10px;
 }
 
 .el-input.is-disabled .el-input__inner {

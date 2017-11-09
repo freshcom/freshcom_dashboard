@@ -1,50 +1,44 @@
 <template>
-<div class="main-col">
-  <div class="content">
+<div class="page-wrapper">
+  <div>
+    <el-menu :router="true" default-active="/product_items" mode="horizontal" class="secondary-nav">
+      <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
+      <el-menu-item :route="{ name: 'ListProductItem' }" index="/product_items">Items</el-menu-item>
+      <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">Collections</el-menu-item>
+    </el-menu>
+    <locale-selector :before-change="confirmResourceLocaleChange" @change="loadRecord" class="pull-right"></locale-selector>
+  </div>
 
-    <div class="secondary-nav">
-      <el-menu :router="true" default-active="/product_items" mode="horizontal">
-        <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
-        <el-menu-item :route="{ name: 'ListProductItem' }" index="/product_items">Items</el-menu-item>
-        <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">Collections</el-menu-item>
-      </el-menu>
-      <locale-selector :before-change="confirmResourceLocaleChange" @change="loadRecord"></locale-selector>
-    </div>
+  <div>
+    <el-card class="main-card">
+      <div slot="header">
+        <span style="line-height: 36px;">Edit Product Item</span>
 
-    <div class="main-scroller">
-      <div class="main">
-        <el-card class="main-card">
-          <div slot="header">
-            <span style="line-height: 36px;">Edit Product Item</span>
+        <div style="float: right;">
+          <el-button @click="cancel" plain size="medium">
+            Cancel
+          </el-button>
 
-            <div style="float: right;">
-              <el-button @click="cancel">
-                Cancel
-              </el-button>
-
-              <el-button @click="submit(recordDraft)" type="primary">
-                Save
-              </el-button>
-            </div>
-          </div>
-
-          <div class="data">
-            <product-item-form v-model="recordDraft" :record="record" :errors="errors"></product-item-form>
-          </div>
-
-          <div class="footer">
-            <el-button @click="cancel">
-              Cancel
-            </el-button>
-
-            <el-button @click="submit(recordDraft)" type="primary" class="pull-right">
-              Save
-            </el-button>
-          </div>
-        </el-card>
+          <el-button @click="submit(recordDraft)" type="primary" size="medium">
+            Save
+          </el-button>
+        </div>
       </div>
-    </div>
 
+      <div class="data">
+        <product-item-form v-model="recordDraft" :record="record" :errors="errors"></product-item-form>
+      </div>
+
+      <div class="footer">
+        <el-button @click="cancel" plain size="medium">
+          Cancel
+        </el-button>
+
+        <el-button @click="submit(recordDraft)" type="primary" size="medium" class="pull-right">
+          Save
+        </el-button>
+      </div>
+    </el-card>
   </div>
 </div>
 </template>
