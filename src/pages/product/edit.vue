@@ -4,7 +4,7 @@
   <div>
     <el-menu :router="true" default-active="/products" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
-      <el-menu-item :route="{ name: 'ListProductItem' }" index="/product_items">Items</el-menu-item>
+      <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">Collections</el-menu-item>
     </el-menu>
     <locale-selector :before-change="confirmResourceLocaleChange" @change="loadRecord" class="pull-right"></locale-selector>
   </div>

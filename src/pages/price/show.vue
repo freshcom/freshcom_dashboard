@@ -1,141 +1,138 @@
 <template>
 <div class="main-col">
   <div class="content">
-    <div class="secondary-nav">
-      <el-menu :router="true" default-active="/product_items" mode="horizontal">
+    <div>
+      <el-menu :router="true" default-active="/products" mode="horizontal" class="secondary-nav">
         <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
-        <el-menu-item :route="{ name: 'ListProductItem' }" index="/product_items">Items</el-menu-item>
         <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">Collections</el-menu-item>
       </el-menu>
-      <locale-selector @change="loadRecord"></locale-selector>
+      <locale-selector @change="loadRecord" class="pull-right"></locale-selector>
     </div>
 
-    <div class="main-scroller">
-      <div class="main">
-        <el-card v-loading="isLoading" class="main-card">
-          <div slot="header">
+    <div>
+      <el-card v-loading="isLoading" class="main-card">
+        <div slot="header">
 
-            <div class="brief no-avatar">
-              <div class="detail">
-                <p>Price {{record.code}}</p>
-                <h2>{{record.name}}</h2>
-                <p class="id">{{record.id}}</p>
-              </div>
-            </div>
-
-            <div class="header-actions">
-              <el-button @click="editRecord()">Edit</el-button>
+          <div class="brief no-avatar">
+            <div class="detail">
+              <p>Price {{record.code}}</p>
+              <h2>{{record.name}}</h2>
+              <p class="id">{{record.id}}</p>
             </div>
           </div>
 
-          <div class="data">
-            <div class="block-title">
-              <h3>Details</h3>
-            </div>
-            <div class="block">
-              <div class="block-body">
-                <dl>
-                  <dt>ID</dt>
-                  <dd>{{record.id}}</dd>
+          <div class="header-actions">
+            <el-button @click="editRecord()" size="medium">Edit</el-button>
+          </div>
+        </div>
 
-                  <dt>Code</dt>
-                  <dd>{{record.code}}</dd>
+        <div class="data">
+          <div class="block-title">
+            <h3>Details</h3>
+          </div>
+          <div class="block">
+            <div class="block-body">
+              <dl>
+                <dt>ID</dt>
+                <dd>{{record.id}}</dd>
 
-                  <dt>Status</dt>
-                  <dd>
-                    {{$t(`attributes.price.status.${record.status}`)}}
-                  </dd>
+                <dt>Code</dt>
+                <dd>{{record.code}}</dd>
 
-                  <dt>Name</dt>
-                  <dd>{{record.name}}</dd>
+                <dt>Status</dt>
+                <dd>
+                  {{$t(`attributes.price.status.${record.status}`)}}
+                </dd>
 
-                  <dt>Label</dt>
-                  <dd>{{record.label}}</dd>
+                <dt>Name</dt>
+                <dd>{{record.name}}</dd>
 
-                  <dt>Charge Amount</dt>
-                  <dd>${{record.chargeCents / 100}} / {{record.chargeUnit}}</dd>
+                <dt>Label</dt>
+                <dd>{{record.label}}</dd>
 
-                  <dt>Order Unit</dt>
-                  <dd>{{record.orderUnit}}</dd>
+                <dt>Charge Amount</dt>
+                <dd>${{record.chargeCents / 100}} / {{record.chargeUnit}}</dd>
 
-                  <dt>Estimate By Default</dt>
-                  <dd>{{record.estimateByDefault}}</dd>
+                <dt>Order Unit</dt>
+                <dd>{{record.orderUnit}}</dd>
 
-                  <dt>Estimate Average</dt>
-                  <dd>
-                    {{record.estimateAveragePercentage}}<span v-if="record.estimateAveragePercentage">%</span>
-                  </dd>
+                <dt>Estimate By Default</dt>
+                <dd>{{record.estimateByDefault}}</dd>
 
-                  <dt>Maximum Average</dt>
-                  <dd>
-                    {{record.estimateMaximumPercentage}}<span v-if="record.estimateMaximumPercentage">%</span>
-                  </dd>
+                <dt>Estimate Average</dt>
+                <dd>
+                  {{record.estimateAveragePercentage}}<span v-if="record.estimateAveragePercentage">%</span>
+                </dd>
 
-                  <dt>Minimum OQ</dt>
-                  <dd>{{record.minimumOrderQuantity}}</dd>
+                <dt>Maximum Average</dt>
+                <dd>
+                  {{record.estimateMaximumPercentage}}<span v-if="record.estimateMaximumPercentage">%</span>
+                </dd>
 
-                  <dt>Tax One</dt>
-                  <dd>{{record.taxOnePercentage}}%</dd>
+                <dt>Minimum OQ</dt>
+                <dd>{{record.minimumOrderQuantity}}</dd>
 
-                  <dt>Tax Two</dt>
-                  <dd>{{record.taxTwoPercentage}}%</dd>
+                <dt>Tax One</dt>
+                <dd>{{record.taxOnePercentage}}%</dd>
 
-                  <dt>Tax Three</dt>
-                  <dd>{{record.taxThreePercentage}}%</dd>
-                </dl>
-              </div>
-            </div>
+                <dt>Tax Two</dt>
+                <dd>{{record.taxTwoPercentage}}%</dd>
 
-            <div class="block-title">
-              <h3>Custom Data</h3>
-            </div>
-            <div class="block">
-              <div class="block-body">
-                {{record.customData}}
-              </div>
-            </div>
-
-            <h3>Related Resources</h3>
-            <div class="block">
-              <div class="block-body">
-                <dl>
-                  <dt v-if="record.productItem">Product Item</dt>
-                  <dd v-if="record.productItem">
-                    <router-link :to="{ name: 'ShowProductItem', params: { id: record.productItem.id }}">
-                      {{record.productItem.id}}
-                    </router-link>
-                  </dd>
-
-                  <dt v-if="record.product">Product</dt>
-                  <dd v-if="record.product">
-                    <router-link :to="{ name: 'ShowProduct', params: { id: record.product.id }}">
-                      {{record.product.id}}
-                    </router-link>
-                  </dd>
-                </dl>
-              </div>
-            </div>
-
-            <h3>Logs</h3>
-            <div class="block">
-              <div class="block-body">
-
-              </div>
-            </div>
-
-            <h3>Events</h3>
-            <div class="block">
-              <div class="block-body">
-
-              </div>
+                <dt>Tax Three</dt>
+                <dd>{{record.taxThreePercentage}}%</dd>
+              </dl>
             </div>
           </div>
 
-          <div class="footer text-right">
-            <delete-button @confirmed="deleteRecord">Delete</delete-button>
+          <div class="block-title">
+            <h3>Custom Data</h3>
           </div>
-        </el-card>
-      </div>
+          <div class="block">
+            <div class="block-body">
+              {{record.customData}}
+            </div>
+          </div>
+
+          <h3>Related Resources</h3>
+          <div class="block">
+            <div class="block-body">
+              <dl>
+                <dt v-if="record.productItem">Product Item</dt>
+                <dd v-if="record.productItem">
+                  <router-link :to="{ name: 'ShowProductItem', params: { id: record.productItem.id }}">
+                    {{record.productItem.id}}
+                  </router-link>
+                </dd>
+
+                <dt v-if="record.product">Product</dt>
+                <dd v-if="record.product">
+                  <router-link :to="{ name: 'ShowProduct', params: { id: record.product.id }}">
+                    {{record.product.id}}
+                  </router-link>
+                </dd>
+              </dl>
+            </div>
+          </div>
+
+          <h3>Logs</h3>
+          <div class="block">
+            <div class="block-body">
+
+            </div>
+          </div>
+
+          <h3>Events</h3>
+          <div class="block">
+            <div class="block-body">
+
+            </div>
+          </div>
+        </div>
+
+        <div class="footer text-right">
+          <delete-button @confirmed="deleteRecord" size="medium">Delete</delete-button>
+        </div>
+      </el-card>
     </div>
   </div>
 </div>
@@ -155,7 +152,7 @@ export default {
   components: {
     DeleteButton
   },
-  mixins: [ShowPage({ storeNamespace: 'price', name: 'Price', include: 'children.productItem' })],
+  mixins: [ShowPage({ storeNamespace: 'price', name: 'Price', include: 'children.product' })],
   methods: {
     editRecord () {
       this.$store.dispatch('pushRoute', { name: 'EditPrice', params: { id: this.record.id } })

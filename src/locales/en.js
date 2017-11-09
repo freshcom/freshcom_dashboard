@@ -32,12 +32,12 @@ export default {
     },
     product: {
       status: {
-        requirePrimaryActiveItem: 'A Product must have a Primary Active Item in order to be marked Active.',
-        requireAtLeastOneInternalItem: 'A Product must have at least one Active/Internal Item in order to be marked Internal.',
+        requirePrimaryActiveVariant: 'A Product with variants must have a Primary Active Variant in order to be marked Active.',
+        requireAtLeastOneInternalVariant: 'A Product must have at least one Active/Internal Variant in order to be marked Internal.',
         requireAllItemActive: 'A Product with Item Mode set to All must have all of its Item set to Active in order to be marked Active.',
         requireAllItemInternal: 'A Product with Item Mode set to All must have all of its Item set to Active/Internal in order to be marked Internal.',
-        requireAtLeastOneActivePrice: 'A Product with Item Mode set to All require at least one Active Price in order to be marked Active.',
-        requireAtLeastOneInternalPrice: 'A Product with Item Mode set to All require at least one Active/Internal Price in order to be marked Internal.'
+        requireActivePrice: 'A Product must have a Active Price in order to be marked Active.',
+        requireInternalPrice: 'A Product must have a Active/Internal Price in order to be marked Internal.'
       }
     },
     account: {
@@ -82,14 +82,13 @@ export default {
       }
     },
     product: {
-      status: {
-        draft: 'Draft',
-        active: 'Active',
-        internal: 'Internal',
-        disabled: 'Disabled'
-      }
-    },
-    productItem: {
+      kind: {
+        simple: 'Simple',
+        item: 'Item',
+        variant: 'Variant',
+        combo: 'Combo',
+        withVariants: 'with Variants'
+      },
       status: {
         draft: 'Draft',
         active: 'Active',
@@ -98,8 +97,7 @@ export default {
       },
       nameSync: {
         disabled: 'Disabled',
-        sync_with_source: 'Sync with source',
-        sync_with_product: 'Sync with product'
+        syncWithSource: 'Sync with source'
       }
     },
     price: {

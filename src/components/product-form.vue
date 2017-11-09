@@ -215,7 +215,7 @@ export default {
       this.updateValue()
     },
     canSelectKind (formModel) {
-      if (formModel.kind === 'item' || formModel.kind === 'variant') {
+      if (formModel.id || formModel.kind === 'item' || formModel.kind === 'variant') {
         return false
       }
 

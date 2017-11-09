@@ -133,6 +133,33 @@ export default {
       })
     },
 
+    updateVariant ({ state, commit, rootState }, actionPayload) {
+      let apiPayload = { data: JSONAPI.serialize(actionPayload.recordDraft) }
+
+      let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
+      return ProductAPI.updateRecord(actionPayload.id, apiPayload, options).then(response => {
+        let apiPayload = response.data
+        let updatedVariant = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+        let record = _.cloneDeep(state.record)
+        _.each(record.variants, (variant) => {
+          if (actionPayload.recordDraft.primary) {
+            variant.primary = false
+          }
+
+          if (variant.id === updatedVariant.id) {
+            variant.status = updatedVariant.status
+            variant.primary = updatedVariant.primary
+          }
+        })
+
+        commit(MT.RECORD_CHANGED, record)
+
+        return record
+      }).catch(error => {
+        throw JSONAPI.deserializeErrors(error.response.data.errors)
+      })
+    },
+
     loadRecords ({ state, commit, rootState }, actionPayload) {
       commit(MT.RECORDS_LOADING)
       actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })

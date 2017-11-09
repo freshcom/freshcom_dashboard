@@ -84,7 +84,7 @@
     <div v-for="child in formModel.children" class="child-row">
       <hr>
 
-      <div class="product-item">{{child.productItem.name}}</div>
+      <div class="product-item">{{child.product.name}}</div>
 
       <div class="price">
         <money-input v-model="child.chargeCents" class="child-price-input">
