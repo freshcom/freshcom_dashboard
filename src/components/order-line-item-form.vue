@@ -149,7 +149,7 @@
 
     <el-form-item label="Tax 1" class="tax">
       <money-input
-        :value="formModel.taxOneCents"
+        v-model="formModel.taxOneCents"
         :disabled="type === 'Product'"
         @change="balanceByTax()"
       >
@@ -160,7 +160,7 @@
 
     <el-form-item label="Tax 2" class="tax">
       <money-input
-        :value="formModel.taxTwoCents"
+        v-model="formModel.taxTwoCents"
         :disabled="type === 'Product'"
         @change="balanceByTax()"
       >
@@ -171,7 +171,7 @@
 
     <el-form-item label="Tax 3" class="tax">
       <money-input
-        :value="formModel.taxThreeCents"
+        v-model="formModel.taxThreeCents"
         :disabled="type === 'Product'"
         @change="balanceByTax()"
       >
@@ -194,7 +194,6 @@ import { dollar, chargeDollar } from '@/helpers/filters'
 import Price from '@/models/price'
 import OrderLineItem from '@/models/order-line-item'
 import RemoteSelect from '@/components/remote-select'
-import RemoteCascader from '@/components/remote-cascader'
 
 import MoneyInput from '@/components/money-input'
 
@@ -203,7 +202,6 @@ export default {
   props: ['value', 'errors', 'isVisible'],
   components: {
     RemoteSelect,
-    RemoteCascader,
     MoneyInput
   },
   filters: {
