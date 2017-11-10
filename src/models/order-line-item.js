@@ -18,10 +18,7 @@ export default {
       taxThreeCents: 0,
       grandTotalCents: 0,
 
-      product: undefined,
-      productItem: undefined,
-      sku: undefined,
-      unlockable: undefined,
+      product: {},
 
       priceTaxOnePercentage: 0,
       priceTaxTwoPercentage: 0,
@@ -122,18 +119,6 @@ export default {
     return this.balanceByChargeQuantity(lineItem)
   },
 
-  balanceByProductItem (sourceLineItem) {
-    if (!sourceLineItem.productItem) {
-      return sourceLineItem
-    }
-
-    let lineItem = _.cloneDeep(sourceLineItem)
-    let productItem = lineItem.productItem
-
-    lineItem.price = productItem.defaultPrice
-    return this.balanceByPrice(lineItem)
-  },
-
   // Expects product.defaultPrice and product.items be loaded
   balanceByProduct (sourceLineItem) {
     if (!sourceLineItem.product) {
@@ -141,17 +126,8 @@ export default {
     }
 
     let lineItem = _.cloneDeep(sourceLineItem)
-    let product = lineItem.product
-
-    if (product.itemMode === 'all') {
-      lineItem.price = product.defaultPrice
-      lineItem.productItem = undefined
-      return this.balanceByPrice(lineItem)
-    } else {
-      let primaryItem = _.find(product.items, { primary: true })
-      lineItem.productItem = primaryItem
-      return this.balanceByProductItem(lineItem)
-    }
+    lineItem.price = lineItem.product.defaultPrice
+    return this.balanceByPrice(lineItem)
   },
 
   tableData (lineItems) {

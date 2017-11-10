@@ -81,6 +81,7 @@ input::-webkit-inner-spin-button {
 .wrapper > .el-container {
   max-width: 1280px;
   height: 100vh;
+  min-width: 1024px;
 
   .el-container {
     width: 100vh;

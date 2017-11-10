@@ -13,7 +13,7 @@
     <el-col v-if="!formModel.id && type === 'Product'" :span="9" class="p-r-10">
       <el-form-item label="Product" class="full">
         <remote-select
-          :value="formModel.product"
+          :value="product"
           :records="selectableProducts"
           :is-loading="isLoadingSelectableProducts"
           @filter="loadSelectableProducts"
@@ -26,18 +26,17 @@
       </el-form-item>
     </el-col>
 
-    <el-col v-if="!formModel.id && type === 'Product'" :span="9" class="p-l-10">
-      <el-form-item label="Product Item" class="full">
+    <el-col :span="9" class="p-l-10">
+      <el-form-item v-if="canSelectVariant(formModel, type)" label="Variant" class="full">
         <el-select
-          :value="formModel.productItem"
-          :disabled="!isProductItemSelectable"
-          :placeholder="productItemSelectPlaceholder"
-          @change="balanceByProductItem($event)"
+          :value="formModel.product"
+          @change="balanceByProductVariant($event)"
           value-key="id"
+          placeholder="Select variant..."
           class="product-item-select"
         >
           <el-option
-            v-for="item in selectableProductItems"
+            v-for="item in selectableProductVariants"
             :key="item.id"
             :label="item.name"
             :value="item"
@@ -46,6 +45,7 @@
           </el-option>
         </el-select>
       </el-form-item>
+      <p v-else></p>
     </el-col>
 
     <el-col v-if="type === 'None' || formModel.id" :span="18">
@@ -194,6 +194,8 @@ import { dollar, chargeDollar } from '@/helpers/filters'
 import Price from '@/models/price'
 import OrderLineItem from '@/models/order-line-item'
 import RemoteSelect from '@/components/remote-select'
+import RemoteCascader from '@/components/remote-cascader'
+
 import MoneyInput from '@/components/money-input'
 
 export default {
@@ -201,6 +203,7 @@ export default {
   props: ['value', 'errors', 'isVisible'],
   components: {
     RemoteSelect,
+    RemoteCascader,
     MoneyInput
   },
   filters: {
@@ -210,7 +213,8 @@ export default {
   data () {
     return {
       formModel: _.cloneDeep(this.value),
-      type: 'Product'
+      type: 'Product',
+      product: undefined
     }
   },
   computed: {
@@ -220,22 +224,8 @@ export default {
     selectableProducts () {
       return this.$store.state.orderLineItem.selectableProducts
     },
-    selectableProductItems () {
-      return this.$store.state.orderLineItem.selectableProductItems
-    },
-    isProductItemSelectable () {
-      if (!this.formModel.productItem) {
-        return false
-      }
-
-      return true
-    },
-    productItemSelectPlaceholder () {
-      if (this.formModel.product && this.formModel.product.itemMode === 'all') {
-        return 'All'
-      } else {
-        return 'Select product first...'
-      }
+    selectableProductVariants () {
+      return this.$store.state.orderLineItem.selectableProductVariants
     },
     errorMessages () {
       return _.reduce(this.errors, (result, v, k) => {
@@ -251,13 +241,8 @@ export default {
       return false
     },
     selectablePrices () {
-      if (this.formModel.productItem || (this.formModel.product && this.formModel.product.itemMode === 'all')) {
-        let prices
-        if (this.formModel.productItem) {
-          prices = this.formModel.productItem.prices
-        } else {
-          prices = this.formModel.product.prices
-        }
+      if (this.formModel.product) {
+        let prices = this.formModel.product.prices
 
         let lowestActivePrice = Price.getLowestPrice(prices, this.formModel.orderQuantity, 'active')
         let internalPrices = _.filter(prices, (price) => {
@@ -297,14 +282,15 @@ export default {
       this.$emit('input', formModel)
     }, 300),
     loadSelectableProducts: _.debounce(function (searchKeyword) {
-      if (searchKeyword) {
-        this.$store.dispatch('orderLineItem/loadSelectableProducts', {
-          search: searchKeyword,
-          filter: { status: ['active', 'internal'] },
-          include: 'prices,defaultPrice'
-        })
-      }
+      return this.$store.dispatch('orderLineItem/loadSelectableProducts', {
+        search: searchKeyword,
+        filter: { status: ['active', 'internal'] },
+        include: 'prices,defaultPrice,variants.prices,variants.defaultPrice'
+      })
     }, 300),
+    canSelectVariant (formModel, type) {
+      return !formModel.id && formModel.product.kind === 'variant' && type === 'Product'
+    },
     resetSelectableProducts () {
       this.$store.dispatch('orderLineItem/resetSelectableProducts')
     },
@@ -336,32 +322,34 @@ export default {
       this.formModel.price = price
       this.updateValue(OrderLineItem.balanceByPrice(this.formModel))
     },
-    balanceByProductItem (productItem) {
-      if (this.formModel.productItem.id === productItem.id) {
+    balanceByProductVariant (variant) {
+      if (this.formModel.product.id === variant.id) {
         return
       }
 
-      this.formModel.productItem = productItem
-      this.updateValue(OrderLineItem.balanceByProductItem(this.formModel))
+      this.formModel.product = variant
+      this.updateValue(OrderLineItem.balanceByProduct(this.formModel))
     },
     balanceByProduct (product) {
       if (!product) {
         return this.reset()
       }
 
-      this.formModel.product = product
-      if (this.formModel.product.itemMode === 'all') {
-        this.updateValue(OrderLineItem.balanceByProduct(this.formModel))
-      } else {
-        this.$store.dispatch('orderLineItem/loadSelectableProductItems', {
-          filter: { productId: this.formModel.product.id, status: ['active', 'internal'] },
+      if (product.kind === 'withVariants') {
+        this.$store.dispatch('orderLineItem/loadSelectableProductVariants', {
+          filter: { parentId: product.id, status: ['active', 'internal'] },
           include: 'prices,defaultPrice'
         }).then(response => {
-          let primaryItem = _.find(response.resources, { primary: true })
+          let primaryVariant = _.find(response.resources, { primary: true })
           let formModel = _.cloneDeep(this.formModel)
-          formModel.productItem = primaryItem
-          this.updateValue(OrderLineItem.balanceByProductItem(formModel))
+          formModel.product = primaryVariant
+          this.updateValue(OrderLineItem.balanceByProduct(formModel))
         })
+      } else {
+        this.product = product
+        let formModel = _.cloneDeep(this.formModel)
+        formModel.product = product
+        this.updateValue(OrderLineItem.balanceByProduct(formModel))
       }
     }
   }

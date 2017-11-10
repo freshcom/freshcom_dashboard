@@ -2,7 +2,6 @@ import _ from 'lodash'
 
 import OrderLineItemAPI from '@/api/order-line-item'
 import ProductAPI from '@/api/product'
-import ProductItemAPI from '@/api/product-item'
 import JSONAPI from '@/jsonapi'
 
 import OrderLineItem from '@/models/order-line-item'
@@ -16,9 +15,9 @@ const MT = {
   SELECTABLE_PRODUCTS_CHANGED: 'SELECTABLE_PRODUCTS_CHANGED',
   SELECTABLE_PRODUCTS_LOADING: 'SELECTABLE_PRODUCTS_LOADING',
   SELECTABLE_PRODUCTS_RESET: 'SELECTABLE_PRODUCTS_RESET',
-  SELECTABLE_PRODUCT_ITEMS_CHANGED: 'SELECTABLE_PRODUCT_ITEMS_CHANGED',
-  SELECTABLE_PRODUCT_ITEMS_LOADING: 'SELECTABLE_PRODUCT_ITEMS_LOADING',
-  SELECTABLE_PRODUCT_ITEMS_RESET: 'SELECTABLE_PRODUCT_ITEMS_RESET'
+  SELECTABLE_PRODUCT_VARIANTS_CHANGED: 'SELECTABLE_PRODUCT_VARIANTS_CHANGED',
+  SELECTABLE_PRODUCT_VARIANTS_LOADING: 'SELECTABLE_PRODUCT_VARIANTS_LOADING',
+  SELECTABLE_PRODUCT_VARIANTS_RESET: 'SELECTABLE_PRODUCT_VARIANTS_RESET'
 }
 
 export default {
@@ -30,8 +29,8 @@ export default {
     records: [],
     selectableProducts: [],
     isLoadingSelectableProducts: false,
-    selectableProductItems: [],
-    isLoadingSelectableProductItems: false
+    selectableProductVariants: [],
+    isLoadingSelectableProductVariants: false
   },
   actions: {
     setRecord ({ commit }, record) {
@@ -66,15 +65,15 @@ export default {
       commit(MT.SELECTABLE_PRODUCTS_RESET)
     },
 
-    loadSelectableProductItems ({ state, commit, rootState }, actionPayload) {
-      commit(MT.SELECTABLE_PRODUCT_ITEMS_LOADING)
+    loadSelectableProductVariants ({ state, commit, rootState }, actionPayload) {
+      commit(MT.SELECTABLE_PRODUCT_VARIANTS_LOADING)
       actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
 
-      return ProductItemAPI.queryRecord(actionPayload).then(response => {
+      return ProductAPI.queryRecord(actionPayload).then(response => {
         let apiPayload = response.data
         return { meta: response.data.meta, resources: JSONAPI.deserialize(apiPayload.data, apiPayload.included) }
       }).then(response => {
-        commit(MT.SELECTABLE_PRODUCT_ITEMS_CHANGED, response.resources)
+        commit(MT.SELECTABLE_PRODUCT_VARIANTS_CHANGED, response.resources)
 
         return response
       }).catch(error => {
@@ -82,8 +81,8 @@ export default {
       })
     },
 
-    resetSelectableProductItems ({ commit }) {
-      commit(MT.SELECTABLE_PRODUCT_ITEMS_RESET)
+    resetSelectableProductVariants ({ commit }) {
+      commit(MT.SELECTABLE_PRODUCT_VARIANTS_RESET)
     },
 
     loadRecord ({ state, commit, rootState }, actionPayload) {
@@ -196,18 +195,18 @@ export default {
       state.selectableProducts = []
     },
 
-    [MT.SELECTABLE_PRODUCT_ITEMS_CHANGED] (state, productItems) {
-      state.selectableProductItems = productItems
-      state.isLoadingSelectableProductItems = false
+    [MT.SELECTABLE_PRODUCT_VARIANTS_CHANGED] (state, productVariants) {
+      state.selectableProductVariants = productVariants
+      state.isLoadingSelectableProductVariants = false
     },
 
-    [MT.SELECTABLE_PRODUCT_ITEMS_LOADING] (state) {
-      state.isLoadingSelectableProductItems = true
+    [MT.SELECTABLE_PRODUCT_VARIANTS_LOADING] (state) {
+      state.isLoadingSelectableProductVariants = true
     },
 
-    [MT.SELECTABLE_PRODUCT_ITEMS_RESET] (state) {
-      state.isLoadingSelectableProductItems = false
-      state.selectableProductItems = []
+    [MT.SELECTABLE_PRODUCT_VARIANTS_RESET] (state) {
+      state.isLoadingSelectableProductVariants = false
+      state.selectableProductVariants = []
     },
 
     [MT.RECORD_LOADING] (state) {
