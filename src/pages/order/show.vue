@@ -408,7 +408,7 @@ export default {
       return this.$store.state.order.isAddingRefund
     }
   },
-  mixins: [ShowPage({ storeNamespace: 'order', name: 'Order', include: 'rootLineItems.children,payments' })],
+  mixins: [ShowPage({ storeNamespace: 'order', name: 'Order', include: 'rootLineItems.children' })],
   methods: {
     canRefundPayment (payment) {
       return payment.status === 'partially_refunded' || payment.status === 'paid'

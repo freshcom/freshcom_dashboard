@@ -84,7 +84,7 @@
             Cancel
           </el-button>
 
-          <el-button :disabled="record.rootLineItems.length === 0" @click="nextStep(recordDraft)" size="medium" type="primary" class="pull-right">
+          <el-button :disabled="record.rootLineItems.length === 0" @click="next()" size="medium" type="primary" class="pull-right">
             Next
           </el-button>
         </template>
@@ -94,7 +94,7 @@
             Back
           </el-button>
 
-          <el-button @click="nextStep(recordDraft)" size="medium" type="primary" class="pull-right">
+          <el-button @click="updateOrder(recordDraft, paymentDraft)" size="medium" type="primary" class="pull-right">
             Next
           </el-button>
         </template>
@@ -218,32 +218,36 @@ export default {
     }
   },
   methods: {
-    nextStep (recordDraft) {
-      if (this.activeStep === 0) {
+    updateOrder (recordDraft, payment) {
+      this.$store.dispatch('order/updateRecord', {
+        id: recordDraft.id,
+        recordDraft: recordDraft
+      }).then(order => {
+        let payment = _.cloneDeep(this.payment)
+        payment.target = order
+        payment.owner = order.customer
+
+        if (order.isEstimate) {
+          payment.authorizedAmountCents = order.authorizationCents
+        } else {
+          payment.paidAmountCents = order.grandTotalCents
+        }
+
+        this.$store.dispatch('order/setPaymentForCreate', payment)
+
         this.activeStep += 1
-        return
-      }
+      }).catch(errors => {
+        this.errors = errors
 
-      if (this.activeStep === 1) {
-        this.isLoading = true
-        this.$store.dispatch('order/updateRecord', { id: recordDraft.id, recordDraft: recordDraft }).then(order => {
-          let payment = _.cloneDeep(this.paymentDraft)
-          payment.order = order
-          this.$store.dispatch('order/setPaymentForCreate', payment)
-
-          this.isLoading = false
-          this.activeStep += 1
-        }).catch(errors => {
-          this.errors = errors
-          this.isLoading = false
-
-          this.$message({
-            showClose: true,
-            message: `Unable to continue. please fix the highlighted form errors then try again.`,
-            type: 'error'
-          })
+        this.$message({
+          showClose: true,
+          message: `Unable to continue. please fix the highlighted form errors then try again.`,
+          type: 'error'
         })
-      }
+      })
+    },
+    next () {
+      this.activeStep += 1
     },
     editLineItem (lineItemId) {
       let lineItem = _.find(this.record.rootLineItems, { id: lineItemId })
@@ -273,13 +277,19 @@ export default {
       this.$store.dispatch('order/endEditLineItem')
     },
     createPayment (paymentDraft, order) {
-      this.isLoading = true
+      // this.isLoading = true
 
       let paymentCreated
-      if (paymentDraft.gateway === 'online' && paymentDraft.status === 'paid') {
+      paymentDraft = _.cloneDeep(paymentDraft)
+      paymentDraft.owner = { id: order.id, type: order.type }
+      if (paymentDraft.gateway === 'online') {
+        if (order.isEstimate) {
+          paymentDraft.authorizedAmountCents = order.authorizationCents
+        } else {
+          paymentDraft.paidAmountCents = order.grandTotalCents
+        }
+
         paymentCreated = createStripeToken().then(data => {
-          paymentDraft = _.cloneDeep(paymentDraft)
-          paymentDraft.order = order
           paymentDraft.source = data.token.id
           return this.$store.dispatch('order/createPayment', paymentDraft)
         })
@@ -296,11 +306,10 @@ export default {
           type: 'success'
         })
 
-        this.isLoading = false
+        console.log('x')
         this.$store.dispatch('order/resetRecord')
         return this.$store.dispatch('pushRoute', { name: 'ListOrder' })
       }).catch(errors => {
-        this.isLoading = false
         this.errors = errors
         if (errors.source) {
           let errorCode = errors.source[0]

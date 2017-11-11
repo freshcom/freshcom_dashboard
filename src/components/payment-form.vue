@@ -1,5 +1,5 @@
 <template>
-<el-form @input.native="updateValue" label-position="top" size="small" class="m-b-10">
+<el-form @input.native="updateValue" :model="formModel" @input="test()" label-position="top" size="small" class="m-b-10">
 
   <el-row :gutter="10">
     <el-col v-if="canSelectGateway" :span="8">
@@ -44,10 +44,10 @@
   <el-row>
     <el-col :span="12">
       <el-form-item v-if="canSelectAction" :error="errorMessages.status" required>
-        <b class="m-r-20">Action</b>
-        <el-radio-group @change="updateValue" v-model="formModel.status">
-          <el-radio label="paid">Pay Now</el-radio>
-          <el-radio label="pending">Pay through Paylink</el-radio>
+        <b class="m-r-20">Action {{action}}</b>
+        <el-radio-group @input="handleActionChange($event)" :value="action">
+          <el-radio label="payNow">Pay Now</el-radio>
+          <el-radio label="payLater">Pay through Paylink</el-radio>
         </el-radio-group>
       </el-form-item>
     </el-col>
@@ -174,6 +174,7 @@ export default {
   data () {
     return {
       complete: false,
+      action: 'payNow',
       formModel: _.cloneDeep(this.value),
       stripeOptions: {
         // see https://stripe.com/docs/stripe.js#element-options for details
@@ -210,13 +211,13 @@ export default {
       return !this.record.id && this.formModel.gateway === 'offline'
     },
     canEnterPaidAmount () {
-      return this.record.id && this.formModel.gateway === 'offline' && this.formModel.status === 'paid'
+      return this.record.id && this.formModel.gateway === 'offline' && this.action === 'payNow'
     },
     canEnterCaptureAmount () {
       return this.record.id && this.record.status === 'authorized'
     },
     canEnterCreditCard () {
-      return !this.record.id && this.formModel.gateway === 'online' && this.formModel.status === 'paid'
+      return !this.record.id && this.formModel.gateway === 'online' && this.action === 'payNow'
     },
     canSelectProcessor () {
       return !this.record.id && this.formModel.gateway === 'online'
@@ -242,11 +243,20 @@ export default {
     }
   },
   watch: {
+    test () {
+      console.log('test')
+    },
     value (v) {
       this.formModel = _.cloneDeep(v)
+      if (v.pendingAmountCents) {
+        this.action = 'payLater'
+      }
+
+      if (v.paidAmountCents || v.paidAuthorizedAmountCents) {
+        this.action = 'payNow'
+      }
     },
     record (record) {
-      console.log(record)
       if (record.order && record.order.customer) {
         this.$store.dispatch('payment/loadSelectableCards', { customer_id: record.order.customer.id })
       }
@@ -255,7 +265,26 @@ export default {
   methods: {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
-    }, 300)
+    }, 300),
+    handleActionChange (action) {
+      this.formModel.authorizedAmountCents = undefined
+      this.formModel.paidAmountCents = undefined
+      this.formModel.pendingAmountCents = undefined
+
+      if (action === 'payNow' && this.formModel.target.isEstimate) {
+        this.formModel.authorizedAmountCents = this.formModel.target.authorizationCents
+      }
+
+      if (action === 'payNow' && !this.formModel.target.isEstimate) {
+        this.formModel.paidAmountCents = this.formModel.target.grandTotalCents
+      }
+
+      if (action === 'payLater') {
+        this.formModel.pendingAmountCents = this.formModel.target.authorizationCents
+      }
+
+      this.$emit('input', this.formModel)
+    }
   }
 }
 </script>

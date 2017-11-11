@@ -3,7 +3,7 @@ export default {
     return {
       id: undefined,
       type: 'Payment',
-      status: 'paid',
+      status: 'pending',
 
       gateway: 'online',
       processor: 'stripe',

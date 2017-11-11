@@ -5,12 +5,12 @@ export default {
       type: 'Order',
 
       code: '',
-      firstName: '',
-      lastName: '',
-      email: '',
+      firstName: 'test',
+      lastName: 'test',
+      email: 'test@example.com',
       status: 'cart',
 
-      fulfillmentMethod: 'ship',
+      fulfillmentMethod: 'pickup',
       subTotalCents: 0,
       taxOneCents: 0,
       taxTwoCents: 0,

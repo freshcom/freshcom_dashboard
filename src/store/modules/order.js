@@ -100,12 +100,26 @@ export default {
       }
 
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
+
       return OrderAPI.getRecord(actionPayload.id, options).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.RECORD_CHANGED, record)
 
         return record
+      }).then(record => {
+        return Promise.all([
+          record,
+          PaymentAPI.queryRecord({ filter: { targetType: 'Order', targetId: record.id } })
+        ])
+      }).then(responses => {
+        let record = responses[0]
+        let paymentResponse = responses[1]
+        let apiPayload = paymentResponse.data
+        let payments = JSONAPI.deserialize(apiPayload.data)
+
+        record.payments = payments
+
+        commit(MT.RECORD_CHANGED, record)
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
@@ -207,7 +221,7 @@ export default {
         return Promise.all([OrderLineItemAPI.createRecord(order.id, apiPayload), order])
       }).then(responses => {
         let order = responses[1]
-        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children,payments' })
+        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children' })
       }).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
@@ -243,7 +257,7 @@ export default {
       let order = lineItem.order
 
       return OrderLineItemAPI.deleteRecord(lineItem.id).then(() => {
-        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children,payments' })
+        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children' })
       }).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
@@ -257,12 +271,12 @@ export default {
 
     createPayment ({ commit }, paymentDraft) {
       let apiPayload = { data: JSONAPI.serialize(paymentDraft) }
-      let order = paymentDraft.order
+      let owner = paymentDraft.owner
 
-      return PaymentAPI.createRecord(paymentDraft.order.id, apiPayload).then(response => {
+      return PaymentAPI.createRecord(apiPayload).then(response => {
         return JSONAPI.deserialize(response.data.data)
       }).then(response => {
-        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children,payments' })
+        return OrderAPI.getRecord(owner.id, { include: 'rootLineItems.children' })
       }).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
@@ -280,7 +294,7 @@ export default {
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
 
       return PaymentAPI.updateRecord(actionPayload.id, apiPayload, options).then(() => {
-        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children,payments' })
+        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children' })
       }).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
@@ -299,7 +313,7 @@ export default {
       let order = refundDraft.payment.order
 
       return RefundAPI.createRecord(refundDraft.payment.id, apiPayload).then(() => {
-        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children,payments' })
+        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children' })
       }).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
@@ -335,7 +349,7 @@ export default {
       let order = payment.order
 
       return PaymentAPI.deleteRecord(payment.id).then(() => {
-        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children,payments' })
+        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children' })
       }).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
