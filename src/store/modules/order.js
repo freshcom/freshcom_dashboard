@@ -271,12 +271,12 @@ export default {
 
     createPayment ({ commit }, paymentDraft) {
       let apiPayload = { data: JSONAPI.serialize(paymentDraft) }
-      let owner = paymentDraft.owner
+      let target = paymentDraft.target
 
       return PaymentAPI.createRecord(apiPayload).then(response => {
         return JSONAPI.deserialize(response.data.data)
       }).then(response => {
-        return OrderAPI.getRecord(owner.id, { include: 'rootLineItems.children' })
+        return OrderAPI.getRecord(target.id, { include: 'rootLineItems.children' })
       }).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)

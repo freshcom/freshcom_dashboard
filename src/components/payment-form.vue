@@ -185,8 +185,8 @@ export default {
     }
   },
   created () {
-    if (this.record.order && this.record.order.customer) {
-      this.$store.dispatch('payment/loadSelectableCards', { customerId: this.record.order.customer.id }).then(response => {
+    if (this.record.owner) {
+      this.$store.dispatch('payment/loadSelectableCards', { filter: { ownerId: this.record.owner.id, ownerType: this.record.ownerType } }).then(response => {
         let cards = response.resources
         if (cards.length > 0) {
           this.useCardFrom = 'savedCard'
@@ -199,7 +199,7 @@ export default {
   },
   computed: {
     orderHasCustomer () {
-      return !!this.record.order.customer
+      return this.record.owner && this.record.owner.type === 'Customer'
     },
     selectableCards () {
       return this.$store.state.payment.selectableCards
@@ -257,8 +257,8 @@ export default {
       }
     },
     record (record) {
-      if (record.order && record.order.customer) {
-        this.$store.dispatch('payment/loadSelectableCards', { customer_id: record.order.customer.id })
+      if (record.owner) {
+        this.$store.dispatch('payment/loadSelectableCards', { filter: { ownerId: record.owner.id, ownerType: record.ownerType } })
       }
     }
   },

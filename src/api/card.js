@@ -48,7 +48,7 @@ export default {
       params.filter = filter
     }
 
-    return axios.get(`/customers/${customerId}/cards`, { params: params })
+    return axios.get(`/cards`, { params: params })
   },
 
   getRecord (id, options = {}) {

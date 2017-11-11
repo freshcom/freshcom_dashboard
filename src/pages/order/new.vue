@@ -281,7 +281,6 @@ export default {
 
       let paymentCreated
       paymentDraft = _.cloneDeep(paymentDraft)
-      paymentDraft.owner = { id: order.id, type: order.type }
       if (paymentDraft.gateway === 'online') {
         if (order.isEstimate) {
           paymentDraft.authorizedAmountCents = order.authorizationCents
@@ -306,7 +305,6 @@ export default {
           type: 'success'
         })
 
-        console.log('x')
         this.$store.dispatch('order/resetRecord')
         return this.$store.dispatch('pushRoute', { name: 'ListOrder' })
       }).catch(errors => {
