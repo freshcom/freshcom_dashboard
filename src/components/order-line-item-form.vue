@@ -258,7 +258,8 @@ export default {
   },
   watch: {
     value (newValue, oldValue) {
-      if (!newValue.product && oldValue.product) {
+      if (!newValue.product.id && oldValue.product.id) {
+        this.product = undefined
         this.resetSelectableProducts()
       }
 
@@ -293,7 +294,6 @@ export default {
       this.$store.dispatch('orderLineItem/resetSelectableProducts')
     },
     reset () {
-      this.resetSelectableProducts()
       this.formModel = OrderLineItem.objectWithDefaults()
       this.$emit('input', this.formModel)
     },

@@ -107,6 +107,7 @@ export default {
       commit(MT.SELECTABLE_CARDS_LOADING)
       actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
 
+      console.log(actionPayload)
       return CardAPI.queryRecord(actionPayload).then(response => {
         let apiPayload = response.data
         return { meta: response.data.meta, resources: JSONAPI.deserialize(apiPayload.data, apiPayload.included) }

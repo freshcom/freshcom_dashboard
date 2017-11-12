@@ -114,10 +114,17 @@
         <div class="block">
           <div class="block-body">
             <dl>
-              <dt>Order</dt>
+              <dt>Target</dt>
               <dd>
-                <router-link :to="{ name: 'ShowOrder', params: { id: record.order.id }}">
-                  {{record.order.id}}
+                <router-link :to="{ name: `Show${record.targetType}`, params: { id: record.targetId }}">
+                  {{record.targetId}}
+                </router-link>
+              </dd>
+
+              <dt>Owner</dt>
+              <dd>
+                <router-link :to="{ name: `Show${record.ownerType}`, params: { id: record.ownerId }}">
+                  {{record.ownerId}}
                 </router-link>
               </dd>
             </dl>

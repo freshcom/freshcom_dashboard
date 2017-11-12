@@ -34,13 +34,13 @@ export default {
   props: ['stripeCode', 'stripeScope'],
   created () {
     if (this.stripeCode) {
-      this.$store.dispatch('session/updateAccount', {
-        recordDraft: { stripeCode: this.stripeCode, type: 'Account' }
+      this.$store.dispatch('stripeAccount/createRecord', {
+        authCode: this.stripeCode, type: 'StripeAccount'
       }).catch(errors => {
-        let errorCode = errors.stripeCode[0]
+        let errorCode = errors.authCode[0]
         this.$message({
           showClose: true,
-          message: this.$t(errorI18nKey('account', 'stripeCode', errorCode)),
+          message: this.$t(errorI18nKey('account', 'authCode', errorCode)),
           type: 'error'
         })
       })
@@ -48,7 +48,7 @@ export default {
   },
   computed: {
     account () {
-      return this.$store.state.session.account
+      return this.$store.state.stripeAccount.record
     },
     stripeAuthorizeUrl () {
       return `https://connect.stripe.com/oauth/authorize?response_type=code&client_id=${STRIPE_CLIENT_ID}&scope=read_write`

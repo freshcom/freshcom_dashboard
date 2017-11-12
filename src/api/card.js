@@ -21,7 +21,7 @@ export default {
     return axios.patch(`/cards/${id}`, payload, { params: params })
   },
 
-  queryRecord (customerId, options = {}) {
+  queryRecord (options = {}) {
     let params = {}
 
     if (options.search) {
