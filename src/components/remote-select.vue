@@ -4,8 +4,8 @@
     @clear="clear"
     @change="changeHandler"
     @visible-change="visibleChangeHandler"
-    :loading="isLoading"
-    :remote-method="filter"
+    :loading="isSearching"
+    :remote-method="search"
     :placeholder="placeholder"
     :no-data-text="noDataText"
     remote
@@ -27,10 +27,9 @@ import _ from 'lodash'
 export default {
   name: 'RemoteSelect',
   props: {
-    value: Object,
-    records: Array,
+    searchMethod: Function,
+    value: null,
     placeholder: String,
-    isLoading: Boolean,
     noDataText: String,
     recordToOption: {
       type: Function,
@@ -50,6 +49,8 @@ export default {
   },
   data () {
     return {
+      isSearching: false,
+      records: [],
       selectedOption: undefined,
       isDropdownVisible: false
     }
@@ -72,9 +73,23 @@ export default {
     clear () {
       this.$emit('clear')
     },
-    filter (input) {
-      this.$emit('filter', input)
+    search (input) {
+      if (!input) {
+        this.records = []
+        return
+      }
+
+      this.isSearching = true
+      this._search(input)
     },
+    _search: _.debounce(function (keyword) {
+      return this.searchMethod(keyword).then(records => {
+        this.records = records
+        this.isSearching = false
+      }).catch(() => {
+        this.isSearching = false
+      })
+    }, 300),
     changeHandler (value) {
       this.$emit('change', _.find(this.records, { id: value }))
     },

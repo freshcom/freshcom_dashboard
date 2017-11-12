@@ -6,11 +6,8 @@
       <el-form-item label="Customer" :error="errorMessages.customer">
         <remote-select
           v-model="formModel.customer"
-          :records="selectableCustomers"
-          :isLoading="isLoadingSelectableCustomers"
+          :search-method="searchCustomers"
           :record-to-option="customerToOption"
-          @filter="loadSelectableCustomers"
-          @reset="resetSelectableCustomers"
           @input="updateValue"
           placeholder="Type to start searching..."
           class="customer-select"
@@ -124,16 +121,11 @@ export default {
   },
   data () {
     return {
+      isLoadingCustomers: false,
       formModel: _.cloneDeep(this.value)
     }
   },
   computed: {
-    selectableCustomers () {
-      return this.$store.state.order.selectableCustomers
-    },
-    isLoadingSelectableCustomers () {
-      return this.$store.state.order.isLoadingSelectableCustomers
-    },
     errorMessages () {
       return _.reduce(this.errors, (result, v, k) => {
         result[k] = this.$t(errorI18nKey('ProductItem', k, v[0]), { name: _.startCase(k) })
@@ -155,12 +147,11 @@ export default {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
-    loadSelectableCustomers: _.debounce(function (searchKeyword) {
-      this.$store.dispatch('order/loadSelectableCustomers', { search: searchKeyword })
-    }, 300),
-    resetSelectableCustomers () {
-      this.$store.dispatch('order/resetSelectableCustomers')
+
+    searchCustomers (keyword) {
+      return this.$store.dispatch('order/searchCustomers', { search: keyword })
     },
+
     customerToOption (customer) {
       if (!customer) {
         return { value: undefined }

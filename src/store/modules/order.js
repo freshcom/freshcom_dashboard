@@ -9,7 +9,6 @@ import RefundAPI from '@/api/refund'
 import JSONAPI from '@/jsonapi'
 
 import Order from '@/models/order'
-import OrderLineItem from '@/models/order-line-item'
 import Payment from '@/models/payment'
 import Refund from '@/models/refund'
 
@@ -22,13 +21,6 @@ const MT = {
   RECORDS_LOADING: 'RECORDS_LOADING',
   PAYMENT_FOR_CREATE_CHANGED: 'PAYMENT_FOR_CREATE_CHANGED',
   PAYMENT_DRAFT_FOR_CREATE_CHANGED: 'PAYMENT_DRAFT_FOR_CREATE_CHANGED',
-  LINE_ITEM_ADD_STARTED: 'LINE_ITEM_ADD_STARTED',
-  LINE_ITEM_ADD_ENDED: 'LINE_ITEM_ADD_ENDED',
-  LINE_ITEM_EDIT_STARTED: 'LINE_ITEM_EDIT_STARTED',
-  LINE_ITEM_EDIT_ENDED: 'LINE_ITEM_EDIT_ENDED',
-  LINE_ITEM_DRAFT_FOR_CREATE_CHANGED: 'LINE_ITEM_DRAFT_FOR_CREATE_CHANGED',
-  LINE_ITEM_DRAFT_FOR_UPDATE_CHANGED: 'LINE_ITEM_DRAFT_FOR_UPDATE_CHANGED',
-  LINE_ITEM_FOR_CREATE_SUBMITTING: 'LINE_ITEM_FOR_CREATE_SUBMITTING',
   SELECTED_PRICES_CHANGED: 'SELECTED_PRICES_CHANGED',
   SELECTABLE_CUSTOMERS_CHANGED: 'SELECTABLE_CUSTOMERS_CHANGED',
   SELECTABLE_CUSTOMERS_LOADING: 'SELECTABLE_CUSTOMERS_LOADING',
@@ -50,13 +42,6 @@ export default {
 
     records: [],
     isLoadingRecords: true,
-
-    isEditingLineItem: false,
-    lineItemDraftForUpdate: OrderLineItem.objectWithDefaults(),
-
-    isAddingLineItem: false,
-    lineItemDraftForCreate: OrderLineItem.objectWithDefaults(),
-    isSubmittingLineItemForCreate: false,
 
     isEditingPayment: false,
     paymentDraftForEdit: Payment.objectWithDefaults(),
@@ -138,7 +123,7 @@ export default {
       })
     },
 
-    updateRecord ({ state, commit, rootState }, actionPayload) {
+    updateOrder ({ state, commit, rootState }, actionPayload) {
       let apiPayload = { data: JSONAPI.serialize(actionPayload.recordDraft) }
 
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
@@ -182,19 +167,14 @@ export default {
       commit(MT.PAYMENT_FOR_CREATE_CHANGED, payment)
     },
 
-    loadSelectableCustomers ({ state, commit, rootState }, actionPayload) {
-      commit(MT.SELECTABLE_CUSTOMERS_LOADING)
+    searchCustomers ({ state, commit, rootState }, actionPayload) {
       actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
 
       return CustomerAPI.queryRecord(actionPayload).then(response => {
         let apiPayload = response.data
         return { meta: response.data.meta, resources: JSONAPI.deserialize(apiPayload.data, apiPayload.included) }
       }).then(response => {
-        commit(MT.SELECTABLE_CUSTOMERS_CHANGED, response.resources)
-
-        return response
-      }).catch(error => {
-        console.log(error)
+        return response.resources
       })
     },
 
@@ -203,7 +183,6 @@ export default {
     },
 
     createLineItem ({ state, commit }, lineItemDraft) {
-      commit(MT.LINE_ITEM_FOR_CREATE_SUBMITTING)
       let orderCreated = new Promise((resolve, reject) => {
         resolve(lineItemDraft.order)
       })
@@ -224,11 +203,9 @@ export default {
         return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children' })
       }).then(response => {
         let apiPayload = response.data
-        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.RECORD_CHANGED, record)
-        commit(MT.LINE_ITEM_ADD_ENDED)
+        let order = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
 
-        return record
+        return order
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
@@ -240,14 +217,12 @@ export default {
 
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
       return OrderLineItemAPI.updateRecord(actionPayload.id, apiPayload, options).then(() => {
-        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children,payments' })
+        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children' })
       }).then(response => {
         let apiPayload = response.data
-        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.RECORD_CHANGED, record)
-        commit(MT.LINE_ITEM_EDIT_ENDED)
+        let order = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
 
-        return record
+        return order
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
@@ -260,10 +235,9 @@ export default {
         return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children' })
       }).then(response => {
         let apiPayload = response.data
-        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.RECORD_CHANGED, record)
+        let order = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
 
-        return record
+        return order
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
@@ -361,30 +335,6 @@ export default {
       })
     },
 
-    startAddLineItem ({ commit, dispatch }) {
-      commit(MT.LINE_ITEM_ADD_STARTED)
-    },
-
-    endAddLineItem ({ commit }) {
-      commit(MT.LINE_ITEM_ADD_ENDED)
-    },
-
-    setLineItemDraftForCreate ({ commit }, lineItemDraft) {
-      commit(MT.LINE_ITEM_DRAFT_FOR_CREATE_CHANGED, lineItemDraft)
-    },
-
-    startEditLineItem ({ commit, dispatch }, lineItem) {
-      commit(MT.LINE_ITEM_EDIT_STARTED, lineItem)
-    },
-
-    endEditLineItem ({ commit }) {
-      commit(MT.LINE_ITEM_EDIT_ENDED)
-    },
-
-    setLineItemDraftForUpdate ({ commit }, lineItemDraft) {
-      commit(MT.LINE_ITEM_DRAFT_FOR_UPDATE_CHANGED, lineItemDraft)
-    },
-
     startAddPayment ({ commit }, paymentDraft) {
       commit(MT.PAYMENT_ADD_STARTED, paymentDraft)
     },
@@ -437,34 +387,6 @@ export default {
 
     [MT.RECORDS_LOADING] (state, records) {
       state.isLoadingRecords = true
-    },
-
-    [MT.LINE_ITEM_ADD_STARTED] (state, lineItem) {
-      state.isAddingLineItem = true
-    },
-
-    [MT.LINE_ITEM_ADD_ENDED] (state, lineItem) {
-      state.isSubmittingLineItemForCreate = false
-      state.isAddingLineItem = false
-      state.lineItemDraftForCreate = OrderLineItem.objectWithDefaults()
-    },
-
-    [MT.LINE_ITEM_EDIT_STARTED] (state, lineItem) {
-      state.lineItemDraftForUpdate = lineItem
-      state.isEditingLineItem = true
-    },
-
-    [MT.LINE_ITEM_EDIT_ENDED] (state, lineItem) {
-      state.isEditingLineItem = false
-      state.lineItemDraftForEdit = OrderLineItem.objectWithDefaults()
-    },
-
-    [MT.LINE_ITEM_DRAFT_FOR_CREATE_CHANGED] (state, lineItemDraftForCreate) {
-      state.lineItemDraftForCreate = lineItemDraftForCreate
-    },
-
-    [MT.LINE_ITEM_DRAFT_FOR_UPDATE_CHANGED] (state, lineItemDraftForUpdate) {
-      state.lineItemDraftForUpdate = lineItemDraftForUpdate
     },
 
     [MT.SELECTED_PRICES_CHANGED] (state, prices) {
@@ -523,10 +445,6 @@ export default {
     [MT.PAYMENT_ADD_ENDED] (state) {
       state.paymentDraftForCreate = Payment.objectWithDefaults()
       state.isAddingPayment = false
-    },
-
-    [MT.LINE_ITEM_FOR_CREATE_SUBMITTING] (state) {
-      state.isSubmittingLineItemForCreate = true
     }
   }
 }

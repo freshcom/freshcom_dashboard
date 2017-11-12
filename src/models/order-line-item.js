@@ -18,7 +18,7 @@ export default {
       taxThreeCents: 0,
       grandTotalCents: 0,
 
-      product: {},
+      product: undefined,
 
       priceTaxOnePercentage: 0,
       priceTaxTwoPercentage: 0,

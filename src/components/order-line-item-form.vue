@@ -1,23 +1,21 @@
 <template>
 <el-form :model="formModel" label-position="top" size="small">
-  <el-row v-if="!formModel.id" class="m-b-20">
-    <el-form-item label="Source Type" class="type">
+  <el-row v-if="canSelectType" class="m-b-20">
+    <el-form-item label="Type" class="type">
       <el-radio-group @change="reset()" v-model="type">
         <el-radio-button label="Product"></el-radio-button>
-        <el-radio-button label="None"></el-radio-button>
+        <el-radio-button label="Custom"></el-radio-button>
       </el-radio-group>
     </el-form-item>
   </el-row>
 
   <el-row class="m-b-20">
-    <el-col v-if="!formModel.id && type === 'Product'" :span="9" class="p-r-10">
+    <el-col v-if="canSelectProduct" :span="9" class="p-r-10">
       <el-form-item label="Product" class="full">
         <remote-select
-          :value="product"
-          :records="selectableProducts"
-          :is-loading="isLoadingSelectableProducts"
-          @filter="loadSelectableProducts"
-          @change="balanceByProduct($event)"
+          :search-method="searchProducts"
+          :value="selectedProduct"
+          @change="handleProductChange($event)"
           no-data-text="No matching product"
           placeholder="Type to start searching..."
           class="product-select"
@@ -27,16 +25,16 @@
     </el-col>
 
     <el-col :span="9" class="p-l-10">
-      <el-form-item v-if="canSelectVariant(formModel, type)" label="Variant" class="full">
+      <el-form-item v-if="canSelectVariant" label="Variant" class="full">
         <el-select
           :value="formModel.product"
-          @change="balanceByProductVariant($event)"
+          @change="handleProductVariantChange($event)"
           value-key="id"
           placeholder="Select variant..."
           class="product-item-select"
         >
           <el-option
-            v-for="item in selectableProductVariants"
+            v-for="item in productVariants"
             :key="item.id"
             :label="item.name"
             :value="item"
@@ -48,7 +46,7 @@
       <p v-else></p>
     </el-col>
 
-    <el-col v-if="type === 'None' || formModel.id" :span="18">
+    <el-col v-if="canViewName" :span="18">
       <el-form-item label="Name" class="name full">
         <el-input v-model="formModel.name" @input="updateValue()" :disabled="!!formModel.id"></el-input>
       </el-form-item>
@@ -58,7 +56,7 @@
       <el-form-item label="Sub Total Amount is" class="is-estimate">
         <el-switch
           v-model="formModel.isEstimate"
-          :disabled="!isIsEstimateTogglable"
+          :disabled="!canToggleEstimate"
           @change="updateValue()"
           active-text="Estimate"
           inactive-text="Exact">
@@ -67,14 +65,14 @@
     </el-col>
   </el-row>
 
-  <el-row v-if="type === 'Product'" class="m-b-20">
+  <el-row v-if="canEnterOrderQuantity" class="m-b-20">
     <el-form-item label="Order Qty." class="order-quantity">
       <el-input-number
         :value="formModel.orderQuantity"
         :min="1"
         :step="1"
         :disabled="!formModel.price"
-        @change="balanceByOrderQuantity($event)"
+        @change="handleOrderQuantityChange($event)"
         controls-position="right"
       >
       </el-input-number>
@@ -89,7 +87,7 @@
         :disabled="!formModel.priceEstimateByDefault"
         :min="0"
         @focus="$event.target.select()"
-        @change="balanceByChargeQuantity($event)"
+        @change="handleChargeQuantityChange($event)"
       >
       </el-input-number>
     </el-form-item>
@@ -108,12 +106,12 @@
       <el-select v-else
         :value="formModel.price"
         :disabled="!formModel.price"
-        @change="balanceByPrice($event)"
+        @change="handlePriceChange($event)"
         value-key="id"
         placeholder=""
       >
         <el-option
-          v-for="price in selectablePrices"
+          v-for="price in prices"
           :key="price.id"
           :label="price | chargeDollar"
           :value="price"
@@ -151,7 +149,7 @@
       <money-input
         v-model="formModel.taxOneCents"
         :disabled="type === 'Product'"
-        @change="balanceByTax()"
+        @change="handleTaxChange()"
       >
       </money-input>
     </el-form-item>
@@ -162,7 +160,7 @@
       <money-input
         v-model="formModel.taxTwoCents"
         :disabled="type === 'Product'"
-        @change="balanceByTax()"
+        @change="handleTaxChange()"
       >
       </money-input>
     </el-form-item>
@@ -173,7 +171,7 @@
       <money-input
         v-model="formModel.taxThreeCents"
         :disabled="type === 'Product'"
-        @change="balanceByTax()"
+        @change="handleTaxChange()"
       >
       </money-input>
     </el-form-item>
@@ -210,35 +208,53 @@ export default {
   },
   data () {
     return {
-      formModel: _.cloneDeep(this.value),
       type: 'Product',
-      product: undefined
+
+      products: [],
+      selectedProduct: null,
+      isLoadingProducts: false,
+
+      productVariants: [],
+
+      formModel: _.cloneDeep(this.value)
     }
   },
   computed: {
-    isLoadingSelectableProducts () {
-      return this.$store.state.orderLineItem.isLoadingSelectableProducts
+    canViewName () {
+      return this.type === 'Custom' || this.formModel.id
     },
-    selectableProducts () {
-      return this.$store.state.orderLineItem.selectableProducts
+
+    canEnterOrderQuantity () {
+      return this.type === 'Product'
     },
-    selectableProductVariants () {
-      return this.$store.state.orderLineItem.selectableProductVariants
+
+    canSelectType () {
+      return !this.formModel.id
     },
+
+    canSelectVariant () {
+      return !this.formModel.id &&
+             this.formModel.product &&
+             this.formModel.product.kind === 'variant' &&
+             this.type === 'Product'
+    },
+
+    canSelectProduct () {
+      return !this.formModel.id && this.type === 'Product'
+    },
+
+    canToggleEstimate () {
+      return this.formModel.priceEstimateByDefault
+    },
+
     errorMessages () {
       return _.reduce(this.errors, (result, v, k) => {
         result[k] = this.$t(errorI18nKey('orderLineItem', k, v[0]), { name: _.startCase(k) })
         return result
       }, {})
     },
-    isIsEstimateTogglable () {
-      if (this.formModel.priceEstimateByDefault) {
-        return true
-      }
 
-      return false
-    },
-    selectablePrices () {
+    prices () {
       if (this.formModel.product) {
         let prices = this.formModel.product.prices
 
@@ -258,9 +274,10 @@ export default {
   },
   watch: {
     value (newValue, oldValue) {
-      if (!newValue.product.id && oldValue.product.id) {
-        this.product = undefined
-        this.resetSelectableProducts()
+      if (!newValue.product && oldValue.product) {
+        this.selectedProduct = {}
+        this.products = []
+        this.productVariants = []
       }
 
       this.formModel = _.cloneDeep(newValue)
@@ -271,7 +288,7 @@ export default {
       if (this.formModel.product) {
         this.type = 'Product'
       } else {
-        this.type = 'None'
+        this.type = 'Custom'
       }
     }
   },
@@ -280,39 +297,42 @@ export default {
       formModel = formModel || this.formModel
       this.$emit('input', formModel)
     }, 300),
-    loadSelectableProducts: _.debounce(function (searchKeyword) {
-      return this.$store.dispatch('orderLineItem/loadSelectableProducts', {
-        search: searchKeyword,
+
+    searchProducts (keyword) {
+      return this.$store.dispatch('orderLineItem/searchProducts', {
+        search: keyword,
         filter: { status: ['active', 'internal'] },
-        include: 'prices,defaultPrice,variants.prices,variants.defaultPrice'
+        include: 'prices,defaultPrice'
       })
-    }, 300),
-    canSelectVariant (formModel, type) {
-      return !formModel.id && formModel.product.kind === 'variant' && type === 'Product'
     },
-    resetSelectableProducts () {
-      this.$store.dispatch('orderLineItem/resetSelectableProducts')
-    },
+
     reset () {
       this.formModel = OrderLineItem.objectWithDefaults()
+      this.products = []
+      this.productVariants = []
       this.$emit('input', this.formModel)
     },
-    balanceByTax () {
+
+    handleTaxChange () {
       this.updateValue(OrderLineItem.balanceByTax(this.formModel))
     },
-    balanceByChargeQuantity (chargeQuantity) {
+
+    handleChargeQuantityChange (chargeQuantity) {
       this.formModel.chargeQuantity = chargeQuantity
       this.updateValue(OrderLineItem.balanceByChargeQuantity(this.formModel))
     },
-    balanceByOrderQuantity (orderQuantity) {
+
+    handleOrderQuantityChange (orderQuantity) {
       this.formModel.orderQuantity = orderQuantity
       this.updateValue(OrderLineItem.balanceByOrderQuantity(this.formModel))
     },
+
     balanceBySubTotalCents (subTotalCents) {
       this.formModel.subTotalCents = subTotalCents
       this.updateValue(OrderLineItem.balanceBySubTotalCents(this.formModel))
     },
-    balanceByPrice (price) {
+
+    handlePriceChange (price) {
       if (this.formModel.price.id === price.id) {
         return
       }
@@ -320,7 +340,8 @@ export default {
       this.formModel.price = price
       this.updateValue(OrderLineItem.balanceByPrice(this.formModel))
     },
-    balanceByProductVariant (variant) {
+
+    handleProductVariantChange (variant) {
       if (this.formModel.product.id === variant.id) {
         return
       }
@@ -328,26 +349,26 @@ export default {
       this.formModel.product = variant
       this.updateValue(OrderLineItem.balanceByProduct(this.formModel))
     },
-    balanceByProduct (product) {
+
+    handleProductChange (product) {
       if (!product) {
         return this.reset()
       }
 
       if (product.kind === 'withVariants') {
-        this.$store.dispatch('orderLineItem/loadSelectableProductVariants', {
+        this.$store.dispatch('orderLineItem/loadProductVariants', {
           filter: { parentId: product.id, status: ['active', 'internal'] },
           include: 'prices,defaultPrice'
-        }).then(response => {
-          let primaryVariant = _.find(response.resources, { primary: true })
-          let formModel = _.cloneDeep(this.formModel)
-          formModel.product = primaryVariant
-          this.updateValue(OrderLineItem.balanceByProduct(formModel))
+        }).then(variants => {
+          this.productVariants = variants
+          this.formModel.product = _.find(variants, { primary: true })
+
+          this.updateValue(OrderLineItem.balanceByProduct(this.formModel))
         })
       } else {
-        this.product = product
-        let formModel = _.cloneDeep(this.formModel)
-        formModel.product = product
-        this.updateValue(OrderLineItem.balanceByProduct(formModel))
+        this.selectedProduct = product
+        this.formModel.product = product
+        this.updateValue(OrderLineItem.balanceByProduct(this.formModel))
       }
     }
   }

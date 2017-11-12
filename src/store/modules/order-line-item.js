@@ -45,19 +45,14 @@ export default {
       commit(MT.RECORD_RESET)
     },
 
-    loadSelectableProducts ({ state, commit, rootState }, actionPayload) {
-      commit(MT.SELECTABLE_PRODUCTS_LOADING)
+    searchProducts ({ state, commit, rootState }, actionPayload) {
       actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
 
       return ProductAPI.queryRecord(actionPayload).then(response => {
         let apiPayload = response.data
         return { meta: response.data.meta, resources: JSONAPI.deserialize(apiPayload.data, apiPayload.included) }
       }).then(response => {
-        commit(MT.SELECTABLE_PRODUCTS_CHANGED, response.resources)
-
-        return response
-      }).catch(error => {
-        console.log(error)
+        return response.resources
       })
     },
 
@@ -65,19 +60,14 @@ export default {
       commit(MT.SELECTABLE_PRODUCTS_RESET)
     },
 
-    loadSelectableProductVariants ({ state, commit, rootState }, actionPayload) {
-      commit(MT.SELECTABLE_PRODUCT_VARIANTS_LOADING)
+    loadProductVariants ({ state, commit, rootState }, actionPayload) {
       actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
 
       return ProductAPI.queryRecord(actionPayload).then(response => {
         let apiPayload = response.data
         return { meta: response.data.meta, resources: JSONAPI.deserialize(apiPayload.data, apiPayload.included) }
       }).then(response => {
-        commit(MT.SELECTABLE_PRODUCT_VARIANTS_CHANGED, response.resources)
-
-        return response
-      }).catch(error => {
-        console.log(error)
+        return response.resources
       })
     },
 

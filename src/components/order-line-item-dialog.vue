@@ -45,37 +45,3 @@ export default {
   }
 }
 </script>
-
-
-<style scoped>
-.el-form-item {
-  display: inline-block;
-  margin: 10px 0px;
-}
-
-.el-form-item.order-quantity .el-input-number {
-  width: 120px;
-}
-
-.el-form-item.charge-quantity .el-input {
-  width: 100px;
-}
-
-.el-form-item.charge-price .el-input {
-  width: 100px;
-}
-
-.el-form-item.charge-price .el-tag, .el-form-item.tax .el-tag, .el-form-item.sub-total-left .el-tag, .el-form-item.grand-total .el-tag {
-  font-size: 18px;
-  padding: 6px 15px;
-  height: 36px;
-}
-
-.el-form-item.sub-total-right, .el-form-item.grand-total {
-  float: right;
-}
-
-.el-form-item.sub-total-right .el-input {
-  width: 120px;
-}
-</style>

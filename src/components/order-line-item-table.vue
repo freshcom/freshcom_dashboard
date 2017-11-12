@@ -66,9 +66,11 @@ export default {
       }
       this.expandedLineItemIds = []
     },
+
     deleteLineItem (lineItemId) {
       this.$emit('delete', lineItemId)
     },
+
     editLineItem (lineItemId) {
       this.$emit('edit', lineItemId)
     }
