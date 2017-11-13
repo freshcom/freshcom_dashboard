@@ -23,14 +23,17 @@
   <el-table-column width="80px" label="Tax" prop="taxTotal" align="right"></el-table-column>
   <el-table-column width="100px" label="GT Amt." prop="grandTotal" align="right"></el-table-column>
 
-  <el-table-column width="80">
+  <el-table-column width="120">
     <template slot-scope="scope">
-      <el-button @click="editLineItem(scope.row.id)" plain size="mini" class="icon">
-        <icon name="pencil" scale="0.8" class="v-middle"></icon>
-      </el-button>
-      <delete-button @confirmed="deleteLineItem(scope.row.id)" icon-only size="mini" class="icon">
-        <icon name="times" scale="0.8" class="v-middle"></icon>
-      </delete-button>
+      <p class="text-right actions">
+        <el-button @click="editLineItem(scope.row.id)" plain size="mini">
+          Edit
+        </el-button>
+
+        <delete-button @confirmed="deleteLineItem(scope.row.id)" size="mini">
+          Delete
+        </delete-button>
+      </p>
     </template>
   </el-table-column>
 </el-table>

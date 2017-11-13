@@ -44,8 +44,8 @@
   <el-row>
     <el-col :span="12">
       <el-form-item v-if="canSelectAction" :error="errorMessages.status" required>
-        <b class="m-r-20">Action {{action}}</b>
-        <el-radio-group @input="handleActionChange($event)" :value="action">
+        <b class="m-r-20">Action</b>
+        <el-radio-group v-model="action">
           <el-radio label="payNow">Pay Now</el-radio>
           <el-radio label="payLater">Pay through Paylink</el-radio>
         </el-radio-group>
@@ -69,7 +69,7 @@
         <el-form-item class="card-from" required>
           <b class="m-r-20">Card</b>
           <el-radio-group v-model="useCardFrom">
-            <el-radio v-if="orderHasCustomer" label="savedCard">Select from saved cards</el-radio>
+            <el-radio v-if="canSelectCards" label="savedCard">Select from saved cards</el-radio>
             <el-radio label="newCard">Enter a new card</el-radio>
           </el-radio-group>
         </el-form-item>
@@ -83,7 +83,7 @@
         </el-form-item>
       </el-col>
     </el-row>
-     <el-row v-if="useCardFrom === 'newCard' && orderHasCustomer">
+     <el-row v-if="useCardFrom === 'newCard' && hasOwner">
       <el-col :span="12">
         <el-form-item class="card" required>
           <el-checkbox v-model="formModel.saveSource">Save this card</el-checkbox>
@@ -95,7 +95,7 @@
       <el-col :span="12">
         <el-form-item class="card" required>
           <el-select @change="updateValue" v-model="formModel.source" class="full">
-            <el-option v-for="card in selectableCards" :key="card.id" :label="`${card.brand} ****${card.lastFourDigit}`" :value="card.stripeCardId">
+            <el-option v-for="card in cards" :key="card.id" :label="`${card.brand} ****${card.lastFourDigit}`" :value="card.stripeCardId">
               <span>{{card.brand}} ****{{card.lastFourDigit}}</span>
             </el-option>
           </el-select>
@@ -115,7 +115,7 @@
     <template v-if="canEnterBillingAddress">
       <el-row :gutter="10">
         <el-col :span="12">
-          <el-form-item label="Street Address 1" :error="errorMessages.billingAddressLineOne" required>
+          <el-form-item label="Street Address 1" :error="errorMessages.billingAddressLineOne">
             <el-input v-model="formModel.billingAddressLineOne"></el-input>
           </el-form-item>
         </el-col>
@@ -131,22 +131,22 @@
 
       <el-row :gutter="10">
         <el-col :span="6">
-          <el-form-item label="City" :error="errorMessages.billingAddressCity" required>
+          <el-form-item label="City" :error="errorMessages.billingAddressCity">
             <el-input v-model="formModel.billingAddressCity"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="6">
-          <el-form-item label="Province" :error="errorMessages.billingAddressProvince" required>
+          <el-form-item label="Province" :error="errorMessages.billingAddressProvince">
             <el-input v-model="formModel.billingAddressProvince"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="6">
-          <el-form-item label="Country" :error="errorMessages.billingAddressCountryCode" required>
+          <el-form-item label="Country" :error="errorMessages.billingAddressCountryCode">
             <el-input v-model="formModel.billingAddressCountryCode"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="6">
-          <el-form-item label="Postal Code" :error="errorMessages.billingAddressPostalCode" required>
+          <el-form-item label="Postal Code" :error="errorMessages.billingAddressPostalCode">
             <el-input v-model="formModel.billingAddressPostalCode"></el-input>
           </el-form-item>
         </el-col>
@@ -176,6 +176,8 @@ export default {
       complete: false,
       action: 'payNow',
       formModel: _.cloneDeep(this.value),
+      cards: [],
+      isLoadingCards: false,
       stripeOptions: {
         // see https://stripe.com/docs/stripe.js#element-options for details
       },
@@ -184,50 +186,43 @@ export default {
       useCardFrom: 'newCard'
     }
   },
-  created () {
-    if (this.record.owner) {
-      this.$store.dispatch('payment/loadSelectableCards', { filter: { ownerId: this.record.owner.id, ownerType: this.record.ownerType } }).then(response => {
-        let cards = response.resources
-        if (cards.length > 0) {
-          this.useCardFrom = 'savedCard'
-          let primaryCard = _.find(cards, { primary: true })
-          this.formModel.source = primaryCard.stripeCardId
-          this.updateValue()
-        }
-      })
-    }
-  },
   computed: {
-    orderHasCustomer () {
-      return this.record.owner && this.record.owner.type === 'Customer'
+    canSelectCards () {
+      return this.cards.length > 0
     },
-    selectableCards () {
-      return this.$store.state.payment.selectableCards
+
+    hasOwner () {
+      return this.formModel.owner
     },
-    isLoadingSelectableCards () {
-      return this.$store.state.payment.isLoadingSelectableCards
-    },
+
     canSelectStatus () {
-      return !this.record.id && this.formModel.gateway === 'offline'
+      return !this.formModel.id && this.formModel.gateway === 'offline'
     },
+
     canEnterPaidAmount () {
-      return this.record.id && this.formModel.gateway === 'offline' && this.action === 'payNow'
+      return this.formModel.id && this.formModel.gateway === 'offline' && this.action === 'payNow'
     },
+
     canEnterCaptureAmount () {
-      return this.record.id && this.record.status === 'authorized'
+      return this.formModel.id && this.formModel.status === 'authorized'
     },
+
     canEnterCreditCard () {
-      return !this.record.id && this.formModel.gateway === 'online' && this.action === 'payNow'
+      return !this.formModel.id && this.formModel.gateway === 'online' && this.action === 'payNow'
     },
+
     canSelectProcessor () {
-      return !this.record.id && this.formModel.gateway === 'online'
+      return !this.formModel.id && this.formModel.gateway === 'online'
     },
+
     canSelectAction () {
-      return !this.record.id && this.formModel.gateway === 'online'
+      return !this.formModel.id && this.formModel.gateway === 'online'
     },
+
     canSelectGateway () {
-      return !this.record.id
+      return !this.formModel.id
     },
+
     canEnterBillingAddress () {
       if (this.formModel.order && this.formModel.order.fulfillmentMethod === 'ship' && this.isBillingAndShippingAddressSame) {
         return false
@@ -243,47 +238,39 @@ export default {
     }
   },
   watch: {
-    test () {
-      console.log('test')
-    },
     value (v) {
       this.formModel = _.cloneDeep(v)
-      if (v.pendingAmountCents) {
-        this.action = 'payLater'
-      }
 
-      if (v.paidAmountCents || v.paidAuthorizedAmountCents) {
-        this.action = 'payNow'
-      }
-    },
-    record (record) {
-      if (record.owner) {
-        this.$store.dispatch('payment/loadSelectableCards', { filter: { ownerId: record.owner.id, ownerType: record.ownerType } })
-      }
+      if (!this.formModel.owner) { return }
+
+      this.loadCards(this.formModel.owner).then(cards => {
+        if (cards.length === 0) { return cards }
+        this.useCardFrom = 'savedCard'
+
+        let primaryCard = _.find(cards, { primary: true })
+        this.formModel.source = primaryCard.stripeCardId
+        this.updateValue()
+      })
     }
   },
   methods: {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
-    handleActionChange (action) {
-      this.formModel.authorizedAmountCents = undefined
-      this.formModel.paidAmountCents = undefined
-      this.formModel.pendingAmountCents = undefined
 
-      if (action === 'payNow' && this.formModel.target.isEstimate) {
-        this.formModel.authorizedAmountCents = this.formModel.target.authorizationCents
-      }
+    loadCards (owner) {
+      this.isLoadingCards = true
 
-      if (action === 'payNow' && !this.formModel.target.isEstimate) {
-        this.formModel.paidAmountCents = this.formModel.target.grandTotalCents
-      }
+      return this.$store.dispatch('payment/loadCards', {
+        filter: { ownerId: owner.id, ownerType: owner.type }
+      }).then(cards => {
+        this.cards = cards
+        this.isLoadingCards = false
 
-      if (action === 'payLater') {
-        this.formModel.pendingAmountCents = this.formModel.target.authorizationCents
-      }
-
-      this.$emit('input', this.formModel)
+        return cards
+      }).catch(() => {
+        this.isLoadingCards = false
+      })
     }
   }
 }

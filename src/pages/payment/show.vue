@@ -15,7 +15,7 @@
         <div class="brief no-avatar">
           <div class="detail">
             <p>Payment {{record.code}}</p>
-            <h2>{{briefAmountCents | dollar}}</h2>
+            <h2>{{record.amountCents | dollar}}</h2>
             <p class="id">{{record.id}}</p>
           </div>
         </div>
@@ -48,14 +48,14 @@
               <dt v-if="record.method">Method</dt>
               <dd v-if="record.method">{{record.method}}</dd>
 
-              <dt v-if="record.authorizedAmountCents">Authorized Amount</dt>
-              <dd v-if="record.authorizedAmountCents">
-                {{record.authorizedAmountCents | dollar}}
+              <dt v-if="record.amountCents">Amount</dt>
+              <dd v-if="record.amountCents">
+                {{record.amountCents | dollar}}
               </dd>
 
-              <dt v-if="record.paidAmountCents">Paid Amount</dt>
-              <dd v-if="record.paidAmountCents">
-                {{record.paidAmountCents | dollar}}
+              <dt v-if="record.transactionFeeCents">Transaction Fee</dt>
+              <dd v-if="record.transactionFeeCents">
+                {{record.transactionFeeCents | dollar}}
               </dd>
 
               <dt v-if="record.refundedAmountCents">Refunded Amount</dt>
@@ -176,19 +176,6 @@ export default {
   },
   mixins: [ShowPage({ storeNamespace: 'payment', name: 'Payment', include: 'refunds' })],
   computed: {
-    briefAmountCents () {
-      if (this.record.paidAmountCents) {
-        return this.record.paidAmountCents
-      }
-
-      if (this.record.authorizedAmountCents) {
-        return this.record.authorizedAmountCents
-      }
-
-      if (this.record.pendingAmountCents) {
-        return this.record.pendingAmountCents
-      }
-    },
     canRefund () {
       return this.record.status === 'paid' || this.record.status === 'partially_refunded'
     }

@@ -1,14 +1,13 @@
 <template>
 <el-form @input.native="updateValue" label-position="top" size="small" class="m-b-10">
-
   <el-row :gutter="20">
     <el-col :span="12">
       <el-form-item label="Customer" :error="errorMessages.customer">
         <remote-select
-          v-model="formModel.customer"
+          :value="formModel.customer"
           :search-method="searchCustomers"
           :record-to-option="customerToOption"
-          @input="updateValue"
+          @change="handleCustomerChange($event)"
           placeholder="Type to start searching..."
           class="customer-select"
         >
@@ -110,13 +109,11 @@
 import _ from 'lodash'
 import errorI18nKey from '@/utils/error-i18n-key'
 import RemoteSelect from '@/components/remote-select'
-import CustomerSelect from '@/components/customer-select'
 
 export default {
   name: 'OrderForm',
   props: ['value', 'errors', 'record'],
   components: {
-    CustomerSelect,
     RemoteSelect
   },
   data () {
@@ -147,6 +144,16 @@ export default {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
+
+    handleCustomerChange (customer) {
+      if (customer) {
+        this.formModel.customer = customer
+      } else {
+        this.formModel.customer = null
+      }
+
+      this.$emit('input', this.formModel)
+    },
 
     searchCustomers (keyword) {
       return this.$store.dispatch('order/searchCustomers', { search: keyword })

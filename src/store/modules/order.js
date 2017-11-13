@@ -22,9 +22,6 @@ const MT = {
   PAYMENT_FOR_CREATE_CHANGED: 'PAYMENT_FOR_CREATE_CHANGED',
   PAYMENT_DRAFT_FOR_CREATE_CHANGED: 'PAYMENT_DRAFT_FOR_CREATE_CHANGED',
   SELECTED_PRICES_CHANGED: 'SELECTED_PRICES_CHANGED',
-  SELECTABLE_CUSTOMERS_CHANGED: 'SELECTABLE_CUSTOMERS_CHANGED',
-  SELECTABLE_CUSTOMERS_LOADING: 'SELECTABLE_CUSTOMERS_LOADING',
-  SELECTABLE_CUSTOMERS_RESET: 'SELECTABLE_CUSTOMERS_RESET',
   PAYMENT_EDIT_STARTED: 'PAYMENT_EDIT_STARTED',
   PAYMENT_EDIT_ENDED: 'PAYMENT_EDIT_ENDED',
   PAYMENT_ADD_STARTED: 'PAYMENT_ADD_STARTED',
@@ -51,9 +48,6 @@ export default {
     paymentDraftForCreate: Payment.objectWithDefaults(),
     paymentForCreate: Payment.objectWithDefaults(),
 
-    isLoadingSelectableCustomers: true,
-    selectableCustomers: [],
-
     selectablePrices: [],
 
     isAddingRefund: false,
@@ -72,18 +66,7 @@ export default {
       commit(MT.RECORD_RESET)
     },
 
-    loadRecord ({ state, commit, rootState }, actionPayload) {
-      commit(MT.RECORD_LOADING)
-      if (state.record && state.record.id === actionPayload.id && state.record.locale === rootState.resourceLocale) {
-        return new Promise((resolve, reject) => {
-          resolve(state.record)
-        })
-      }
-
-      if (state.record.id !== actionPayload.id) {
-        commit(MT.RECORD_RESET)
-      }
-
+    getOrder ({ state, commit, rootState }, actionPayload) {
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
 
       return OrderAPI.getRecord(actionPayload.id, options).then(response => {
@@ -91,22 +74,15 @@ export default {
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
 
         return record
-      }).then(record => {
-        return Promise.all([
-          record,
-          PaymentAPI.queryRecord({ filter: { targetType: 'Order', targetId: record.id } })
-        ])
-      }).then(responses => {
-        let record = responses[0]
-        let paymentResponse = responses[1]
-        let apiPayload = paymentResponse.data
-        let payments = JSONAPI.deserialize(apiPayload.data)
+      })
+    },
 
-        record.payments = payments
+    listPayment (context, params) {
+      return PaymentAPI.queryRecord({ filter: { targetType: 'Order', targetId: params.orderId } }).then(response => {
+        let apiPayload = response.data
+        let payments = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
 
-        commit(MT.RECORD_CHANGED, record)
-      }).catch(error => {
-        throw JSONAPI.deserializeErrors(error.response.data.errors)
+        return payments
       })
     },
 
@@ -124,7 +100,7 @@ export default {
     },
 
     updateOrder ({ state, commit, rootState }, actionPayload) {
-      let apiPayload = { data: JSONAPI.serialize(actionPayload.recordDraft) }
+      let apiPayload = { data: JSONAPI.serialize(actionPayload.orderDraft) }
 
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
       return OrderAPI.updateRecord(actionPayload.id, apiPayload, options).then(response => {
@@ -176,10 +152,6 @@ export default {
       }).then(response => {
         return response.resources
       })
-    },
-
-    resetSelectableCustomers ({ commit }) {
-      commit(MT.SELECTABLE_CUSTOMERS_RESET)
     },
 
     createLineItem ({ state, commit }, lineItemDraft) {
@@ -253,10 +225,9 @@ export default {
         return OrderAPI.getRecord(target.id, { include: 'rootLineItems.children' })
       }).then(response => {
         let apiPayload = response.data
-        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+        let order = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
 
-        commit(MT.RECORD_CHANGED, record)
-        commit(MT.PAYMENT_ADD_ENDED)
+        return order
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
@@ -391,20 +362,6 @@ export default {
 
     [MT.SELECTED_PRICES_CHANGED] (state, prices) {
       state.selectablePrices = prices
-    },
-
-    [MT.SELECTABLE_CUSTOMERS_CHANGED] (state, customers) {
-      state.selectableCustomers = customers
-      state.isLoadingSelectableCustomers = false
-    },
-
-    [MT.SELECTABLE_CUSTOMERS_LOADING] (state) {
-      state.isLoadingSelectableCustomers = true
-    },
-
-    [MT.SELECTABLE_CUSTOMERS_RESET] (state) {
-      state.isLoadingSelectableCustomers = true
-      state.selectableCustomers = []
     },
 
     [MT.PAYMENT_EDIT_STARTED] (state, payment) {

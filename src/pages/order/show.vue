@@ -5,7 +5,7 @@
       <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">Orders</el-menu-item>
       <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">Payments</el-menu-item>
     </el-menu>
-    <locale-selector @change="loadRecord" class="pull-right"></locale-selector>
+    <locale-selector @change="loadOrder" class="pull-right"></locale-selector>
   </div>
 
   <div>
@@ -14,9 +14,9 @@
 
         <div class="brief no-avatar">
           <div class="detail">
-            <p>Order {{record.code}}</p>
-            <h2>{{record.firstName}} {{record.lastName}}</h2>
-            <p class="id">{{record.id}}</p>
+            <p>Order {{order.code}}</p>
+            <h2>{{order.firstName}} {{order.lastName}}</h2>
+            <p class="id">{{order.id}}</p>
           </div>
         </div>
 
@@ -33,81 +33,95 @@
           <div class="block-body">
             <dl>
               <dt>ID</dt>
-              <dd>{{record.id}}</dd>
+              <dd>{{order.id}}</dd>
 
-              <template v-if="record.code">
+              <template v-if="order.code">
                 <dt>Code</dt>
-                <dd>{{record.code}}</dd>
+                <dd>{{order.code}}</dd>
               </template>
 
               <dt>Status</dt>
               <dd>
-                <el-tag v-if="record.status === 'opened'" type="primary" size="mini">
-                  {{$t(`attributes.order.status.${record.status}`)}}
+                <el-tag v-if="order.status === 'opened'" type="primary" size="mini">
+                  {{$t(`attributes.order.status.${order.status}`)}}
                 </el-tag>
                 <el-tag v-else type="gray" size="mini">
-                  {{$t(`attributes.order.status.${record.status}`)}}
+                  {{$t(`attributes.order.status.${order.status}`)}}
                 </el-tag>
               </dd>
 
               <dt>Name</dt>
-              <dd>{{record.firstName}} {{record.lastName}}</dd>
+              <dd>{{order.firstName}} {{order.lastName}}</dd>
 
               <dt>Email</dt>
-              <dd>{{record.email}}</dd>
+              <dd>{{order.email}}</dd>
 
-              <template v-if="record.phoneNumber">
+              <template v-if="order.phoneNumber">
                 <dt>Phone</dt>
-                <dd>{{record.phoneNumber}}</dd>
+                <dd>{{order.phoneNumber}}</dd>
+              </template>
+
+              <template v-if="order.label">
+                <dt>Phone</dt>
+                <dd>{{order.label}}</dd>
               </template>
 
               <hr>
 
               <dt>Fulfillment Method</dt>
-              <dd>{{$t(`attributes.order.fulfillmentMethod.${record.fulfillmentMethod}`)}}</dd>
+              <dd>{{$t(`attributes.order.fulfillmentMethod.${order.fulfillmentMethod}`)}}</dd>
 
-              <template v-if="record.fulfillmentMethod === 'ship'">
+              <template v-if="order.fulfillmentMethod === 'ship'">
                 <dt>Delivery Address</dt>
                 <dd>
-                  {{record.deliveryAddressLineOne}}
-                  <template v-if="record.deliveryAddressLineTwo">
+                  {{order.deliveryAddressLineOne}}
+                  <template v-if="order.deliveryAddressLineTwo">
                     <br>
-                    {{record.deliveryAddressLineTwo}}
+                    {{order.deliveryAddressLineTwo}}
                   </template>
                   <br>
-                  {{record.deliveryAddressCity}}, {{record.deliveryAddressProvince}}, {{record.deliveryAddressCountryCode}}
+                  {{order.deliveryAddressCity}}, {{order.deliveryAddressProvince}}, {{order.deliveryAddressCountryCode}}
                   <br>
-                  {{record.deliveryAddressPostalCode}}
+                  {{order.deliveryAddressPostalCode}}
                 </dd>
               </template>
 
               <hr>
 
-              <template v-if="record.SubTotalCents != record.grandTotalCents">
+              <template v-if="order.SubTotalCents != order.grandTotalCents">
                 <dt>Sub Total</dt>
-                <dd>{{record.subTotalCents | dollar}}</dd>
+                <dd>
+                  <span v-if="order.isEstimate">~</span>
+                  {{order.subTotalCents | dollar}}
+                </dd>
               </template>
 
-              <template v-if="record.taxOneCents > 0">
+              <template v-if="order.taxOneCents > 0">
                 <dt>Tax 1</dt>
-                <dd>{{record.taxOneCents | dollar}}</dd>
+                <dd>{{order.taxOneCents | dollar}}</dd>
               </template>
 
-              <template v-if="record.taxTwoCents > 0">
+              <template v-if="order.taxTwoCents > 0">
                 <dt>Tax 2</dt>
-                <dd>{{record.taxTwoCents | dollar}}</dd>
+                <dd>{{order.taxTwoCents | dollar}}</dd>
               </template>
 
-              <template v-if="record.taxThreeCents > 0">
+              <template v-if="order.taxThreeCents > 0">
                 <dt>Tax 3</dt>
-                <dd>{{record.taxThreeCents | dollar}}</dd>
+                <dd>{{order.taxThreeCents | dollar}}</dd>
               </template>
 
               <dt>Grand Total</dt>
-              <dd>{{record.grandTotalCents | dollar}}</dd>
+              <dd>
+                <span v-if="order.isEstimate">~</span>
+                {{order.grandTotalCents | dollar}}
+              </dd>
 
               <dt>Authorization Total</dt>
-              <dd>{{record.authorizationCents | dollar}}</dd>
+              <dd>{{order.authorizationCents | dollar}}</dd>
+
+              <dt>Opened At</dt>
+              <dd>{{order.openedAt | moment('MMM DD YYYY hh:mm:ss')}}</dd>
             </dl>
           </div>
         </div>
@@ -124,7 +138,7 @@
         </div>
         <div class="block">
           <div class="block-body full">
-            <order-line-item-table @delete="deleteLineItem" @edit="openEditLineItemDialog" :records="record.rootLineItems">
+            <order-line-item-table @delete="deleteLineItem" @edit="openEditLineItemDialog($event)" :records="order.rootLineItems">
             </order-line-item-table>
           </div>
         </div>
@@ -134,7 +148,7 @@
             Payments
           </h3>
           <span>
-            <el-tag v-if="record.isPaymentBalanced" type="primary" size="mini">
+            <el-tag v-if="order.isPaymentBalanced" type="primary" size="mini">
               Balanced
             </el-tag>
             <el-tag v-else type="danger" size="mini">
@@ -152,26 +166,12 @@
 
         <div class="block">
           <div class="block-body full">
-            <el-table :data="record.payments" stripe class="block-table" :show-header="false" style="width: 100%">
+            <el-table :data="payments" stripe class="block-table" :show-header="false" style="width: 100%">
               <el-table-column>
                 <template scope="scope">
                   <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }">
                     <b>
-                      <template v-if="scope.row.status === 'pending'">
-                        {{scope.row.pendingAmountCents | dollar}}
-                      </template>
-
-                      <template v-if="scope.row.status === 'authorized'">
-                        {{scope.row.authorizedAmountCents | dollar}}
-                      </template>
-
-                      <template v-if="scope.row.status === 'paid'">
-                        {{scope.row.paidAmountCents | dollar}}
-                      </template>
-
-                      <template v-if="scope.row.status === 'partially_refunded' || scope.row.status === 'refunded'">
-                        {{scope.row.paidAmountCents | dollar}} ({{-scope.row.refundedAmountCents | dollar}})
-                      </template>
+                      {{scope.row.amountCents | dollar}}
                     </b>
 
                     <el-tag type="gray" class="m-l-10" size="mini">
@@ -183,7 +183,7 @@
 
               <el-table-column width="200">
                 <template scope="scope">
-                  <span>{{scope.row.insertedAt | moment("MMM Do YYYY hh:mm:ss")}}</span>
+                  <span>{{scope.row.insertedAt | moment("MMM DD YYYY hh:mm:ss")}}</span>
                 </template>
               </el-table-column>
 
@@ -222,7 +222,7 @@
         </div>
         <div class="block">
           <div class="block-body">
-            {{record.customData}}
+            {{order.customData}}
           </div>
         </div>
 
@@ -230,8 +230,8 @@
         <div class="block">
           <div class="block-body">
              <dl>
-                <dt v-if="record.customer">Customer</dt>
-                <dd v-if="record.customer"><a href="#">{{record.customer.id}}</a></dd>
+                <dt v-if="order.customer">Customer</dt>
+                <dd v-if="order.customer"><a href="#">{{order.customer.id}}</a></dd>
               </dl>
           </div>
         </div>
@@ -252,54 +252,41 @@
       </div>
 
       <div class="footer text-right">
-        <delete-button @confirmed="deleteRecord" size="medium">Delete</delete-button>
+        <delete-button @confirmed="deleteOrder()" size="medium">Delete</delete-button>
       </div>
     </el-card>
   </div>
 
   <div class="launchable">
-    <order-line-item-dialog
-      v-model="lineItemDraftForUpdate"
-      @save="updateLineItem"
-      @cancel="closeEditLineItemDialog"
-      :is-visible="isEditingLineItem"
-      title="Edit Line Item"
-    >
-    </order-line-item-dialog>
+    <el-dialog :show-close="false" :visible="isAddingLineItem" title="Add Line Item" width="750px">
+      <order-line-item-form v-model="lineItemDraftForAdd"></order-line-item-form>
 
-    <order-line-item-dialog
-      v-model="lineItemDraftForCreate"
-      @save="createLineItem"
-      @cancel="closeAddLineItemDialog"
-      :is-visible="isAddingLineItem"
-      title="Add Line Item"
-    >
-    </order-line-item-dialog>
+      <div slot="footer" class="dialog-footer">
+        <el-button :disabled="isCreatingLineItem" @click="closeAddLineItemDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isCreatingLineItem" @click="createLineItem()" type="primary" size="small">Save</el-button>
+      </div>
+    </el-dialog>
 
-    <payment-dialog
-      v-model="paymentDraftForEdit"
-      @save="updatePayment"
-      @cancel="closeEditPaymentDialog"
-      :record="paymentForEdit"
-      :errors="errors"
-      :is-visible="isEditingPayment"
-      title="Payment"
-    >
-    </payment-dialog>
+    <el-dialog :show-close="false" :visible="isEditingLineItem" title="Edit Line Item" width="750px">
+      <order-line-item-form v-model="lineItemDraftForEdit"></order-line-item-form>
 
-    <payment-dialog
-      v-model="paymentDraftForCreate"
-      @save="createPayment"
-      @cancel="closeAddPaymentDialog"
-      :record="paymentForCreate"
-      :errors="errors"
-      :is-visible="isAddingPayment"
-      title="Add Payment"
-    >
-    </payment-dialog>
+      <div slot="footer" class="dialog-footer">
+        <el-button :disabled="isUpdatingLineItem" @click="closeEditLineItemDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isUpdatingLineItem" @click="updateLineItem()" type="primary" size="small">Save</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog :show-close="false" :visible="isAddingPayment" title="Add Payment" width="750px">
+      <payment-form v-model="paymentDraftForAdd"></payment-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button :disabled="isCreatingPayment" @click="closeAddPaymentDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isCreatingPayment" @click="createPayment()" type="primary" size="small">Save</el-button>
+      </div>
+    </el-dialog>
 
     <refund-dialog
-      v-model="refundDraftForCreate"
+      v-model="refundDraftForAdd"
       @refund="createRefund"
       @cancel="closeAddRefundDialog"
       :errors="errors"
@@ -318,7 +305,14 @@ import 'vue-awesome/icons/pencil'
 import 'vue-awesome/icons/plus'
 
 import _ from 'lodash'
-import ShowPage from '@/mixins/show-page'
+import Order from '@/models/order'
+import OrderLineItem from '@/models/order-line-item'
+import Payment from '@/models/payment'
+import Refund from '@/models/refund'
+
+import OrderLineItemForm from '@/components/order-line-item-form'
+import PaymentForm from '@/components/payment-form'
+
 import DeleteButton from '@/components/delete-button'
 import OrderLineItemTable from '@/components/order-line-item-table'
 import OrderLineItemDialog from '@/components/order-line-item-dialog'
@@ -332,139 +326,213 @@ export default {
     dollar
   },
   components: {
+    PaymentForm,
+    OrderLineItemForm,
     DeleteButton,
     OrderLineItemDialog,
     OrderLineItemTable,
     PaymentDialog,
     RefundDialog
   },
+  props: ['id'],
   data () {
     return {
+      order: Order.objectWithDefaults(),
+      isLoading: false,
+
+      payments: [],
+
+      lineItemDraftForAdd: OrderLineItem.objectWithDefaults(),
+      isAddingLineItem: false,
+      isCreatingLineItem: false,
+
+      lineItemForEdit: OrderLineItem.objectWithDefaults(),
+      lineItemDraftForEdit: OrderLineItem.objectWithDefaults(),
+      isEditingLineItem: false,
+      isUpdatingLineItem: false,
+
+      paymentForEdit: Payment.objectWithDefaults(),
+      paymentDraftForEdit: Payment.objectWithDefaults(),
+      isEditingPayment: false,
+      isUpdatingPayment: false,
+
+      paymentDraftForAdd: Payment.objectWithDefaults(),
+      isAddingPayment: false,
+      isCreatingPayment: false,
+
+      refundDraftForAdd: Refund.objectWithDefaults(),
+      isAddingRefund: false,
+      isCreatingRefund: false,
+
       expandedLineItemIds: [],
       errors: {},
       paymentDialogTitle: ''
     }
   },
-  computed: {
-    isEditingLineItem () {
-      return this.$store.state.order.isEditingLineItem
-    },
-    lineItemDraftForUpdate: {
-      get () {
-        return this.$store.state.order.lineItemDraftForUpdate
-      },
-      set (value) {
-        this.$store.dispatch('order/setLineItemDraftForUpdate', value)
-      }
-    },
-    isAddingLineItem () {
-      return this.$store.state.order.isAddingLineItem
-    },
-    lineItemDraftForCreate: {
-      get () {
-        return this.$store.state.order.lineItemDraftForCreate
-      },
-      set (value) {
-        this.$store.dispatch('order/setLineItemDraftForCreate', value)
-      }
-    },
-    paymentDraftForEdit: {
-      get () {
-        return this.$store.state.order.paymentDraftForEdit
-      },
-      set (value) {
-        this.$store.dispatch('order/setPaymentDraftForCapture', value)
-      }
-    },
-    paymentForEdit () {
-      return this.$store.state.order.paymentForEdit
-    },
-    isEditingPayment () {
-      return this.$store.state.order.isEditingPayment
-    },
-    paymentDraftForCreate: {
-      get () {
-        return this.$store.state.order.paymentDraftForCreate
-      },
-      set (value) {
-        this.$store.dispatch('order/setPaymentDraftForCreate', value)
-      }
-    },
-    paymentForCreate () {
-      return this.$store.state.order.paymentForCreate
-    },
-    isAddingPayment () {
-      return this.$store.state.order.isAddingPayment
-    },
-    refundDraftForCreate: {
-      get () {
-        return this.$store.state.order.refundDraftForCreate
-      },
-      set (value) {
-        this.$store.dispatch('order/setRefundDraftForCreate', value)
-      }
-    },
-    isAddingRefund () {
-      return this.$store.state.order.isAddingRefund
-    }
+  created () {
+    this.loadOrder()
   },
-  mixins: [ShowPage({ storeNamespace: 'order', name: 'Order', include: 'rootLineItems.children' })],
   methods: {
-    canRefundPayment (payment) {
-      return payment.status === 'partially_refunded' || payment.status === 'paid'
-    },
-    editRecord () {
-      this.$router.push({ name: 'EditOrder', params: { id: this.record.id }, query: { callbackPath: this.currentRoutePath } })
-    },
-    recordDeleted () {
-      this.$store.dispatch('product/resetRecord')
-      this.$store.dispatch('popRoute', 1)
-    },
-    deleteLineItem (id) {
-      let orderLineItem = _.find(this.record.rootLineItems, { id: id })
-      orderLineItem = _.cloneDeep(orderLineItem)
-      orderLineItem.order = this.record
-      this.$store.dispatch('order/deleteLineItem', orderLineItem).then(() => {
-        this.$message({
-          showClose: true,
-          message: 'Line Item deleted successfully.',
-          type: 'success'
-        })
+    loadOrder () {
+      this.isLoading = true
+
+      this.$store.dispatch('order/getOrder', {
+        id: this.id,
+        include: 'rootLineItems.children'
+      }).then(order => {
+        this.order = order
+
+        return this.$store.dispatch('order/listPayment', { orderId: order.id })
+      }).then(payments => {
+        this.payments = payments
+
+        this.isLoading = false
+      }).catch(errors => {
+        this.isLoading = false
+        throw errors
       })
     },
+
     openAddLineItemDialog () {
-      this.$store.dispatch('order/startAddLineItem')
+      this.lineItemDraftForAdd.order = this.order
+      this.isAddingLineItem = true
     },
+
     closeAddLineItemDialog () {
-      this.$store.dispatch('order/endAddLineItem')
+      this.isAddingLineItem = false
+      this.isCreatingLineItem = false
+
+      // Wait for close animation to finish
+      setTimeout(() => {
+        this.lineItemDraftForAdd = OrderLineItem.objectWithDefaults()
+      }, 300)
     },
-    createLineItem (formModel) {
-      formModel.order = this.record
-      this.$store.dispatch('order/createLineItem', formModel).then(() => {
+
+    createLineItem () {
+      this.isCreatingLineItem = true
+
+      this.$store.dispatch('order/createLineItem', this.lineItemDraftForAdd).then(order => {
+        this.order = order
+
         this.$message({
           showClose: true,
           message: `Line Item created successfully.`,
           type: 'success'
         })
+
+        this.closeAddLineItemDialog()
+      }).catch(errors => {
+        this.errors = errors
+
+        this.isCreatingLineItem = false
       })
     },
+
     openEditLineItemDialog (lineItemId) {
-      let lineItem = _.find(this.record.rootLineItems, { id: lineItemId })
-      this.$store.dispatch('order/startEditLineItem', _.cloneDeep(lineItem))
+      let lineItem = _.find(this.order.rootLineItems, { id: lineItemId })
+      this.lineItemForEdit = lineItem
+      this.lineItemDraftForEdit = _.cloneDeep(lineItem)
+
+      this.isEditingLineItem = true
     },
+
     closeEditLineItemDialog () {
-      this.$store.dispatch('order/endEditLineItem')
+      this.isEditingLineItem = false
+      this.isUpdatingLineItem = false
+
+      // Wait for close animation to finish
+      setTimeout(() => {
+        this.lineItemForEdit = OrderLineItem.objectWithDefaults()
+        this.lineItemDraftForEdit = OrderLineItem.objectWithDefaults()
+      }, 300)
     },
+
     updateLineItem (formModel) {
-      formModel.order = this.record
-      this.$store.dispatch('order/updateLineItem', { id: formModel.id, lineItemDraft: formModel }).then(() => {
+      this.isUpdatingLineItem = true
+
+      this.$store.dispatch('order/updateLineItem', {
+        id: this.lineItemDraftForEdit.id,
+        lineItemDraft: this.lineItemDraftForEdit
+      }).then(order => {
+        this.order = order
+
         this.$message({
           showClose: true,
-          message: `Line Item updated successfully.`,
+          message: `Line Item saved successfully.`,
           type: 'success'
         })
+
+        this.closeEditLineItemDialog()
+      }).catch(errors => {
+        this.errors = errors
+
+        this.isUpdatingLineItem = false
       })
     },
+
+    deleteLineItem (id) {
+      let orderLineItem = _.find(this.order.rootLineItems, { id: id })
+
+      this.$store.dispatch('order/deleteLineItem', orderLineItem).then(order => {
+        this.order = order
+      })
+    },
+
+    openAddPaymentDialog () {
+      this.paymentDraftForAdd.target = this.order
+      this.paymentDraftForAdd.owner = this.order.customer
+
+      this.isAddingPayment = true
+    },
+
+    closeAddPaymentDialog () {
+      this.isAddingPayment = false
+      this.isCreatingPayment = false
+
+      // Wait for close animation to finish
+      setTimeout(() => {
+        this.PaymentDraftForAdd = OrderLineItem.objectWithDefaults()
+      }, 300)
+    },
+
+    createPayment () {
+      this.isCreatingPayment = true
+
+      this.$store.dispatch('order/createPayment', this.paymentDraftForAdd).then(order => {
+        this.order = order
+        return this.$store.dispatch('order/listPayment', { orderId: order.id })
+      }).then(payments => {
+        this.payments = payments
+
+        this.$message({
+          showClose: true,
+          message: `Payment created successfully.`,
+          type: 'success'
+        })
+
+        this.closeAddPaymentDialog()
+      }).catch(errors => {
+        this.errors = errors
+
+        this.isCreatingPayment = false
+      })
+    },
+
+    deleteOrder () {
+
+    },
+
+    canRefundPayment (payment) {
+      return payment.status === 'partially_refunded' || payment.status === 'paid'
+    },
+    editRecord () {
+      this.$router.push({ name: 'EditOrder', params: { id: this.order.id }, query: { callbackPath: this.currentRoutePath } })
+    },
+    orderDeleted () {
+      this.$store.dispatch('product/resetRecord')
+      this.$store.dispatch('popRoute', 1)
+    },
+
     openEditPaymentDialog (payment) {
       let paymentDraft = _.cloneDeep(payment)
 
@@ -472,14 +540,14 @@ export default {
         paymentDraft.status = 'paid'
       }
 
-      paymentDraft.paidAmountCents = this.record.grandTotalCents
+      paymentDraft.paidAmountCents = this.order.grandTotalCents
       this.$store.dispatch('order/startEditPayment', paymentDraft)
     },
     closeEditPaymentDialog () {
       this.$store.dispatch('order/endEditPayment')
     },
     updatePayment (formModel) {
-      formModel.order = this.record
+      formModel.order = this.order
       this.$store.dispatch('order/updatePayment', { id: formModel.id, paymentDraft: formModel }).then(() => {
         this.$message({
           showClose: true,
@@ -499,24 +567,7 @@ export default {
         })
       })
     },
-    openAddPaymentDialog () {
-      let paymentDraft = _.cloneDeep(this.paymentDraftForCreate)
-      paymentDraft.order = this.record
 
-      this.$store.dispatch('order/startAddPayment', paymentDraft)
-    },
-    closeAddPaymentDialog () {
-      this.$store.dispatch('order/endAddPayment')
-    },
-    createPayment (formModel) {
-      this.$store.dispatch('order/createPayment', formModel).then(() => {
-        this.$message({
-          showClose: true,
-          message: `Payment created successfully.`,
-          type: 'success'
-        })
-      })
-    },
     createRefund (formModel) {
       this.$store.dispatch('order/createRefund', formModel).then(() => {
         this.$message({
@@ -527,7 +578,7 @@ export default {
       })
     },
     openAddRefundDialog (payment) {
-      let refundDraft = _.cloneDeep(this.refundDraftForCreate)
+      let refundDraft = _.cloneDeep(this.refundDraftForAdd)
       refundDraft.payment = payment
       refundDraft.amountCents = payment.paidAmountCents - payment.refundedAmountCents
       this.$store.dispatch('order/startAddRefund', refundDraft)

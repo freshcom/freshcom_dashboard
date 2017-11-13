@@ -12,7 +12,7 @@
       <el-button type="danger" size="mini" @click="confirmed">Delete</el-button>
     </div>
   </el-popover>
-  <el-button :type="type" :size="size" :class="iconOnly ? 'icon' : ''" v-popover:warnDelete>
+  <el-button :type="type" :size="size" :class="iconOnly ? 'icon' : ''" plain v-popover:warnDelete>
     <slot>Delete</slot>
   </el-button>
 </div>
@@ -28,8 +28,7 @@ export default {
       default: ''
     },
     type: {
-      type: String,
-      default: 'danger'
+      type: String
     },
     iconOnly: {
       type: Boolean,

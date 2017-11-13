@@ -9,7 +9,7 @@
   </div>
 
   <div>
-    <el-card v-loading="isLoading" class="main-card">
+    <el-card class="main-card">
       <div slot="header">
         <span>Create a Order</span>
       </div>
@@ -23,10 +23,10 @@
       </div>
 
       <div class="data">
-        <template v-if="activeStep === 0">
+        <div v-show="activeStep === this.step.LINE_ITEMS">
           <div class="block">
             <div class="block-body">
-              <order-line-item-form v-model="lineItemDraftForCreate" :errors="errors">
+              <order-line-item-form v-model="lineItemDraftForAdd" :errors="errors">
               </order-line-item-form>
             </div>
 
@@ -42,7 +42,7 @@
                 <order-line-item-table
                   :records="order.rootLineItems"
                   @delete="deleteLineItem"
-                  @edit="openLineItemDialog"
+                  @edit="startEditLineItem"
                 >
                 </order-line-item-table>
             </div>
@@ -67,47 +67,33 @@
               <p v-if="order.isEstimate">{{order.authorizationCents | dollar}}</p>
             </div>
           </div>
-        </template>
+        </div>
 
-        <template v-if="activeStep === 1">
+        <div v-show="activeStep === this.step.INFORMATION">
           <order-form v-model="orderDraft" :errors="errors"></order-form>
-        </template>
+        </div>
 
-        <template v-if="activeStep === 2">
-          <payment-form v-model="paymentDraft" :record="payment" :errors="errors"></payment-form>
-        </template>
+        <div v-show="activeStep === this.step.PAYMENT">
+          <payment-form v-model="paymentDraft" :errors="errors"></payment-form>
+        </div>
       </div>
 
       <div class="footer">
-        <template v-if="activeStep === 0">
-          <el-button @click="cancel" plain size="medium">
-            Cancel
-          </el-button>
+        <el-button v-show="canCancel" @click="cancel" plain size="medium">
+          Cancel
+        </el-button>
 
-          <el-button :disabled="order.rootLineItems.length === 0" @click="next()" size="medium" type="primary" class="pull-right">
-            Next
-          </el-button>
-        </template>
+        <el-button v-show="canNext" :loading="isUpdatingOrder" :disabled="order.rootLineItems.length === 0" @click="next()" size="medium" type="primary" class="pull-right">
+          Next
+        </el-button>
 
-        <template v-if="activeStep === 1">
-          <el-button @click="back" plain size="medium">
-            Back
-          </el-button>
+        <el-button v-show="canBack" @click="back" plain size="medium">
+          Back
+        </el-button>
 
-          <el-button @click="updateOrder()" size="medium" type="primary" class="pull-right">
-            Next
-          </el-button>
-        </template>
-
-        <template v-if="activeStep === 2">
-          <el-button @click="back" plain size="medium">
-            Back
-          </el-button>
-
-          <el-button @click="createPayment(paymentDraft, record)" size="medium" type="primary" class="pull-right">
-            Place Order
-          </el-button>
-        </template>
+        <el-button v-show="canPlaceOrder" @click="createPayment()" size="medium" type="primary" class="pull-right">
+          Place Order
+        </el-button>
       </div>
     </el-card>
   </div>
@@ -117,7 +103,7 @@
       <order-line-item-form v-model="lineItemDraftForEdit"></order-line-item-form>
 
       <div slot="footer" class="dialog-footer">
-        <el-button :disabled="isUpdatingLineItem" @click="closeLineItemDialog()" plain size="small">Cancel</el-button>
+        <el-button :disabled="isUpdatingLineItem" @click="cancelEditLineItem()" plain size="small">Cancel</el-button>
         <el-button :loading="isUpdatingLineItem" @click="updateLineItem()" type="primary" size="small">Save</el-button>
       </div>
     </el-dialog>
@@ -156,35 +142,56 @@ export default {
   },
   data () {
     return {
-      lineItemDraftForCreate: OrderLineItem.objectWithDefaults(),
+      step: {
+        LINE_ITEMS: 0,
+        INFORMATION: 1,
+        PAYMENT: 2
+      },
+      activeStep: 0,
+
+      lineItemDraftForAdd: OrderLineItem.objectWithDefaults(),
+      isCreatingLineItem: false,
+
       lineItemForEdit: OrderLineItem.objectWithDefaults(),
       lineItemDraftForEdit: OrderLineItem.objectWithDefaults(),
-
-      order: Order.objectWithDefaults(),
-      orderDraft: Order.objectWithDefaults(),
-
-      paymentDraft: Payment.objectWithDefaults(),
-
-      isCreatingLineItem: false,
       isEditingLineItem: false,
       isUpdatingLineItem: false,
 
+      order: Order.objectWithDefaults(),
+      orderDraft: Order.objectWithDefaults(),
       isUpdatingOrder: false,
 
-      errors: {},
-      isLoading: false,
-      activeStep: 0
+      paymentDraft: Payment.objectWithDefaults(),
+
+      errors: {}
+    }
+  },
+  computed: {
+    canBack () {
+      return this.activeStep === this.step.INFORMATION || this.activeStep === this.step.PAYMENT
+    },
+
+    canCancel () {
+      return this.activeStep === this.step.LINE_ITEMS
+    },
+
+    canNext () {
+      return this.activeStep === this.step.LINE_ITEMS || this.activeStep === this.step.INFORMATION
+    },
+
+    canPlaceOrder () {
+      return this.activeStep === this.step.PAYMENT
     }
   },
   methods: {
     createLineItem () {
       this.isCreatingLineItem = true
-      this.lineItemDraftForCreate.order = this.order
+      this.lineItemDraftForAdd.order = this.order
 
-      this.$store.dispatch('order/createLineItem', this.lineItemDraftForCreate).then(order => {
+      this.$store.dispatch('order/createLineItem', this.lineItemDraftForAdd).then(order => {
         this.order = order
         this.orderDraft = _.cloneDeep(this.order)
-        this.lineItemDraftForCreate = OrderLineItem.objectWithDefaults()
+        this.lineItemDraftForAdd = OrderLineItem.objectWithDefaults()
 
         this.isCreatingLineItem = false
       }).catch(errors => {
@@ -192,6 +199,18 @@ export default {
         this.isCreatingLineItem = false
       })
     },
+
+    startEditLineItem (lineItemId) {
+      this.lineItemForEdit = _.find(this.order.rootLineItems, { id: lineItemId })
+      this.lineItemDraftForEdit = _.cloneDeep(this.lineItemForEdit)
+
+      this.isEditingLineItem = true
+    },
+
+    cancelEditLineItem () {
+      this.isEditingLineItem = false
+    },
+
     updateLineItem () {
       this.isUpdatingLineItem = true
       this.lineItemDraftForEdit.order = this.order
@@ -213,35 +232,38 @@ export default {
         this.isEditingLineItem = false
       }).catch(errors => {
         this.errors = errors
+
+        this.isEditingLineItem = false
         this.isUpdatingLineItem = false
       })
     },
-    openLineItemDialog (lineItemId) {
-      this.lineItemForEdit = _.find(this.order.rootLineItems, { id: lineItemId })
-      this.lineItemDraftForEdit = _.cloneDeep(this.lineItemForEdit)
 
-      this.isEditingLineItem = true
-    },
-    closeLineItemDialog () {
-      this.isEditingLineItem = false
-    },
     deleteLineItem (id) {
-      let orderLineItem = _.find(this.order.rootLineItems, { id: id })
+      let lineItem = _.find(this.order.rootLineItems, { id: id })
 
-      this.$store.dispatch('order/deleteLineItem', orderLineItem).then(order => {
+      this.$store.dispatch('order/deleteLineItem', lineItem).then(order => {
         this.order = order
         this.orderDraft = _.cloneDeep(this.order)
       })
     },
+
     next () {
-      this.activeStep += 1
+      if (this.activeStep === this.step.INFORMATION) {
+        this.updateOrder().then(() => {
+          this.activeStep += 1
+        })
+      } else {
+        this.activeStep += 1
+      }
     },
+
     updateOrder () {
       this.isUpdatingOrder = true
 
-      this.$store.dispatch('order/updateOrder', {
+      return this.$store.dispatch('order/updateOrder', {
         id: this.orderDraft.id,
-        orderDraft: this.orderDraft
+        orderDraft: this.orderDraft,
+        include: 'customer,rootLineItems.children'
       }).then(order => {
         this.order = order
         this.orderDraft = _.cloneDeep(order)
@@ -250,12 +272,12 @@ export default {
         this.paymentDraft.owner = order.customer
 
         if (order.isEstimate) {
-          this.paymentDraft.authorizedAmountCents = order.authorizationCents
+          this.paymentDraft.amountCents = order.authorizationCents
+          this.paymentDraft.capture = false
         } else {
-          this.paymentDraft.paidAmountCents = order.grandTotalCents
+          this.paymentDraft.amountCents = order.grandTotalCents
+          this.paymentDraft.capture = true
         }
-
-        this.activeStep += 1
 
         this.isUpdatingOrder = false
       }).catch(errors => {
@@ -268,28 +290,20 @@ export default {
         })
 
         this.isUpdatingOrder = false
+        throw errors
       })
     },
-    createPayment (paymentDraft, order) {
-      // this.isLoading = true
 
+    createPayment () {
       let paymentCreated
-      paymentDraft = _.cloneDeep(paymentDraft)
-      if (paymentDraft.gateway === 'online') {
-        if (order.isEstimate) {
-          paymentDraft.authorizedAmountCents = order.authorizationCents
-        } else {
-          paymentDraft.paidAmountCents = order.grandTotalCents
-        }
 
+      if (this.paymentDraft.gateway === 'online') {
         paymentCreated = createStripeToken().then(data => {
-          paymentDraft.source = data.token.id
-          return this.$store.dispatch('order/createPayment', paymentDraft)
+          this.paymentDraft.source = data.token.id
+          return this.$store.dispatch('order/createPayment', this.paymentDraft)
         })
       } else {
-        paymentDraft = _.cloneDeep(paymentDraft)
-        paymentDraft.order = order
-        paymentCreated = this.$store.dispatch('order/createPayment', paymentDraft)
+        paymentCreated = this.$store.dispatch('order/createPayment', this.paymentDraft)
       }
 
       paymentCreated.then(payment => {
@@ -313,9 +327,11 @@ export default {
         }
       })
     },
+
     cancel () {
       console.log('cancel')
     },
+
     back () {
       this.activeStep -= 1
     }

@@ -103,20 +103,14 @@ export default {
       })
     },
 
-    loadSelectableCards ({ commit, rootState }, actionPayload) {
-      commit(MT.SELECTABLE_CARDS_LOADING)
+    loadCards ({ commit, rootState }, actionPayload) {
       actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
 
-      console.log(actionPayload)
       return CardAPI.queryRecord(actionPayload).then(response => {
         let apiPayload = response.data
         return { meta: response.data.meta, resources: JSONAPI.deserialize(apiPayload.data, apiPayload.included) }
       }).then(response => {
-        commit(MT.SELECTABLE_CARDS_CHANGED, response.resources)
-
-        return response
-      }).catch(error => {
-        console.log(error)
+        return response.resources
       })
     }
   },

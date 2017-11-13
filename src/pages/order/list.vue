@@ -54,7 +54,7 @@
               </el-popover>
             </template>
           </el-table-column>
-          <el-table-column prop="openedAt" label="" align="right" width="130"></el-table-column>
+          <el-table-column prop="openedAt" label="" align="right" width="200"></el-table-column>
         </el-table>
 
         <div v-if="hasSearchResult" class="footer">
@@ -95,7 +95,7 @@ export default {
           status: record.status,
           idLastPart: idLastPart,
           id: record.id,
-          openedAt: this.$options.filters.moment(record.updatedAt, 'D MMM YYYY')
+          openedAt: this.$options.filters.moment(record.updatedAt, 'MMM DD YYYY hh:mm:ss')
         }
       })
     }

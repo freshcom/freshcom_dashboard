@@ -215,6 +215,31 @@ a {
   tbody tr td:last-child {
     text-align: right;
   }
+
+  p {
+    margin: 0;
+  }
+
+  .actions {
+    .el-button {
+      padding: 5px 10px;
+      font-size: 11px;
+    }
+
+    a {
+      margin-left: 10px;
+    }
+
+    svg {
+      line-height: 16px;
+      min-height: 16px;
+      height: 16px;
+    }
+
+    .el-button+.el-button {
+      margin-left: 0px;
+    }
+  }
 }
 
 a:hover {
