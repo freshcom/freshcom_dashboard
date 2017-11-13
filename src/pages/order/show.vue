@@ -50,6 +50,11 @@
                 </el-tag>
               </dd>
 
+              <dt>Payment Status</dt>
+              <dd>
+                {{order.paymentStatus}}
+              </dd>
+
               <dt>Name</dt>
               <dd>{{order.firstName}} {{order.lastName}}</dd>
 
