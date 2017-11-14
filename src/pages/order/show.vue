@@ -42,17 +42,12 @@
 
               <dt>Status</dt>
               <dd>
-                <el-tag v-if="order.status === 'opened'" type="primary" size="mini">
-                  {{$t(`attributes.order.status.${order.status}`)}}
-                </el-tag>
-                <el-tag v-else type="gray" size="mini">
-                  {{$t(`attributes.order.status.${order.status}`)}}
-                </el-tag>
+                {{$t(`attributes.order.status.${order.status}`)}}
               </dd>
 
               <dt>Payment Status</dt>
               <dd>
-                {{order.paymentStatus}}
+                {{$t(`attributes.order.paymentStatus.${order.paymentStatus}`)}}
               </dd>
 
               <dt>Name</dt>
@@ -176,13 +171,15 @@
                 <template scope="scope">
                   <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }">
                     <b>
-                      {{scope.row.amountCents | dollar}}
+                      <span>
+                        {{scope.row.amountCents | dollar}}
+                      </span>
                     </b>
-
-                    <el-tag type="gray" class="m-l-10" size="mini">
-                      {{$t(`attributes.payment.status.${scope.row.status}`)}}
-                    </el-tag>
                   </router-link>
+
+                  <el-tag size="mini" type="info">
+                    {{$t(`attributes.payment.status.${scope.row.status}`)}}
+                  </el-tag>
                 </template>
               </el-table-column>
 
@@ -290,7 +287,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :show-close="false" :visible="isAddingRefund" title="Refund Payment" width="300px">
+    <el-dialog :show-close="false" :visible="isAddingRefund" title="Refund Payment" width="500px">
       <refund-form v-model="refundDraftForAdd"></refund-form>
 
       <div slot="footer" class="dialog-footer">
@@ -400,18 +397,16 @@ export default {
     },
 
     openAddLineItemDialog () {
-      this.lineItemDraftForAdd.order = this.order
+      let lineItem = OrderLineItem.objectWithDefaults()
+      lineItem.order = this.order
+
+      this.lineItemDraftForAdd = lineItem
       this.isAddingLineItem = true
     },
 
     closeAddLineItemDialog () {
       this.isAddingLineItem = false
       this.isCreatingLineItem = false
-
-      // Wait for close animation to finish
-      setTimeout(() => {
-        this.lineItemDraftForAdd = OrderLineItem.objectWithDefaults()
-      }, 300)
     },
 
     createLineItem () {
@@ -445,12 +440,6 @@ export default {
     closeEditLineItemDialog () {
       this.isEditingLineItem = false
       this.isUpdatingLineItem = false
-
-      // Wait for close animation to finish
-      setTimeout(() => {
-        this.lineItemForEdit = OrderLineItem.objectWithDefaults()
-        this.lineItemDraftForEdit = OrderLineItem.objectWithDefaults()
-      }, 300)
     },
 
     updateLineItem (formModel) {
@@ -485,20 +474,18 @@ export default {
     },
 
     openAddPaymentDialog () {
-      this.paymentDraftForAdd.target = this.order
-      this.paymentDraftForAdd.owner = this.order.customer
+      let paymentDraft = Payment.objectWithDefaults()
 
+      paymentDraft.target = this.order
+      paymentDraft.owner = this.order.customer
+
+      this.paymentDraftForAdd = paymentDraft
       this.isAddingPayment = true
     },
 
     closeAddPaymentDialog () {
       this.isAddingPayment = false
       this.isCreatingPayment = false
-
-      // Wait for close animation to finish
-      setTimeout(() => {
-        this.PaymentDraftForAdd = OrderLineItem.objectWithDefaults()
-      }, 300)
     },
 
     createPayment () {
@@ -525,15 +512,45 @@ export default {
     },
 
     openAddRefundDialog (payment) {
-      this.refundDraftForAdd.payment = payment
-      this.refundDraftForAdd.gateway = payment.gateway
-      this.refundDraftForAdd.processor = payment.processor
-      this.refundDraftForAdd.amountCents = payment.amountCents - payment.refundedAmountCents
+      let refundDraft = Refund.objectWithDefaults()
 
+      refundDraft.payment = payment
+      refundDraft.gateway = payment.gateway
+      refundDraft.processor = payment.processor
+      refundDraft.amountCents = payment.grossAmountCents
+      refundDraft.owner = payment.owner
+      refundDraft.target = payment.target
+
+      this.refundDraftForAdd = refundDraft
       this.isAddingRefund = true
     },
+
     closeAddRefundDialog () {
       this.isAddingRefund = false
+      this.isCreatingRefund = false
+    },
+
+    createRefund () {
+      this.isCreatingPayment = true
+
+      this.$store.dispatch('order/createRefund', this.refundDraftForAdd).then(order => {
+        this.order = order
+        return this.$store.dispatch('order/listPayment', { orderId: order.id })
+      }).then(payments => {
+        this.payments = payments
+
+        this.$message({
+          showClose: true,
+          message: `Refund created successfully.`,
+          type: 'success'
+        })
+
+        this.closeAddRefundDialog()
+      }).catch(errors => {
+        this.errors = errors
+
+        this.isCreatingRefund = false
+      })
     },
 
     deleteOrder () {
@@ -581,16 +598,6 @@ export default {
         this.$message({
           showClose: true,
           message: `Payment deleted successfully.`,
-          type: 'success'
-        })
-      })
-    },
-
-    createRefund (formModel) {
-      this.$store.dispatch('order/createRefund', formModel).then(() => {
-        this.$message({
-          showClose: true,
-          message: `Refund created successfully.`,
           type: 'success'
         })
       })

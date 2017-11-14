@@ -2,15 +2,9 @@
 <el-form @input.native="updateValue" :model="formModel" label-width="120px" size="small" class="m-b-10">
 
   <el-form-item label="Gateway" :error="errorMessages.gateway" required>
-    <el-select @change="updateValue" v-model="formModel.gateway">
+    <el-select @change="handleGatewayChange($event)" :value="formModel.gateway">
       <el-option label="Online" value="online"></el-option>
       <el-option label="Offline" value="offline"></el-option>
-    </el-select>
-  </el-form-item>
-
-  <el-form-item v-if="canSelectProcessor" label="Processor" :error="errorMessages.processor" required>
-    <el-select @change="updateValue" v-model="formModel.processor">
-      <el-option label="Stripe" value="stripe"></el-option>
     </el-select>
   </el-form-item>
 
@@ -22,7 +16,16 @@
   </el-form-item>
 
   <el-form-item :error="errorMessages.amountCents" required label="Refund Amount" size="small" class="refund-amount">
-    <money-input v-model="formModel.amountCents"></money-input>
+    <money-input v-model="formModel.amountCents" class="refund-amount-input"></money-input>
+  </el-form-item>
+
+  <el-form-item :error="errorMessages.notes" label="Notes" size="small" class="refund-amount">
+    <el-input
+      type="textarea"
+      :autosize="{ minRows: 2, maxRows: 4}"
+      placeholder="Enter detail of this refund..."
+      v-model="formModel.notes">
+    </el-input>
   </el-form-item>
 
 </el-form>
@@ -68,11 +71,22 @@ export default {
   methods: {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
-    }, 300)
+    }, 300),
+
+    handleGatewayChange (value) {
+      this.formModel.gateway = value
+      if (value === 'offline') {
+        this.formModel.method = 'cash'
+      }
+      this.updateValue()
+    }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.refund-amount-input {
+  width: 120px;
+}
 </style>

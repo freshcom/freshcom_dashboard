@@ -255,18 +255,15 @@ export default {
 
     createRefund ({ state, commit }, refundDraft) {
       let apiPayload = { data: JSONAPI.serialize(refundDraft) }
-      let order = refundDraft.payment.order
+      let target = refundDraft.target
 
       return RefundAPI.createRecord(refundDraft.payment.id, apiPayload).then(() => {
-        return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children' })
+        return OrderAPI.getRecord(target.id, { include: 'rootLineItems.children' })
       }).then(response => {
         let apiPayload = response.data
-        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+        let order = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
 
-        commit(MT.RECORD_CHANGED, record)
-        commit(MT.REFUND_ADD_ENDED)
-
-        return record
+        return order
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })

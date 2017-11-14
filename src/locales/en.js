@@ -72,6 +72,15 @@ export default {
       }
     },
     order: {
+      paymentStatus: {
+        pending: 'Pending',
+        partiallyAuthorized: 'Partially Authorized',
+        authorized: 'Authorized',
+        partiallyPaid: 'Partially Paid',
+        paid: 'Paid',
+        partiallyRefunded: 'Partially Refunded',
+        refunded: 'Refunded'
+      },
       status: {
         opened: 'Opened',
         cart: 'Cart'
