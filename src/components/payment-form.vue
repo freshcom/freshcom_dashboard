@@ -1,5 +1,5 @@
 <template>
-<el-form @input.native="updateValue" :model="formModel" @input="test()" label-position="top" size="small" class="m-b-10">
+<el-form @input.native="updateValue" :model="formModel" label-position="top" size="small" class="m-b-10">
 
   <el-row :gutter="10">
     <el-col v-if="canSelectGateway" :span="8">
@@ -79,7 +79,7 @@
     <el-row v-if="useCardFrom === 'newCard'">
       <el-col :span="12">
         <el-form-item class="card" required>
-          <card class="stripe-card" :class="{ complete }" :stripe="stripePk" :options="stripeOptions" @change="complete = $event.complete"></card>
+          <card ref="xxx" class="stripe-card" :stripe="stripePk" :options="stripeOptions"></card>
         </el-form-item>
       </el-col>
     </el-row>

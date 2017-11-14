@@ -91,7 +91,7 @@
           Back
         </el-button>
 
-        <el-button v-show="canPlaceOrder" @click="createPayment()" size="medium" type="primary" class="pull-right">
+        <el-button v-show="canPlaceOrder" :loading="isCreatingPayment" @click="createPayment()" size="medium" type="primary" class="pull-right">
           Place Order
         </el-button>
       </div>
@@ -162,6 +162,7 @@ export default {
       isUpdatingOrder: false,
 
       paymentDraft: Payment.objectWithDefaults(),
+      isCreatingPayment: false,
 
       errors: {}
     }
@@ -295,6 +296,8 @@ export default {
     },
 
     createPayment () {
+      this.isCreatingPayment = true
+
       let paymentCreated
 
       if (this.paymentDraft.gateway === 'online') {
@@ -313,6 +316,7 @@ export default {
           type: 'success'
         })
 
+        this.isCreatingPayment = false
         this.$store.dispatch('order/resetRecord')
         return this.$store.dispatch('pushRoute', { name: 'ListOrder' })
       }).catch(errors => {
@@ -325,6 +329,8 @@ export default {
             type: 'error'
           })
         }
+
+        this.isCreatingPayment = false
       })
     },
 

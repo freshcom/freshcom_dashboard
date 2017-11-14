@@ -1,0 +1,78 @@
+<template>
+<el-form @input.native="updateValue" :model="formModel" label-width="120px" size="small" class="m-b-10">
+
+  <el-form-item label="Gateway" :error="errorMessages.gateway" required>
+    <el-select @change="updateValue" v-model="formModel.gateway">
+      <el-option label="Online" value="online"></el-option>
+      <el-option label="Offline" value="offline"></el-option>
+    </el-select>
+  </el-form-item>
+
+  <el-form-item v-if="canSelectProcessor" label="Processor" :error="errorMessages.processor" required>
+    <el-select @change="updateValue" v-model="formModel.processor">
+      <el-option label="Stripe" value="stripe"></el-option>
+    </el-select>
+  </el-form-item>
+
+  <el-form-item v-if="formModel.gateway === 'offline'" label="Method" :error="errorMessages.method" required>
+    <el-select @change="updateValue" v-model="formModel.method">
+      <el-option label="Cash" value="cash"></el-option>
+      <el-option label="Cheque" value="cheque"></el-option>
+    </el-select>
+  </el-form-item>
+
+  <el-form-item :error="errorMessages.amountCents" required label="Refund Amount" size="small" class="refund-amount">
+    <money-input v-model="formModel.amountCents"></money-input>
+  </el-form-item>
+
+</el-form>
+</template>
+
+<script>
+import _ from 'lodash'
+import errorI18nKey from '@/utils/error-i18n-key'
+import MoneyInput from '@/components/money-input'
+
+export default {
+  name: 'RefundForm',
+  props: ['value', 'errors'],
+  components: {
+    MoneyInput
+  },
+  data () {
+    return {
+      formModel: _.cloneDeep(this.value)
+    }
+  },
+  computed: {
+    canSelectProcessor () {
+      return !this.formModel.id && this.formModel.gateway === 'online'
+    },
+
+    canSelectGateway () {
+      return !this.formModel.id
+    },
+
+    errorMessages () {
+      return _.reduce(this.errors, (result, v, k) => {
+        result[k] = this.$t(errorI18nKey('Payment', k, v[0]), { name: _.startCase(k) })
+        return result
+      }, {})
+    }
+  },
+  watch: {
+    value (v) {
+      this.formModel = _.cloneDeep(v)
+    }
+  },
+  methods: {
+    updateValue: _.debounce(function () {
+      this.$emit('input', this.formModel)
+    }, 300)
+  }
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+</style>

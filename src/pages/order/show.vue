@@ -290,15 +290,14 @@
       </div>
     </el-dialog>
 
-    <refund-dialog
-      v-model="refundDraftForAdd"
-      @refund="createRefund"
-      @cancel="closeAddRefundDialog"
-      :errors="errors"
-      :is-visible="isAddingRefund"
-      title="Refund Payment"
-    >
-    </refund-dialog>
+    <el-dialog :show-close="false" :visible="isAddingRefund" title="Refund Payment" width="300px">
+      <refund-form v-model="refundDraftForAdd"></refund-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button :disabled="isCreatingRefund" @click="closeAddRefundDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isCreatingRefund" @click="createRefund()" type="primary" size="small">Refund {{refundDraftForAdd.amountCents | dollar}}</el-button>
+      </div>
+    </el-dialog>
   </div>
 </div>
 
@@ -317,6 +316,7 @@ import Refund from '@/models/refund'
 
 import OrderLineItemForm from '@/components/order-line-item-form'
 import PaymentForm from '@/components/payment-form'
+import RefundForm from '@/components/refund-form'
 
 import DeleteButton from '@/components/delete-button'
 import OrderLineItemTable from '@/components/order-line-item-table'
@@ -331,6 +331,7 @@ export default {
     dollar
   },
   components: {
+    RefundForm,
     PaymentForm,
     OrderLineItemForm,
     DeleteButton,
@@ -523,6 +524,18 @@ export default {
       })
     },
 
+    openAddRefundDialog (payment) {
+      this.refundDraftForAdd.payment = payment
+      this.refundDraftForAdd.gateway = payment.gateway
+      this.refundDraftForAdd.processor = payment.processor
+      this.refundDraftForAdd.amountCents = payment.amountCents - payment.refundedAmountCents
+
+      this.isAddingRefund = true
+    },
+    closeAddRefundDialog () {
+      this.isAddingRefund = false
+    },
+
     deleteOrder () {
 
     },
@@ -581,15 +594,6 @@ export default {
           type: 'success'
         })
       })
-    },
-    openAddRefundDialog (payment) {
-      let refundDraft = _.cloneDeep(this.refundDraftForAdd)
-      refundDraft.payment = payment
-      refundDraft.amountCents = payment.paidAmountCents - payment.refundedAmountCents
-      this.$store.dispatch('order/startAddRefund', refundDraft)
-    },
-    closeAddRefundDialog () {
-      this.$store.dispatch('order/endAddRefund')
     }
   }
 }
