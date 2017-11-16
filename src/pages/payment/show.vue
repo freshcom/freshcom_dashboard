@@ -5,7 +5,7 @@
       <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">Orders</el-menu-item>
       <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">Payments</el-menu-item>
     </el-menu>
-    <locale-selector @change="loadRecord" class="pull-right"></locale-selector>
+    <locale-selector @change="loadPayment" class="pull-right"></locale-selector>
   </div>
 
   <div>
@@ -14,9 +14,9 @@
 
         <div class="brief no-avatar">
           <div class="detail">
-            <p>Payment {{record.code}}</p>
-            <h2>{{record.amountCents | dollar}}</h2>
-            <p class="id">{{record.id}}</p>
+            <p>Payment {{payment.code}}</p>
+            <h2>{{payment.amountCents | dollar}}</h2>
+            <p class="id">{{payment.id}}</p>
           </div>
         </div>
       </div>
@@ -29,38 +29,42 @@
           <div class="block-body">
             <dl>
               <dt>ID</dt>
-              <dd>{{record.id}}</dd>
+              <dd>{{payment.id}}</dd>
 
-              <dt v-if="record.code">Code</dt>
-              <dd v-if="record.code">{{record.code}}</dd>
+              <dt v-if="payment.code">Code</dt>
+              <dd v-if="payment.code">{{payment.code}}</dd>
 
               <dt>Status</dt>
               <dd>
-                {{$t(`attributes.payment.status.${record.status}`)}}
+                {{$t(`attributes.payment.status.${payment.status}`)}}
               </dd>
 
-              <dt v-if="record.gateway">Gateway</dt>
-              <dd v-if="record.gateway">{{record.gateway}}</dd>
-
-              <dt v-if="record.processor">Processor</dt>
-              <dd v-if="record.processor">{{record.processor}}</dd>
-
-              <dt v-if="record.method">Method</dt>
-              <dd v-if="record.method">{{record.method}}</dd>
-
-              <dt v-if="record.amountCents">Amount</dt>
-              <dd v-if="record.amountCents">
-                {{record.amountCents | dollar}}
+              <dt v-if="payment.gateway">Gateway</dt>
+              <dd v-if="payment.gateway">
+                {{$t(`attributes.payment.gateway.${payment.gateway}`)}}
               </dd>
 
-              <dt v-if="record.transactionFeeCents">Transaction Fee</dt>
-              <dd v-if="record.transactionFeeCents">
-                {{record.transactionFeeCents | dollar}}
+              <dt v-if="payment.method">Method</dt>
+              <dd v-if="payment.method">{{payment.method}}</dd>
+
+              <dt v-if="payment.amountCents">Amount</dt>
+              <dd v-if="payment.amountCents">
+                {{payment.amountCents | dollar}}
               </dd>
 
-              <dt v-if="record.refundedAmountCents">Refunded Amount</dt>
-              <dd v-if="record.refundedAmountCents">
-                {{record.refundedAmountCents | dollar}}
+              <dt v-if="payment.refundedAmountCents">Refunded Amount</dt>
+              <dd v-if="payment.refundedAmountCents">
+                {{payment.refundedAmountCents | dollar}}
+              </dd>
+
+              <dt v-if="payment.transactionFeeCents">Transaction Fee</dt>
+              <dd v-if="payment.transactionFeeCents">
+                {{payment.transactionFeeCents - payment.refundedTransactionFeeCents | dollar}}
+              </dd>
+
+              <dt v-if="payment.netAmountCents">Net Amount</dt>
+              <dd v-if="payment.netAmountCents">
+                {{payment.netAmountCents | dollar}}
               </dd>
             </dl>
           </div>
@@ -79,7 +83,7 @@
 
         <div class="block">
           <div class="block-body full">
-            <el-table :data="record.refunds" stripe class="block-table" :show-header="false" style="width: 100%">
+            <el-table :data="payment.refunds" stripe class="block-table" :show-header="false" style="width: 100%">
               <el-table-column width="300">
                 <template scope="scope">
                   <span>{{scope.row.amountCents | dollar}}</span>
@@ -106,7 +110,7 @@
         </div>
         <div class="block">
           <div class="block-body">
-            {{record.customData}}
+            {{payment.customData}}
           </div>
         </div>
 
@@ -116,15 +120,15 @@
             <dl>
               <dt>Target</dt>
               <dd>
-                <router-link :to="{ name: `Show${record.targetType}`, params: { id: record.targetId }}">
-                  {{record.targetId}}
+                <router-link :to="{ name: `Show${payment.targetType}`, params: { id: payment.targetId }}">
+                  {{payment.targetId}}
                 </router-link>
               </dd>
 
               <dt>Owner</dt>
               <dd>
-                <router-link :to="{ name: `Show${record.ownerType}`, params: { id: record.ownerId }}">
-                  {{record.ownerId}}
+                <router-link :to="{ name: `Show${payment.ownerType}`, params: { id: payment.ownerId }}">
+                  {{payment.ownerId}}
                 </router-link>
               </dd>
             </dl>
@@ -147,7 +151,7 @@
       </div>
 
       <div class="footer text-right">
-        <delete-button @confirmed="deleteRecord" size="small">Delete</delete-button>
+        <delete-button @confirmed="deletePayment" size="small">Delete</delete-button>
       </div>
     </el-card>
   </div>
@@ -161,12 +165,14 @@ import 'vue-awesome/icons/times'
 import 'vue-awesome/icons/pencil'
 import 'vue-awesome/icons/plus'
 
-import ShowPage from '@/mixins/show-page'
+import Payment from '@/models/payment'
+import Refund from '@/models/refund'
 import DeleteButton from '@/components/delete-button'
 import { chargeDollar, dollar } from '@/helpers/filters'
 
 export default {
   name: 'ShowPayment',
+  props: ['id'],
   components: {
     DeleteButton
   },
@@ -174,19 +180,50 @@ export default {
     chargeDollar,
     dollar
   },
-  mixins: [ShowPage({ storeNamespace: 'payment', name: 'Payment', include: 'refunds' })],
+  data () {
+    return {
+      payment: Payment.objectWithDefaults(),
+      isLoading: false,
+
+      refundDraftForAdd: Refund.objectWithDefaults(),
+      isAddingRefund: false,
+      isCreatingRefund: false
+    }
+  },
+  created () {
+    this.loadPayment()
+  },
   computed: {
     canRefund () {
-      return this.record.status === 'paid' || this.record.status === 'partially_refunded'
+      return this.payment.status === 'paid' || this.payment.status === 'partially_refunded'
     }
   },
   methods: {
-    editRecord () {
-      this.$store.dispatch('pushRoute', { name: 'EditProductItem', params: { id: this.record.id }, query: { callbackPath: this.currentRoutePath } })
+    loadPayment () {
+      this.isLoading = true
+      this.$store.dispatch('payment/getPayment', {
+        id: this.id,
+        include: 'refunds'
+      }).then(payment => {
+        this.payment = payment
+
+        this.isLoading = false
+      }).catch(errors => {
+        this.isLoading = false
+        throw errors
+      })
     },
-    recordDeleted () {
+
+    editRecord () {
+      this.$store.dispatch('pushRoute', { name: 'EditProductItem', params: { id: this.payment.id }, query: { callbackPath: this.currentRoutePath } })
+    },
+    paymentDeleted () {
       this.$store.dispatch('product/resetRecord')
       this.$store.dispatch('popRoute', 1)
+    },
+
+    deletePayment () {
+
     }
   }
 }

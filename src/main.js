@@ -63,7 +63,9 @@ Vue.use(ElementUI, {
 })
 
 // -- Moment.js --
-Vue.use(vueMoment)
+Vue.use(vueMoment, { defaultFormat: 'YYYY-MM', defaultFormatUtc: 'YYYY-MM' })
+Vue.moment.defaultFormat = 'MMM DD YYYY HH:mm:ss'
+
 Vue.use(money, { precision: 2, masked: false, prefix: '$ ' })
 
 Vue.config.productionTip = false

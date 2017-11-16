@@ -117,11 +117,11 @@
                 {{order.grandTotalCents | dollar}}
               </dd>
 
-              <dt>Authorization Total</dt>
-              <dd>{{order.authorizationCents | dollar}}</dd>
+              <dt v-if="order.authorizationCents != order.grandTotalCents">Authorization Total</dt>
+              <dd v-if="order.authorizationCents != order.grandTotalCents">{{order.authorizationCents | dollar}}</dd>
 
               <dt>Opened At</dt>
-              <dd>{{order.openedAt | moment('MMM DD YYYY hh:mm:ss')}}</dd>
+              <dd>{{order.openedAt | moment}}</dd>
             </dl>
           </div>
         </div>
@@ -147,14 +147,6 @@
           <h3>
             Payments
           </h3>
-          <span>
-            <el-tag v-if="order.isPaymentBalanced" type="primary" size="mini">
-              Balanced
-            </el-tag>
-            <el-tag v-else type="danger" size="mini">
-              Not Balanced
-            </el-tag>
-          </span>
 
           <span class="block-title-actions pull-right">
             <a @click="openAddPaymentDialog()" href="javascript:;">
@@ -177,7 +169,7 @@
                     </b>
                   </router-link>
 
-                  <el-tag size="mini" type="info">
+                  <el-tag size="mini" type="info" class="m-l-20">
                     {{$t(`attributes.payment.status.${scope.row.status}`)}}
                   </el-tag>
                 </template>
@@ -185,7 +177,7 @@
 
               <el-table-column width="200">
                 <template scope="scope">
-                  <span>{{scope.row.insertedAt | moment("MMM DD YYYY hh:mm:ss")}}</span>
+                  <span>{{scope.row.insertedAt | moment}}</span>
                 </template>
               </el-table-column>
 
@@ -531,7 +523,7 @@ export default {
     },
 
     createRefund () {
-      this.isCreatingPayment = true
+      this.isCreatingRefund = true
 
       this.$store.dispatch('order/createRefund', this.refundDraftForAdd).then(order => {
         this.order = order

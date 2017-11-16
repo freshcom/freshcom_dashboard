@@ -51,7 +51,7 @@ import EditCustomerPage from '@/pages/customer/edit'
 
 import ShowPaymentPage from '@/pages/payment/show'
 
-import ShowPayoutSettingPage from '@/pages/payout/show-settings'
+import ShowBillingSettingsPage from '@/pages/billing/show-settings'
 
 Vue.use(Router)
 
@@ -419,9 +419,9 @@ export default new Router({
       }
     },
     {
-      path: '/payouts/settings',
-      name: 'ShowPayoutSettings',
-      component: ShowPayoutSettingPage,
+      path: '/billing/settings',
+      name: 'ShowBillingSettings',
+      component: ShowBillingSettingsPage,
       props (route) {
         let queryString = route.fullPath.split('?')[1]
         let query = qs.parse(queryString)

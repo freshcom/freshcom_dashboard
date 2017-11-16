@@ -90,9 +90,9 @@
           </el-menu-item>
         </el-submenu>
 
-        <el-menu-item :route="{ name: 'ShowPayoutSettings' }" index="/payouts">
+        <el-menu-item :route="{ name: 'ShowBillingSettings' }" index="/billing">
           <icon name="id-card" scale="0.8"></icon>
-          <span>Payouts</span>
+          <span>Billing</span>
         </el-menu-item>
 
         <el-menu-item index="operators">

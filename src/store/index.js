@@ -18,7 +18,7 @@ import OrderLineItemStore from '@/store/modules/order-line-item'
 import PaymentStore from '@/store/modules/payment'
 import UnlockableStore from '@/store/modules/unlockable'
 import CustomerStore from '@/store/modules/customer'
-import StripeAccountStore from '@/store/modules/stripe-account'
+import BillingStore from '@/store/modules/billing'
 
 Vue.use(Vuex)
 
@@ -44,7 +44,7 @@ export default new Vuex.Store({
     payment: PaymentStore,
     unlockable: UnlockableStore,
     customer: CustomerStore,
-    stripeAccount: StripeAccountStore
+    billing: BillingStore
   },
   state: {
     uiLocale: DEFAULT_LOCALE,

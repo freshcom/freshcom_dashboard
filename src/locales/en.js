@@ -64,6 +64,9 @@ export default {
         paid: 'Paid',
         partially_refunded: 'Partially Refunded',
         refunded: 'Refunded'
+      },
+      gateway: {
+        online: 'Online'
       }
     },
     customer: {

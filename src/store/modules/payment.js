@@ -32,24 +32,13 @@ export default {
       commit(MT.RESET_RECORD)
     },
 
-    loadRecord ({ state, commit, rootState }, actionPayload) {
-      if (state.record && state.record.id === actionPayload.id && state.record.locale === rootState.resourceLocale) {
-        return new Promise((resolve, reject) => {
-          resolve(state.record)
-        })
-      }
-
-      if (state.record.id !== actionPayload.id) {
-        commit(MT.RESET_RECORD)
-      }
-
+    getPayment ({ state, commit, rootState }, actionPayload) {
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
       return PaymentAPI.getRecord(actionPayload.id, options).then(response => {
         let apiPayload = response.data
-        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.SET_RECORD, record)
+        let payment = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
 
-        return record
+        return payment
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })

@@ -34,14 +34,14 @@
         </p>
         <el-table v-if="hasSearchResult" @row-click="viewRecord" :data="tableData">
           <el-table-column prop="name" label="Order"></el-table-column>
+          <el-table-column prop="grandTotalCents" label="" width="100">
+            <template slot-scope="scope">
+              <b>{{scope.row.grandTotalCents | dollar}}</b>
+            </template>
+          </el-table-column>
           <el-table-column prop="status" label="Status" width="100">
             <template slot-scope="scope">
-              <el-tag v-if="scope.row.status === 'opened'" size="mini" type="primary">
-                {{$t(`attributes.order.status.${scope.row.status}`)}}
-              </el-tag>
-              <el-tag v-else type="gray">
-                {{$t(`attributes.order.status.${scope.row.status}`)}}
-              </el-tag>
+              {{$t(`attributes.order.status.${scope.row.status}`)}}
             </template>
           </el-table-column>
           <el-table-column prop="id" label="ID" width="120">
@@ -76,11 +76,15 @@ import 'vue-awesome/icons/chevron-left'
 import _ from 'lodash'
 import Pagination from '@/components/pagination'
 import ListPage from '@/mixins/list-page'
+import { dollar } from '@/helpers/filters'
 
 export default {
   name: 'ListOrder',
   components: {
     Pagination
+  },
+  filters: {
+    dollar
   },
   mixins: [ListPage({ storeNamespace: 'order', fields: { 'Order': 'code,name,status' } })],
   computed: {
@@ -92,10 +96,11 @@ export default {
 
         return {
           name: name,
+          grandTotalCents: record.grandTotalCents,
           status: record.status,
           idLastPart: idLastPart,
           id: record.id,
-          openedAt: this.$options.filters.moment(record.updatedAt, 'MMM DD YYYY hh:mm:ss')
+          openedAt: this.$options.filters.moment(record.openedAt)
         }
       })
     }
