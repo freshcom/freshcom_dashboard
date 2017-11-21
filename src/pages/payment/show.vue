@@ -87,6 +87,9 @@
               <el-table-column width="300">
                 <template slot-scope="scope">
                   <b>{{scope.row.amountCents | dollar}}</b>
+                  <el-tag v-if="scope.row.gateway !== payment.gateway" size="mini" type="info" class="m-l-10">
+                    {{$t(`attributes.refund.gateway.${scope.row.gateway}`)}}
+                  </el-tag>
                 </template>
               </el-table-column>
 

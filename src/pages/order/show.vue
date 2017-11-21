@@ -184,8 +184,8 @@
               <el-table-column width="200">
                 <template scope="scope">
                   <p class="text-right actions">
-                    <el-button v-if="scope.row.status === 'pending'" @click="openEditPaymentDialog(scope.row)" size="mini">
-                      Pay
+                    <el-button v-if="scope.row.status === 'pending'" @click="openEditPaymentDialog(scope.row)" plain size="mini">
+                      Edit
                     </el-button>
 
                     <el-button v-if="scope.row.status === 'authorized'" @click="openEditPaymentDialog(scope.row)" plain size="mini">
@@ -203,11 +203,6 @@
                 </template>
               </el-table-column>
             </el-table>
-          </div>
-
-
-          <div class="block-footer text-center">
-            <a class="view-more" href="#">View More</a>
           </div>
         </div>
 
@@ -276,6 +271,15 @@
       <div slot="footer" class="dialog-footer">
         <el-button :disabled="isCreatingPayment" @click="closeAddPaymentDialog()" plain size="small">Cancel</el-button>
         <el-button :loading="isCreatingPayment" @click="createPayment()" type="primary" size="small">Save</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog :show-close="false" :visible="isEditingPayment" title="Add Payment" width="600px">
+      <payment-form v-model="paymentDraftForEdit" :errors="errors"></payment-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button :disabled="isUpdatingPayment" @click="closeEditPaymentDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isUpdatingPayment" @click="updatePayment()" type="primary" size="small">Save</el-button>
       </div>
     </el-dialog>
 
@@ -563,28 +567,43 @@ export default {
     openEditPaymentDialog (payment) {
       let paymentDraft = _.cloneDeep(payment)
 
-      if (paymentDraft.status === 'pending') {
-        paymentDraft.status = 'paid'
-      }
+      paymentDraft.amountCents = this.order.grandTotalCents
 
-      paymentDraft.paidAmountCents = this.order.grandTotalCents
-      this.$store.dispatch('order/startEditPayment', paymentDraft)
+      this.paymentDraftForEdit = paymentDraft
+
+      this.isEditingPayment = true
     },
+
     closeEditPaymentDialog () {
-      this.$store.dispatch('order/endEditPayment')
+      this.isEditingPayment = false
     },
-    updatePayment (formModel) {
-      formModel.order = this.order
-      this.$store.dispatch('order/updatePayment', { id: formModel.id, paymentDraft: formModel }).then(() => {
+
+    updatePayment () {
+      this.isUpdatingPayment = true
+
+      this.$store.dispatch('order/updatePayment', {
+        id: this.paymentDraftForEdit.id,
+        paymentDraft: this.paymentDraftForEdit
+      }).then(order => {
+        this.order = order
+        return this.$store.dispatch('order/listPayment', { orderId: order.id })
+      }).then(payments => {
+        this.payments = payments
+
         this.$message({
           showClose: true,
-          message: `Payment captured successfully.`,
+          message: `Payment updated successfully.`,
           type: 'success'
         })
+
+        this.closeEditPaymentDialog()
       }).catch(errors => {
         this.errors = errors
+
+        this.isUpdatingPayment = false
       })
     },
+
     deletePayment (payment) {
       this.$store.dispatch('order/deletePayment', payment).then(() => {
         this.$message({

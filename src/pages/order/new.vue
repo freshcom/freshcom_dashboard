@@ -269,17 +269,20 @@ export default {
         this.order = order
         this.orderDraft = _.cloneDeep(order)
 
-        this.paymentDraft.target = order
-        this.paymentDraft.owner = order.customer
+        let paymentDraft = _.cloneDeep(this.paymentDraft)
+
+        paymentDraft.target = order
+        paymentDraft.owner = order.customer
 
         if (order.isEstimate) {
-          this.paymentDraft.amountCents = order.authorizationCents
-          this.paymentDraft.capture = false
+          paymentDraft.amountCents = order.authorizationCents
+          paymentDraft.capture = false
         } else {
-          this.paymentDraft.amountCents = order.grandTotalCents
-          this.paymentDraft.capture = true
+          paymentDraft.amountCents = order.grandTotalCents
+          paymentDraft.capture = true
         }
 
+        this.paymentDraft = paymentDraft
         this.isUpdatingOrder = false
       }).catch(errors => {
         this.errors = errors

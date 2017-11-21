@@ -21,7 +21,7 @@ export default {
       if (value !== this.value) {
         this.$emit('change', value)
       }
-    }, 300)
+    })
   },
   computed: {
     model: {

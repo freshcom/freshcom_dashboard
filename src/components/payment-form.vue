@@ -2,7 +2,12 @@
 <el-form @input.native="updateValue" :model="formModel" label-position="top" size="small" class="m-b-10">
 
   <el-row :gutter="10">
-    <el-col v-if="canSelectGateway" :span="8">
+    <el-col :span="6">
+      <el-form-item :error="errorMessages.amountCents" label="Amount" class="amount">
+        <money-input v-model="formModel.amountCents"></money-input>
+      </el-form-item>
+    </el-col>
+    <el-col v-if="canSelectGateway" :span="6">
       <el-form-item label="Gateway" :error="errorMessages.gateway" required>
         <el-select @change="updateValue" v-model="formModel.gateway">
           <el-option label="Online" value="online"></el-option>
@@ -10,21 +15,15 @@
         </el-select>
       </el-form-item>
     </el-col>
-    <el-col :span="8">
+    <el-col :span="6">
       <el-form-item v-if="canSelectStatus" label="Status" :error="errorMessages.status" required>
         <el-select @change="updateValue" v-model="formModel.status">
           <el-option label="Pending" value="pending"></el-option>
           <el-option label="Paid" value="paid"></el-option>
         </el-select>
       </el-form-item>
-
-      <el-form-item v-if="canSelectProcessor" label="Processor" :error="errorMessages.processor" required>
-        <el-select @change="updateValue" v-model="formModel.processor">
-          <el-option label="Stripe" value="stripe"></el-option>
-        </el-select>
-      </el-form-item>
     </el-col>
-    <el-col :span="8">
+    <el-col :span="6">
       <el-form-item v-if="formModel.gateway === 'offline' && formModel.status === 'paid'" label="Method" :error="errorMessages.method" required>
         <el-select @change="updateValue" v-model="formModel.method">
           <el-option label="Credit" value="credit"></el-option>
@@ -32,11 +31,6 @@
           <el-option label="Cash" value="cash"></el-option>
           <el-option label="Cheque" value="cheque"></el-option>
         </el-select>
-      </el-form-item>
-    </el-col>
-    <el-col :span="8">
-      <el-form-item v-if="canEnterPaidAmount" :error="errorMessages.paidAmountCents" label="Paid Amount" class="paid-amount">
-        <money-input v-model="formModel.paidAmountCents"></money-input>
       </el-form-item>
     </el-col>
   </el-row>
@@ -57,8 +51,8 @@
   </el-row>
 
   <el-row>
-    <el-form-item v-if="canEnterCaptureAmount" :error="errorMessages.paidAmountCents" label="Capture Amount" class="capture-amount">
-      <money-input v-model="formModel.paidAmountCents"></money-input>
+    <el-form-item v-if="canEnterCaptureAmount" :error="errorMessages.amountCents" label="Capture Amount" class="capture-amount">
+      <money-input v-model="formModel.amountCents"></money-input>
     </el-form-item>
   </el-row>
 
@@ -196,11 +190,7 @@ export default {
     },
 
     canSelectStatus () {
-      return !this.formModel.id && this.formModel.gateway === 'offline'
-    },
-
-    canEnterPaidAmount () {
-      return this.formModel.id && this.formModel.gateway === 'offline' && this.action === 'payNow'
+      return this.formModel.gateway === 'offline'
     },
 
     canEnterCaptureAmount () {

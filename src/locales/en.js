@@ -47,6 +47,12 @@ export default {
     }
   },
   attributes: {
+    refund: {
+      gateway: {
+        online: 'Online',
+        offline: 'Offline'
+      }
+    },
     sku: {
       status: {
         active: 'Active'
@@ -81,6 +87,7 @@ export default {
         authorized: 'Authorized',
         partiallyPaid: 'Partially Paid',
         paid: 'Paid',
+        overPaid: 'Over Paid',
         partiallyRefunded: 'Partially Refunded',
         refunded: 'Refunded'
       },

@@ -242,12 +242,9 @@ export default {
         return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children' })
       }).then(response => {
         let apiPayload = response.data
-        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+        let order = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
 
-        commit(MT.RECORD_CHANGED, record)
-        commit(MT.PAYMENT_EDIT_ENDED)
-
-        return record
+        return order
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
