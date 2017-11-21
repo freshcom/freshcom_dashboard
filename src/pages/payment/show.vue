@@ -83,25 +83,21 @@
 
         <div class="block">
           <div class="block-body full">
-            <el-table :data="payment.refunds" stripe class="block-table" :show-header="false" style="width: 100%">
+            <el-table :data="payment.refunds" class="block-table" :show-header="false" style="width: 100%">
               <el-table-column width="300">
-                <template scope="scope">
-                  <span>{{scope.row.amountCents | dollar}}</span>
+                <template slot-scope="scope">
+                  <b>{{scope.row.amountCents | dollar}}</b>
                 </template>
               </el-table-column>
 
               <el-table-column>
-                <template scope="scope">
+                <template slot-scope="scope">
                   <p class="text-right">
-                    {{scope.row.insertedAt}}
+                    {{scope.row.insertedAt | moment}}
                   </p>
                 </template>
               </el-table-column>
             </el-table>
-          </div>
-
-          <div class="block-footer text-center">
-            <a class="view-more" href="#">View More</a>
           </div>
         </div>
 

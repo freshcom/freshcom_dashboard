@@ -169,7 +169,7 @@
                     </b>
                   </router-link>
 
-                  <el-tag size="mini" type="info" class="m-l-20">
+                  <el-tag size="mini" type="info" class="m-l-10">
                     {{$t(`attributes.payment.status.${scope.row.status}`)}}
                   </el-tag>
                 </template>

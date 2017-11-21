@@ -219,6 +219,15 @@ export default {
       formModel: _.cloneDeep(this.value)
     }
   },
+  created () {
+    if (!this.formModel.id) { return }
+
+    if (this.formModel.product) {
+      this.type = 'Product'
+    } else {
+      this.type = 'Custom'
+    }
+  },
   computed: {
     canViewName () {
       return this.type === 'Custom' || this.formModel.id
