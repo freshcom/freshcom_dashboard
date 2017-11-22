@@ -21,7 +21,7 @@
         </div>
 
         <div class="header-actions">
-          <el-button @click="editRecord()" size="medium">Edit</el-button>
+          <el-button @click="editOrder()" size="medium">Edit</el-button>
         </div>
       </div>
 
@@ -376,6 +376,10 @@ export default {
       return payment.status === 'pending'
     },
 
+    canRefundPayment (payment) {
+      return payment.status === 'partially_refunded' || payment.status === 'paid'
+    },
+
     loadOrder () {
       this.isLoading = true
 
@@ -394,6 +398,10 @@ export default {
         this.isLoading = false
         throw errors
       })
+    },
+
+    editOrder () {
+      this.$router.push({ name: 'EditOrder', params: { id: this.order.id }, query: { callbackPath: this.currentRoutePath } })
     },
 
     openAddLineItemDialog () {
@@ -453,7 +461,7 @@ export default {
 
         this.$message({
           showClose: true,
-          message: `Line Item saved successfully.`,
+          message: `Line item saved successfully.`,
           type: 'success'
         })
 
@@ -564,21 +572,6 @@ export default {
       })
     },
 
-    deleteOrder () {
-
-    },
-
-    canRefundPayment (payment) {
-      return payment.status === 'partially_refunded' || payment.status === 'paid'
-    },
-    editRecord () {
-      this.$router.push({ name: 'EditOrder', params: { id: this.order.id }, query: { callbackPath: this.currentRoutePath } })
-    },
-    orderDeleted () {
-      this.$store.dispatch('product/resetRecord')
-      this.$store.dispatch('popRoute', 1)
-    },
-
     openEditPaymentDialog (payment) {
       let paymentDraft = _.cloneDeep(payment)
 
@@ -631,6 +624,20 @@ export default {
           type: 'success'
         })
       })
+    },
+
+    deleteOrder () {
+      this.$store.dispatch('order/deleteOrder', this.order.id).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Order deleted successfully.`,
+          type: 'success'
+        })
+      })
+    },
+
+    back () {
+
     }
   }
 }

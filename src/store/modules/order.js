@@ -106,7 +106,6 @@ export default {
       return OrderAPI.updateRecord(actionPayload.id, apiPayload, options).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.RECORD_CHANGED, record)
 
         return record
       }).catch(error => {
@@ -127,11 +126,11 @@ export default {
       })
     },
 
-    deleteRecord ({ commit }, id) {
+    deleteOrder ({ commit }, id) {
       return OrderAPI.deleteRecord(id).then(response => {
-        commit(MT.RECORD_RESET)
-
         return response
+      }).catch(error => {
+        throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
     },
 

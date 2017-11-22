@@ -6,7 +6,7 @@
     placement="left"
     width="160"
     v-model="isConfirmVisible">
-    <p>Are you sure you?</p>
+    <p>Are you sure?</p>
     <div style="text-align: right; margin: 0">
       <el-button @click="isConfirmVisible = false" plain size="mini">Cancel</el-button>
       <el-button type="danger" size="mini" @click="confirmed">Delete</el-button>

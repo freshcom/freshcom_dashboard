@@ -1,65 +1,113 @@
 <template>
-<div class="main-col">
-  <div class="content">
+<div class="page-wrapper">
 
-    <div class="secondary-nav">
-      <el-menu :router="true" default-active="/orders" mode="horizontal">
-        <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">Orders</el-menu-item>
-      </el-menu>
-      <locale-selector @change="loadRecord"></locale-selector>
-    </div>
-
-    <div class="main-scroller">
-      <div class="main">
-        <el-card class="main-card">
-          <div slot="header">
-            <span style="line-height: 36px;">Edit Order</span>
-
-            <div style="float: right;">
-              <el-button @click="cancel">
-                Cancel
-              </el-button>
-
-              <el-button @click="submit(recordDraft)" type="primary">
-                Save
-              </el-button>
-            </div>
-          </div>
-
-          <div class="data">
-            <sku-form v-model="recordDraft" :errors="errors"></sku-form>
-          </div>
-
-          <div class="footer">
-            <el-button @click="cancel">
-              Cancel
-            </el-button>
-
-            <el-button @click="submit(recordDraft)" type="primary" class="pull-right">
-              Save
-            </el-button>
-          </div>
-        </el-card>
-      </div>
-    </div>
-
+  <div>
+    <el-menu :router="true" default-active="/orders" mode="horizontal" class="secondary-nav">
+      <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">Orders</el-menu-item>
+    </el-menu>
+    <locale-selector @change="loadOrder()" class="pull-right"></locale-selector>
   </div>
+
+  <div>
+    <el-card v-loading="isLoading" class="main-card">
+      <div slot="header">
+        <span style="line-height: 36px;">Edit Order</span>
+
+        <div style="float: right;">
+          <el-button @click="back()" size="medium">
+            Cancel
+          </el-button>
+
+          <el-button :loading="isUpdatingOrder" @click="submit()" type="primary" size="medium">
+            Save
+          </el-button>
+        </div>
+      </div>
+
+      <div class="data">
+        <order-form v-model="orderDraft" :errors="errors"></order-form>
+      </div>
+
+      <div class="footer">
+        <el-button @click="back()" size="medium">
+          Cancel
+        </el-button>
+
+        <el-button :loading="isUpdatingOrder" @click="submit()" type="primary" size="medium" class="pull-right">
+          Save
+        </el-button>
+      </div>
+    </el-card>
+  </div>
+
 </div>
 </template>
 
 <script>
-import SkuForm from '@/components/order-form'
-import EditPage from '@/mixins/edit-page'
+import _ from 'lodash'
+import Order from '@/models/order'
+import OrderForm from '@/components/order-form'
 
 export default {
   name: 'EditOrder',
   components: {
-    SkuForm
+    OrderForm
   },
-  mixins: [EditPage({ storeNamespace: 'order', name: 'Order' })],
+  props: ['id'],
+  data () {
+    return {
+      isLoading: false,
+      order: Order.objectWithDefaults(),
+      orderDraft: Order.objectWithDefaults(),
+
+      isUpdatingOrder: false,
+
+      errors: {}
+    }
+  },
+  created () {
+    this.loadOrder()
+  },
   methods: {
-    recordUpdated (record) {
-      this.$store.dispatch('pushRoute', { name: 'ShowOrder', params: { id: record.id } })
+    loadOrder () {
+      this.isLoading = true
+
+      this.$store.dispatch('order/getOrder', {
+        id: this.id
+      }).then(order => {
+        this.order = order
+        this.orderDraft = _.cloneDeep(order)
+
+        this.isLoading = false
+      }).catch(errors => {
+        this.isLoading = false
+        throw errors
+      })
+    },
+
+    submit () {
+      this.isUpdatingOrder = true
+      this.$store.dispatch('order/updateOrder', { id: this.orderDraft.id, orderDraft: this.orderDraft }).then(order => {
+        this.$message({
+          showClose: true,
+          message: `Order saved successfully.`,
+          type: 'success'
+        })
+
+        this.isUpdatingOrder = false
+        this.back()
+      }).catch(errors => {
+        this.errors = errors
+        this.isUpdatingOrder = false
+      })
+    },
+
+    back () {
+      if (this.callbackPath) {
+        return this.$store.dispatch('pushRoute', { path: this.callbackPath })
+      }
+
+      return this.$store.dispatch('pushRoute', { name: 'ShowOrder', params: { id: this.order.id } })
     }
   }
 }

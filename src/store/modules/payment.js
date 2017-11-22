@@ -1,6 +1,7 @@
 import _ from 'lodash'
 
 import PaymentAPI from '@/api/payment'
+import RefundAPI from '@/api/refund'
 import JSONAPI from '@/jsonapi'
 import CardAPI from '@/api/card'
 import Payment from '@/models/payment'
@@ -84,10 +85,8 @@ export default {
       })
     },
 
-    deleteRecord ({ commit }, id) {
+    deletePayment ({ commit }, id) {
       return PaymentAPI.deleteRecord(id).then(response => {
-        commit(MT.RESET_RECORD)
-
         return response
       })
     },
@@ -100,6 +99,23 @@ export default {
         return { meta: response.data.meta, resources: JSONAPI.deserialize(apiPayload.data, apiPayload.included) }
       }).then(response => {
         return response.resources
+      })
+    },
+
+    createRefund ({ rootState }, refundDraft) {
+      let apiPayload = { data: JSONAPI.serialize(refundDraft) }
+      let payment = refundDraft.payment
+
+      return RefundAPI.createRecord(refundDraft.payment.id, apiPayload).then(() => {
+        let options = { locale: rootState.resourceLocale, include: 'refunds' }
+        return PaymentAPI.getRecord(payment.id, options)
+      }).then(response => {
+        let apiPayload = response.data
+        let payment = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+
+        return payment
+      }).catch(error => {
+        throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
     }
   },

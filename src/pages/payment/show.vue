@@ -74,7 +74,7 @@
           <h3>Refunds</h3>
 
           <span v-if="canRefund" class="block-title-actions pull-right">
-            <a href="javascript:;">
+            <a @click="openAddRefundDialog()" href="javascript:;">
               <icon name="plus" scale="0.8" class="v-middle"></icon>
               <span>Add</span>
             </a>
@@ -154,6 +154,17 @@
       </div>
     </el-card>
   </div>
+
+  <div class="launchable">
+    <el-dialog :show-close="false" :visible="isAddingRefund" title="Refund Payment" width="500px">
+      <refund-form v-model="refundDraftForAdd" :errors="errors"></refund-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button :disabled="isCreatingRefund" @click="closeAddRefundDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isCreatingRefund" @click="createRefund()" type="primary" size="small">Refund {{refundDraftForAdd.amountCents | dollar}}</el-button>
+      </div>
+    </el-dialog>
+  </div>
 </div>
 
 </template>
@@ -166,6 +177,7 @@ import 'vue-awesome/icons/plus'
 
 import Payment from '@/models/payment'
 import Refund from '@/models/refund'
+import RefundForm from '@/components/refund-form'
 import DeleteButton from '@/components/delete-button'
 import { chargeDollar, dollar } from '@/helpers/filters'
 
@@ -173,7 +185,8 @@ export default {
   name: 'ShowPayment',
   props: ['id'],
   components: {
-    DeleteButton
+    DeleteButton,
+    RefundForm
   },
   filters: {
     chargeDollar,
@@ -186,7 +199,9 @@ export default {
 
       refundDraftForAdd: Refund.objectWithDefaults(),
       isAddingRefund: false,
-      isCreatingRefund: false
+      isCreatingRefund: false,
+
+      errors: {}
     }
   },
   created () {
@@ -201,7 +216,7 @@ export default {
     }
   },
   methods: {
-    // TODO: Allow add payment
+    // TODO: Allow add refund
     loadPayment () {
       this.isLoading = true
       this.$store.dispatch('payment/getPayment', {
@@ -217,16 +232,57 @@ export default {
       })
     },
 
-    editRecord () {
-      this.$store.dispatch('pushRoute', { name: 'EditProductItem', params: { id: this.payment.id }, query: { callbackPath: this.currentRoutePath } })
+    openAddRefundDialog () {
+      let refundDraft = Refund.objectWithDefaults()
+
+      refundDraft.payment = this.payment
+      refundDraft.gateway = this.payment.gateway
+      refundDraft.processor = this.payment.processor
+      refundDraft.amountCents = this.payment.grossAmountCents
+      refundDraft.owner = this.payment.owner
+      refundDraft.target = this.payment.target
+
+      this.refundDraftForAdd = refundDraft
+      this.errors = {}
+      this.isAddingRefund = true
     },
-    paymentDeleted () {
-      this.$store.dispatch('product/resetRecord')
-      this.$store.dispatch('popRoute', 1)
+
+    closeAddRefundDialog () {
+      this.isAddingRefund = false
+      this.isCreatingRefund = false
+    },
+
+    createRefund () {
+      this.isCreatingRefund = true
+
+      this.$store.dispatch('payment/createRefund', this.refundDraftForAdd).then(payment => {
+        this.payment = payment
+
+        this.$message({
+          showClose: true,
+          message: `Refund created successfully.`,
+          type: 'success'
+        })
+
+        this.closeAddRefundDialog()
+      }).catch(errors => {
+        this.errors = errors
+
+        this.isCreatingRefund = false
+      })
     },
 
     deletePayment () {
+      let orderId = this.payment.target.id
+      this.$store.dispatch('payment/deletePayment', this.payment.id).then(response => {
+        this.$message({
+          showClose: true,
+          message: `Payment deleted successfully.`,
+          type: 'success'
+        })
 
+        this.$store.dispatch('pushRoute', { name: 'ShowOrder', params: { id: orderId } })
+      })
     }
   }
 }

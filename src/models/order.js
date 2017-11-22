@@ -18,7 +18,9 @@ export default {
       grandTotalCents: 0,
       authorizationCents: 0,
 
-      rootLineItems: []
+      rootLineItems: [],
+
+      customer: null
     }
   }
 }
