@@ -1,7 +1,7 @@
 <template>
 <el-form @input.native="updateValue" :model="formModel" label-width="120px" size="small" class="m-b-10">
 
-  <el-form-item label="Gateway" :error="errorMessages.gateway" required>
+  <el-form-item v-if="canSelectGateway" :error="errorMessages.gateway" label="Gateway" required>
     <el-select @change="handleGatewayChange($event)" :value="formModel.gateway">
       <el-option label="Online" value="online"></el-option>
       <el-option label="Offline" value="offline"></el-option>
@@ -53,7 +53,7 @@ export default {
     },
 
     canSelectGateway () {
-      return !this.formModel.id
+      return !this.formModel.id && this.formModel.payment.gateway === 'online'
     },
 
     errorMessages () {

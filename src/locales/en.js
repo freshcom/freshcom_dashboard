@@ -72,7 +72,8 @@ export default {
         refunded: 'Refunded'
       },
       gateway: {
-        online: 'Online'
+        online: 'Online',
+        offline: 'Offline'
       }
     },
     customer: {

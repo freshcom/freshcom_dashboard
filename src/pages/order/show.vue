@@ -158,9 +158,9 @@
 
         <div class="block">
           <div class="block-body full">
-            <el-table :data="payments" stripe class="block-table" :show-header="false" style="width: 100%">
+            <el-table :data="payments" class="block-table" :show-header="false" style="width: 100%">
               <el-table-column>
-                <template scope="scope">
+                <template slot-scope="scope">
                   <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }">
                     <b>
                       <span>
@@ -176,15 +176,15 @@
               </el-table-column>
 
               <el-table-column width="200">
-                <template scope="scope">
+                <template slot-scope="scope">
                   <span>{{scope.row.insertedAt | moment}}</span>
                 </template>
               </el-table-column>
 
               <el-table-column width="200">
-                <template scope="scope">
+                <template slot-scope="scope">
                   <p class="text-right actions">
-                    <el-button v-if="scope.row.status === 'pending'" @click="openEditPaymentDialog(scope.row)" plain size="mini">
+                    <el-button v-if="canEditPayment(scope.row)" @click="openEditPaymentDialog(scope.row)" plain size="mini">
                       Edit
                     </el-button>
 
@@ -274,7 +274,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :show-close="false" :visible="isEditingPayment" title="Add Payment" width="600px">
+    <el-dialog :show-close="false" :visible="isEditingPayment" title="Edit Payment" width="600px">
       <payment-form v-model="paymentDraftForEdit" :errors="errors"></payment-form>
 
       <div slot="footer" class="dialog-footer">
@@ -284,7 +284,7 @@
     </el-dialog>
 
     <el-dialog :show-close="false" :visible="isAddingRefund" title="Refund Payment" width="500px">
-      <refund-form v-model="refundDraftForAdd"></refund-form>
+      <refund-form v-model="refundDraftForAdd" :errors="errors"></refund-form>
 
       <div slot="footer" class="dialog-footer">
         <el-button :disabled="isCreatingRefund" @click="closeAddRefundDialog()" plain size="small">Cancel</el-button>
@@ -317,6 +317,7 @@ import OrderLineItemDialog from '@/components/order-line-item-dialog'
 import PaymentDialog from '@/components/payment-dialog'
 import RefundDialog from '@/components/refund-dialog'
 import { dollar } from '@/helpers/filters'
+import { createToken as createStripeToken } from 'vue-stripe-elements'
 
 export default {
   name: 'ShowOrder',
@@ -364,14 +365,17 @@ export default {
       isCreatingRefund: false,
 
       expandedLineItemIds: [],
-      errors: {},
-      paymentDialogTitle: ''
+      errors: {}
     }
   },
   created () {
     this.loadOrder()
   },
   methods: {
+    canEditPayment (payment) {
+      return payment.status === 'pending'
+    },
+
     loadOrder () {
       this.isLoading = true
 
@@ -487,7 +491,17 @@ export default {
     createPayment () {
       this.isCreatingPayment = true
 
-      this.$store.dispatch('order/createPayment', this.paymentDraftForAdd).then(order => {
+      let paymentCreated
+      if (this.paymentDraftForAdd.gateway === 'online') {
+        paymentCreated = createStripeToken().then(data => {
+          this.paymentDraftForAdd.source = data.token.id
+          return this.$store.dispatch('order/createPayment', this.paymentDraftForAdd)
+        })
+      } else {
+        paymentCreated = this.$store.dispatch('order/createPayment', this.paymentDraftForAdd)
+      }
+
+      paymentCreated.then(order => {
         this.order = order
         return this.$store.dispatch('order/listPayment', { orderId: order.id })
       }).then(payments => {
@@ -518,6 +532,7 @@ export default {
       refundDraft.target = payment.target
 
       this.refundDraftForAdd = refundDraft
+      this.errors = {}
       this.isAddingRefund = true
     },
 
@@ -567,15 +582,14 @@ export default {
     openEditPaymentDialog (payment) {
       let paymentDraft = _.cloneDeep(payment)
 
-      paymentDraft.amountCents = this.order.grandTotalCents
-
       this.paymentDraftForEdit = paymentDraft
-
+      this.errors = {}
       this.isEditingPayment = true
     },
 
     closeEditPaymentDialog () {
       this.isEditingPayment = false
+      this.isUpdatingPayment = false
     },
 
     updatePayment () {
@@ -605,7 +619,12 @@ export default {
     },
 
     deletePayment (payment) {
-      this.$store.dispatch('order/deletePayment', payment).then(() => {
+      this.$store.dispatch('order/deletePayment', payment).then(order => {
+        this.order = order
+        return this.$store.dispatch('order/listPayment', { orderId: order.id })
+      }).then(payments => {
+        this.payments = payments
+
         this.$message({
           showClose: true,
           message: `Payment deleted successfully.`,

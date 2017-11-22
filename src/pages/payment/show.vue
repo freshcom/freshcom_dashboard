@@ -149,7 +149,7 @@
         </div>
       </div>
 
-      <div class="footer text-right">
+      <div v-if="canDelete" class="footer text-right">
         <delete-button @confirmed="deletePayment" size="small">Delete</delete-button>
       </div>
     </el-card>
@@ -193,11 +193,15 @@ export default {
     this.loadPayment()
   },
   computed: {
+    canDelete () {
+      return this.payment.status === 'pending'
+    },
     canRefund () {
       return this.payment.status === 'paid' || this.payment.status === 'partially_refunded'
     }
   },
   methods: {
+    // TODO: Allow add payment
     loadPayment () {
       this.isLoading = true
       this.$store.dispatch('payment/getPayment', {

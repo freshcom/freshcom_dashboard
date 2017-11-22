@@ -235,7 +235,7 @@ export default {
 
     updatePayment ({ state, commit, rootState }, actionPayload) {
       let apiPayload = { data: JSONAPI.serialize(actionPayload.paymentDraft) }
-      let order = actionPayload.paymentDraft.order
+      let order = actionPayload.paymentDraft.target
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
 
       return PaymentAPI.updateRecord(actionPayload.id, apiPayload, options).then(() => {
@@ -285,16 +285,15 @@ export default {
     },
 
     deletePayment ({ state, commit }, payment) {
-      let order = payment.order
+      let order = payment.target
 
       return PaymentAPI.deleteRecord(payment.id).then(() => {
         return OrderAPI.getRecord(order.id, { include: 'rootLineItems.children' })
       }).then(response => {
         let apiPayload = response.data
-        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.RECORD_CHANGED, record)
+        let order = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
 
-        return record
+        return order
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
