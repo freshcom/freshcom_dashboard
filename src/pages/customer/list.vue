@@ -5,7 +5,7 @@
     <el-menu :router="true" default-active="/customers" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListCustomer' }" index="/customers">Customers</el-menu-item>
     </el-menu>
-    <locale-selector @change="search" class="pull-right"></locale-selector>
+    <locale-selector @change="searchCustomer()" class="pull-right"></locale-selector>
   </div>
 
   <div>
@@ -13,7 +13,7 @@
       <div slot="header" class="clearfix">
         <el-button size="small"><icon name="filter" scale="0.7" class="v-middle"></icon> Filter</el-button>
         <div class="search">
-          <el-input :value="searchKeyword" @input="enteringKeyword" size="small" placeholder="Search...">
+          <el-input :value="searchKeyword" @input="updateSearchKeyword" size="small" placeholder="Search...">
             <template slot="prepend"><icon name="search" scale="1" class="v-middle"></icon></template>
           </el-input>
         </div>
@@ -27,19 +27,15 @@
         <p v-if="noSearchResult" class="search-notice text-center">
           There is no result that matches "{{searchKeyword}}"
         </p>
-        <p v-if="isEnteringSearchKeyword" class="search-notice text-center">
-          Stop typing to search...
-        </p>
-        <el-table v-if="hasSearchResult" @row-click="viewRecord" :data="tableData" stripe class="full">
-          <el-table-column prop="name" label="Customer"></el-table-column>
+        <el-table v-if="hasSearchResult" @row-click="viewCustomer" :data="customers" stripe class="full">
+          <el-table-column prop="name" label="Customer">
+            <template slot-scope="scope">
+              {{scope.row.firstName}} {{scope.row.lastName}}
+            </template>
+          </el-table-column>
           <el-table-column prop="status" label="Status" width="150">
             <template slot-scope="scope">
-              <el-tag v-if="scope.row.status === 'registered'" size="mini" type="primary">
-                {{$t(`attributes.customer.status.${scope.row.status}`)}}
-              </el-tag>
-              <el-tag v-else type="gray">
-                {{$t(`attributes.customer.status.${scope.row.status}`)}}
-              </el-tag>
+              {{$t(`attributes.customer.status.${scope.row.status}`)}}
             </template>
           </el-table-column>
           <el-table-column prop="id" label="ID" width="120">
@@ -47,12 +43,16 @@
               <el-popover trigger="hover" placement="top">
                 <span>{{ scope.row.id }}</span>
                 <div slot="reference" class="name-wrapper">
-                  {{ scope.row.idLastPart }}
+                  {{ scope.row.id | idLastPart }}
                 </div>
               </el-popover>
             </template>
           </el-table-column>
-          <el-table-column prop="createdAt" label="Created At" align="right" width="130"></el-table-column>
+          <el-table-column prop="createdAt" label="Created At" align="right" width="200">
+            <template slot-scope="scope">
+              {{scope.row.insertedAt | moment}}
+            </template>
+          </el-table-column>
         </el-table>
 
         <div v-if="hasSearchResult" class="footer">
@@ -71,34 +71,86 @@ import 'vue-awesome/icons/search'
 
 import _ from 'lodash'
 import Pagination from '@/components/pagination'
-import ListPage from '@/mixins/list-page'
+import { idLastPart } from '@/helpers/filters'
 
 export default {
   name: 'ListCustomer',
   components: {
     Pagination
   },
-  mixins: [ListPage({ storeNamespace: 'customer', fields: { 'Customer': 'code,name,status' } })],
+  filters: {
+    idLastPart
+  },
+  props: {
+    searchKeyword: {
+      type: String,
+      default: ''
+    },
+    page: {
+      type: Object,
+      required: true
+    }
+  },
+  data () {
+    return {
+      customers: [],
+      isLoading: false,
+      totalCount: 0,
+      resultCount: 0
+    }
+  },
+  created () {
+    this.searchCustomer()
+  },
   computed: {
-    tableData () {
-      return _.map(this.records, (record) => {
-        let name = `${record.firstName} ${record.lastName}`
-        if (record.code) { name = `[${record.code}] ` + name }
-        let idLastPart = _.last(record.id.split('-'))
-
-        return {
-          name: name,
-          status: record.status,
-          idLastPart: idLastPart,
-          id: record.id,
-          createdAt: this.$options.filters.moment(record.inserted, 'D MMM YYYY')
-        }
-      })
+    noSearchResult () {
+      return !this.isLoading && this.resultCount === 0 && this.totalCount > 0
+    },
+    hasSearchResult () {
+      return !this.isLoading && this.resultCount !== 0
+    },
+    currentRoutePath () {
+      return this.$store.state.route.fullPath
+    }
+  },
+  watch: {
+    searchKeyword (newKeyword) {
+      this.searchOrder()
+    },
+    page (newPage, oldPage) {
+      if (_.isEqual(newPage, oldPage)) {
+        return
+      }
+      this.search()
     }
   },
   methods: {
-    viewRecord (row) {
-      this.goTo({ name: 'ShowCustomer', params: { id: row.id } })
+    updateSearchKeyword: _.debounce(function (newSearchKeyword) {
+      // Remove page[number] from query to reset to the first page
+      let q = _.merge({}, _.omit(this.$route.query, ['page[number]']), { search: newSearchKeyword })
+      this.$router.replace({ name: this.$store.state.route.name, query: q })
+    }, 300),
+    searchCustomer () {
+      this.isLoading = true
+
+      this.$store.dispatch('customer/listCustomer', {
+        search: this.searchKeyword,
+        page: this.page
+      }).then(response => {
+        this.customers = response.customers
+        this.totalCount = response.meta.totalCount
+        this.resultCount = response.meta.resultCount
+
+        this.isLoading = false
+      }).catch(errors => {
+        this.isLoading = false
+      })
+    },
+    viewCustomer (customer) {
+      this.$store.dispatch('pushRoute', { name: 'ShowCustomer', params: { id: customer.id, callbackPath: this.currentRoutePath } })
+    },
+    newCustomer () {
+      this.$store.dispatch('pushRoute', { name: 'NewCustomer' })
     }
   }
 }

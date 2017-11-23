@@ -22,3 +22,7 @@ export function dollar (cents) {
     return `$ ${str}`
   }
 }
+
+export function idLastPart (id) {
+  return _.last(id.split('-'))
+}

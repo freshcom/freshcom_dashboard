@@ -70,7 +70,7 @@
         </div>
 
         <div v-show="activeStep === this.step.INFORMATION">
-          <order-form v-model="orderDraft" :errors="errors"></order-form>
+          <order-form v-model="orderDraft" :errors="errors" :can-select-customer="!this.customerId"></order-form>
         </div>
 
         <div v-show="activeStep === this.step.PAYMENT">
@@ -140,6 +140,7 @@ export default {
   filters: {
     dollar
   },
+  props: ['customerId'],
   data () {
     return {
       step: {
@@ -157,8 +158,12 @@ export default {
       isEditingLineItem: false,
       isUpdatingLineItem: false,
 
-      order: Order.objectWithDefaults(),
-      orderDraft: Order.objectWithDefaults(),
+      order: Order.objectWithDefaults({
+        customer: { id: this.customerId, type: 'Customer' }
+      }),
+      orderDraft: Order.objectWithDefaults({
+        customer: { id: this.customerId, type: 'Customer' }
+      }),
       isUpdatingOrder: false,
 
       paymentDraft: Payment.objectWithDefaults(),
@@ -190,6 +195,7 @@ export default {
       this.lineItemDraftForAdd.order = this.order
 
       this.$store.dispatch('order/createLineItem', this.lineItemDraftForAdd).then(order => {
+        console.log(order.customer)
         this.order = order
         this.orderDraft = _.cloneDeep(this.order)
         this.lineItemDraftForAdd = OrderLineItem.objectWithDefaults()

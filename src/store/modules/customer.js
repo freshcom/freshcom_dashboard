@@ -79,14 +79,12 @@ export default {
       })
     },
 
-    loadRecords ({ state, commit, rootState }, actionPayload) {
+    listCustomer ({ state, commit, rootState }, actionPayload) {
       actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
 
       return CustomerAPI.queryRecord(actionPayload).then(response => {
-        return { meta: response.data.meta, resources: JSONAPI.deserialize(response.data.data) }
+        return { meta: response.data.meta, customers: JSONAPI.deserialize(response.data.data) }
       }).then(response => {
-        commit(MT.SET_RECORDS, response.resources)
-
         return response
       })
     },

@@ -7,6 +7,15 @@ import { DEFAULT_PAGE_SIZE } from '@/env'
 
 import HomePage from '@/pages/home'
 import LoginPage from '@/pages/login'
+
+import ListOrderPage from '@/pages/order/list'
+import NewOrderPage from '@/pages/order/new'
+import ShowOrderPage from '@/pages/order/show'
+import EditOrderPage from '@/pages/order/edit'
+
+import ListPaymentPage from '@/pages/payment/list'
+import ShowPaymentPage from '@/pages/payment/show'
+
 import ListSkuPage from '@/pages/sku/list'
 import ShowSkuPage from '@/pages/sku/show'
 import EditSkuPage from '@/pages/sku/edit'
@@ -34,11 +43,6 @@ import NewPricePage from '@/pages/price/new'
 import EditPricePage from '@/pages/price/edit'
 import ShowPricePage from '@/pages/price/show'
 
-import ListOrderPage from '@/pages/order/list'
-import NewOrderPage from '@/pages/order/new'
-import ShowOrderPage from '@/pages/order/show'
-import EditOrderPage from '@/pages/order/edit'
-
 import ListUnlockablePage from '@/pages/unlockable/list'
 import ShowUnlockablePage from '@/pages/unlockable/show'
 import EditUnlockablePage from '@/pages/unlockable/edit'
@@ -48,8 +52,6 @@ import ListCustomerPage from '@/pages/customer/list'
 import ShowCustomerPage from '@/pages/customer/show'
 import NewCustomerPage from '@/pages/customer/new'
 import EditCustomerPage from '@/pages/customer/edit'
-
-import ShowPaymentPage from '@/pages/payment/show'
 
 import ShowBillingSettingsPage from '@/pages/billing/show-settings'
 
@@ -83,6 +85,68 @@ export default new Router({
       path: '/login',
       name: 'Login',
       component: LoginPage
+    },
+    {
+      path: '/orders',
+      name: 'ListOrder',
+      component: ListOrderPage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          page: page
+        }
+      }
+    },
+    {
+      path: '/orders/new',
+      name: 'NewOrder',
+      component: NewOrderPage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { customerId: query.customerId, callbackPath: query.callbackPath }
+      }
+    },
+    {
+      path: '/orders/:id',
+      name: 'ShowOrder',
+      component: ShowOrderPage,
+      props (route) {
+        return { id: route.params.id }
+      }
+    },
+    {
+      path: '/orders/:id/edit',
+      name: 'EditOrder',
+      component: EditOrderPage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { id: route.params.id, callbackPath: query.callbackPath }
+      }
+    },
+    {
+      path: '/payments',
+      name: 'ListPayment',
+      component: ListPaymentPage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          page: page
+        }
+      }
+    },
+    {
+      path: '/payments/:id',
+      name: 'ShowPayment',
+      component: ShowPaymentPage,
+      props (route) {
+        return { id: route.params.id }
+      }
     },
     {
       path: '/skus',
@@ -288,48 +352,6 @@ export default new Router({
       }
     },
     {
-      path: '/orders',
-      name: 'ListOrder',
-      component: ListOrderPage,
-      props (route) {
-        let page = extractPagination(route)
-        return {
-          searchKeyword: route.query.search,
-          page: page
-        }
-      }
-    },
-    {
-      path: '/orders/new',
-      name: 'NewOrder',
-      component: NewOrderPage,
-      props (route) {
-        let queryString = route.fullPath.split('?')[1]
-        let query = qs.parse(queryString)
-
-        return { customerId: query.customerId, callbackPath: query.callbackPath }
-      }
-    },
-    {
-      path: '/orders/:id',
-      name: 'ShowOrder',
-      component: ShowOrderPage,
-      props (route) {
-        return { id: route.params.id }
-      }
-    },
-    {
-      path: '/orders/:id/edit',
-      name: 'EditOrder',
-      component: EditOrderPage,
-      props (route) {
-        let queryString = route.fullPath.split('?')[1]
-        let query = qs.parse(queryString)
-
-        return { id: route.params.id, callbackPath: query.callbackPath }
-      }
-    },
-    {
       path: '/unlockables',
       name: 'ListUnlockable',
       component: ListUnlockablePage,
@@ -408,14 +430,6 @@ export default new Router({
         let query = qs.parse(queryString)
 
         return { id: route.params.id, callbackPath: query.callbackPath }
-      }
-    },
-    {
-      path: '/payments/:id',
-      name: 'ShowPayment',
-      component: ShowPaymentPage,
-      props (route) {
-        return { id: route.params.id }
       }
     },
     {

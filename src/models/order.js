@@ -1,5 +1,5 @@
 export default {
-  objectWithDefaults () {
+  objectWithDefaults (overwrites = { customer: null }) {
     return {
       id: undefined,
       type: 'Order',
@@ -20,7 +20,7 @@ export default {
 
       rootLineItems: [],
 
-      customer: null
+      customer: overwrites.customer
     }
   }
 }

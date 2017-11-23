@@ -25,7 +25,7 @@
       </div>
 
       <div class="data">
-        <order-form v-model="orderDraft" :errors="errors"></order-form>
+        <order-form v-model="orderDraft" :can-select-customer="false" :errors="errors"></order-form>
       </div>
 
       <div class="footer">

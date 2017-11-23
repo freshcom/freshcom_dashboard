@@ -1,8 +1,15 @@
 import axios from './jsonapi-axios'
 
 export default {
-  createRecord (payload, params = {}) {
-    return axios.post('/orders', payload)
+  createRecord (payload, options = {}) {
+    let params = {}
+
+    let include = options.include
+    if (include) {
+      params.include = include
+    }
+
+    return axios.post('/orders', payload, { params: params })
   },
 
   updateRecord (id, payload, options) {

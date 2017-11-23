@@ -6,7 +6,7 @@
       <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">Orders</el-menu-item>
       <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">Payments</el-menu-item>
     </el-menu>
-    <locale-selector @change="search" class="pull-right"></locale-selector>
+    <locale-selector @change="searchOrder" class="pull-right"></locale-selector>
   </div>
 
   <div>
@@ -15,12 +15,12 @@
         <el-button size="small"><icon name="filter" scale="0.7" class="v-middle"></icon> Filter</el-button>
 
         <div class="search">
-          <el-input :value="searchKeyword" @input="enteringKeyword" size="small" placeholder="Search...">
+          <el-input :value="searchKeyword" @input="updateSearchKeyword" size="small" placeholder="Search...">
             <template slot="prepend"><icon name="search" scale="1" class="v-middle"></icon></template>
           </el-input>
         </div>
 
-        <el-button @click="goTo({ name: 'NewOrder' })" size="small" class="pull-right">
+        <el-button @click="newOrder()" size="small" class="pull-right">
           <icon name="plus" scale="0.7" class="v-middle"></icon> New
         </el-button>
       </div>
@@ -29,17 +29,19 @@
         <p v-if="noSearchResult" class="search-notice text-center">
           There is no result that matches "{{searchKeyword}}"
         </p>
-        <p v-if="isEnteringSearchKeyword" class="search-notice text-center">
-          Stop typing to search...
-        </p>
-        <el-table v-if="hasSearchResult" @row-click="viewRecord" :data="tableData">
-          <el-table-column prop="name" label="Order"></el-table-column>
+        <el-table v-if="hasSearchResult" @row-click="viewOrder" :data="orders">
+          <el-table-column prop="name" label="Order">
+            <template slot-scope="scope">
+              {{scope.row.firstName}} {{scope.row.lastName}}
+            </template>
+          </el-table-column>
+
           <el-table-column prop="grandTotalCents" label="" width="100">
             <template slot-scope="scope">
               <b>{{scope.row.grandTotalCents | dollar}}</b>
             </template>
           </el-table-column>
-          <el-table-column prop="status" label="Status" width="100">
+          <el-table-column prop="status" label="Status" width="200">
             <template slot-scope="scope">
               {{$t(`attributes.order.status.${scope.row.status}`)}}
             </template>
@@ -49,12 +51,16 @@
               <el-popover trigger="hover" placement="top">
                 <span>{{ scope.row.id }}</span>
                 <div slot="reference" class="name-wrapper">
-                  {{ scope.row.idLastPart }}
+                  {{ scope.row.id | idLastPart }}
                 </div>
               </el-popover>
             </template>
           </el-table-column>
-          <el-table-column prop="openedAt" label="" align="right" width="200"></el-table-column>
+          <el-table-column prop="openedAt" label="" align="right" width="200">
+            <template slot-scope="scope">
+              {{scope.row.openedAt | moment}}
+            </template>
+          </el-table-column>
         </el-table>
 
         <div v-if="hasSearchResult" class="footer">
@@ -75,8 +81,7 @@ import 'vue-awesome/icons/chevron-left'
 
 import _ from 'lodash'
 import Pagination from '@/components/pagination'
-import ListPage from '@/mixins/list-page'
-import { dollar } from '@/helpers/filters'
+import { dollar, idLastPart } from '@/helpers/filters'
 
 export default {
   name: 'ListOrder',
@@ -84,30 +89,79 @@ export default {
     Pagination
   },
   filters: {
-    dollar
+    dollar,
+    idLastPart
   },
-  mixins: [ListPage({ storeNamespace: 'order', fields: { 'Order': 'code,name,status' } })],
+  props: {
+    searchKeyword: {
+      type: String,
+      default: ''
+    },
+    page: {
+      type: Object,
+      required: true
+    }
+  },
+  data () {
+    return {
+      orders: [],
+      isLoading: false,
+      totalCount: 0,
+      resultCount: 0
+    }
+  },
+  created () {
+    this.searchOrder()
+  },
   computed: {
-    tableData () {
-      return _.map(this.records, (record) => {
-        let name = record.firstName + ' ' + record.lastName
-        if (record.code) { name = `[${record.code}] ` + name }
-        let idLastPart = _.last(record.id.split('-'))
-
-        return {
-          name: name,
-          grandTotalCents: record.grandTotalCents,
-          status: record.status,
-          idLastPart: idLastPart,
-          id: record.id,
-          openedAt: this.$options.filters.moment(record.openedAt)
-        }
-      })
+    noSearchResult () {
+      return !this.isLoading && this.resultCount === 0 && this.totalCount > 0
+    },
+    hasSearchResult () {
+      return !this.isLoading && this.resultCount !== 0
+    },
+    currentRoutePath () {
+      return this.$store.state.route.fullPath
+    }
+  },
+  watch: {
+    searchKeyword (newKeyword) {
+      this.searchOrder()
+    },
+    page (newPage, oldPage) {
+      if (_.isEqual(newPage, oldPage)) {
+        return
+      }
+      this.search()
     }
   },
   methods: {
-    viewRecord (row) {
-      this.goTo({ name: 'ShowOrder', params: { id: row.id } })
+    updateSearchKeyword: _.debounce(function (newSearchKeyword) {
+      // Remove page[number] from query to reset to the first page
+      let q = _.merge({}, _.omit(this.$route.query, ['page[number]']), { search: newSearchKeyword })
+      this.$router.replace({ name: this.$store.state.route.name, query: q })
+    }, 300),
+    searchOrder () {
+      this.isLoading = true
+
+      this.$store.dispatch('order/listOrder', {
+        search: this.searchKeyword,
+        page: this.page
+      }).then(response => {
+        this.orders = response.orders
+        this.totalCount = response.meta.totalCount
+        this.resultCount = response.meta.resultCount
+
+        this.isLoading = false
+      }).catch(errors => {
+        this.isLoading = false
+      })
+    },
+    viewOrder (order) {
+      this.$store.dispatch('pushRoute', { name: 'ShowOrder', params: { id: order.id, callbackPath: this.currentRoutePath } })
+    },
+    newOrder () {
+      this.$store.dispatch('pushRoute', { name: 'NewOrder' })
     }
   }
 }
@@ -127,9 +181,5 @@ export default {
   min-width: 28px;
   height: 28px;
   line-height: 28px;
-}
-
-.dd {
-  font-family: "Courier New";
 }
 </style>

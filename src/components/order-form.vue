@@ -2,7 +2,7 @@
 <el-form @input.native="updateValue" label-position="top" size="small" class="m-b-10">
   <el-row :gutter="20">
     <el-col :span="12">
-      <el-form-item label="Customer" :error="errorMessages.customer">
+      <el-form-item v-if="canSelectCustomer" label="Customer" :error="errorMessages.customer">
         <remote-select
           :value="formModel.customer"
           :search-method="searchCustomers"
@@ -12,6 +12,9 @@
           class="customer-select"
         >
         </remote-select>
+      </el-form-item>
+      <el-form-item v-if="!canSelectCustomer && formModel.customer" label="Customer">
+        <b>{{formModel.customer.firstName}} {{formModel.customer.lastName}}</b>
       </el-form-item>
     </el-col>
   </el-row>
@@ -112,7 +115,7 @@ import RemoteSelect from '@/components/remote-select'
 
 export default {
   name: 'OrderForm',
-  props: ['value', 'errors', 'record'],
+  props: ['value', 'errors', 'record', 'canSelectCustomer'],
   components: {
     RemoteSelect
   },

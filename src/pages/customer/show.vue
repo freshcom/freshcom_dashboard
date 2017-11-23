@@ -264,7 +264,7 @@ export default {
   filters: {
     dollar
   },
-  mixins: [ShowPage({ storeNamespace: 'customer', name: 'Customer', include: 'cards,externalFileCollections,orders,unlocks.unlockable' })],
+  mixins: [ShowPage({ storeNamespace: 'customer', name: 'Customer', include: 'orders,unlocks.unlockable' })],
   computed: {
     avatarUrl () {
       if (this.record.avatar) {

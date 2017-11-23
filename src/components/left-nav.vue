@@ -165,6 +165,7 @@ export default {
       if (routePath.startsWith('/prices')) { return '/products' }
       if (routePath.startsWith('/product_collections')) { return '/products' }
       if (routePath.startsWith('/orders') || routePath.startsWith('/payments')) { return '/orders' }
+      if (routePath.startsWith('/customers') || routePath.startsWith('/customers')) { return '/customers' }
 
       return routePath
     },
