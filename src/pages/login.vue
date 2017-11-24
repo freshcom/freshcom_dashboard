@@ -59,7 +59,6 @@ export default {
 
         this.$store.dispatch('pushRoute', { name: 'Home' })
       }).catch(response => {
-        console.log(response)
         this.$message({
           showClose: true,
           message: response.error_description,

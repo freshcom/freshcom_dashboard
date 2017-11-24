@@ -216,7 +216,6 @@ export default {
     }
   },
   methods: {
-    // TODO: Allow add refund
     loadPayment () {
       this.isLoading = true
       this.$store.dispatch('payment/getPayment', {

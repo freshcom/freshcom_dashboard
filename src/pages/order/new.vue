@@ -123,7 +123,7 @@ import OrderLineItem from '@/models/order-line-item'
 import Payment from '@/models/payment'
 
 import { dollar } from '@/helpers/filters'
-import { createToken as createStripeToken } from 'vue-stripe-elements'
+import { createToken as createStripeToken } from 'vue-stripe-elements-plus'
 import errorI18nKey from '@/utils/error-i18n-key'
 import OrderLineItemTable from '@/components/order-line-item-table'
 import OrderLineItemDialog from '@/components/order-line-item-dialog'
@@ -195,7 +195,6 @@ export default {
       this.lineItemDraftForAdd.order = this.order
 
       this.$store.dispatch('order/createLineItem', this.lineItemDraftForAdd).then(order => {
-        console.log(order.customer)
         this.order = order
         this.orderDraft = _.cloneDeep(this.order)
         this.lineItemDraftForAdd = OrderLineItem.objectWithDefaults()
@@ -308,8 +307,7 @@ export default {
       this.isCreatingPayment = true
 
       let paymentCreated
-
-      if (this.paymentDraft.gateway === 'online') {
+      if (this.paymentDraft.gateway === 'online' && this.paymentDraft.useCardFrom === 'newCard') {
         paymentCreated = createStripeToken().then(data => {
           this.paymentDraft.source = data.token.id
           return this.$store.dispatch('order/createPayment', this.paymentDraft)

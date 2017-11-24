@@ -317,7 +317,7 @@ import OrderLineItemDialog from '@/components/order-line-item-dialog'
 import PaymentDialog from '@/components/payment-dialog'
 import RefundDialog from '@/components/refund-dialog'
 import { dollar } from '@/helpers/filters'
-import { createToken as createStripeToken } from 'vue-stripe-elements'
+import { createToken as createStripeToken } from 'vue-stripe-elements-plus'
 
 export default {
   name: 'ShowOrder',

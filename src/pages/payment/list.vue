@@ -2,48 +2,43 @@
 <div class="page-wrapper">
 
   <div>
-    <el-menu :router="true" default-active="/orders" mode="horizontal" class="secondary-nav">
+    <el-menu :router="true" default-active="/payments" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">Orders</el-menu-item>
       <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">Payments</el-menu-item>
     </el-menu>
-    <locale-selector @change="searchOrder" class="pull-right"></locale-selector>
+    <locale-selector @change="searchPayment()" class="pull-right"></locale-selector>
   </div>
 
   <div>
     <el-card class="main-card">
       <div slot="header" class="clearfix">
-        <el-button plain size="small"><icon name="filter" scale="0.7" class="v-middle"></icon> Filter</el-button>
+        <el-button size="small"><icon name="filter" scale="0.7" class="v-middle"></icon> Filter</el-button>
 
         <div class="search">
           <el-input :value="searchKeyword" @input="updateSearchKeyword" size="small" placeholder="Search...">
             <template slot="prepend"><icon name="search" scale="1" class="v-middle"></icon></template>
           </el-input>
         </div>
-
-        <el-button @click="newOrder()" plain size="small" class="pull-right">
-          <icon name="plus" scale="0.7" class="v-middle"></icon> New
-        </el-button>
       </div>
 
       <div class="data full" v-loading="isLoading">
         <p v-if="noSearchResult" class="search-notice text-center">
           There is no result that matches "{{searchKeyword}}"
         </p>
-        <el-table v-if="hasSearchResult" @row-click="viewOrder" :data="orders">
-          <el-table-column prop="name" label="Order">
+        <el-table v-if="hasSearchResult" @row-click="viewPayment" :data="payments">
+          <el-table-column prop="amountCents" label="Payment">
             <template slot-scope="scope">
-              {{scope.row.firstName}} {{scope.row.lastName}}
-            </template>
-          </el-table-column>
-
-          <el-table-column prop="grandTotalCents" label="" width="100">
-            <template slot-scope="scope">
-              <b>{{scope.row.grandTotalCents | dollar}}</b>
+              <b>{{scope.row.amountCents | dollar}}</b>
             </template>
           </el-table-column>
           <el-table-column prop="status" label="Status" width="200">
             <template slot-scope="scope">
-              {{$t(`attributes.order.status.${scope.row.status}`)}}
+              {{$t(`attributes.payment.status.${scope.row.status}`)}}
+            </template>
+          </el-table-column>
+          <el-table-column prop="status" label="Gateway" width="100">
+            <template slot-scope="scope">
+              {{$t(`attributes.payment.gateway.${scope.row.gateway}`)}}
             </template>
           </el-table-column>
           <el-table-column prop="id" label="ID" width="120">
@@ -56,9 +51,9 @@
               </el-popover>
             </template>
           </el-table-column>
-          <el-table-column prop="openedAt" label="" align="right" width="200">
+          <el-table-column prop="insertedAt" label="" align="right" width="200">
             <template slot-scope="scope">
-              {{scope.row.openedAt | moment}}
+              {{scope.row.insertedAt | moment}}
             </template>
           </el-table-column>
         </el-table>
@@ -84,7 +79,7 @@ import Pagination from '@/components/pagination'
 import { dollar, idLastPart } from '@/helpers/filters'
 
 export default {
-  name: 'ListOrder',
+  name: 'ListPayment',
   components: {
     Pagination
   },
@@ -104,14 +99,14 @@ export default {
   },
   data () {
     return {
-      orders: [],
+      payments: [],
       isLoading: false,
       totalCount: 0,
       resultCount: 0
     }
   },
   created () {
-    this.searchOrder()
+    this.searchPayment()
   },
   computed: {
     noSearchResult () {
@@ -126,7 +121,7 @@ export default {
   },
   watch: {
     searchKeyword (newKeyword) {
-      this.searchOrder()
+      this.searchPayment()
     },
     page (newPage, oldPage) {
       if (_.isEqual(newPage, oldPage)) {
@@ -141,14 +136,14 @@ export default {
       let q = _.merge({}, _.omit(this.$route.query, ['page[number]']), { search: newSearchKeyword })
       this.$router.replace({ name: this.$store.state.route.name, query: q })
     }, 300),
-    searchOrder () {
+    searchPayment () {
       this.isLoading = true
 
-      this.$store.dispatch('order/listOrder', {
+      this.$store.dispatch('payment/listPayment', {
         search: this.searchKeyword,
         page: this.page
       }).then(response => {
-        this.orders = response.orders
+        this.payments = response.payments
         this.totalCount = response.meta.totalCount
         this.resultCount = response.meta.resultCount
 
@@ -157,11 +152,11 @@ export default {
         this.isLoading = false
       })
     },
-    viewOrder (order) {
-      this.$store.dispatch('pushRoute', { name: 'ShowOrder', params: { id: order.id, callbackPath: this.currentRoutePath } })
+    viewPayment (payment) {
+      this.$store.dispatch('pushRoute', { name: 'ShowPayment', params: { id: payment.id, callbackPath: this.currentRoutePath } })
     },
-    newOrder () {
-      this.$store.dispatch('pushRoute', { name: 'NewOrder' })
+    newPayment () {
+      this.$store.dispatch('pushRoute', { name: 'NewPayment' })
     }
   }
 }

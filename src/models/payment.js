@@ -8,8 +8,9 @@ export default {
       gateway: 'online',
       processor: 'stripe',
       method: '',
-      source: '',
+      source: undefined,
       saveSource: true,
+      useCardFrom: 'newCard',
 
       order: {}
     }

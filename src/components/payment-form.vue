@@ -1,6 +1,6 @@
 <template>
 <el-form @input.native="updateValue" :model="formModel" label-position="top" size="small" class="m-b-10">
-
+  {{formModel.saveSource}}
   <el-row :gutter="10">
     <el-col :span="6">
       <el-form-item :error="errorMessages.amountCents" label="Amount" class="amount">
@@ -62,30 +62,34 @@
       <el-col :span="12">
         <el-form-item class="card-from" required>
           <b class="m-r-20">Card</b>
-          <el-radio-group v-model="useCardFrom">
-            <el-radio v-if="canSelectCards" label="savedCard">Select from saved cards</el-radio>
-            <el-radio label="newCard">Enter a new card</el-radio>
+          <el-radio-group v-model="formModel.useCardFrom" @change="handleUseCardFromChange">
+            <el-radio v-if="canSelectCards" label="savedCard">
+              Select from saved cards
+            </el-radio>
+            <el-radio label="newCard">
+              Enter a new card
+            </el-radio>
           </el-radio-group>
         </el-form-item>
       </el-col>
     </el-row>
 
-    <el-row v-if="useCardFrom === 'newCard'">
+    <el-row v-if="formModel.useCardFrom === 'newCard'">
       <el-col :span="12">
         <el-form-item class="card" required>
-          <card ref="xxx" class="stripe-card" :stripe="stripePk" :options="stripeOptions"></card>
+          <card class="stripe-card" :stripe="stripePk" :options="stripeOptions"></card>
         </el-form-item>
       </el-col>
     </el-row>
-     <el-row v-if="useCardFrom === 'newCard' && hasOwner">
+     <el-row v-if="formModel.useCardFrom === 'newCard' && hasOwner">
       <el-col :span="12">
         <el-form-item class="card" required>
-          <el-checkbox v-model="formModel.saveSource">Save this card</el-checkbox>
+          <el-checkbox v-model="formModel.saveSource" @change="updateValue">Save this card</el-checkbox>
         </el-form-item>
       </el-col>
     </el-row>
 
-    <el-row v-if="useCardFrom === 'savedCard'">
+    <el-row v-if="formModel.useCardFrom === 'savedCard'">
       <el-col :span="12">
         <el-form-item class="card" required>
           <el-select @change="updateValue" v-model="formModel.source" class="full">
@@ -155,7 +159,7 @@
 import _ from 'lodash'
 import errorI18nKey from '@/utils/error-i18n-key'
 import MoneyInput from '@/components/money-input'
-import { Card } from 'vue-stripe-elements'
+import { Card } from 'vue-stripe-elements-plus'
 import { STRIPE_PUBLISHABLE_KEY } from '@/env'
 
 export default {
@@ -176,8 +180,7 @@ export default {
         // see https://stripe.com/docs/stripe.js#element-options for details
       },
       stripePk: STRIPE_PUBLISHABLE_KEY,
-      isBillingAndShippingAddressSame: false,
-      useCardFrom: 'newCard'
+      isBillingAndShippingAddressSame: false
     }
   },
   computed: {
@@ -231,11 +234,11 @@ export default {
     value (v) {
       this.formModel = _.cloneDeep(v)
 
-      if (!this.formModel.owner) { return }
+      if (!this.formModel.owner || this.cards.length > 0) { return }
 
       this.loadCards(this.formModel.owner).then(cards => {
         if (cards.length === 0) { return cards }
-        this.useCardFrom = 'savedCard'
+        this.formModel.useCardFrom = 'savedCard'
 
         let primaryCard = _.find(cards, { primary: true })
         this.formModel.source = primaryCard.stripeCardId
@@ -247,6 +250,16 @@ export default {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
+
+    handleUseCardFromChange (useCardFrom) {
+      if (useCardFrom === 'newCard') {
+        this.formModel.source = undefined
+      } else {
+        let primaryCard = _.find(this.cards, { primary: true })
+        this.formModel.source = primaryCard.stripeCardId
+      }
+      this.updateValue()
+    },
 
     loadCards (owner) {
       this.isLoadingCards = true

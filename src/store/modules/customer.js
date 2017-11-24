@@ -1,6 +1,7 @@
 import _ from 'lodash'
 
 import CustomerAPI from '@/api/customer'
+import CardAPI from '@/api/card'
 import JSONAPI from '@/jsonapi'
 
 import Customer from '@/models/customer'
@@ -28,24 +29,13 @@ export default {
       commit(MT.RESET_RECORD)
     },
 
-    loadRecord ({ state, commit, rootState }, actionPayload) {
-      if (state.record && state.record.id === actionPayload.id && state.record.locale === rootState.resourceLocale) {
-        return new Promise((resolve, reject) => {
-          resolve(state.record)
-        })
-      }
-
-      if (state.record.id !== actionPayload.id) {
-        commit(MT.RESET_RECORD)
-      }
-
+    getCustomer ({ state, commit, rootState }, actionPayload) {
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
       return CustomerAPI.getRecord(actionPayload.id, options).then(response => {
         let apiPayload = response.data
-        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.SET_RECORD, record)
+        let customer = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
 
-        return record
+        return customer
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
@@ -95,6 +85,31 @@ export default {
 
         return response
       })
+    },
+
+    listCard ({ commit }, params) {
+      return CardAPI.queryRecord({ filter: { ownerType: 'Customer', ownerId: params.customerId } }).then(response => {
+        let apiPayload = response.data
+        let payments = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+
+        return payments
+      })
+    },
+
+    updateCard ({ commit, rootState }, actionPayload) {
+      let apiPayload = { data: JSONAPI.serialize(actionPayload.cardDraft) }
+      let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
+
+      return CardAPI.updateRecord(actionPayload.id, apiPayload, options).then(response => {
+        let apiPayload = response.data
+        let card = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+
+        return card
+      })
+    },
+
+    deleteCard ({ commit }, id) {
+      return CardAPI.deleteRecord(id)
     }
   },
 
