@@ -385,14 +385,8 @@ export default {
       })
     },
     loadCards () {
-      this.isLoadingCards = true
-
       return this.$store.dispatch('customer/listCard', { customerId: this.id }).then(cards => {
         this.cards = cards
-
-        this.isLoadingCards = false
-      }).catch(errors => {
-        this.isLoadingCards = false
       })
     },
 

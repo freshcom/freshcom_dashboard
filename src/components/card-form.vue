@@ -11,7 +11,7 @@
     <el-input v-model="formModel.expYear" placeholder="YYYY" class="exp-year-input"></el-input>
   </el-form-item>
 
-  <el-form-item label="Primary" :error="errorMessages.primary">
+  <el-form-item label="" :error="errorMessages.primary">
     <el-checkbox v-model="formModel.primary" @change="updateValue">Primary</el-checkbox>
   </el-form-item>
 
