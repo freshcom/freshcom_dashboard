@@ -5,7 +5,7 @@ export default {
       type: 'Customer',
 
       code: '',
-      status: 'anonymous',
+      status: 'internal',
       firstName: '',
       lastName: ''
     }

@@ -24,7 +24,8 @@
         </div>
 
         <div class="header-actions">
-          <el-button @click="editCustomer()" plain size="medium">Edit</el-button>
+          <el-button v-if="customer.status === 'registered'" @click="editCustomer()" plain size="small">Reset Password</el-button>
+          <el-button @click="editCustomer()" plain size="small">Edit</el-button>
         </div>
       </div>
 
@@ -48,6 +49,9 @@
 
               <dt>Name</dt>
               <dd>{{customer.firstName}} {{customer.lastName}}</dd>
+
+              <dt v-if="customer.displayName">Display Name</dt>
+              <dd v-if="customer.displayName">{{customer.displayName}}</dd>
 
               <dt>Email</dt>
               <dd>{{customer.email}}</dd>
@@ -277,7 +281,17 @@
         <h3>Related Resources</h3>
         <div class="block">
           <div class="block-body">
+            <dl>
+              <dt v-if="customer.enroller">Enroller</dt>
+              <dd v-if="customer.enroller">
+                <a href="#">{{customer.enroller.id}}</a>
+              </dd>
 
+              <dt v-if="customer.sponsor">Sponsor</dt>
+              <dd v-if="customer.sponsor">
+                <a href="#">{{customer.sponsor.id}}</a>
+              </dd>
+            </dl>
           </div>
         </div>
 
@@ -297,7 +311,7 @@
       </div>
 
       <div class="footer text-right">
-        <delete-button @confirmed="deleteCustomer" plain size="medium">Delete</delete-button>
+        <delete-button @confirmed="deleteCustomer()" plain size="small">Delete</delete-button>
       </div>
     </el-card>
   </div>
@@ -395,7 +409,15 @@ export default {
     },
 
     deleteCustomer () {
+      this.$store.dispatch('customer/deleteCustomer', this.customer.id).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Customer deleted successfully.`,
+          type: 'success'
+        })
 
+        this.back()
+      })
     },
 
     openEditCardDialog (card) {
@@ -436,7 +458,17 @@ export default {
     deleteCard (card) {
       this.$store.dispatch('customer/deleteCard', card.id).then(() => {
         return this.loadCards()
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Card deleted successfully.`,
+          type: 'success'
+        })
       })
+    },
+
+    back () {
+      this.$store.dispatch('pushRoute', { name: 'ListCustomer' })
     }
   }
 }

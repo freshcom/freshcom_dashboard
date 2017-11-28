@@ -1,17 +1,13 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
-import App from './App'
 import _ from 'lodash'
-import jsonapiAxios from './api/jsonapi-axios'
 
 import { sync } from 'vuex-router-sync'
 import router from './router'
 import store from './store'
 
 import Icon from 'vue-awesome/components/Icon.vue'
-import LeftNav from '@/components/left-nav'
-import LocaleSelector from '@/components/locale-selector'
 
 import VueI18n from 'vue-i18n'
 import { DEFAULT_LOCALE } from '@/env'
@@ -25,6 +21,12 @@ import 'element-ui/lib/theme-chalk/index.css'
 
 import vueMoment from 'vue-moment'
 import money from 'v-money'
+
+import jsonapiAxios from './api/jsonapi-axios'
+
+import App from './app'
+import LeftNav from '@/components/left-nav'
+import LocaleSelector from '@/components/locale-selector'
 
 // -- Sync Store & Router --
 sync(store, router)

@@ -14,11 +14,11 @@
         <span style="line-height: 36px;">Edit Order</span>
 
         <div style="float: right;">
-          <el-button @click="back()" size="medium">
+          <el-button @click="back()" plain size="small">
             Cancel
           </el-button>
 
-          <el-button :loading="isUpdatingOrder" @click="submit()" type="primary" size="medium">
+          <el-button :loading="isUpdatingOrder" @click="submit()" type="primary" size="small">
             Save
           </el-button>
         </div>
@@ -29,11 +29,11 @@
       </div>
 
       <div class="footer">
-        <el-button @click="back()" size="medium">
+        <el-button @click="back()" plain size="small">
           Cancel
         </el-button>
 
-        <el-button :loading="isUpdatingOrder" @click="submit()" type="primary" size="medium" class="pull-right">
+        <el-button :loading="isUpdatingOrder" @click="submit()" type="primary" size="small" class="pull-right">
           Save
         </el-button>
       </div>
@@ -73,7 +73,8 @@ export default {
       this.isLoading = true
 
       this.$store.dispatch('order/getOrder', {
-        id: this.id
+        id: this.id,
+        include: 'customer'
       }).then(order => {
         this.order = order
         this.orderDraft = _.cloneDeep(order)

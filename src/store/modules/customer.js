@@ -1,6 +1,7 @@
 import _ from 'lodash'
 
 import CustomerAPI from '@/api/customer'
+import DataImportAPI from '@/api/data-import'
 import CardAPI from '@/api/card'
 import JSONAPI from '@/jsonapi'
 
@@ -41,29 +42,24 @@ export default {
       })
     },
 
-    createRecord (context, recordDraft) {
+    createCustomer (context, recordDraft) {
       let apiPayload = { data: JSONAPI.serialize(recordDraft) }
       return CustomerAPI.createRecord(apiPayload).then(response => {
         return JSONAPI.deserialize(response.data.data)
-      }).then(record => {
-        context.commit(MT.SET_RECORD, record)
-
-        return record
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
     },
 
-    updateRecord ({ state, commit, rootState }, actionPayload) {
-      let apiPayload = { data: JSONAPI.serialize(actionPayload.recordDraft) }
+    updateCustomer ({ state, commit, rootState }, actionPayload) {
+      let apiPayload = { data: JSONAPI.serialize(actionPayload.customerDraft) }
 
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
       return CustomerAPI.updateRecord(actionPayload.id, apiPayload, options).then(response => {
         let apiPayload = response.data
-        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.SET_RECORD, record)
+        let customer = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
 
-        return record
+        return customer
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
@@ -79,10 +75,8 @@ export default {
       })
     },
 
-    deleteRecord ({ commit }, id) {
+    deleteCustomer ({ commit }, id) {
       return CustomerAPI.deleteRecord(id).then(response => {
-        commit(MT.RESET_RECORD)
-
         return response
       })
     },
@@ -110,6 +104,15 @@ export default {
 
     deleteCard ({ commit }, id) {
       return CardAPI.deleteRecord(id)
+    },
+
+    createDataImport (context, recordDraft) {
+      let apiPayload = { data: JSONAPI.serialize(recordDraft) }
+      return DataImportAPI.createRecord(apiPayload).then(response => {
+        return JSONAPI.deserialize(response.data.data)
+      }).catch(error => {
+        throw JSONAPI.deserializeErrors(error.response.data.errors)
+      })
     }
   },
 

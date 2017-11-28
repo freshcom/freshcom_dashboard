@@ -131,6 +131,10 @@ input::-webkit-inner-spin-button {
 
 
 /* START Util Class */
+p.btn-group {
+  display: inline-block;
+}
+
 .v-middle {
   vertical-align: middle;
 }
@@ -371,7 +375,7 @@ p.search-notice {
 .search {
   display: inline-block;
   margin-left: 35px;
-  width: 500px;
+  width: 400px;
 }
 /* END Card Search */
 

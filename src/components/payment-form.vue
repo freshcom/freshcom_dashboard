@@ -1,6 +1,6 @@
 <template>
 <el-form @input.native="updateValue" :model="formModel" label-position="top" size="small" class="m-b-10">
-  {{formModel.saveSource}}
+
   <el-row :gutter="10">
     <el-col :span="6">
       <el-form-item :error="errorMessages.amountCents" label="Amount" class="amount">

@@ -11,7 +11,7 @@
   <div>
     <el-card class="main-card">
       <div slot="header">
-        <span>Create a Order</span>
+        <span>Create an order</span>
       </div>
 
       <div>
@@ -74,24 +74,48 @@
         </div>
 
         <div v-show="activeStep === this.step.PAYMENT">
+          <el-row>
+            <el-col :span="8" :offset="8">
+              <el-button plain size="mini" class="pull-right">Use Points</el-button>
+
+              <div class="block">
+                <div class="block-body full">
+                  <el-table :data="summaryTableData" class="block-table" :show-header="false">
+                    <el-table-column width="150px">
+                      <template slot-scope="scope">
+                        {{scope.row.name}}
+                      </template>
+                    </el-table-column>
+
+                    <el-table-column align="right">
+                      <template slot-scope="scope">
+                        <span>{{scope.row.valueCents | dollar}}</span>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </div>
+              </div>
+            </el-col>
+          </el-row>
+          <hr/>
           <payment-form v-model="paymentDraft" :errors="errors"></payment-form>
         </div>
       </div>
 
       <div class="footer">
-        <el-button v-show="canCancel" @click="cancel" plain size="medium">
+        <el-button v-show="canCancel" @click="cancel" plain size="small">
           Cancel
         </el-button>
 
-        <el-button v-show="canNext" :loading="isUpdatingOrder" :disabled="order.rootLineItems.length === 0" @click="next()" size="medium" type="primary" class="pull-right">
+        <el-button v-show="canNext" :loading="isUpdatingOrder" :disabled="order.rootLineItems.length === 0" @click="next()" size="small" type="primary" class="pull-right">
           Next
         </el-button>
 
-        <el-button v-show="canBack" @click="back" plain size="medium">
+        <el-button v-show="canBack" @click="back" plain size="small">
           Back
         </el-button>
 
-        <el-button v-show="canPlaceOrder" :loading="isCreatingPayment" @click="createPayment()" size="medium" type="primary" class="pull-right">
+        <el-button v-show="canPlaceOrder" :loading="isCreatingPayment" @click="createPayment()" size="small" type="primary" class="pull-right">
           Place Order
         </el-button>
       </div>
@@ -187,6 +211,39 @@ export default {
 
     canPlaceOrder () {
       return this.activeStep === this.step.PAYMENT
+    },
+
+    summaryTableData () {
+      let tableData = []
+
+      if (this.order.subTotalCents !== this.order.grandTotalCents) {
+        tableData.push({
+          name: 'Sub total',
+          valueCents: this.order.subTotalCents
+        })
+      }
+
+      let taxTotalCents = this.order.taxOneCents + this.order.taxTwoCents + this.order.taxThreeCents
+      if (taxTotalCents > 0) {
+        tableData.push({
+          name: 'Tax total',
+          valueCents: taxTotalCents
+        })
+      }
+
+      tableData.push({
+        name: 'Grand total',
+        valueCents: this.order.grandTotalCents
+      })
+
+      if (this.order.authorizationCents !== this.order.grandTotalCents) {
+        tableData.push({
+          name: 'Authorization total',
+          valueCents: this.order.authorizationCents
+        })
+      }
+
+      return tableData
     }
   },
   methods: {

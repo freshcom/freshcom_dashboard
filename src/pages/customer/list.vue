@@ -10,27 +10,44 @@
 
   <div>
     <el-card class="main-card">
-      <div slot="header" class="clearfix">
-        <el-button size="small"><icon name="filter" scale="0.7" class="v-middle"></icon> Filter</el-button>
-        <div class="search">
-          <el-input :value="searchKeyword" @input="updateSearchKeyword" size="small" placeholder="Search...">
-            <template slot="prepend"><icon name="search" scale="1" class="v-middle"></icon></template>
-          </el-input>
-        </div>
+      <div slot="header">
+        <el-row>
+          <el-col :span="18">
+            <el-button plain size="small"><icon name="filter" scale="0.7" class="v-middle"></icon> Filter</el-button>
 
-        <el-button @click="goTo({ name: 'NewCustomer' })" size="small" class="pull-right">
-          <icon name="plus" scale="0.7" class="v-middle"></icon> New
-        </el-button>
+            <div class="search">
+              <el-input :value="searchKeyword" @input="updateSearchKeyword" size="small" placeholder="Search...">
+                <template slot="prepend"><icon name="search" scale="1" class="v-middle"></icon></template>
+              </el-input>
+            </div>
+          </el-col>
+
+          <el-col :span="6">
+            <div class="text-right">
+              <el-button @click="openAddDataImportDialog()" plain size="small">
+                <icon name="plus" scale="0.7" class="v-middle"></icon> Import
+              </el-button>
+              <el-button @click="newCustomer()" plain size="small">
+                <icon name="plus" scale="0.7" class="v-middle"></icon> New
+              </el-button>
+            </div>
+          </el-col>
+        </el-row>
       </div>
 
       <div class="data full" v-loading="isLoading">
         <p v-if="noSearchResult" class="search-notice text-center">
           There is no result that matches "{{searchKeyword}}"
         </p>
-        <el-table v-if="hasSearchResult" @row-click="viewCustomer" :data="customers" stripe class="full">
+        <el-table v-if="hasSearchResult" @row-click="viewCustomer" :data="customers"  class="full">
           <el-table-column prop="name" label="Customer">
             <template slot-scope="scope">
-              {{scope.row.firstName}} {{scope.row.lastName}}
+              <span v-if="scope.row.firstName || scope.row.lastName">
+                {{scope.row.firstName}} {{scope.row.lastName}}
+              </span>
+              <span v-else>
+                {{scope.row.displayName}}
+              </span>
             </template>
           </el-table-column>
           <el-table-column prop="status" label="Status" width="150">
@@ -63,6 +80,16 @@
     </el-card>
   </div>
 
+  <div class="launchable">
+    <el-dialog :show-close="false" :visible="isAddingDataImport" title="Import customer" width="750px">
+      <data-import-form v-model="dataImportDraftForAdd" :errors="errors"></data-import-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button :disabled="isCreatingDataImport" @click="closeAddDataImportDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isCreatingDataImport" @click="createDataImport()" type="primary" size="small">Save</el-button>
+      </div>
+    </el-dialog>
+  </div>
 </div>
 </template>
 
@@ -72,11 +99,14 @@ import 'vue-awesome/icons/search'
 import _ from 'lodash'
 import Pagination from '@/components/pagination'
 import { idLastPart } from '@/helpers/filters'
+import DataImportForm from '@/components/data-import-form'
+import DataImport from '@/models/data-import'
 
 export default {
   name: 'ListCustomer',
   components: {
-    Pagination
+    Pagination,
+    DataImportForm
   },
   filters: {
     idLastPart
@@ -96,7 +126,13 @@ export default {
       customers: [],
       isLoading: false,
       totalCount: 0,
-      resultCount: 0
+      resultCount: 0,
+
+      isAddingDataImport: false,
+      isCreatingDataImport: false,
+      dataImportDraftForAdd: DataImport.objectWithDefaults(),
+
+      errors: {}
     }
   },
   created () {
@@ -115,13 +151,13 @@ export default {
   },
   watch: {
     searchKeyword (newKeyword) {
-      this.searchOrder()
+      this.searchCustomer()
     },
     page (newPage, oldPage) {
       if (_.isEqual(newPage, oldPage)) {
         return
       }
-      this.search()
+      this.searchCustomer()
     }
   },
   methods: {
@@ -130,6 +166,7 @@ export default {
       let q = _.merge({}, _.omit(this.$route.query, ['page[number]']), { search: newSearchKeyword })
       this.$router.replace({ name: this.$store.state.route.name, query: q })
     }, 300),
+
     searchCustomer () {
       this.isLoading = true
 
@@ -146,11 +183,43 @@ export default {
         this.isLoading = false
       })
     },
+
     viewCustomer (customer) {
       this.$store.dispatch('pushRoute', { name: 'ShowCustomer', params: { id: customer.id, callbackPath: this.currentRoutePath } })
     },
+
     newCustomer () {
       this.$store.dispatch('pushRoute', { name: 'NewCustomer' })
+    },
+
+    openAddDataImportDialog () {
+      let dataImport = DataImport.objectWithDefaults()
+      dataImport.dataType = 'Customer'
+
+      this.dataImportDraftForAdd = dataImport
+      this.isAddingDataImport = true
+    },
+
+    closeAddDataImportDialog () {
+      this.isAddingDataImport = false
+      this.isCreatingDataImport = false
+    },
+
+    createDataImport () {
+      this.isCreatingDataImport = true
+
+      this.$store.dispatch('customer/createDataImport', this.dataImportDraftForAdd).then(dataImport => {
+        this.$message({
+          showClose: true,
+          message: `Import started successfully.`,
+          type: 'success'
+        })
+
+        this.closeAddDataImportDialog()
+      }).catch(errors => {
+        this.errors = errors
+        this.isCreatingDataImport = false
+      })
     }
   }
 }

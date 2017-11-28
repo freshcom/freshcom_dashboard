@@ -21,7 +21,7 @@
         </div>
 
         <div class="header-actions">
-          <el-button @click="editOrder()" size="medium">Edit</el-button>
+          <el-button @click="editOrder()" plain size="small">Edit</el-button>
         </div>
       </div>
 
@@ -241,7 +241,7 @@
       </div>
 
       <div class="footer text-right">
-        <delete-button @confirmed="deleteOrder()" size="medium">Delete</delete-button>
+        <delete-button @confirmed="deleteOrder()" size="small">Delete</delete-button>
       </div>
     </el-card>
   </div>

@@ -1,5 +1,5 @@
 <template>
-<el-form @input.native="updateValue" label-width="180px">
+<el-form @input.native="updateValue" label-width="180px" size="small">
   <el-form-item label="Code" :error="errorMessages.code">
     <el-input v-model="formModel.code"></el-input>
   </el-form-item>
@@ -7,22 +7,23 @@
   <el-form-item label="Status" :error="errorMessages.status" required>
     <el-select @change="updateValue" v-model="formModel.status">
       <el-option label="Anonymous" value="anonymous"></el-option>
+      <el-option label="Internal" value="internal"></el-option>
       <el-option label="Registered" value="registered"></el-option>
       <el-option label="Suspended" value="suspended"></el-option>
       <el-option label="Disabled" value="disabled"></el-option>
     </el-select>
   </el-form-item>
 
-  <el-form-item label="Name" :error="errorMessages.firstName" required>
+  <el-form-item label="Name" :error="errorMessages.firstName" :required="formModel.status === 'registered'">
     <el-input v-model="formModel.firstName" placeholder="First Name" class="name-input"></el-input>
     <el-input v-model="formModel.lastName" placeholder="Last Name" class="name-input"></el-input>
   </el-form-item>
 
-  <el-form-item label="Email" :error="errorMessages.email" required>
+  <el-form-item label="Email" :error="errorMessages.email" :required="formModel.status === 'registered'">
     <el-input v-model="formModel.email"></el-input>
   </el-form-item>
 
-  <el-form-item label="Password" :error="errorMessages.password" required>
+  <el-form-item v-show="canInputPassword" :error="errorMessages.password" label="Password" required>
     <el-input v-model="formModel.password" type="password"></el-input>
   </el-form-item>
 
@@ -54,6 +55,10 @@ export default {
         result[k] = this.$t(errorI18nKey('Customer', k, v[0]), { name: _.startCase(k) })
         return result
       }, {})
+    },
+
+    canInputPassword () {
+      return this.formModel.status === 'registered' && !this.formModel.id
     }
   },
   watch: {

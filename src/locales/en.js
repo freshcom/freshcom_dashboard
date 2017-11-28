@@ -78,7 +78,9 @@ export default {
     },
     customer: {
       status: {
-        registered: 'Registered'
+        guest: 'Guest',
+        registered: 'Registered',
+        internal: 'Internal'
       }
     },
     order: {
