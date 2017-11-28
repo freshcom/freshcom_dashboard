@@ -82,13 +82,6 @@ export default {
   deserialize (data, included = []) {
     let db = {}
     if (!_.isEmpty(included)) {
-      // // This is so that included object can link to the main object
-      // if (!_.isArray(data)) {
-      //   let preObject = this._deserializeResourceObject(data)
-      //   db[preObject.type] = db[preObject.type] || {}
-      //   db[preObject.type][preObject.id] = preObject
-      // }
-
       // TODO: Improve this double call to add in the relationship
       db = this._deserializeIncluded(included)
       db = this._deserializeIncluded(included, db)

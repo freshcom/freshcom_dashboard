@@ -46,7 +46,7 @@
                 {{scope.row.firstName}} {{scope.row.lastName}}
               </span>
               <span v-else>
-                {{scope.row.displayName}}
+                {{scope.row.otherName}}
               </span>
             </template>
           </el-table-column>
