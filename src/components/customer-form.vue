@@ -6,7 +6,7 @@
 
   <el-form-item label="Status" :error="errorMessages.status" required>
     <el-select @change="updateValue" v-model="formModel.status">
-      <el-option label="Anonymous" value="anonymous"></el-option>
+      <el-option label="Guest" value="guest"></el-option>
       <el-option label="Internal" value="internal"></el-option>
       <el-option label="Registered" value="registered"></el-option>
       <el-option label="Suspended" value="suspended"></el-option>
