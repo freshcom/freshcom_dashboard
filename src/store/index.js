@@ -19,6 +19,7 @@ import PaymentStore from '@/store/modules/payment'
 import UnlockableStore from '@/store/modules/unlockable'
 import CustomerStore from '@/store/modules/customer'
 import BillingStore from '@/store/modules/billing'
+import PointDepositStore from '@/store/modules/point-deposit'
 
 Vue.use(Vuex)
 
@@ -44,7 +45,8 @@ export default new Vuex.Store({
     payment: PaymentStore,
     unlockable: UnlockableStore,
     customer: CustomerStore,
-    billing: BillingStore
+    billing: BillingStore,
+    pointDeposit: PointDepositStore
   },
   state: {
     uiLocale: DEFAULT_LOCALE,

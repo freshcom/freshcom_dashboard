@@ -53,6 +53,10 @@ import ShowCustomerPage from '@/pages/customer/show'
 import NewCustomerPage from '@/pages/customer/new'
 import EditCustomerPage from '@/pages/customer/edit'
 
+import ListPointDepositPage from '@/pages/point-deposit/list'
+import NewPointDepositPage from '@/pages/point-deposit/new'
+import ShowPointDepositPage from '@/pages/point-deposit/show'
+
 import ShowBillingSettingsPage from '@/pages/billing/show-settings'
 
 Vue.use(Router)
@@ -349,6 +353,37 @@ export default new Router({
         let query = qs.parse(queryString)
 
         return { id: route.params.id, callbackPath: query.callbackPath }
+      }
+    },
+    {
+      path: '/point_deposits',
+      name: 'ListPointDeposit',
+      component: ListPointDepositPage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          page: page
+        }
+      }
+    },
+    {
+      path: '/point_deposits/new',
+      name: 'NewPointDeposit',
+      component: NewPointDepositPage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { callbackPath: query.callbackPath }
+      }
+    },
+    {
+      path: '/point_deposits/:id',
+      name: 'ShowPointDeposit',
+      component: ShowPointDepositPage,
+      props (route) {
+        return { id: route.params.id }
       }
     },
     {

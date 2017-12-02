@@ -53,6 +53,11 @@ export default {
         offline: 'Offline'
       }
     },
+    pointDeposit: {
+      status: {
+        active: 'Active'
+      }
+    },
     sku: {
       status: {
         active: 'Active'

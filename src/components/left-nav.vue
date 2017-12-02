@@ -42,6 +42,10 @@
             <icon name="unlock-alt" scale="0.8"></icon>
             <span>Unlockables</span>
           </el-menu-item>
+          <el-menu-item :route="{ name: 'ListPointDeposit' }" index="/point_deposits">
+            <icon name="money" scale="0.8"></icon>
+            <span>Point Deposit</span>
+          </el-menu-item>
 <!--           <el-menu-item index="stockTransfers">
             <icon name="exchange" scale="0.8"></icon>
             <span>Stock Transfers</span>
@@ -135,6 +139,7 @@ import 'vue-awesome/icons/bank'
 import 'vue-awesome/icons/id-card'
 import 'vue-awesome/icons/folder-open'
 import 'vue-awesome/icons/folder'
+import 'vue-awesome/icons/money'
 
 import 'vue-awesome/icons/cog'
 import 'vue-awesome/icons/podcast'
@@ -166,6 +171,7 @@ export default {
       if (routePath.startsWith('/product_collections')) { return '/products' }
       if (routePath.startsWith('/orders') || routePath.startsWith('/payments')) { return '/orders' }
       if (routePath.startsWith('/customers') || routePath.startsWith('/customers')) { return '/customers' }
+      if (routePath.startsWith('/point_deposits') || routePath.startsWith('/point_deposits')) { return '/point_deposits' }
 
       return routePath
     },
