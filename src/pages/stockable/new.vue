@@ -1,8 +1,8 @@
 <template>
 <div class="page-wrapper">
   <div>
-    <el-menu :router="true" default-active="/skus" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListSku' }" index="/skus">SKUs</el-menu-item>
+    <el-menu :router="true" default-active="/stockables" mode="horizontal" class="secondary-nav">
+      <el-menu-item :route="{ name: 'ListStockable' }" index="/stockables">Stockables</el-menu-item>
     </el-menu>
     <locale-selector class="pull-right"></locale-selector>
   </div>
@@ -10,7 +10,7 @@
   <div>
     <el-card v-loading="isLoading" class="main-card">
       <div slot="header">
-        <span style="line-height: 36px;">Create a SKU</span>
+        <span style="line-height: 36px;">Create a Stockable</span>
 
         <div class="pull-right">
           <el-button @click="cancel" plain size="medium">
@@ -24,7 +24,7 @@
       </div>
 
       <div class="data">
-        <sku-form v-model="recordDraft" :errors="errors"></sku-form>
+        <stockable-form v-model="recordDraft" :errors="errors"></stockable-form>
       </div>
 
       <div class="footer">
@@ -43,17 +43,17 @@
 
 <script>
 import NewPage from '@/mixins/new-page'
-import SkuForm from '@/components/sku-form'
+import StockableForm from '@/components/stockable-form'
 
 export default {
-  name: 'NewSku',
+  name: 'NewStockable',
   components: {
-    SkuForm
+    StockableForm
   },
-  mixins: [NewPage({ storeNamespace: 'sku', name: 'SKU' })],
+  mixins: [NewPage({ storeNamespace: 'stockable', name: 'Stockable' })],
   methods: {
     recordCreated (record) {
-      this.$store.dispatch('pushRoute', { name: 'ShowSku', params: { id: record.id } })
+      this.$store.dispatch('pushRoute', { name: 'ShowStockable', params: { id: record.id } })
     }
   }
 }

@@ -88,7 +88,7 @@ import _ from 'lodash'
 import errorI18nKey from '@/utils/error-i18n-key'
 
 export default {
-  name: 'SkuForm',
+  name: 'StockableForm',
   props: ['value', 'errors'],
   data () {
     return {
@@ -100,7 +100,7 @@ export default {
   computed: {
     errorMessages () {
       return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(errorI18nKey('Sku', k, v[0]), { name: _.startCase(k) })
+        result[k] = this.$t(errorI18nKey('Stockable', k, v[0]), { name: _.startCase(k) })
         return result
       }, {})
     },

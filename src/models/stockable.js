@@ -2,7 +2,7 @@ export default {
   objectWithDefaults () {
     return {
       id: undefined,
-      type: 'Sku',
+      type: 'Stockable',
 
       code: '',
       status: 'active',

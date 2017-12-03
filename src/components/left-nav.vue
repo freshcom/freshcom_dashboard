@@ -24,7 +24,7 @@
             <span>Customers</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
-            <icon name="cubes" scale="0.8"></icon>
+            <icon name="cube" scale="0.8"></icon>
             <span>Products</span>
           </el-menu-item>
         </el-submenu>
@@ -32,18 +32,18 @@
         <el-submenu index="inventory">
           <template slot="title">
             <icon name="archive" scale="0.8"></icon>
-            <span>Inventory</span>
+            <span>Goods</span>
           </template>
-          <el-menu-item :route="{ name: 'ListSku' }" index="/skus">
-            <icon name="cube" scale="0.8"></icon>
-            <span>SKUs</span>
+          <el-menu-item :route="{ name: 'ListStockable' }" index="/stockables">
+            <icon name="cubes" scale="0.8"></icon>
+            <span>Stockables</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListUnlockable' }" index="/unlockables">
             <icon name="unlock-alt" scale="0.8"></icon>
             <span>Unlockables</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListPointDeposit' }" index="/point_deposits">
-            <icon name="money" scale="0.8"></icon>
+            <icon name="diamond" scale="0.8"></icon>
             <span>Point Deposit</span>
           </el-menu-item>
 <!--           <el-menu-item index="stockTransfers">
@@ -139,7 +139,7 @@ import 'vue-awesome/icons/bank'
 import 'vue-awesome/icons/id-card'
 import 'vue-awesome/icons/folder-open'
 import 'vue-awesome/icons/folder'
-import 'vue-awesome/icons/money'
+import 'vue-awesome/icons/diamond'
 
 import 'vue-awesome/icons/cog'
 import 'vue-awesome/icons/podcast'
@@ -161,7 +161,7 @@ export default {
     selected () {
       let routePath = this.$store.state.route.fullPath
 
-      if (routePath.startsWith('/skus')) { return '/skus' }
+      if (routePath.startsWith('/stockables')) { return '/stockables' }
       if (routePath.startsWith('/unlockables')) { return '/unlockables' }
       if (routePath.startsWith('/file_collections')) { return '/file_collections' }
       if (routePath.startsWith('/files')) { return '/files' }

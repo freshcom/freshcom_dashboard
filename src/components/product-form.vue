@@ -36,21 +36,21 @@
       <el-row>
         <el-col :span="6">
           <el-select v-model="sourceType" @change="clearSource()">
-            <el-option label="SKU" value="Sku"></el-option>
+            <el-option label="Stockable" value="Stockable"></el-option>
             <el-option label="Unlockable" value="Unlockable"></el-option>
           </el-select>
         </el-col>
-        <el-col v-if="sourceType === 'Sku'" :span="18">
+        <el-col v-if="sourceType === 'Stockable'" :span="18">
           <div class="source-select-wrapper">
             <remote-select
               v-model="formModel.source"
-              :records="selectableSkus"
-              :is-loading="isLoadingSelectableSkus"
-              @filter="loadSelectableSkus"
-              @reset="resetSelectableSkus"
+              :records="selectableStockables"
+              :is-loading="isLoadingSelectableStockables"
+              @filter="loadSelectableStockables"
+              @reset="resetSelectableStockables"
               @input="updateValue"
-              no-data-text="No matching SKU"
-              placeholder="Type to search for SKU..."
+              no-data-text="No matching Stockable"
+              placeholder="Type to search for Stockable..."
               class="source-select"
             >
             </remote-select>
@@ -129,17 +129,17 @@ export default {
   data () {
     return {
       formModel: _.cloneDeep(this.value),
-      sourceType: 'Sku',
+      sourceType: 'Stockable',
       imageUrl: '',
       pendingAvatarId: ''
     }
   },
   computed: {
-    isLoadingSelectableSkus () {
-      return this.$store.state.product.isLoadingSelectableSkus
+    isLoadingSelectableStockables () {
+      return this.$store.state.product.isLoadingSelectableStockables
     },
-    selectableSkus () {
-      return this.$store.state.product.selectableSkus
+    selectableStockables () {
+      return this.$store.state.product.selectableStockables
     },
     isLoadingSelectableUnlockables () {
       return this.$store.state.product.isLoadingSelectableUnlockables
@@ -189,11 +189,11 @@ export default {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
-    loadSelectableSkus: _.debounce(function (searchKeyword) {
-      this.$store.dispatch('product/loadSelectableSkus', { search: searchKeyword })
+    loadSelectableStockables: _.debounce(function (searchKeyword) {
+      this.$store.dispatch('product/loadSelectableStockables', { search: searchKeyword })
     }, 300),
-    resetSelectableSkus () {
-      this.$store.dispatch('product/resetSelectableSkus')
+    resetSelectableStockables () {
+      this.$store.dispatch('product/resetSelectableStockables')
     },
     loadSelectableUnlockables: _.debounce(function (searchKeyword) {
       this.$store.dispatch('product/loadSelectableUnlockables', { search: searchKeyword })

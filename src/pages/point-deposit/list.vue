@@ -81,6 +81,7 @@ import 'vue-awesome/icons/chevron-right'
 import 'vue-awesome/icons/chevron-left'
 
 import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
 import Pagination from '@/components/pagination'
 import { dollar, idLastPart } from '@/helpers/filters'
 
@@ -145,11 +146,11 @@ export default {
     searchPointDeposit () {
       this.isLoading = true
 
-      this.$store.dispatch('pointDeposit/listPointDeposit', {
+      freshcom.listPointDeposit({
         search: this.searchKeyword,
         page: this.page
       }).then(response => {
-        this.pointDeposits = response.pointDeposits
+        this.pointDeposits = response.data
         this.totalCount = response.meta.totalCount
         this.resultCount = response.meta.resultCount
 

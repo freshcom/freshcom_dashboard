@@ -1,12 +1,28 @@
 import _ from 'lodash'
+import i18n from '@/i18n'
 
-export default function (type, errorKey, errorLabel) {
-  type = _.camelCase(type)
-  let commonLabels = ['required', 'invalid']
+// TODO: rename this file
+export default function (errors, namespace, interpolations = {}) {
+  return _.reduce(errors, (result, errorArray, k) => {
+    let errorObj = errorArray[0]
 
-  if (_.indexOf(commonLabels, errorLabel) !== -1) {
-    return `errors.${errorLabel}`
-  } else {
-    return `errors.${type}.${errorKey}.${errorLabel}`
-  }
+    let fieldKey = `fields.${namespace}.${k}`
+    let fieldName = i18n.t(fieldKey)
+
+    if (fieldName === fieldKey) {
+      fieldName = _.capitalize(_.startCase(k))
+    }
+
+    let errorCode = errorObj['code']
+    let errorKey = `errors.${namespace}.${errorCode}`
+    let errorInterpolations = Object.assign({}, { name: fieldName }, interpolations)
+    let errorMsg = i18n.t(errorKey, errorInterpolations)
+
+    if (errorKey === errorMsg) {
+      errorMsg = i18n.t(`errors.common.${errorCode}`, errorInterpolations)
+    }
+
+    result[k] = errorMsg
+    return result
+  }, {})
 }

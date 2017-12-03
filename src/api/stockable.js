@@ -2,7 +2,7 @@ import axios from './jsonapi-axios'
 
 export default {
   createRecord (payload, params = {}) {
-    return axios.post('/skus', payload)
+    return axios.post('/stockables', payload)
   },
 
   updateRecord (id, payload, options) {
@@ -18,7 +18,7 @@ export default {
       params.locale = locale
     }
 
-    return axios.patch(`/skus/${id}`, payload, { params: params })
+    return axios.patch(`/stockables/${id}`, payload, { params: params })
   },
 
   queryRecord (options = {}) {
@@ -43,7 +43,7 @@ export default {
       params.locale = locale
     }
 
-    return axios.get('/skus', {
+    return axios.get('/stockables', {
       params: params
     })
   },
@@ -66,11 +66,11 @@ export default {
       params.locale = locale
     }
 
-    return axios.get(`/skus/${id}`, { params: params })
+    return axios.get(`/stockables/${id}`, { params: params })
   },
 
   deleteRecord (id) {
-    return axios.delete(`/skus/${id}`)
+    return axios.delete(`/stockables/${id}`)
   }
 
 }

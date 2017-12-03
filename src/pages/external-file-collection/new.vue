@@ -53,11 +53,11 @@ export default {
     ExternalFileCollectionForm
   },
   mixins: [NewPage({ storeNamespace: 'externalFileCollection', name: 'File Collection' })],
-  props: ['skuId', 'productId', 'unlockableId'],
+  props: ['stockableId', 'productId', 'unlockableId'],
   created () {
-    if (this.skuId) {
+    if (this.stockableId) {
       let record = _.cloneDeep(this.record)
-      record.owner = { id: this.skuId, type: 'Sku' }
+      record.owner = { id: this.stockableId, type: 'Stockable' }
       this.$store.dispatch('externalFileCollection/setRecord', record)
       return
     }
@@ -70,8 +70,8 @@ export default {
   },
   methods: {
     recordCreated (record) {
-      if (this.skuId) {
-        this.$store.dispatch('sku/resetRecord')
+      if (this.stockableId) {
+        this.$store.dispatch('stockable/resetRecord')
       }
 
       if (this.productId) {

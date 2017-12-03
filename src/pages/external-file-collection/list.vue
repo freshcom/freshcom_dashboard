@@ -61,7 +61,7 @@ export default {
     Pagination,
     DeleteButton
   },
-  mixins: [ListPage({ storeNamespace: 'externalFileCollection', fields: { 'Sku': 'name,label,contentType' } })],
+  mixins: [ListPage({ storeNamespace: 'externalFileCollection', fields: { 'Stockable': 'name,label,contentType' } })],
   methods: {
     viewRecord (row) {
       this.goTo({ name: 'ShowExternalFileCollection', params: { id: row.id } })

@@ -1,6 +1,9 @@
 export default {
   hello: 'Hi',
   errors: {
+    common: {
+      required: '{name} is required.'
+    },
     required: '{name} is required.',
     invalid: '{name} is invalid.',
     payment: {
@@ -46,6 +49,11 @@ export default {
       }
     }
   },
+  fields: {
+    pointDeposit: {
+      printName: 'Print name'
+    }
+  },
   attributes: {
     refund: {
       gateway: {
@@ -58,7 +66,7 @@ export default {
         active: 'Active'
       }
     },
-    sku: {
+    stockable: {
       status: {
         active: 'Active'
       }

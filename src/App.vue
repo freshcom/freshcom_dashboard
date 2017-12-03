@@ -35,7 +35,7 @@ export default {
     this.spinner = this.$loading({ text: 'Loading...', lock: true })
   },
   created () {
-    return this.$store.dispatch('session/loadToken').then(() => {
+    return this.$store.dispatch('session/getToken').then(() => {
       this.spinner.close()
     }).catch(() => {
       this.$store.dispatch('pushRoute', { name: 'Login' })

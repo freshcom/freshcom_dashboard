@@ -2,8 +2,8 @@
 <div class="page-wrapper">
 
   <div>
-    <el-menu :router="true" default-active="/skus" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListSku' }" index="/skus">SKUs</el-menu-item>
+    <el-menu :router="true" default-active="/stockables" mode="horizontal" class="secondary-nav">
+      <el-menu-item :route="{ name: 'ListStockable' }" index="/stockables">Stockables</el-menu-item>
     </el-menu>
     <locale-selector @change="search" class="pull-right"></locale-selector>
   </div>
@@ -18,7 +18,7 @@
           </el-input>
         </div>
 
-        <el-button @click="goTo({ name: 'NewSku' })" size="small" class="pull-right">
+        <el-button @click="goTo({ name: 'NewStockable' })" size="small" class="pull-right">
           <icon name="plus" scale="0.7" class="v-middle"></icon> New
         </el-button>
       </div>
@@ -31,14 +31,14 @@
           Stop typing to search...
         </p>
         <el-table v-if="hasSearchResult" @row-click="viewRecord" :data="tableData">
-          <el-table-column prop="name" label="SKU"></el-table-column>
+          <el-table-column prop="name" label="Stockable"></el-table-column>
           <el-table-column prop="status" label="Status" width="100">
             <template slot-scope="scope">
               <el-tag v-if="scope.row.status === 'active'" size="mini" type="primary">
-                {{$t(`attributes.sku.status.${scope.row.status}`)}}
+                {{$t(`attributes.stockable.status.${scope.row.status}`)}}
               </el-tag>
               <el-tag v-else type="gray">
-                {{$t(`attributes.sku.status.${scope.row.status}`)}}
+                {{$t(`attributes.stockable.status.${scope.row.status}`)}}
               </el-tag>
             </template>
           </el-table-column>
@@ -76,11 +76,11 @@ import Pagination from '@/components/pagination'
 import ListPage from '@/mixins/list-page'
 
 export default {
-  name: 'ListSku',
+  name: 'ListStockable',
   components: {
     Pagination
   },
-  mixins: [ListPage({ storeNamespace: 'sku', fields: { 'Sku': 'code,name,status' } })],
+  mixins: [ListPage({ storeNamespace: 'stockable', fields: { 'Stockable': 'code,name,status' } })],
   computed: {
     tableData () {
       return _.map(this.records, (record) => {
@@ -100,7 +100,7 @@ export default {
   },
   methods: {
     viewRecord (row) {
-      this.goTo({ name: 'ShowSku', params: { id: row.id } })
+      this.goTo({ name: 'ShowStockable', params: { id: row.id } })
     }
   }
 }

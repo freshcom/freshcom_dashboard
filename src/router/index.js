@@ -16,10 +16,10 @@ import EditOrderPage from '@/pages/order/edit'
 import ListPaymentPage from '@/pages/payment/list'
 import ShowPaymentPage from '@/pages/payment/show'
 
-import ListSkuPage from '@/pages/sku/list'
-import ShowSkuPage from '@/pages/sku/show'
-import EditSkuPage from '@/pages/sku/edit'
-import NewSkuPage from '@/pages/sku/new'
+import ListStockablePage from '@/pages/stockable/list'
+import ShowStockablePage from '@/pages/stockable/show'
+import EditStockablePage from '@/pages/stockable/edit'
+import NewStockablePage from '@/pages/stockable/new'
 
 import NewExternalFileCollectionPage from '@/pages/external-file-collection/new'
 import EditExternalFileCollectionPage from '@/pages/external-file-collection/edit'
@@ -56,6 +56,7 @@ import EditCustomerPage from '@/pages/customer/edit'
 import ListPointDepositPage from '@/pages/point-deposit/list'
 import NewPointDepositPage from '@/pages/point-deposit/new'
 import ShowPointDepositPage from '@/pages/point-deposit/show'
+import EditPointDepositPage from '@/pages/point-deposit/edit'
 
 import ShowBillingSettingsPage from '@/pages/billing/show-settings'
 
@@ -153,9 +154,9 @@ export default new Router({
       }
     },
     {
-      path: '/skus',
-      name: 'ListSku',
-      component: ListSkuPage,
+      path: '/stockables',
+      name: 'ListStockable',
+      component: ListStockablePage,
       props (route) {
         let page = extractPagination(route)
         return {
@@ -165,22 +166,22 @@ export default new Router({
       }
     },
     {
-      path: '/skus/new',
-      name: 'NewSku',
-      component: NewSkuPage
+      path: '/stockables/new',
+      name: 'NewStockable',
+      component: NewStockablePage
     },
     {
-      path: '/skus/:id',
-      name: 'ShowSku',
-      component: ShowSkuPage,
+      path: '/stockables/:id',
+      name: 'ShowStockable',
+      component: ShowStockablePage,
       props (route) {
         return { id: route.params.id }
       }
     },
     {
-      path: '/skus/:id/edit',
-      name: 'EditSku',
-      component: EditSkuPage,
+      path: '/stockables/:id/edit',
+      name: 'EditStockable',
+      component: EditStockablePage,
       props (route) {
         return { id: route.params.id }
       }
@@ -205,7 +206,7 @@ export default new Router({
         let queryString = route.fullPath.split('?')[1]
         let query = qs.parse(queryString)
 
-        return { skuId: query.skuId, productId: query.productId, callbackPath: query.callbackPath }
+        return { stockableId: query.stockableId, productId: query.productId, callbackPath: query.callbackPath }
       }
     },
     {
@@ -384,6 +385,17 @@ export default new Router({
       component: ShowPointDepositPage,
       props (route) {
         return { id: route.params.id }
+      }
+    },
+    {
+      path: '/point_deposits/:id/edit',
+      name: 'EditPointDeposit',
+      component: EditPointDepositPage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { id: route.params.id, callbackPath: query.callbackPath }
       }
     },
     {

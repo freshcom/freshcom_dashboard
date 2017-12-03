@@ -1,9 +1,9 @@
 import _ from 'lodash'
 
-import SkuAPI from '@/api/sku'
+import StockableAPI from '@/api/stockable'
 import JSONAPI from '@/jsonapi'
 
-import Sku from '@/models/sku'
+import Stockable from '@/models/stockable'
 
 const MT = {
   SET_RECORD: 'SET_RECORD',
@@ -15,8 +15,8 @@ const MT = {
 export default {
   namespaced: true,
   state: {
-    record: Sku.objectWithDefaults(),
-    recordDraft: Sku.objectWithDefaults(),
+    record: Stockable.objectWithDefaults(),
+    recordDraft: Stockable.objectWithDefaults(),
     records: []
   },
   actions: {
@@ -40,7 +40,7 @@ export default {
       }
 
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
-      return SkuAPI.getRecord(actionPayload.id, options).then(response => {
+      return StockableAPI.getRecord(actionPayload.id, options).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
         commit(MT.SET_RECORD, record)
@@ -53,7 +53,7 @@ export default {
 
     createRecord (context, recordDraft) {
       let apiPayload = { data: JSONAPI.serialize(recordDraft) }
-      return SkuAPI.createRecord(apiPayload).then(response => {
+      return StockableAPI.createRecord(apiPayload).then(response => {
         return JSONAPI.deserialize(response.data.data)
       }).then(record => {
         context.commit(MT.SET_RECORD, record)
@@ -68,7 +68,7 @@ export default {
       let apiPayload = { data: JSONAPI.serialize(actionPayload.recordDraft) }
 
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
-      return SkuAPI.updateRecord(actionPayload.id, apiPayload, options).then(response => {
+      return StockableAPI.updateRecord(actionPayload.id, apiPayload, options).then(response => {
         let apiPayload = response.data
         let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
         commit(MT.SET_RECORD, record)
@@ -82,7 +82,7 @@ export default {
     loadRecords ({ state, commit, rootState }, actionPayload) {
       actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
 
-      return SkuAPI.queryRecord(actionPayload).then(response => {
+      return StockableAPI.queryRecord(actionPayload).then(response => {
         return { meta: response.data.meta, resources: JSONAPI.deserialize(response.data.data) }
       }).then(response => {
         commit(MT.SET_RECORDS, response.resources)
@@ -92,7 +92,7 @@ export default {
     },
 
     deleteRecord ({ commit }, id) {
-      return SkuAPI.deleteRecord(id).then(response => {
+      return StockableAPI.deleteRecord(id).then(response => {
         commit(MT.RESET_RECORD)
 
         return response
@@ -102,8 +102,8 @@ export default {
 
   mutations: {
     [MT.RESET_RECORD] (state) {
-      state.record = Sku.objectWithDefaults()
-      state.recordDraft = Sku.objectWithDefaults()
+      state.record = Stockable.objectWithDefaults()
+      state.recordDraft = Stockable.objectWithDefaults()
     },
 
     [MT.SET_RECORD] (state, record) {

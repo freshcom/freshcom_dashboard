@@ -35,21 +35,21 @@ export default {
       })
     },
 
-    updateRecord ({ state, commit, rootState }, actionPayload) {
-      let apiPayload = { data: JSONAPI.serialize(actionPayload.recordDraft) }
+    updatePointDeposit ({ state, commit, rootState }, actionPayload) {
+      let apiPayload = { data: JSONAPI.serialize(actionPayload.pointDepositDraft) }
 
       let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
       return PointDepositAPI.updateRecord(actionPayload.id, apiPayload, options).then(response => {
         let apiPayload = response.data
-        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+        let pointDeposit = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
 
-        return record
+        return pointDeposit
       }).catch(error => {
         throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
     },
 
-    deleteRecord ({ commit }, id) {
+    deletePointDeposit ({ commit }, id) {
       return PointDepositAPI.deleteRecord(id).then(response => {
         return response
       })

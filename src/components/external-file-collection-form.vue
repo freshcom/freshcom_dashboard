@@ -1,7 +1,7 @@
 <template>
 <el-form :model="formModel" @input.native="updateValue" label-width="150px" size="small" class="efc-form">
 
-  <el-form-item v-if="formModel.owner.type === 'Sku'" label="SKU ID" :error="errorMessages.owner">
+  <el-form-item v-if="formModel.owner.type === 'Stockable'" label="Stockable ID" :error="errorMessages.owner">
     {{formModel.owner.id}}
   </el-form-item>
 

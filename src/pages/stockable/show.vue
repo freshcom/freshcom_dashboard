@@ -2,8 +2,8 @@
 <div class="page-wrapper">
 
   <div>
-    <el-menu :router="true" default-active="/skus" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListSku' }" index="/skus">SKUs</el-menu-item>
+    <el-menu :router="true" default-active="/stockables" mode="horizontal" class="secondary-nav">
+      <el-menu-item :route="{ name: 'ListStockable' }" index="/stockables">Stockables</el-menu-item>
     </el-menu>
     <locale-selector @change="loadRecord" class="pull-right"></locale-selector>
   </div>
@@ -85,7 +85,7 @@
           <h3>File Collections</h3>
 
           <span class="block-title-actions pull-right">
-            <router-link :to="{ name: 'NewExternalFileCollection', query: { skuId: record.id, callbackPath: currentRoutePath } }">
+            <router-link :to="{ name: 'NewExternalFileCollection', query: { stockableId: record.id, callbackPath: currentRoutePath } }">
               <icon name="plus" scale="0.8" class="v-middle"></icon>
               <span>Add</span>
             </router-link>
@@ -179,11 +179,11 @@ import ShowPage from '@/mixins/show-page'
 import DeleteButton from '@/components/delete-button'
 
 export default {
-  name: 'ShowSku',
+  name: 'ShowStockable',
   components: {
     DeleteButton
   },
-  mixins: [ShowPage({ storeNamespace: 'sku', name: 'SKU', include: 'avatar,externalFileCollections' })],
+  mixins: [ShowPage({ storeNamespace: 'stockable', name: 'Stockable', include: 'avatar,externalFileCollections' })],
   computed: {
     avatarUrl () {
       if (this.record.avatar) {
@@ -198,10 +198,10 @@ export default {
   },
   methods: {
     editRecord () {
-      this.$store.dispatch('pushRoute', { name: 'EditSku', params: { id: this.record.id } })
+      this.$store.dispatch('pushRoute', { name: 'EditStockable', params: { id: this.record.id } })
     },
     recordDeleted () {
-      this.$store.dispatch('pushRoute', { name: 'ListSku' })
+      this.$store.dispatch('pushRoute', { name: 'ListStockable' })
     }
   }
 }

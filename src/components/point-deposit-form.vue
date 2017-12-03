@@ -8,26 +8,26 @@
     <el-progress v-if="pendingAvatar" :show-text="false" :percentage="pendingAvatar.percentage"></el-progress>
   </div>
 
-  <el-form-item label="Code" :error="errorMessages.code">
+  <el-form-item label="Code" :error="errorMsg.code">
     <el-input v-model="formModel.code"></el-input>
   </el-form-item>
 
-  <el-form-item label="Status" :error="errorMessages.status" required>
+  <el-form-item label="Status" :error="errorMsg.status" required>
     <el-select @change="updateValue" v-model="formModel.status">
       <el-option label="Active" value="active"></el-option>
       <el-option label="Disabled" value="disabled"></el-option>
     </el-select>
   </el-form-item>
 
-  <el-form-item label="Amount" :error="errorMessages.amount" required>
+  <el-form-item label="Amount" :error="errorMsg.amount" required>
     <el-input-number v-model="formModel.amount" :controls="false" :step="1" :min="1"></el-input-number>
   </el-form-item>
 
-  <el-form-item label="Name" :error="errorMessages.name" required>
+  <el-form-item label="Name" :error="errorMsg.name" required>
     <el-input v-model="formModel.name"></el-input>
   </el-form-item>
 
-  <el-form-item label="Print Name" :error="errorMessages.printName" required>
+  <el-form-item label="Print Name" :error="errorMsg.printName" required>
     <el-input v-model="formModel.printName"></el-input>
   </el-form-item>
 
@@ -56,11 +56,8 @@ export default {
     }
   },
   computed: {
-    errorMessages () {
-      return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(errorI18nKey('PointDeposit', k, v[0]), { name: _.startCase(k) })
-        return result
-      }, {})
+    errorMsg () {
+      return errorI18nKey(this.errors, 'pointDeposit')
     },
     avatarUrl () {
       if (!this.formModel.avatar) {

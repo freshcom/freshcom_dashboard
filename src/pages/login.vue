@@ -48,8 +48,8 @@ export default {
   },
   methods: {
     attemptLogin (form) {
-      this.$store.dispatch('session/createToken', form).then(data => {
-        let user = data[0]
+      this.$store.dispatch('session/login', form).then(data => {
+        let user = data[1]
 
         this.$message({
           showClose: true,

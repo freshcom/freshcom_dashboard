@@ -44,6 +44,7 @@
 </template>
 
 <script>
+import freshcom from '@/freshcom-sdk'
 import PointDeposit from '@/models/point-deposit'
 import PointDepositForm from '@/components/point-deposit-form'
 
@@ -63,7 +64,7 @@ export default {
     submit () {
       this.isCreatingPointDeposit = true
 
-      this.$store.dispatch('pointDeposit/createPointDeposit', this.pointDepositDraft).then(pointDeposit => {
+      freshcom.createPointDeposit(this.pointDepositDraft).then(response => {
         this.$message({
           showClose: true,
           message: `Point deposit created successfully.`,
@@ -76,6 +77,20 @@ export default {
         this.errors = errors
         this.isCreatingPointDeposit = false
       })
+
+      // this.$store.dispatch('pointDeposit/createPointDeposit', this.pointDepositDraft).then(pointDeposit => {
+      //   this.$message({
+      //     showClose: true,
+      //     message: `Point deposit created successfully.`,
+      //     type: 'success'
+      //   })
+
+      //   this.isCreatingPointDeposit = false
+      //   this.back()
+      // }).catch(errors => {
+      //   this.errors = errors
+      //   this.isCreatingPointDeposit = false
+      // })
     },
     back () {
       this.$store.dispatch('pushRoute', { name: 'ListPointDeposit' })

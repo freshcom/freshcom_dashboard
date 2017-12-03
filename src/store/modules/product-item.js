@@ -1,7 +1,7 @@
 import _ from 'lodash'
 
 import ProductItemAPI from '@/api/product-item'
-import SkuAPI from '@/api/sku'
+import StockableAPI from '@/api/stockable'
 import UnlockableAPI from '@/api/unlockable'
 import JSONAPI from '@/jsonapi'
 
@@ -13,9 +13,9 @@ const MT = {
   RECORD_RESET: 'RECORD_RESET',
   RECORDS_CHANGED: 'RECORDS_CHANGED',
   RECORDS_LOADING: 'RECORDS_LOADING',
-  SELECTABLE_SKUS_CHANGED: 'SELECTABLE_SKUS_CHANGED',
-  SELECTABLE_SKUS_LOADING: 'SELECTABLE_SKUS_LOADING',
-  SELECTABLE_SKUS_RESET: 'SELECTABLE_SKUS_RESET',
+  SELECTABLE_StockableS_CHANGED: 'SELECTABLE_StockableS_CHANGED',
+  SELECTABLE_StockableS_LOADING: 'SELECTABLE_StockableS_LOADING',
+  SELECTABLE_StockableS_RESET: 'SELECTABLE_StockableS_RESET',
   SELECTABLE_UNLOCKABLES_CHANGED: 'SELECTABLE_UNLOCKABLES_CHANGED',
   SELECTABLE_UNLOCKABLES_LOADING: 'SELECTABLE_UNLOCKABLES_LOADING',
   SELECTABLE_UNLOCKABLES_RESET: 'SELECTABLE_UNLOCKABLES_RESET'
@@ -28,8 +28,8 @@ export default {
     recordDraft: ProductItem.objectWithDefaults(),
     records: [],
     isLoadingRecords: true,
-    selectableSkus: [],
-    isLoadingSelectableSkus: true,
+    selectableStockables: [],
+    isLoadingSelectableStockables: true,
     selectableUnlockables: [],
     isLoadingSelectableUnlockables: true
   },
@@ -46,21 +46,21 @@ export default {
       commit(MT.RECORD_RESET)
     },
 
-    loadSelectableSkus ({ state, commit, rootState }, actionPayload) {
-      commit(MT.SELECTABLE_SKUS_LOADING)
+    loadSelectableStockables ({ state, commit, rootState }, actionPayload) {
+      commit(MT.SELECTABLE_StockableS_LOADING)
       actionPayload = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
 
-      return SkuAPI.queryRecord(actionPayload).then(response => {
+      return StockableAPI.queryRecord(actionPayload).then(response => {
         return { meta: response.data.meta, resources: JSONAPI.deserialize(response.data.data) }
       }).then(response => {
-        commit(MT.SELECTABLE_SKUS_CHANGED, response.resources)
+        commit(MT.SELECTABLE_StockableS_CHANGED, response.resources)
 
         return response
       })
     },
 
-    resetSelectableSkus ({ commit }) {
-      commit(MT.SELECTABLE_SKUS_RESET)
+    resetSelectableStockables ({ commit }) {
+      commit(MT.SELECTABLE_StockableS_RESET)
     },
 
     loadSelectableUnlockables ({ state, commit, rootState }, actionPayload) {
@@ -178,18 +178,18 @@ export default {
       state.isLoadingRecords = true
     },
 
-    [MT.SELECTABLE_SKUS_CHANGED] (state, skus) {
-      state.selectableSkus = skus
-      state.isLoadingSelectableSkus = false
+    [MT.SELECTABLE_StockableS_CHANGED] (state, stockables) {
+      state.selectableStockables = stockables
+      state.isLoadingSelectableStockables = false
     },
 
-    [MT.SELECTABLE_SKUS_LOADING] (state) {
-      state.isLoadingSelectableSkus = true
+    [MT.SELECTABLE_StockableS_LOADING] (state) {
+      state.isLoadingSelectableStockables = true
     },
 
-    [MT.SELECTABLE_SKUS_RESET] (state) {
-      state.isLoadingSelectableSkus = true
-      state.selectableSkus = []
+    [MT.SELECTABLE_StockableS_RESET] (state) {
+      state.isLoadingSelectableStockables = true
+      state.selectableStockables = []
     },
 
     [MT.SELECTABLE_UNLOCKABLES_CHANGED] (state, unlockables) {

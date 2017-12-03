@@ -145,9 +145,9 @@
                 </router-link>
               </dd>
 
-              <dt v-if="record.sku">SKU</dt>
-              <dd v-if="record.sku">
-                <a href="#">{{record.sku.id}}</a>
+              <dt v-if="record.stockable">Stockable</dt>
+              <dd v-if="record.stockable">
+                <a href="#">{{record.stockable.id}}</a>
               </dd>
 
               <dt v-if="record.unlockable">Unlockable</dt>

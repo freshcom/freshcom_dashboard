@@ -132,9 +132,9 @@ export default {
         return result
       }, {})
     },
-    skuErrorMessage () {
+    stockableErrorMessage () {
       if (this.errorMessages['relationships']) {
-        return 'SKU is invalid'
+        return 'Stockable is invalid'
       }
     }
   },

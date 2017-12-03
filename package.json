@@ -16,6 +16,8 @@
     "element-ui": "^2.0.5",
     "lodash": "^4.17.4",
     "qs": "^6.5.1",
+    "simple-jas": "^0.4.0",
+    "v-money": "0.8.1",
     "vue": "^2.5.8",
     "vue-awesome": "^2.3.2",
     "vue-i18n": "^7.3.2",
@@ -23,8 +25,7 @@
     "vue-router": "^3.0.1",
     "vue-stripe-elements-plus": "^0.2.6",
     "vuex": "^3.0.0",
-    "vuex-router-sync": "^5.0.0",
-    "v-money": "0.8.1"
+    "vuex-router-sync": "^5.0.0"
   },
   "devDependencies": {
     "@kazupon/vue-i18n-loader": "^0.2.1",

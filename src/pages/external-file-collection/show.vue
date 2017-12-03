@@ -98,10 +98,10 @@
                 </router-link>
               </dd>
 
-              <dt v-if="record.sku">SKU</dt>
-              <dd v-if="record.sku">
-                <router-link :to="{ name: 'ShowSku', params: { id: record.sku.id }}">
-                  {{record.sku.id}}
+              <dt v-if="record.stockable">Stockable</dt>
+              <dd v-if="record.stockable">
+                <router-link :to="{ name: 'ShowStockable', params: { id: record.stockable.id }}">
+                  {{record.stockable.id}}
                 </router-link>
               </dd>
 
@@ -161,8 +161,8 @@ export default {
       this.$store.dispatch('pushRoute', { name: 'EditExternalFileCollection', params: { id: this.record.id } })
     },
     recordDeleted (record) {
-      if (record.sku) {
-        this.$store.dispatch('sku/resetRecord')
+      if (record.stockable) {
+        this.$store.dispatch('stockable/resetRecord')
       }
       this.$store.dispatch('popRoute', 1)
     }

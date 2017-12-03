@@ -6,20 +6,20 @@
 
   <el-form-item v-if="!record.id" label="Source Type" required>
     <el-select v-model="sourceType" @change="clearSource()">
-      <el-option label="SKU" value="sku"></el-option>
+      <el-option label="Stockable" value="stockable"></el-option>
       <el-option label="Unlockable" value="unlockable"></el-option>
     </el-select>
   </el-form-item>
 
-  <el-form-item v-if="sourceType == 'sku' && !record.id" :error="skuErrorMessage" label="SKU" required>
+  <el-form-item v-if="sourceType == 'stockable' && !record.id" :error="stockableErrorMessage" label="Stockable" required>
     <remote-select
-      v-model="formModel.sku"
-      @filter="loadSelectableSkus"
-      @reset="resetSelectableSkus"
+      v-model="formModel.stockable"
+      @filter="loadSelectableStockables"
+      @reset="resetSelectableStockables"
       @input="updateValue"
-      :records="selectableSkus"
-      :isLoading="isLoadingSelectableSkus"
-      placeholder="Select SKU"
+      :records="selectableStockables"
+      :isLoading="isLoadingSelectableStockables"
+      placeholder="Select Stockable"
       class="source-select"
     >
     </remote-select>
@@ -39,8 +39,8 @@
     </remote-select>
   </el-form-item>
 
-  <el-form-item v-if="record.sku" label="SKU">
-    {{formModel.sku.id}}
+  <el-form-item v-if="record.stockable" label="Stockable">
+    {{formModel.stockable.id}}
   </el-form-item>
 
   <hr>
@@ -112,15 +112,15 @@ export default {
   data () {
     return {
       formModel: _.cloneDeep(this.value),
-      sourceType: 'sku'
+      sourceType: 'stockable'
     }
   },
   computed: {
-    isLoadingSelectableSkus () {
-      return this.$store.state.productItem.isLoadingSelectableSkus
+    isLoadingSelectableStockables () {
+      return this.$store.state.productItem.isLoadingSelectableStockables
     },
-    selectableSkus () {
-      return this.$store.state.productItem.selectableSkus
+    selectableStockables () {
+      return this.$store.state.productItem.selectableStockables
     },
     isLoadingSelectableUnlockables () {
       return this.$store.state.productItem.isLoadingSelectableUnlockables
@@ -134,9 +134,9 @@ export default {
         return result
       }, {})
     },
-    skuErrorMessage () {
+    stockableErrorMessage () {
       if (this.errorMessages['relationships']) {
-        return 'SKU is invalid'
+        return 'Stockable is invalid'
       }
     },
     unlockableErrorMessage () {
@@ -154,11 +154,11 @@ export default {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
-    loadSelectableSkus: _.debounce(function (searchKeyword) {
-      this.$store.dispatch('productItem/loadSelectableSkus', { search: searchKeyword })
+    loadSelectableStockables: _.debounce(function (searchKeyword) {
+      this.$store.dispatch('productItem/loadSelectableStockables', { search: searchKeyword })
     }, 300),
-    resetSelectableSkus () {
-      this.$store.dispatch('productItem/resetSelectableSkus')
+    resetSelectableStockables () {
+      this.$store.dispatch('productItem/resetSelectableStockables')
     },
     loadSelectableUnlockables: _.debounce(function (searchKeyword) {
       this.$store.dispatch('productItem/loadSelectableUnlockables', { search: searchKeyword })
@@ -168,7 +168,7 @@ export default {
     },
     clearSource () {
       let formModel = _.cloneDeep(this.formModel)
-      delete formModel.sku
+      delete formModel.stockable
       delete formModel.unlockable
       this.formModel = formModel
       this.updateValue()

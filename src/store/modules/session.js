@@ -1,8 +1,7 @@
 import _ from 'lodash'
-import TokenAPI from '@/api/token'
-import UserAPI from '@/api/user'
 import AccountAPI from '@/api/account'
 import JSONAPI from '@/jsonapi'
+import freshcom from '@/freshcom-sdk'
 
 const MT = {
   TOKEN_CHANGED: 'TOKEN_CHANGED',
@@ -20,7 +19,7 @@ export default {
     account: undefined
   },
   actions: {
-    loadToken ({ commit, dispatch }) {
+    getToken ({ commit, dispatch }) {
       let rawRecord = localStorage.getItem('state.session.token')
       if (!rawRecord) {
         commit(MT.READY, true)
@@ -30,8 +29,8 @@ export default {
       let token = JSON.parse(rawRecord)
       let payload = { refresh_token: token.refresh_token, grant_type: 'refresh_token' }
 
-      return TokenAPI.createRecord(payload).then(response => {
-        let token = response.data
+      return freshcom.createToken(payload).then(token => {
+        console.log(token)
         localStorage.setItem('state.session.token', JSON.stringify(token))
         commit(MT.TOKEN_CHANGED, token)
 
@@ -40,61 +39,54 @@ export default {
         localStorage.removeItem('state.session.token')
         throw error.response.data
       }).then(() => {
-        return Promise.all([dispatch('loadUser'), dispatch('loadAccount')])
+        return Promise.all([dispatch('getAccount'), dispatch('getUser')])
       }).then((resolved) => {
         commit(MT.READY, true)
         return resolved
       })
     },
 
-    createToken ({ commit, dispatch }, form) {
-      let payload = { username: form.username, password: form.password, grant_type: 'password' }
+    login ({ state, commit, dispatch }, form) {
+      let payload = {
+        username: form.username,
+        password: form.password,
+        grant_type: 'password'
+      }
 
-      return TokenAPI.createRecord(payload).then(response => {
-        let token = response.data
-        if (form.rememberMe) {
-          localStorage.setItem('state.session.token', JSON.stringify(token))
-        }
+      return freshcom.createToken(payload).then(token => {
+        localStorage.setItem('state.session.token', JSON.stringify(token))
         commit(MT.TOKEN_CHANGED, token)
 
-        return token
-      }).catch(error => {
-        throw error.response.data
-      }).then(() => {
-        return Promise.all([dispatch('loadUser'), dispatch('loadAccount')])
-      }).then((resolved) => {
+        return Promise.all([dispatch('getAccount'), dispatch('getUser')])
+      }).then(resolved => {
+        commit(MT.ACCOUNT_CHANGED, resolved[0])
+        commit(MT.USER_CHANGED, resolved[1])
         commit(MT.READY, true)
+
         return resolved
       })
     },
 
-    loadUser ({ state, commit }) {
+    getUser ({ state, commit }) {
       if (!state.token) { return }
 
-      return UserAPI.getRecord().then(response => {
-        let apiPayload = response.data
-        let user = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+      return freshcom.retrieveUser().then(response => {
+        let user = response.data
         commit(MT.USER_CHANGED, user)
 
         return user
-      }).catch(error => {
-        throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
     },
 
-    loadAccount ({ state, commit }) {
-      if (!state.token) { return }
-
-      return AccountAPI.getRecord().then(response => {
-        let apiPayload = response.data
-        let account = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
+    getAccount ({ state, commit }) {
+      return freshcom.retrieveAccount().then(response => {
+        let account = response.data
         commit(MT.ACCOUNT_CHANGED, account)
 
         return account
-      }).catch(error => {
-        throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
     },
+
     updateAccount ({ state, commit, rootState }, actionPayload) {
       let apiPayload = { data: JSONAPI.serialize(actionPayload.recordDraft) }
 
@@ -114,6 +106,7 @@ export default {
   mutations: {
     [MT.TOKEN_CHANGED] (state, token) {
       state.token = token
+      freshcom.setAccessToken(token.access_token)
     },
     [MT.USER_CHANGED] (state, user) {
       state.user = user

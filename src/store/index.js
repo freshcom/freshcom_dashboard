@@ -7,7 +7,7 @@ import createLogger from 'vuex/dist/logger'
 import { DEFAULT_LOCALE } from '@/env'
 
 import SessionStore from '@/store/modules/session'
-import SkuStore from '@/store/modules/sku'
+import StockableStore from '@/store/modules/stockable'
 import { Store as ExternalFileStore, Plugin as ExternalFilePlugin } from '@/store/modules/external-file'
 import ExternalFileCollectionStore from '@/store/modules/external-file-collection'
 import ProductStore from '@/store/modules/product'
@@ -36,7 +36,7 @@ export default new Vuex.Store({
     session: SessionStore,
     externalFileCollection: ExternalFileCollectionStore,
     externalFile: ExternalFileStore,
-    sku: SkuStore,
+    stockable: StockableStore,
     product: ProductStore,
     productItem: ProductItemStore,
     price: PriceStore,
