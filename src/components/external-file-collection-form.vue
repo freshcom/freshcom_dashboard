@@ -1,6 +1,7 @@
 <template>
 <el-form :model="formModel" @input.native="updateValue" label-width="150px" size="small" class="efc-form">
 
+  {{formModel.files}}
   <el-form-item v-if="formModel.owner" label="Owner ID" :error="errorMsgs.owner">
     {{formModel.owner.id}}
   </el-form-item>
@@ -25,12 +26,12 @@
       <div class="block-body">
         <el-upload
           :http-request="uploadExternalFile"
-          :file-list="fileList"
+          :file-list="formModel.files"
           :on-remove="deleteExternalFile"
           action=""
           multiple
           >
-          <el-button size="small">Choose File</el-button>
+          <el-button plain size="small">Choose File</el-button>
         </el-upload>
       </div>
     </div>
@@ -41,7 +42,7 @@
 
 <script>
 import _ from 'lodash'
-
+import freshcom from '@/freshcom-sdk'
 import 'vue-awesome/icons/file'
 import 'vue-awesome/icons/plus'
 
@@ -53,8 +54,16 @@ export default {
   data () {
     return {
       formModel: _.cloneDeep(this.value),
-      pendingAvatarId: ''
+      pendingAvatarId: '',
+      data: null
+      // fileList: [{ name: 'hi', percentage: 0, status: 'uploading' }]
     }
+  },
+  created () {
+    // setTimeout(() => {
+    //   this.fileList[0].percentage = 30
+    //   this.fileList[0].status = 'uploading'
+    // }, 3000)
   },
   computed: {
     errorMsgs () {
@@ -62,7 +71,7 @@ export default {
     },
     fileList () {
       return _.reduce(this.formModel.files, (result, item) => {
-        return result.concat({ id: item.id, name: item.name, url: item.url, percentage: 20, status: 'uploading' })
+        return result.concat({ id: item.id, name: item.name, url: item.url, percentage: item.percentage, status: 'uploading' })
       }, [])
     },
     pendingExternalFiles () {
@@ -95,13 +104,36 @@ export default {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
+
     uploadExternalFile (e) {
       let file = e.file
       let externalFile = { type: 'ExternalFile', name: file.name, sizeBytes: file.size, contentType: file.type, file: file }
-      this.$store.dispatch('externalFile/pushPendingRecords', [externalFile]).then(files => {
-        this.pendingAvatarId = files[0].id
+
+      freshcom.uploadExternalFile(externalFile, {}, {
+        created: (response) => {
+          let externalFile = response.data
+          this.formModel.files.push(externalFile)
+
+          this.updateValue()
+        },
+        progress: _.throttle((percentage, ef) => {
+          let targetEf = _.find(this.formModel.files, { id: ef.id })
+          targetEf.percentage = percentage
+          targetEf.status = 'uploading'
+        }, 300)
+      }).then(response => {
+        let targetEf = _.find(this.formModel.files, { id: response.data.id })
+        targetEf.status = 'success'
       })
     },
+
+    // uploadExternalFile (e) {
+    //   let file = e.file
+    //   let externalFile = { type: 'ExternalFile', name: file.name, sizeBytes: file.size, contentType: file.type, file: file }
+    //   this.$store.dispatch('externalFile/pushPendingRecords', [externalFile]).then(files => {
+    //     this.pendingAvatarId = files[0].id
+    //   })
+    // },
     deleteExternalFile (targetEf) {
       this.formModel.files = _.reject(this.formModel.files, (ef) => { return ef.id === targetEf.id })
       this.updateValue()

@@ -187,8 +187,6 @@ export default {
     let file = fields.file
     return this.createExternalFile(fields, params, options).then(response => {
       let externalFile = response.data
-      externalFile.percentage = 0
-      externalFile.file = file
 
       if (options.created) {
         options.created(response)
@@ -197,10 +195,9 @@ export default {
       let config = {
         onUploadProgress: function (progressEvent) {
           let percentage = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-          externalFile.percentage = percentage
 
           if (options.progress) {
-            options.progress(externalFile)
+            options.progress(percentage, externalFile)
           }
         },
         headers: { 'Content-Type': externalFile.contentType }
