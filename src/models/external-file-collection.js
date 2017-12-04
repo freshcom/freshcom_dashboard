@@ -7,7 +7,7 @@ export default {
       name: '',
       label: '',
       files: [],
-      owner: {}
+      owner: null
     }
   }
 }

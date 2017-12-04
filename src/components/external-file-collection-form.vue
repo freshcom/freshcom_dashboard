@@ -1,19 +1,19 @@
 <template>
 <el-form :model="formModel" @input.native="updateValue" label-width="150px" size="small" class="efc-form">
 
-  <el-form-item v-if="formModel.owner.type === 'Stockable'" label="Stockable ID" :error="errorMessages.owner">
+  <el-form-item v-if="formModel.owner" label="Owner ID" :error="errorMsgs.owner">
     {{formModel.owner.id}}
   </el-form-item>
 
-  <el-form-item v-if="formModel.owner.type === 'Product'" label="Product ID" :error="errorMessages.owner">
-    {{formModel.owner.id}}
+  <el-form-item v-if="formModel.owner" label="Owner type" :error="errorMsgs.owner">
+    {{formModel.owner.type}}
   </el-form-item>
 
-  <el-form-item label="Name" :error="errorMessages.name">
+  <el-form-item label="Name" :error="errorMsgs.name">
     <el-input v-model="formModel.name"></el-input>
   </el-form-item>
 
-  <el-form-item label="Label" :error="errorMessages.label" required>
+  <el-form-item label="Label" :error="errorMsgs.label" required>
     <el-input v-model="formModel.label"></el-input>
   </el-form-item>
 
@@ -45,7 +45,7 @@ import _ from 'lodash'
 import 'vue-awesome/icons/file'
 import 'vue-awesome/icons/plus'
 
-import errorI18nKey from '@/utils/error-i18n-key'
+import translateErrors from '@/helpers/translate-errors'
 
 export default {
   name: 'ExternalFileCollectionForm',
@@ -57,11 +57,8 @@ export default {
     }
   },
   computed: {
-    errorMessages () {
-      return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(errorI18nKey('ExternalFileCollection', k, v[0]), { name: _.startCase(k) })
-        return result
-      }, {})
+    errorMsgs () {
+      return translateErrors(this.errors, 'externalFileCollection')
     },
     fileList () {
       return _.reduce(this.formModel.files, (result, item) => {

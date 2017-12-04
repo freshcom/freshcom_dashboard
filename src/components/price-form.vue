@@ -6,11 +6,11 @@
 
   <hr>
 
-  <el-form-item label="Code" :error="errorMessages.code">
+  <el-form-item label="Code" :error="errorMsgs.code">
     <el-input v-model="formModel.code"></el-input>
   </el-form-item>
 
-  <el-form-item label="Status" :error="errorMessages.status" required>
+  <el-form-item label="Status" :error="errorMsgs.status" required>
     <el-select @change="updateValue" v-model="formModel.status">
       <el-option label="Draft" value="draft"></el-option>
       <el-option label="Active" value="active"></el-option>
@@ -19,11 +19,11 @@
     </el-select>
   </el-form-item>
 
-  <el-form-item label="Name" :error="errorMessages.name">
+  <el-form-item label="Name" :error="errorMsgs.name">
     <el-input v-model="formModel.name"></el-input>
   </el-form-item>
 
-  <el-form-item label="Label" :error="errorMessages.label" required>
+  <el-form-item label="Label" :error="errorMsgs.label" required>
     <el-input v-model="formModel.label"></el-input>
   </el-form-item>
 
@@ -34,11 +34,11 @@
     <el-input v-model="formModel.chargeUnit" class="unit-input" placeholder="Unit"></el-input>
   </el-form-item>
 
-  <el-form-item v-if="!isRootPrice(formModel)" label="Unit" :error="errorMessages.chargeUnit" required>
+  <el-form-item v-if="!isRootPrice(formModel)" label="Unit" :error="errorMsgs.chargeUnit" required>
     <el-input v-model="formModel.chargeUnit" class="unit-input" placeholder="Unit"></el-input>
   </el-form-item>
 
-  <el-form-item v-if="isRootPrice(formModel)" label="Estimate By Default" :error="errorMessages.estimateByDefault" required>
+  <el-form-item v-if="isRootPrice(formModel)" label="Estimate By Default" :error="errorMsgs.estimateByDefault" required>
     <el-switch
       @change="updateValue"
       v-model="formModel.estimateByDefault"
@@ -47,16 +47,16 @@
     </el-switch>
   </el-form-item>
 
-  <el-form-item v-if="formModel.estimateByDefault" label="Order Unit" :error="errorMessages.orderUnit" required>
+  <el-form-item v-if="formModel.estimateByDefault" label="Order Unit" :error="errorMsgs.orderUnit" required>
     <el-input v-model="formModel.orderUnit" class="unit-input"></el-input>
   </el-form-item>
 
-  <el-form-item v-if="formModel.estimateByDefault" :error="errorMessages.estimateAveragePercentage" label="Estimate Average" required>
+  <el-form-item v-if="formModel.estimateByDefault" :error="errorMsgs.estimateAveragePercentage" label="Estimate Average" required>
     <percentage-input v-model="formModel.estimateAveragePercentage">
     </percentage-input>
   </el-form-item>
 
-  <el-form-item v-if="formModel.estimateByDefault" :error="errorMessages.estimateMaximumPercentage" label="Estimate Maximum" required>
+  <el-form-item v-if="formModel.estimateByDefault" :error="errorMsgs.estimateMaximumPercentage" label="Estimate Maximum" required>
     <percentage-input v-model="formModel.estimateMaximumPercentage">
     </percentage-input>
   </el-form-item>
@@ -106,7 +106,7 @@
 import _ from 'lodash'
 import MoneyInput from '@/components/money-input'
 import PercentageInput from '@/components/percentage-input'
-import errorI18nKey from '@/utils/error-i18n-key'
+import translateErrors from '@/helpers/translate-errors'
 import ProductItemSelect from '@/components/product-item-select'
 import ProductItemAPI from '@/api/product-item'
 import JSONAPI from '@/jsonapi'
@@ -136,19 +136,16 @@ export default {
     session () {
       return this.$store.state.session.record
     },
-    errorMessages () {
-      return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(errorI18nKey('Price', k, v[0]), { name: _.startCase(k) })
-        return result
-      }, {})
+    errorMsgs () {
+      return translateErrors(this.errors, 'price')
     },
     chargeAmountError () {
-      if (this.errorMessages.chargeCents) {
-        return this.errorMessages.chargeCents
+      if (this.errorMsgs.chargeCents) {
+        return this.errorMsgs.chargeCents
       }
 
-      if (this.errorMessages.chargeUnit) {
-        return this.errorMessages.chargeUnit
+      if (this.errorMsgs.chargeUnit) {
+        return this.errorMsgs.chargeUnit
       }
     },
     subTotalCents () {

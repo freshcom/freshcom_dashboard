@@ -42,9 +42,9 @@
             <icon name="unlock-alt" scale="0.8"></icon>
             <span>Unlockables</span>
           </el-menu-item>
-          <el-menu-item :route="{ name: 'ListPointDeposit' }" index="/point_deposits">
+          <el-menu-item :route="{ name: 'ListDepositable' }" index="/depositables">
             <icon name="diamond" scale="0.8"></icon>
-            <span>Point Deposit</span>
+            <span>Depositables</span>
           </el-menu-item>
 <!--           <el-menu-item index="stockTransfers">
             <icon name="exchange" scale="0.8"></icon>
@@ -171,7 +171,7 @@ export default {
       if (routePath.startsWith('/product_collections')) { return '/products' }
       if (routePath.startsWith('/orders') || routePath.startsWith('/payments')) { return '/orders' }
       if (routePath.startsWith('/customers') || routePath.startsWith('/customers')) { return '/customers' }
-      if (routePath.startsWith('/point_deposits') || routePath.startsWith('/point_deposits')) { return '/point_deposits' }
+      if (routePath.startsWith('/depositables') || routePath.startsWith('/depositables')) { return '/depositables' }
 
       return routePath
     },

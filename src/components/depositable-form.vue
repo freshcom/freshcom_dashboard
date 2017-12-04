@@ -5,29 +5,29 @@
       <img v-if="avatarUrl" :src="avatarUrl" class="file">
       <i v-else class="el-icon-plus file-uploader-icon"></i>
     </el-upload>
-    <el-progress v-if="pendingAvatar" :show-text="false" :percentage="pendingAvatar.percentage"></el-progress>
+    <el-progress v-if="isUploadingAvatar" :show-text="false" :percentage="formModel.avatar.percentage"></el-progress>
   </div>
 
-  <el-form-item label="Code" :error="errorMsg.code">
+  <el-form-item label="Code" :error="errorMsgs.code">
     <el-input v-model="formModel.code"></el-input>
   </el-form-item>
 
-  <el-form-item label="Status" :error="errorMsg.status" required>
+  <el-form-item label="Status" :error="errorMsgs.status" required>
     <el-select @change="updateValue" v-model="formModel.status">
       <el-option label="Active" value="active"></el-option>
       <el-option label="Disabled" value="disabled"></el-option>
     </el-select>
   </el-form-item>
 
-  <el-form-item label="Amount" :error="errorMsg.amount" required>
+  <el-form-item label="Amount" :error="errorMsgs.amount" required>
     <el-input-number v-model="formModel.amount" :controls="false" :step="1" :min="1"></el-input-number>
   </el-form-item>
 
-  <el-form-item label="Name" :error="errorMsg.name" required>
+  <el-form-item label="Name" :error="errorMsgs.name" required>
     <el-input v-model="formModel.name"></el-input>
   </el-form-item>
 
-  <el-form-item label="Print Name" :error="errorMsg.printName" required>
+  <el-form-item label="Print Name" :error="errorMsgs.printName" required>
     <el-input v-model="formModel.printName"></el-input>
   </el-form-item>
 
@@ -43,22 +43,24 @@
 
 <script>
 import _ from 'lodash'
-import errorI18nKey from '@/utils/error-i18n-key'
+import translateErrors from '@/helpers/translate-errors'
+import freshcom from '@/freshcom-sdk'
 
 export default {
-  name: 'PointDepositForm',
+  name: 'DepositableForm',
   props: ['value', 'errors'],
   data () {
     return {
       formModel: _.cloneDeep(this.value),
-      imageUrl: '',
-      pendingAvatarId: ''
+
+      isUploadingAvatar: false
     }
   },
   computed: {
-    errorMsg () {
-      return errorI18nKey(this.errors, 'pointDeposit')
+    errorMsgs () {
+      return translateErrors(this.errors, 'depositable')
     },
+
     avatarUrl () {
       if (!this.formModel.avatar) {
         return
@@ -69,43 +71,33 @@ export default {
       }
 
       return URL.createObjectURL(this.formModel.avatar.file)
-    },
-    pendingAvatar () {
-      return _.find(this.$store.state.externalFile.pendingRecords, (externalFile) => { return externalFile.id === this.pendingAvatarId })
-    },
-    uploadedAvatar () {
-      return _.find(this.$store.state.externalFile.uploadedRecords, (externalFile) => { return externalFile.id === this.pendingAvatarId })
     }
   },
   watch: {
     value (v) {
       this.formModel = _.cloneDeep(v)
-    },
-    uploadedAvatar (externalFile) {
-      if (!externalFile) {
-        return
-      }
-
-      this.$store.dispatch('externalFile/popUploadedRecords', [externalFile])
-      this.formModel = _.merge({}, this.formModel, { avatar: externalFile })
-      this.updateValue()
     }
   },
   methods: {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
-    beforeAvatarUpload () {
-
-    },
-    handleAvatarSuccess () {
-
-    },
     uploadAvatar (e) {
       let file = e.file
       let externalFile = { type: 'ExternalFile', name: file.name, sizeBytes: file.size, contentType: file.type, file: file }
-      this.$store.dispatch('externalFile/pushPendingRecords', [externalFile]).then(externalFiles => {
-        this.pendingAvatarId = externalFiles[0].id
+
+      freshcom.uploadExternalFile(externalFile, {}, {
+        created: (response) => {
+          this.formModel.avatar = response.data
+          this.isUploadingAvatar = true
+        }
+      }).then(response => {
+        let externalFile = response.data
+        this.formModel.avatar = externalFile
+        this.updateValue()
+        this.isUploadingAvatar = false
+      }).catch(() => {
+        this.isUploadingAvatar = false
       })
     }
   }

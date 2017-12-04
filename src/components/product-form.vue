@@ -8,11 +8,11 @@
     <el-progress v-if="pendingAvatar" :show-text="false" :percentage="pendingAvatar.percentage"></el-progress>
   </div>
 
-  <el-form-item label="Code" :error="errorMessages.code">
+  <el-form-item label="Code" :error="errorMsgs.code">
     <el-input v-model="formModel.code"></el-input>
   </el-form-item>
 
-  <el-form-item v-if="formModel.id" label="Status" :error="errorMessages.status" required>
+  <el-form-item v-if="formModel.id" label="Status" :error="errorMsgs.status" required>
     <el-select @change="updateValue" v-model="formModel.status">
       <el-option label="Draft" value="draft"></el-option>
       <el-option label="Active" value="active"></el-option>
@@ -21,7 +21,7 @@
     </el-select>
   </el-form-item>
 
-  <el-form-item :error="errorMessages.kind" label="Kind" required>
+  <el-form-item :error="errorMsgs.kind" label="Kind" required>
     <el-select v-model="formModel.kind" :disabled="!canSelectKind(formModel)" @change="updateValue">
       <el-option label="Simple" value="simple"></el-option>
       <el-option label="With Variants" value="withVariants"></el-option>
@@ -32,7 +32,7 @@
   </el-form-item>
 
   <template v-if="formModel.kind === 'simple' || formModel.kind === 'item' || formModel.kind === 'variant'">
-    <el-form-item :error="errorMessages.source" label="Source" required>
+    <el-form-item :error="errorMsgs.source" label="Source" required>
       <el-row>
         <el-col :span="6">
           <el-select v-model="sourceType" @change="clearSource()">
@@ -76,7 +76,7 @@
       </el-row>
     </el-form-item>
 
-    <el-form-item label="Source Quantity" :error="errorMessages.sourceQuantity" required>
+    <el-form-item label="Source Quantity" :error="errorMsgs.sourceQuantity" required>
       <el-input-number @change="updateValue" v-model="formModel.sourceQuantity" :min="1" :step="1"></el-input-number>
     </el-form-item>
 
@@ -89,19 +89,19 @@
 
   </template>
 
-  <el-form-item v-if="formModel.nameSync == 'disabled'" label="Name" :error="errorMessages.name" required>
+  <el-form-item v-if="formModel.nameSync == 'disabled'" label="Name" :error="errorMsgs.name" required>
     <el-input v-model="formModel.name"></el-input>
   </el-form-item>
 
-  <el-form-item v-if="formModel.kind === 'simple' || formModel.kind === 'combo' || formModel.kind === 'variant'" label="Maximum PO Quantity" :error="errorMessages.maximumPublicOrderQuantity" required>
+  <el-form-item v-if="formModel.kind === 'simple' || formModel.kind === 'combo' || formModel.kind === 'variant'" label="Maximum PO Quantity" :error="errorMsgs.maximumPublicOrderQuantity" required>
     <el-input-number @change="updateValue" v-model="formModel.maximumPublicOrderQuantity" :min="1" :step="1"></el-input-number>
   </el-form-item>
 
-  <el-form-item v-if="formModel.kind === 'item' || formModel.kind === 'variant'" label="Sort Index" :error="errorMessages.sortIndex" required>
+  <el-form-item v-if="formModel.kind === 'item' || formModel.kind === 'variant'" label="Sort Index" :error="errorMsgs.sortIndex" required>
     <el-input-number @change="updateValue" v-model="formModel.sortIndex" :min="0" :step="100"></el-input-number>
   </el-form-item>
 
-  <el-form-item v-if="formModel.itemMode == 'all'" label="Print Name" :error="errorMessages.printName" required>
+  <el-form-item v-if="formModel.itemMode == 'all'" label="Print Name" :error="errorMsgs.printName" required>
     <el-input v-model="formModel.printName"></el-input>
   </el-form-item>
 
@@ -118,7 +118,7 @@
 <script>
 import _ from 'lodash'
 import RemoteSelect from '@/components/remote-select'
-import errorI18nKey from '@/utils/error-i18n-key'
+import translateErrors from '@/helpers/translate-errors'
 
 export default {
   name: 'ProductForm',
@@ -147,11 +147,8 @@ export default {
     selectableUnlockables () {
       return this.$store.state.product.selectableUnlockables
     },
-    errorMessages () {
-      return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(errorI18nKey('Product', k, v[0]), { name: _.startCase(k) })
-        return result
-      }, {})
+    errorMsgs () {
+      return translateErrors(this.errors, 'product')
     },
     avatarUrl () {
       if (!this.formModel.avatar) {

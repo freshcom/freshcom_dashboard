@@ -8,22 +8,22 @@
     <el-progress v-if="pendingAvatar" :show-text="false" :percentage="pendingAvatar.percentage"></el-progress>
   </div>
 
-  <el-form-item label="Code" :error="errorMessages.code">
+  <el-form-item label="Code" :error="errorMsgs.code">
     <el-input v-model="formModel.code"></el-input>
   </el-form-item>
 
-  <el-form-item label="Status" :error="errorMessages.status" required>
+  <el-form-item label="Status" :error="errorMsgs.status" required>
     <el-select @change="updateValue" v-model="formModel.status">
       <el-option label="Active" value="active"></el-option>
       <el-option label="Disabled" value="disabled"></el-option>
     </el-select>
   </el-form-item>
 
-  <el-form-item label="Name" :error="errorMessages.name" required>
+  <el-form-item label="Name" :error="errorMsgs.name" required>
     <el-input v-model="formModel.name"></el-input>
   </el-form-item>
 
-  <el-form-item label="Print Name" :error="errorMessages.printName" required>
+  <el-form-item label="Print Name" :error="errorMsgs.printName" required>
     <el-input v-model="formModel.printName"></el-input>
   </el-form-item>
 
@@ -39,7 +39,7 @@
 
 <script>
 import _ from 'lodash'
-import errorI18nKey from '@/utils/error-i18n-key'
+import translateErrors from '@/helpers/translate-errors'
 
 export default {
   name: 'UnlockableForm',
@@ -52,11 +52,8 @@ export default {
     }
   },
   computed: {
-    errorMessages () {
-      return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(errorI18nKey('Unlockable', k, v[0]), { name: _.startCase(k) })
-        return result
-      }, {})
+    errorMsgs () {
+      return translateErrors(this.errors, 'depositable')
     },
     avatarUrl () {
       if (!this.formModel.avatar) {

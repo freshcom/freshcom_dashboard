@@ -2,9 +2,10 @@ export default {
   objectWithDefaults () {
     return {
       id: undefined,
-      type: 'PointDeposit',
+      type: 'Depositable',
       status: 'active',
-      amount: 0
+      amount: 0,
+      avatar: null
     }
   }
 }

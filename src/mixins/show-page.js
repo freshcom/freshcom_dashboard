@@ -1,4 +1,4 @@
-import errorI18nKey from '@/utils/error-i18n-key'
+// import errorI18nKey from '@/utils/error-i18n-key'
 
 export default function (options) {
   let storeNamespace = options.storeNamespace
@@ -43,9 +43,9 @@ export default function (options) {
           if (this.recordDeleted) {
             this.recordDeleted(targetRecord)
           }
-        }).catch(error => {
-          this.$alert(this.$t(errorI18nKey(storeNamespace, 'id', error.id[0])), 'Error')
-          throw error
+        }).catch(() => {
+          // this.$alert(this.$t(errorI18nKey(storeNamespace, 'id', error.id[0])), 'Error')
+          // throw error
         })
       }
     }

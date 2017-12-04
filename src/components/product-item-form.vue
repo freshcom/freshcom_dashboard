@@ -45,11 +45,11 @@
 
   <hr>
 
-  <el-form-item label="Code" :error="errorMessages.code">
+  <el-form-item label="Code" :error="errorMsgs.code">
     <el-input v-model="formModel.code"></el-input>
   </el-form-item>
 
-  <el-form-item v-if="formModel.id" label="Status" :error="errorMessages.status" required>
+  <el-form-item v-if="formModel.id" label="Status" :error="errorMsgs.status" required>
     <el-select @change="updateValue" v-model="formModel.status">
       <el-option label="Draft" value="draft"></el-option>
       <el-option label="Active" value="active"></el-option>
@@ -66,23 +66,23 @@
     </el-radio-group>
   </el-form-item>
 
-  <el-form-item v-if="formModel.nameSync == 'disabled'" label="Name" :error="errorMessages.name" required>
+  <el-form-item v-if="formModel.nameSync == 'disabled'" label="Name" :error="errorMsgs.name" required>
     <el-input v-model="formModel.name"></el-input>
   </el-form-item>
 
-  <el-form-item v-if="formModel.nameSync == 'sync_with_product'" label="Short Name" :error="errorMessages.name">
+  <el-form-item v-if="formModel.nameSync == 'sync_with_product'" label="Short Name" :error="errorMsgs.name">
     <el-input v-model="formModel.shortName"></el-input>
   </el-form-item>
 
-  <el-form-item label="Source Quantity" :error="errorMessages.sourceQuantity" required>
+  <el-form-item label="Source Quantity" :error="errorMsgs.sourceQuantity" required>
     <el-input-number @change="updateValue" v-model="formModel.sourceQuantity" :min="1" :step="1"></el-input-number>
   </el-form-item>
 
-  <el-form-item label="Sort Index" :error="errorMessages.sortIndex" required>
+  <el-form-item label="Sort Index" :error="errorMsgs.sortIndex" required>
     <el-input-number @change="updateValue" v-model="formModel.sortIndex" :min="0" :step="100"></el-input-number>
   </el-form-item>
 
-  <el-form-item label="Maximum PO Quantity" :error="errorMessages.maximumPublicOrderQuantity" required>
+  <el-form-item label="Maximum PO Quantity" :error="errorMsgs.maximumPublicOrderQuantity" required>
     <el-input-number @change="updateValue" v-model="formModel.maximumPublicOrderQuantity" :min="1" :step="1"></el-input-number>
   </el-form-item>
 
@@ -100,7 +100,7 @@
 import _ from 'lodash'
 import RemoteSelect from '@/components/remote-select'
 import UnlockableSelect from '@/components/unlockable-select'
-import errorI18nKey from '@/utils/error-i18n-key'
+import translateErrors from '@/helpers/translate-errors'
 
 export default {
   name: 'ProductItemForm',
@@ -128,19 +128,16 @@ export default {
     selectableUnlockables () {
       return this.$store.state.productItem.selectableUnlockables
     },
-    errorMessages () {
-      return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(errorI18nKey('productItem', k, v[0]), { name: _.startCase(k) })
-        return result
-      }, {})
+    errorMsgs () {
+      return translateErrors(this.errors, 'productItem')
     },
     stockableErrorMessage () {
-      if (this.errorMessages['relationships']) {
+      if (this.errorMsgs['relationships']) {
         return 'Stockable is invalid'
       }
     },
     unlockableErrorMessage () {
-      if (this.errorMessages['relationships']) {
+      if (this.errorMsgs['relationships']) {
         return 'Unlockable is invalid'
       }
     }

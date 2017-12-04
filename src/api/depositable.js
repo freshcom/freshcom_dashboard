@@ -9,7 +9,7 @@ export default {
       params.include = include
     }
 
-    return axios.post('/point_deposits', payload, { params: params })
+    return axios.post('/depositables', payload, { params: params })
   },
 
   updateRecord (id, payload, options) {
@@ -25,7 +25,7 @@ export default {
       params.locale = locale
     }
 
-    return axios.patch(`/point_deposits/${id}`, payload, { params: params })
+    return axios.patch(`/depositables/${id}`, payload, { params: params })
   },
 
   queryRecord (options = {}) {
@@ -50,7 +50,7 @@ export default {
       params.locale = locale
     }
 
-    return axios.get('/point_deposits', {
+    return axios.get('/depositables', {
       params: params
     })
   },
@@ -73,11 +73,11 @@ export default {
       params.locale = locale
     }
 
-    return axios.get(`/point_deposits/${id}`, { params: params })
+    return axios.get(`/depositables/${id}`, { params: params })
   },
 
   deleteRecord (id) {
-    return axios.delete(`/point_deposits/${id}`)
+    return axios.delete(`/depositables/${id}`)
   }
 
 }

@@ -2,10 +2,10 @@
 <div class="page-wrapper">
 
   <div>
-    <el-menu :router="true" default-active="/point_deposits" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListPointDeposit' }" index="/point_deposits">Point Deposits</el-menu-item>
+    <el-menu :router="true" default-active="/depositables" mode="horizontal" class="secondary-nav">
+      <el-menu-item :route="{ name: 'ListDepositable' }" index="/depositables">Depositables</el-menu-item>
     </el-menu>
-    <locale-selector @change="searchPointDeposit()" class="pull-right"></locale-selector>
+    <locale-selector @change="searchDepositable()" class="pull-right"></locale-selector>
   </div>
 
   <div>
@@ -19,7 +19,7 @@
           </el-input>
         </div>
 
-        <el-button @click="newPointDeposit()" plain size="small" class="pull-right">
+        <el-button @click="newDepositable()" plain size="small" class="pull-right">
           <icon name="plus" scale="0.7" class="v-middle"></icon> New
         </el-button>
       </div>
@@ -28,8 +28,8 @@
         <p v-if="noSearchResult" class="search-notice text-center">
           There is no result that matches "{{searchKeyword}}"
         </p>
-        <el-table v-if="hasSearchResult" @row-click="viewPointDeposit" :data="pointDeposits">
-          <el-table-column prop="name" label="Point Deposit">
+        <el-table v-if="hasSearchResult" @row-click="viewDepositable" :data="depositables">
+          <el-table-column prop="name" label="Depositable">
             <template slot-scope="scope">
               <span v-if="scope.row.code">
                 [{{scope.row.code}}]
@@ -44,7 +44,7 @@
           </el-table-column>
           <el-table-column prop="status" label="Status" width="100">
             <template slot-scope="scope">
-              {{$t(`attributes.pointDeposit.status.${scope.row.status}`)}}
+              {{$t(`attributes.depositable.status.${scope.row.status}`)}}
             </template>
           </el-table-column>
           <el-table-column prop="id" label="ID" width="120">
@@ -86,7 +86,7 @@ import Pagination from '@/components/pagination'
 import { dollar, idLastPart } from '@/helpers/filters'
 
 export default {
-  name: 'ListPointDeposit',
+  name: 'ListDepositable',
   components: {
     Pagination
   },
@@ -106,14 +106,14 @@ export default {
   },
   data () {
     return {
-      pointDeposits: [],
+      depositables: [],
       isLoading: false,
       totalCount: 0,
       resultCount: 0
     }
   },
   created () {
-    this.searchPointDeposit()
+    this.searchDepositable()
   },
   computed: {
     noSearchResult () {
@@ -128,7 +128,7 @@ export default {
   },
   watch: {
     searchKeyword (newKeyword) {
-      this.searchPointDeposit()
+      this.searchDepositable()
     },
     page (newPage, oldPage) {
       if (_.isEqual(newPage, oldPage)) {
@@ -143,14 +143,14 @@ export default {
       let q = _.merge({}, _.omit(this.$route.query, ['page[number]']), { search: newSearchKeyword })
       this.$router.replace({ name: this.$store.state.route.name, query: q })
     }, 300),
-    searchPointDeposit () {
+    searchDepositable () {
       this.isLoading = true
 
-      freshcom.listPointDeposit({
+      freshcom.listDepositable({
         search: this.searchKeyword,
         page: this.page
       }).then(response => {
-        this.pointDeposits = response.data
+        this.depositables = response.data
         this.totalCount = response.meta.totalCount
         this.resultCount = response.meta.resultCount
 
@@ -159,11 +159,11 @@ export default {
         this.isLoading = false
       })
     },
-    viewPointDeposit (pointDeposit) {
-      this.$store.dispatch('pushRoute', { name: 'ShowPointDeposit', params: { id: pointDeposit.id, callbackPath: this.currentRoutePath } })
+    viewDepositable (depositable) {
+      this.$store.dispatch('pushRoute', { name: 'ShowDepositable', params: { id: depositable.id, callbackPath: this.currentRoutePath } })
     },
-    newPointDeposit () {
-      this.$store.dispatch('pushRoute', { name: 'NewPointDeposit' })
+    newDepositable () {
+      this.$store.dispatch('pushRoute', { name: 'NewDepositable' })
     }
   }
 }

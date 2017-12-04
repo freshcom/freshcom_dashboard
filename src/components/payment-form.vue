@@ -3,12 +3,12 @@
 
   <el-row :gutter="10">
     <el-col :span="6">
-      <el-form-item :error="errorMessages.amountCents" label="Amount" class="amount">
+      <el-form-item :error="errorMsgs.amountCents" label="Amount" class="amount">
         <money-input v-model="formModel.amountCents"></money-input>
       </el-form-item>
     </el-col>
     <el-col v-if="canSelectGateway" :span="6">
-      <el-form-item label="Gateway" :error="errorMessages.gateway" required>
+      <el-form-item label="Gateway" :error="errorMsgs.gateway" required>
         <el-select @change="updateValue" v-model="formModel.gateway">
           <el-option label="Online" value="online"></el-option>
           <el-option label="Offline" value="offline"></el-option>
@@ -16,7 +16,7 @@
       </el-form-item>
     </el-col>
     <el-col :span="6">
-      <el-form-item v-if="canSelectStatus" label="Status" :error="errorMessages.status" required>
+      <el-form-item v-if="canSelectStatus" label="Status" :error="errorMsgs.status" required>
         <el-select @change="updateValue" v-model="formModel.status">
           <el-option label="Pending" value="pending"></el-option>
           <el-option label="Paid" value="paid"></el-option>
@@ -24,7 +24,7 @@
       </el-form-item>
     </el-col>
     <el-col :span="6">
-      <el-form-item v-if="formModel.gateway === 'offline' && formModel.status === 'paid'" label="Method" :error="errorMessages.method" required>
+      <el-form-item v-if="formModel.gateway === 'offline' && formModel.status === 'paid'" label="Method" :error="errorMsgs.method" required>
         <el-select @change="updateValue" v-model="formModel.method">
           <el-option label="Credit" value="credit"></el-option>
           <el-option label="Debit" value="debit"></el-option>
@@ -37,7 +37,7 @@
 
   <el-row>
     <el-col :span="12">
-      <el-form-item v-if="canSelectAction" :error="errorMessages.status" required>
+      <el-form-item v-if="canSelectAction" :error="errorMsgs.status" required>
         <b class="m-r-20">Action</b>
         <el-radio-group v-model="action">
           <el-radio label="payNow">Pay Now</el-radio>
@@ -51,7 +51,7 @@
   </el-row>
 
   <el-row>
-    <el-form-item v-if="canEnterCaptureAmount" :error="errorMessages.amountCents" label="Capture Amount" class="capture-amount">
+    <el-form-item v-if="canEnterCaptureAmount" :error="errorMsgs.amountCents" label="Capture Amount" class="capture-amount">
       <money-input v-model="formModel.amountCents"></money-input>
     </el-form-item>
   </el-row>
@@ -102,7 +102,7 @@
     </el-row>
 
     <el-row v-if="formModel.gateway === 'online' && formModel.order && formModel.order.fulfillmentMethod === 'ship'">
-      <el-form-item label="Billing Address" :error="errorMessages.status" required>
+      <el-form-item label="Billing Address" :error="errorMsgs.status" required>
         <el-radio-group @change="updateValue" v-model="isBillingAndShippingAddressSame">
           <el-radio :label="false">Enter new address</el-radio>
           <el-radio :label="true">Same as shipping address</el-radio>
@@ -113,7 +113,7 @@
     <template v-if="canEnterBillingAddress">
       <el-row :gutter="10">
         <el-col :span="12">
-          <el-form-item label="Street Address 1" :error="errorMessages.billingAddressLineOne">
+          <el-form-item label="Street Address 1" :error="errorMsgs.billingAddressLineOne">
             <el-input v-model="formModel.billingAddressLineOne"></el-input>
           </el-form-item>
         </el-col>
@@ -121,7 +121,7 @@
 
       <el-row :gutter="10">
         <el-col :span="12">
-          <el-form-item label="Street Address 2" :error="errorMessages.billingAddressLineTwo">
+          <el-form-item label="Street Address 2" :error="errorMsgs.billingAddressLineTwo">
             <el-input v-model="formModel.billingAddressLineTwo"></el-input>
           </el-form-item>
         </el-col>
@@ -129,22 +129,22 @@
 
       <el-row :gutter="10">
         <el-col :span="6">
-          <el-form-item label="City" :error="errorMessages.billingAddressCity">
+          <el-form-item label="City" :error="errorMsgs.billingAddressCity">
             <el-input v-model="formModel.billingAddressCity"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="6">
-          <el-form-item label="Province" :error="errorMessages.billingAddressProvince">
+          <el-form-item label="Province" :error="errorMsgs.billingAddressProvince">
             <el-input v-model="formModel.billingAddressProvince"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="6">
-          <el-form-item label="Country" :error="errorMessages.billingAddressCountryCode">
+          <el-form-item label="Country" :error="errorMsgs.billingAddressCountryCode">
             <el-input v-model="formModel.billingAddressCountryCode"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="6">
-          <el-form-item label="Postal Code" :error="errorMessages.billingAddressPostalCode">
+          <el-form-item label="Postal Code" :error="errorMsgs.billingAddressPostalCode">
             <el-input v-model="formModel.billingAddressPostalCode"></el-input>
           </el-form-item>
         </el-col>
@@ -157,7 +157,7 @@
 
 <script>
 import _ from 'lodash'
-import errorI18nKey from '@/utils/error-i18n-key'
+import translateErrors from '@/helpers/translate-errors'
 import MoneyInput from '@/components/money-input'
 import { Card } from 'vue-stripe-elements-plus'
 import { STRIPE_PUBLISHABLE_KEY } from '@/env'
@@ -223,11 +223,8 @@ export default {
 
       return true
     },
-    errorMessages () {
-      return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(errorI18nKey('Payment', k, v[0]), { name: _.startCase(k) })
-        return result
-      }, {})
+    errorMsgs () {
+      return translateErrors(this.errors, 'payment')
     }
   },
   watch: {

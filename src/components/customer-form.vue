@@ -1,10 +1,10 @@
 <template>
 <el-form @input.native="updateValue" label-width="180px" size="small">
-  <el-form-item label="Code" :error="errorMessages.code">
+  <el-form-item label="Code" :error="errorMsgs.code">
     <el-input v-model="formModel.code"></el-input>
   </el-form-item>
 
-  <el-form-item label="Status" :error="errorMessages.status" required>
+  <el-form-item label="Status" :error="errorMsgs.status" required>
     <el-select @change="updateValue" v-model="formModel.status">
       <el-option label="Guest" value="guest"></el-option>
       <el-option label="Internal" value="internal"></el-option>
@@ -14,24 +14,24 @@
     </el-select>
   </el-form-item>
 
-  <el-form-item label="Name" :error="errorMessages.firstName" :required="formModel.status === 'registered'">
+  <el-form-item label="Name" :error="errorMsgs.firstName" :required="formModel.status === 'registered'">
     <el-input v-model="formModel.firstName" placeholder="First Name" class="name-input"></el-input>
     <el-input v-model="formModel.lastName" placeholder="Last Name" class="name-input"></el-input>
   </el-form-item>
 
-  <el-form-item label="Email" :error="errorMessages.email" :required="formModel.status === 'registered'">
+  <el-form-item label="Email" :error="errorMsgs.email" :required="formModel.status === 'registered'">
     <el-input v-model="formModel.email"></el-input>
   </el-form-item>
 
-  <el-form-item v-show="canInputPassword" :error="errorMessages.password" label="Password" required>
+  <el-form-item v-show="canInputPassword" :error="errorMsgs.password" label="Password" required>
     <el-input v-model="formModel.password" type="password"></el-input>
   </el-form-item>
 
-  <el-form-item label="Phone" :error="errorMessages.phoneNumber">
+  <el-form-item label="Phone" :error="errorMsgs.phoneNumber">
     <el-input v-model="formModel.phoneNumber"></el-input>
   </el-form-item>
 
-  <el-form-item label="Label" :error="errorMessages.label">
+  <el-form-item label="Label" :error="errorMsgs.label">
     <el-input v-model="formModel.label"></el-input>
   </el-form-item>
 </el-form>
@@ -39,7 +39,7 @@
 
 <script>
 import _ from 'lodash'
-import errorI18nKey from '@/utils/error-i18n-key'
+import translateErrors from '@/helpers/translate-errors'
 
 export default {
   name: 'CustomerForm',
@@ -50,11 +50,8 @@ export default {
     }
   },
   computed: {
-    errorMessages () {
-      return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(errorI18nKey('Customer', k, v[0]), { name: _.startCase(k) })
-        return result
-      }, {})
+    errorMsgs () {
+      return translateErrors(this.errors, 'customer')
     },
 
     canInputPassword () {

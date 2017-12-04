@@ -53,10 +53,10 @@ import ShowCustomerPage from '@/pages/customer/show'
 import NewCustomerPage from '@/pages/customer/new'
 import EditCustomerPage from '@/pages/customer/edit'
 
-import ListPointDepositPage from '@/pages/point-deposit/list'
-import NewPointDepositPage from '@/pages/point-deposit/new'
-import ShowPointDepositPage from '@/pages/point-deposit/show'
-import EditPointDepositPage from '@/pages/point-deposit/edit'
+import ListDepositablePage from '@/pages/depositable/list'
+import NewDepositablePage from '@/pages/depositable/new'
+import ShowDepositablePage from '@/pages/depositable/show'
+import EditDepositablePage from '@/pages/depositable/edit'
 
 import ShowBillingSettingsPage from '@/pages/billing/show-settings'
 
@@ -357,9 +357,9 @@ export default new Router({
       }
     },
     {
-      path: '/point_deposits',
-      name: 'ListPointDeposit',
-      component: ListPointDepositPage,
+      path: '/depositables',
+      name: 'ListDepositable',
+      component: ListDepositablePage,
       props (route) {
         let page = extractPagination(route)
         return {
@@ -369,9 +369,9 @@ export default new Router({
       }
     },
     {
-      path: '/point_deposits/new',
-      name: 'NewPointDeposit',
-      component: NewPointDepositPage,
+      path: '/depositables/new',
+      name: 'NewDepositable',
+      component: NewDepositablePage,
       props (route) {
         let queryString = route.fullPath.split('?')[1]
         let query = qs.parse(queryString)
@@ -380,17 +380,17 @@ export default new Router({
       }
     },
     {
-      path: '/point_deposits/:id',
-      name: 'ShowPointDeposit',
-      component: ShowPointDepositPage,
+      path: '/depositables/:id',
+      name: 'ShowDepositable',
+      component: ShowDepositablePage,
       props (route) {
         return { id: route.params.id }
       }
     },
     {
-      path: '/point_deposits/:id/edit',
-      name: 'EditPointDeposit',
-      component: EditPointDepositPage,
+      path: '/depositables/:id/edit',
+      name: 'EditDepositable',
+      component: EditDepositablePage,
       props (route) {
         let queryString = route.fullPath.split('?')[1]
         let query = qs.parse(queryString)

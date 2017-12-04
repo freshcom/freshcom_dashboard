@@ -2,7 +2,7 @@
 <el-form @input.native="updateValue" label-position="top" size="small" class="m-b-10">
   <el-row :gutter="20">
     <el-col :span="12">
-      <el-form-item v-if="canSelectCustomer" label="Customer" :error="errorMessages.customer">
+      <el-form-item v-if="canSelectCustomer" label="Customer" :error="errorMsgs.customer">
         <remote-select
           :value="formModel.customer"
           :search-method="searchCustomers"
@@ -21,7 +21,7 @@
 
   <el-row :gutter="20">
     <el-col :span="12">
-      <el-form-item label="Code" :error="errorMessages.code">
+      <el-form-item label="Code" :error="errorMsgs.code">
         <el-input v-model="formModel.code"></el-input>
       </el-form-item>
     </el-col>
@@ -29,12 +29,12 @@
 
   <el-row :gutter="20">
     <el-col :span="12">
-      <el-form-item label="Email" :error="errorMessages.email" required>
+      <el-form-item label="Email" :error="errorMsgs.email" required>
         <el-input v-model="formModel.email"></el-input>
       </el-form-item>
     </el-col>
     <el-col :span="12">
-      <el-form-item label="Phone Number" :error="errorMessages.phoneNumber">
+      <el-form-item label="Phone Number" :error="errorMsgs.phoneNumber">
         <el-input v-model="formModel.phoneNumber"></el-input>
       </el-form-item>
     </el-col>
@@ -42,12 +42,12 @@
 
   <el-row :gutter="20">
     <el-col :span="12">
-      <el-form-item label="First Name" :error="errorMessages.firstName" required>
+      <el-form-item label="First Name" :error="errorMsgs.firstName" required>
         <el-input v-model="formModel.firstName"></el-input>
       </el-form-item>
     </el-col>
     <el-col :span="12">
-      <el-form-item label="Last Name" :error="errorMessages.lastName" required>
+      <el-form-item label="Last Name" :error="errorMsgs.lastName" required>
         <el-input v-model="formModel.lastName"></el-input>
       </el-form-item>
     </el-col>
@@ -56,7 +56,7 @@
   <hr class="m-t-10 m-b-10">
 
   <el-row>
-    <el-form-item label="Fulfillment Method" :error="errorMessages.fulfillmentMethod" required>
+    <el-form-item label="Fulfillment Method" :error="errorMsgs.fulfillmentMethod" required>
       <el-select @change="updateValue" v-model="formModel.fulfillmentMethod">
         <el-option label="Ship" value="ship"></el-option>
         <el-option label="Pick Up" value="pickup"></el-option>
@@ -68,7 +68,7 @@
   <template v-if="formModel.fulfillmentMethod === 'ship'">
     <el-row :gutter="10">
       <el-col :span="12">
-        <el-form-item label="Street Address 1" :error="errorMessages.deliveryAddressLineOne" required>
+        <el-form-item label="Street Address 1" :error="errorMsgs.deliveryAddressLineOne" required>
           <el-input v-model="formModel.deliveryAddressLineOne"></el-input>
         </el-form-item>
       </el-col>
@@ -76,7 +76,7 @@
 
     <el-row :gutter="10">
       <el-col :span="12">
-        <el-form-item label="Street Address 2" :error="errorMessages.deliveryAddressLineTwo">
+        <el-form-item label="Street Address 2" :error="errorMsgs.deliveryAddressLineTwo">
           <el-input v-model="formModel.deliveryAddressLineTwo"></el-input>
         </el-form-item>
       </el-col>
@@ -84,22 +84,22 @@
 
     <el-row :gutter="10">
       <el-col :span="6">
-        <el-form-item label="City" :error="errorMessages.deliveryAddressCity" required>
+        <el-form-item label="City" :error="errorMsgs.deliveryAddressCity" required>
           <el-input v-model="formModel.deliveryAddressCity"></el-input>
         </el-form-item>
       </el-col>
       <el-col :span="6">
-        <el-form-item label="Province" :error="errorMessages.deliveryAddressProvince" required>
+        <el-form-item label="Province" :error="errorMsgs.deliveryAddressProvince" required>
           <el-input v-model="formModel.deliveryAddressProvince"></el-input>
         </el-form-item>
       </el-col>
       <el-col :span="6">
-        <el-form-item label="Country" :error="errorMessages.deliveryAddressCountryCode" required>
+        <el-form-item label="Country" :error="errorMsgs.deliveryAddressCountryCode" required>
           <el-input v-model="formModel.deliveryAddressCountryCode"></el-input>
         </el-form-item>
       </el-col>
       <el-col :span="6">
-        <el-form-item label="Postal Code" :error="errorMessages.deliveryAddressPostalCode" required>
+        <el-form-item label="Postal Code" :error="errorMsgs.deliveryAddressPostalCode" required>
           <el-input v-model="formModel.deliveryAddressPostalCode"></el-input>
         </el-form-item>
       </el-col>
@@ -110,7 +110,7 @@
 
 <script>
 import _ from 'lodash'
-import errorI18nKey from '@/utils/error-i18n-key'
+import translateErrors from '@/helpers/translate-errors'
 import RemoteSelect from '@/components/remote-select'
 
 export default {
@@ -126,16 +126,8 @@ export default {
     }
   },
   computed: {
-    errorMessages () {
-      return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(errorI18nKey('ProductItem', k, v[0]), { name: _.startCase(k) })
-        return result
-      }, {})
-    },
-    stockableErrorMessage () {
-      if (this.errorMessages['relationships']) {
-        return 'Stockable is invalid'
-      }
+    errorMsgs () {
+      return translateErrors(this.errors, 'order')
     }
   },
   watch: {

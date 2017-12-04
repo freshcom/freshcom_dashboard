@@ -50,7 +50,7 @@ export default {
     }
   },
   fields: {
-    pointDeposit: {
+    depositable: {
       printName: 'Print name'
     }
   },
@@ -61,7 +61,7 @@ export default {
         offline: 'Offline'
       }
     },
-    pointDeposit: {
+    depositable: {
       status: {
         active: 'Active'
       }

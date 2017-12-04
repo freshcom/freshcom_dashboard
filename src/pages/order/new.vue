@@ -148,9 +148,8 @@ import Payment from '@/models/payment'
 
 import { dollar } from '@/helpers/filters'
 import { createToken as createStripeToken } from 'vue-stripe-elements-plus'
-import errorI18nKey from '@/utils/error-i18n-key'
+import translateErrors from '@/helpers/translate-errors'
 import OrderLineItemTable from '@/components/order-line-item-table'
-import OrderLineItemDialog from '@/components/order-line-item-dialog'
 
 export default {
   name: 'NewOrder',
@@ -158,8 +157,7 @@ export default {
     OrderLineItemForm,
     OrderLineItemTable,
     OrderForm,
-    PaymentForm,
-    OrderLineItemDialog
+    PaymentForm
   },
   filters: {
     dollar
@@ -385,11 +383,11 @@ export default {
         return this.$store.dispatch('pushRoute', { name: 'ListOrder' })
       }).catch(errors => {
         this.errors = errors
+        let translatedErrors = translateErrors(errors, 'payment')
         if (errors.source) {
-          let errorCode = errors.source[0]
           this.$message({
             showClose: true,
-            message: this.$t(errorI18nKey('payment', 'source', errorCode)),
+            message: translatedErrors.source,
             type: 'error'
           })
         }

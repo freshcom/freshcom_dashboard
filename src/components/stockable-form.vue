@@ -8,30 +8,30 @@
     <el-progress v-if="pendingAvatar" :show-text="false" :percentage="pendingAvatar.percentage"></el-progress>
   </div>
 
-  <el-form-item label="Code" :error="errorMessages.code">
+  <el-form-item label="Code" :error="errorMsgs.code">
     <el-input v-model="formModel.code"></el-input>
   </el-form-item>
 
-  <el-form-item label="Status" :error="errorMessages.status" required>
+  <el-form-item label="Status" :error="errorMsgs.status" required>
     <el-select @change="updateValue" v-model="formModel.status">
       <el-option label="Active" value="active"></el-option>
       <el-option label="Disabled" value="disabled"></el-option>
     </el-select>
   </el-form-item>
 
-  <el-form-item label="Name" :error="errorMessages.name" required>
+  <el-form-item label="Name" :error="errorMsgs.name" required>
     <el-input v-model="formModel.name"></el-input>
   </el-form-item>
 
-  <el-form-item label="Print Name" :error="errorMessages.printName" required>
+  <el-form-item label="Print Name" :error="errorMsgs.printName" required>
     <el-input v-model="formModel.printName"></el-input>
   </el-form-item>
 
-  <el-form-item label="Unit Of Measure" :error="errorMessages.unitOfMeasure" required>
+  <el-form-item label="Unit Of Measure" :error="errorMsgs.unitOfMeasure" required>
     <el-input v-model="formModel.unitOfMeasure" width="200px"></el-input>
   </el-form-item>
 
-  <el-form-item label="Variable Weight" :error="errorMessages.variableWeight" required>
+  <el-form-item label="Variable Weight" :error="errorMsgs.variableWeight" required>
     <el-switch
       @change="updateValue"
       v-model="formModel.variableWeight"
@@ -42,7 +42,7 @@
 
   <hr>
 
-  <el-form-item label="Storage Type" :error="errorMessages.storageType">
+  <el-form-item label="Storage Type" :error="errorMsgs.storageType">
     <el-select @change="updateValue" v-model="formModel.storageType" placeholder="Select Storage Type">
       <el-option label="Room" value="room"></el-option>
       <el-option label="Frozen" value="frozen"></el-option>
@@ -50,7 +50,7 @@
     </el-select>
   </el-form-item>
 
-  <el-form-item label="Stackable" :error="errorMessages.stackable" required>
+  <el-form-item label="Stackable" :error="errorMsgs.stackable" required>
     <el-switch
       @change="updateValue"
       v-model="formModel.stackable"
@@ -59,7 +59,7 @@
     </el-switch>
   </el-form-item>
 
-  <el-form-item label="Storage Size" :error="errorMessages.storageSize" required>
+  <el-form-item label="Storage Size" :error="errorMsgs.storageSize" required>
     <el-input-number v-model="formModel.storageSize" :min="0" :step="100"></el-input-number>
   </el-form-item>
 
@@ -85,7 +85,7 @@
 
 <script>
 import _ from 'lodash'
-import errorI18nKey from '@/utils/error-i18n-key'
+import translateErrors from '@/helpers/translate-errors'
 
 export default {
   name: 'StockableForm',
@@ -98,11 +98,8 @@ export default {
     }
   },
   computed: {
-    errorMessages () {
-      return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(errorI18nKey('Stockable', k, v[0]), { name: _.startCase(k) })
-        return result
-      }, {})
+    errorMsgs () {
+      return translateErrors(this.errors, 'stockable')
     },
     avatarUrl () {
       if (!this.formModel.avatar) {

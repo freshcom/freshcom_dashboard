@@ -29,7 +29,7 @@
 import _ from 'lodash'
 import BillingSettings from '@/models/billing-settings'
 import { STRIPE_CLIENT_ID } from '@/env'
-import errorI18nKey from '@/utils/error-i18n-key'
+import translateErrors from '@/helpers/translate-errors'
 
 export default {
   name: 'ShowBillingSettings',
@@ -66,10 +66,10 @@ export default {
       }).catch(errors => {
         this.isLoading = false
 
-        let errorCode = errors.stripeAuthCode[0]
+        let translatedErrors = translateErrors(errors, 'billingSettings')
         this.$message({
           showClose: true,
-          message: this.$t(errorI18nKey('billingSettings', 'stripeAuthCode', errorCode)),
+          message: translatedErrors.stripeAuthCode,
           type: 'error'
         })
 

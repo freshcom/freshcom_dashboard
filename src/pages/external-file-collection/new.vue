@@ -1,39 +1,38 @@
 <template>
 <div class="page-warpper">
   <div>
-    <el-menu :router="true" default-active="file_collections" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListExternalFile' }" index="files">Files</el-menu-item>
-      <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="file_collections">Collections</el-menu-item>
+    <el-menu :router="true" default-active="/file_collections" mode="horizontal" class="secondary-nav">
+      <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="/file_collections">File collections</el-menu-item>
     </el-menu>
     <locale-selector class="pull-right"></locale-selector>
   </div>
 
   <div>
-    <el-card v-loading="isLoading" class="main-card">
+    <el-card class="main-card">
       <div slot="header">
-        <span style="line-height: 36px;">Create a File Collection</span>
+        <span style="line-height: 36px;">Create a file collection</span>
 
         <div class="pull-right">
-          <el-button @click="cancel" plain size="medium">
+          <el-button @click="back()" plain size="small">
             Cancel
           </el-button>
 
-          <el-button @click="submit(recordDraft)" type="primary" size="medium">
+          <el-button @click="submit()" type="primary" size="small">
             Save
           </el-button>
         </div>
       </div>
 
       <div class="data">
-        <external-file-collection-form v-model="recordDraft" :errors="errors"></external-file-collection-form>
+        <external-file-collection-form v-model="efcDraft" :errors="errors"></external-file-collection-form>
       </div>
 
       <div class="footer">
-        <el-button @click="cancel" plain size="medium">
+        <el-button @click="back()" plain size="small">
           Cancel
         </el-button>
 
-        <el-button @click="submit(recordDraft)" type="primary" class="pull-right" size="medium">
+        <el-button @click="submit()" type="primary" class="pull-right" size="small">
           Save
         </el-button>
       </div>
@@ -43,46 +42,49 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+import ExternalFileCollection from '@/models/external-file-collection'
 import ExternalFileCollectionForm from '@/components/external-file-collection-form'
-import NewPage from '@/mixins/new-page'
 
 export default {
   name: 'NewExternalFileCollection',
+  props: ['ownerId', 'ownerType'],
   components: {
     ExternalFileCollectionForm
   },
-  mixins: [NewPage({ storeNamespace: 'externalFileCollection', name: 'File Collection' })],
-  props: ['stockableId', 'productId', 'unlockableId'],
-  created () {
-    if (this.stockableId) {
-      let record = _.cloneDeep(this.record)
-      record.owner = { id: this.stockableId, type: 'Stockable' }
-      this.$store.dispatch('externalFileCollection/setRecord', record)
-      return
+  data () {
+    return {
+      efcDraft: ExternalFileCollection.objectWithDefaults(),
+      isCreatingEfc: false,
+      errors: {}
     }
-
-    if (this.productId) {
-      let record = _.cloneDeep(this.record)
-      record.owner = { id: this.productId, type: 'Product' }
-      this.$store.dispatch('externalFileCollection/setRecord', record)
+  },
+  created () {
+    if (this.ownerId && this.ownerType) {
+      this.efcDraft.owner = { id: this.ownerId, type: this.ownerType }
     }
   },
   methods: {
-    recordCreated (record) {
-      if (this.stockableId) {
-        this.$store.dispatch('stockable/resetRecord')
-      }
+    submit () {
+      this.isCreatingEfc = true
 
-      if (this.productId) {
-        this.$store.dispatch('product/resetRecord')
-      }
+      freshcom.createExternalFileCollection(this.efcDraft).then(response => {
+        this.$message({
+          showClose: true,
+          message: `File collection created successfully.`,
+          type: 'success'
+        })
 
-      if (this.callbackPath) {
-        return this.$store.dispatch('pushRoute', { path: this.callbackPath })
-      }
+        this.isCreatingEfc = false
+        this.back()
+      }).catch(errors => {
+        this.errors = errors
+        this.isCreatingEfc = false
+      })
+    },
 
-      this.$store.dispatch('pushRoute', { name: 'ShowExternalFileCollection', params: { id: record.id } })
+    back () {
+      this.$store.dispatch('pushRoute', { name: 'ListExternalFileCollection' })
     }
   }
 }

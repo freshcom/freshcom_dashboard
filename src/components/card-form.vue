@@ -1,17 +1,17 @@
 <template>
 <el-form @input.native="updateValue" :model="formModel" label-width="180px" size="small" class="m-b-10">
 
-  <el-form-item label="Cardholder Name" :error="errorMessages.cardholderName">
+  <el-form-item label="Cardholder Name" :error="errorMsgs.cardholderName">
     <el-input v-model="formModel.cardholderName"></el-input>
   </el-form-item>
 
-  <el-form-item label="Expiry Date" :error="errorMessages.expiry" required>
+  <el-form-item label="Expiry Date" :error="errorMsgs.expiry" required>
     <el-input v-model="formModel.expMonth" placeholder="MM" class="exp-month-input"></el-input>
     <span>/</span>
     <el-input v-model="formModel.expYear" placeholder="YYYY" class="exp-year-input"></el-input>
   </el-form-item>
 
-  <el-form-item label="" :error="errorMessages.primary">
+  <el-form-item label="" :error="errorMsgs.primary">
     <el-checkbox v-model="formModel.primary" @change="updateValue">Primary</el-checkbox>
   </el-form-item>
 
@@ -20,7 +20,7 @@
 
 <script>
 import _ from 'lodash'
-import errorI18nKey from '@/utils/error-i18n-key'
+import translateErrors from '@/helpers/translate-errors'
 
 export default {
   name: 'CardForm',
@@ -31,11 +31,8 @@ export default {
     }
   },
   computed: {
-    errorMessages () {
-      return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(errorI18nKey('Payment', k, v[0]), { name: _.startCase(k) })
-        return result
-      }, {})
+    errorMsgs () {
+      return translateErrors(this.errors, 'card')
     }
   },
   watch: {

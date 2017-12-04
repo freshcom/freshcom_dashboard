@@ -313,9 +313,6 @@ import RefundForm from '@/components/refund-form'
 
 import DeleteButton from '@/components/delete-button'
 import OrderLineItemTable from '@/components/order-line-item-table'
-import OrderLineItemDialog from '@/components/order-line-item-dialog'
-import PaymentDialog from '@/components/payment-dialog'
-import RefundDialog from '@/components/refund-dialog'
 import { dollar } from '@/helpers/filters'
 import { createToken as createStripeToken } from 'vue-stripe-elements-plus'
 
@@ -329,10 +326,7 @@ export default {
     PaymentForm,
     OrderLineItemForm,
     DeleteButton,
-    OrderLineItemDialog,
-    OrderLineItemTable,
-    PaymentDialog,
-    RefundDialog
+    OrderLineItemTable
   },
   props: ['id'],
   data () {

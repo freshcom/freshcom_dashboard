@@ -1,25 +1,25 @@
 <template>
 <el-form @input.native="updateValue" :model="formModel" label-width="120px" size="small" class="m-b-10">
 
-  <el-form-item v-if="canSelectGateway" :error="errorMessages.gateway" label="Gateway" required>
+  <el-form-item v-if="canSelectGateway" :error="errorMsgs.gateway" label="Gateway" required>
     <el-select @change="handleGatewayChange($event)" :value="formModel.gateway">
       <el-option label="Online" value="online"></el-option>
       <el-option label="Offline" value="offline"></el-option>
     </el-select>
   </el-form-item>
 
-  <el-form-item v-if="formModel.gateway === 'offline'" label="Method" :error="errorMessages.method" required>
+  <el-form-item v-if="formModel.gateway === 'offline'" label="Method" :error="errorMsgs.method" required>
     <el-select @change="updateValue" v-model="formModel.method">
       <el-option label="Cash" value="cash"></el-option>
       <el-option label="Cheque" value="cheque"></el-option>
     </el-select>
   </el-form-item>
 
-  <el-form-item :error="errorMessages.amountCents" required label="Refund Amount" size="small" class="refund-amount">
+  <el-form-item :error="errorMsgs.amountCents" required label="Refund Amount" size="small" class="refund-amount">
     <money-input v-model="formModel.amountCents" class="refund-amount-input"></money-input>
   </el-form-item>
 
-  <el-form-item :error="errorMessages.notes" label="Notes" size="small" class="refund-amount">
+  <el-form-item :error="errorMsgs.notes" label="Notes" size="small" class="refund-amount">
     <el-input
       type="textarea"
       :autosize="{ minRows: 2, maxRows: 4}"
@@ -33,7 +33,7 @@
 
 <script>
 import _ from 'lodash'
-import errorI18nKey from '@/utils/error-i18n-key'
+import translateErrors from '@/helpers/translate-errors'
 import MoneyInput from '@/components/money-input'
 
 export default {
@@ -56,11 +56,8 @@ export default {
       return !this.formModel.id && this.formModel.payment.gateway === 'online'
     },
 
-    errorMessages () {
-      return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(errorI18nKey('Payment', k, v[0]), { name: _.startCase(k) })
-        return result
-      }, {})
+    errorMsgs () {
+      return translateErrors(this.errors, 'refund')
     }
   },
   watch: {

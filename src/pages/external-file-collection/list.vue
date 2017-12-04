@@ -1,35 +1,33 @@
 <template>
 <div class="page-wrapper">
-
   <div>
     <el-menu :router="true" default-active="/file_collections" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="/file_collections">Collections</el-menu-item>
+      <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="/file_collections">File collections</el-menu-item>
     </el-menu>
-    <locale-selector @change="search" class="pull-right"></locale-selector>
+    <locale-selector @change="searchExternalFileCollection()" class="pull-right"></locale-selector>
   </div>
 
   <div>
     <el-card class="main-card">
       <div slot="header" class="clearfix">
+        <el-button plain size="small"><icon name="filter" scale="0.7" class="v-middle"></icon> Filter</el-button>
+
         <div class="search">
-          <el-input :value="searchKeyword" @input="enteringKeyword" size="small" placeholder="Search...">
+          <el-input :value="searchKeyword" @input="updateSearchKeyword" placeholder="Search..." size="small">
             <template slot="prepend"><icon name="search" scale="1" class="v-middle"></icon></template>
           </el-input>
         </div>
 
-        <el-button @click="goTo({ name: 'NewExternalFileCollection' })" size="small" style="float: right;">
+        <el-button @click="newExternalFileCollection()" plain size="small" class="pull-right">
           <icon name="plus" scale="0.7" class="v-middle"></icon> New
         </el-button>
       </div>
 
       <div class="data full" v-loading="isLoading">
-        <p v-if="noSearchResult" class="text-center">
+        <p v-if="noSearchResult" class="search-notice text-center">
           There is no result that matches "{{searchKeyword}}"
         </p>
-        <p v-if="isEnteringSearchKeyword" class="text-center">
-          Stop typing to search...
-        </p>
-        <el-table v-if="hasSearchResult" @row-click="viewRecord" :data="records" stripe class="full">
+        <el-table v-if="hasSearchResult" @row-click="viewExternalFileCollection" :data="externalFileCollections" class="full">
           <el-table-column prop="name" label="Name" width="200"></el-table-column>
           <el-table-column prop="label" label="Label" width="200"></el-table-column>
           <el-table-column prop="id" label="ID"></el-table-column>
@@ -42,29 +40,100 @@
       </div>
     </el-card>
   </div>
-
 </div>
 </template>
 
 <script>
 import 'vue-awesome/icons/search'
-import 'vue-awesome/icons/chevron-right'
-import 'vue-awesome/icons/chevron-left'
+
+import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
 
 import Pagination from '@/components/pagination'
-import DeleteButton from '@/components/delete-button'
-import ListPage from '@/mixins/list-page'
+import { idLastPart } from '@/helpers/filters'
 
 export default {
-  name: 'ListExternalFile',
+  name: 'ListExternalFileCollection',
   components: {
-    Pagination,
-    DeleteButton
+    Pagination
   },
-  mixins: [ListPage({ storeNamespace: 'externalFileCollection', fields: { 'Stockable': 'name,label,contentType' } })],
+  filters: {
+    idLastPart
+  },
+  props: {
+    searchKeyword: {
+      type: String,
+      default: ''
+    },
+    page: {
+      type: Object,
+      required: true
+    }
+  },
+  data () {
+    return {
+      externalFileCollections: [],
+      isLoading: false,
+      totalCount: 0,
+      resultCount: 0,
+
+      errors: {}
+    }
+  },
+  created () {
+    this.searchExternalFileCollection()
+  },
+  computed: {
+    noSearchResult () {
+      return !this.isLoading && this.resultCount === 0 && this.totalCount > 0
+    },
+    hasSearchResult () {
+      return !this.isLoading && this.resultCount !== 0
+    },
+    currentRoutePath () {
+      return this.$store.state.route.fullPath
+    }
+  },
+  watch: {
+    searchKeyword (newKeyword) {
+      this.searchExternalFileCollection()
+    },
+    page (newPage, oldPage) {
+      if (_.isEqual(newPage, oldPage)) {
+        return
+      }
+      this.searchExternalFileCollection()
+    }
+  },
   methods: {
-    viewRecord (row) {
-      this.goTo({ name: 'ShowExternalFileCollection', params: { id: row.id } })
+    updateSearchKeyword: _.debounce(function (newSearchKeyword) {
+      let q = _.merge({}, _.omit(this.$route.query, ['page[number]']), { search: newSearchKeyword })
+      this.$router.replace({ name: this.$store.state.route.name, query: q })
+    }, 300),
+
+    searchExternalFileCollection () {
+      this.isLoading = true
+
+      freshcom.listExternalFileCollection({
+        search: this.searchKeyword,
+        page: this.page
+      }).then(response => {
+        this.externalFileCollections = response.data
+        this.totalCount = response.meta.totalCount
+        this.resultCount = response.meta.resultCount
+
+        this.isLoading = false
+      }).catch(errors => {
+        this.isLoading = false
+      })
+    },
+
+    viewExternalFileCollection (efc) {
+      this.$store.dispatch('pushRoute', { name: 'ShowExternalFileCollection', params: { id: efc.id, callbackPath: this.currentRoutePath } })
+    },
+
+    newExternalFileCollection () {
+      this.$store.dispatch('pushRoute', { name: 'NewExternalFileCollection' })
     }
   }
 }

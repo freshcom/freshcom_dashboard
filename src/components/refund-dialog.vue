@@ -1,7 +1,7 @@
 <template>
 <el-dialog :title="title" :show-close="false" :visible="isVisible" class="fw-sm">
   <el-form :model="formModel">
-    <el-form-item :error="errorMessages.amountCents" label="Refund Amount" size="small" class="refund-amount">
+    <el-form-item :error="errorMsgs.amountCents" label="Refund Amount" size="small" class="refund-amount">
       <money-input v-model="formModel.amountCents"></money-input>
     </el-form-item>
   </el-form>
@@ -17,7 +17,7 @@
 import _ from 'lodash'
 import { dollar } from '@/helpers/filters'
 import MoneyInput from '@/components/money-input'
-import errorI18nKey from '@/utils/error-i18n-key'
+import translateErrors from '@/helpers/translate-errors'
 
 export default {
   name: 'RefundDialog',
@@ -34,11 +34,8 @@ export default {
     }
   },
   computed: {
-    errorMessages () {
-      return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(errorI18nKey('payment', k, v[0]), { name: _.startCase(k) })
-        return result
-      }, {})
+    errorMsgs () {
+      return translateErrors(this.errors, 'refund')
     }
   },
   watch: {

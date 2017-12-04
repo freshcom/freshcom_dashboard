@@ -187,7 +187,7 @@
 
 <script>
 import _ from 'lodash'
-import errorI18nKey from '@/utils/error-i18n-key'
+import translateErrors from '@/helpers/translate-errors'
 import { dollar, chargeDollar } from '@/helpers/filters'
 import Price from '@/models/price'
 import OrderLineItem from '@/models/order-line-item'
@@ -256,11 +256,8 @@ export default {
       return this.formModel.priceEstimateByDefault
     },
 
-    errorMessages () {
-      return _.reduce(this.errors, (result, v, k) => {
-        result[k] = this.$t(errorI18nKey('orderLineItem', k, v[0]), { name: _.startCase(k) })
-        return result
-      }, {})
+    errorMsgs () {
+      return translateErrors(this.errors, 'orderLineItem')
     },
 
     prices () {

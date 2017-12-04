@@ -190,7 +190,7 @@ import 'vue-awesome/icons/plus'
 
 import ShowPage from '@/mixins/show-page'
 import DeleteButton from '@/components/delete-button'
-import errorI18nKey from '@/utils/error-i18n-key'
+import translateErrors from '@/helpers/translate-errors'
 import { chargeDollar } from '@/helpers/filters'
 
 export default {
@@ -235,11 +235,10 @@ export default {
         })
 
         return updatedPrice
-      }).catch(error => {
-        this.$alert(
-          this.$t(errorI18nKey('Price', 'status', error.status[0])),
-          'Error')
-        throw error
+      }).catch(errors => {
+        let translatedErrors = translateErrors(errors, 'price')
+        this.$alert(translatedErrors.status, 'Error')
+        throw errors
       })
     }
   }

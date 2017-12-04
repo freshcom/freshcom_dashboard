@@ -42,7 +42,12 @@ export default {
   },
 
   setAccessToken (accessToken) {
-    this.http.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
+    // Create a new header object to avoid changing
+    // global config. Workaround of
+    // https://github.com/axios/axios/issues/385
+    const defaultHeaders = JSON.parse(JSON.stringify(this.http.defaults.headers))
+    defaultHeaders.common['Authorization'] = `Bearer ${accessToken}`
+    this.http.defaults.headers = defaultHeaders
   },
 
   createToken (payload) {
@@ -102,25 +107,127 @@ export default {
     })
   },
 
-  listPointDeposit (id, params = {}, options = {}) {
-    return this.http.get('/point_deposits', { params: params }).then(response => {
+  //
+  // Depositable
+  //
+  listDepositable (id, params = {}, options = {}) {
+    return this.http.get('/depositables', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(error => {
       throw SimpleJAS.deserializeErrors(error.response.data.errors)
     })
   },
 
-  createPointDeposit (fields, params = {}, options = {}) {
+  createDepositable (fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
-    return this.http.post('/point_deposits', payload, { params: params }).then(response => {
+    return this.http.post('/depositables', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(error => {
       throw SimpleJAS.deserializeErrors(error.response.data.errors)
     })
   },
 
-  retrievePointDeposit (id, params = {}, options = {}) {
-    return this.http.get(`/point_deposits/${id}`, { params: params }).then(response => {
+  retrieveDepositable (id, params = {}, options = {}) {
+    return this.http.get(`/depositables/${id}`, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(error => {
+      throw SimpleJAS.deserializeErrors(error.response.data.errors)
+    })
+  },
+
+  updateDepositable (id, fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.patch(`/depositables/${id}`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(error => {
+      throw SimpleJAS.deserializeErrors(error.response.data.errors)
+    })
+  },
+
+  deleteDepositable (id, params = {}, options = {}) {
+    return this.http.delete(`/depositables/${id}`, { params: params }).then(response => {
+      if (response.data) {
+        return SimpleJAS.deserialize(response.data)
+      }
+    }).catch(error => {
+      throw SimpleJAS.deserializeErrors(error.response.data.errors)
+    })
+  },
+
+  //
+  // ExternalFile
+  //
+  listExternalFile (params = {}, options = {}) {
+    return this.http.get('/external_files', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(error => {
+      throw SimpleJAS.deserializeErrors(error.response.data.errors)
+    })
+  },
+
+  createExternalFile (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post('/external_files', payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(error => {
+      throw SimpleJAS.deserializeErrors(error.response.data.errors)
+    })
+  },
+
+  updateExternalFile (id, fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.patch(`/external_files/${id}`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(error => {
+      throw SimpleJAS.deserializeErrors(error.response.data.errors)
+    })
+  },
+
+  uploadExternalFile (fields, params = {}, options = {}) {
+    let file = fields.file
+    return this.createExternalFile(fields, params, options).then(response => {
+      let externalFile = response.data
+      externalFile.percentage = 0
+      externalFile.file = file
+
+      if (options.created) {
+        options.created(response)
+      }
+
+      let config = {
+        onUploadProgress: function (progressEvent) {
+          let percentage = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+          externalFile.percentage = percentage
+
+          if (options.progress) {
+            options.progress(externalFile)
+          }
+        },
+        headers: { 'Content-Type': externalFile.contentType }
+      }
+
+      return axios.put(externalFile.url, file, config).then(() => { return response })
+    }).then(response => {
+      let externalFile = response.data
+      externalFile.status = 'uploaded'
+      return this.updateExternalFile(externalFile.id, externalFile, params, options)
+    })
+  },
+
+  //
+  // ExternalFileCollection
+  //
+  listExternalFileCollection (params = {}, options = {}) {
+    return this.http.get('/external_file_collections', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(error => {
+      throw SimpleJAS.deserializeErrors(error.response.data.errors)
+    })
+  },
+
+  createExternalFileCollection (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post('/external_file_collections', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(error => {
       throw SimpleJAS.deserializeErrors(error.response.data.errors)
