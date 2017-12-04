@@ -5,7 +5,7 @@
       <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
       <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">Collections</el-menu-item>
     </el-menu>
-    <locale-selector @change="loadRecord" class="pull-right"></locale-selector>
+    <locale-selector @change="loadProduct()" class="pull-right"></locale-selector>
   </div>
 
   <div>
@@ -19,16 +19,16 @@
 
           <div class="detail">
             <p>
-              <span>Product {{$t(`attributes.product.kind.${record.kind}`)}}</span>
-              <span>{{record.code}}</span>
+              <span>Product {{$t(`fields.product.kind.${product.kind}`)}}</span>
+              <span>{{product.code}}</span>
             </p>
-            <h2>{{record.name}}</h2>
-            <p class="id">{{record.id}}</p>
+            <h2>{{product.name}}</h2>
+            <p class="id">{{product.id}}</p>
           </div>
         </div>
 
         <div class="header-actions">
-          <el-button @click="editRecord()" size="medium">Edit</el-button>
+          <el-button @click="editProduct(product)" plain size="small">Edit</el-button>
         </div>
       </div>
 
@@ -40,57 +40,57 @@
           <div class="block-body">
             <dl>
               <dt>ID</dt>
-              <dd>{{record.id}}</dd>
+              <dd>{{product.id}}</dd>
 
               <dt>Code</dt>
-              <dd>{{record.code}}</dd>
+              <dd>{{product.code}}</dd>
 
               <dt>Status</dt>
               <dd>
-                {{$t(`attributes.product.status.${record.status}`)}}
+                {{$t(`fields.product.status.${product.status}`)}}
               </dd>
 
               <dt>Kind</dt>
               <dd>
-                {{$t(`attributes.product.kind.${record.kind}`)}}
+                {{$t(`fields.product.kind.${product.kind}`)}}
               </dd>
 
               <dt>Name Sync</dt>
-              <dd>{{$t(`attributes.product.nameSync.${record.nameSync}`)}}</dd>
+              <dd>{{$t(`fields.product.nameSync.${product.nameSync}`)}}</dd>
 
               <dt>Name</dt>
-              <dd>{{record.name}}</dd>
+              <dd>{{product.name}}</dd>
 
               <dt>Short Name</dt>
-              <dd>{{record.shortName}}</dd>
+              <dd>{{product.shortName}}</dd>
 
               <dt>Print Name</dt>
-              <dd>{{record.printName}}</dd>
+              <dd>{{product.printName}}</dd>
 
               <dt>Sort Index</dt>
-              <dd>{{record.sortIndex}}</dd>
+              <dd>{{product.sortIndex}}</dd>
 
               <dt>Source Quantity</dt>
-              <dd>{{record.sourceQuantity}}</dd>
+              <dd>{{product.sourceQuantity}}</dd>
 
               <dt>Maximum Public OQ</dt>
-              <dd>{{record.maximumPublicOrderQuantity}}</dd>
+              <dd>{{product.maximumPublicOrderQuantity}}</dd>
 
               <dt>Caption</dt>
-              <dd>{{record.caption}}</dd>
+              <dd>{{product.caption}}</dd>
 
               <dt>Description</dt>
-              <dd>{{record.description}}</dd>
+              <dd>{{product.description}}</dd>
             </dl>
           </div>
         </div>
 
-        <template v-if="record.kind === 'combo'">
+        <template v-if="product.kind === 'combo'">
           <div class="block-title">
             <h3>Items</h3>
 
             <span class="block-title-actions pull-right">
-              <router-link :to="{ name: 'NewProduct', query: { parentId: record.id, callbackPath: currentRoutePath } }">
+              <router-link :to="{ name: 'NewProduct', query: { parentId: product.id, callbackPath: currentRoutePath } }">
                 <icon name="plus" scale="0.8" class="v-middle"></icon>
                 <span>Add</span>
               </router-link>
@@ -99,13 +99,13 @@
 
           <div class="block">
             <div class="block-body full">
-              <el-table :data="record.items" :show-header="false" class="block-table" style="width: 100%">
+              <el-table :data="product.items" :show-header="false" class="block-table" style="width: 100%">
                 <el-table-column>
                   <template scope="scope">
                     <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id } }">
                       <span>{{scope.row.name}}</span>
                       <el-tag v-if="scope.row.status != 'active'" type="gray" size="mini">
-                        {{$t(`attributes.product.status.${scope.row.status}`)}}
+                        {{$t(`fields.product.status.${scope.row.status}`)}}
                       </el-tag>
                     </router-link>
                   </template>
@@ -114,7 +114,7 @@
                 <el-table-column width="300">
                   <template scope="scope">
                     <p class="text-right actions">
-                      <el-button @click="goTo({ name: 'EditProduct', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } })" size="mini">
+                      <el-button @click="editProduct(scope.row)" plain size="mini">
                         Edit
                       </el-button>
                     </p>
@@ -123,7 +123,6 @@
               </el-table>
             </div>
 
-
             <div class="block-footer text-center">
               <a class="view-more" href="#">View More</a>
             </div>
@@ -131,12 +130,12 @@
         </template>
 
 
-        <template v-if="record.kind === 'withVariants'">
+        <template v-if="product.kind === 'withVariants'">
           <div class="block-title">
             <h3>Variants</h3>
 
             <span class="block-title-actions pull-right">
-              <router-link :to="{ name: 'NewProduct', query: { parentId: record.id, kind: 'variant', callbackPath: currentRoutePath } }">
+              <router-link :to="{ name: 'NewProduct', query: { parentId: product.id, kind: 'variant', callbackPath: currentRoutePath } }">
                 <icon name="plus" scale="0.8" class="v-middle"></icon>
                 <span>Add</span>
               </router-link>
@@ -145,13 +144,13 @@
 
           <div class="block">
             <div class="block-body full">
-              <el-table :data="record.variants" :show-header="false" class="block-table" style="width: 100%">
+              <el-table :data="product.variants" :show-header="false" class="block-table" style="width: 100%">
                 <el-table-column>
                   <template slot-scope="scope">
                     <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id } }">
                       <span>{{scope.row.name}}</span>
                       <el-tag v-if="scope.row.status != 'active'" type="gray" size="mini">
-                        {{$t(`attributes.product.status.${scope.row.status}`)}}
+                        {{$t(`fields.product.status.${scope.row.status}`)}}
                       </el-tag>
 
                       <el-tag v-if="scope.row.primary" size="mini">
@@ -170,15 +169,15 @@
                 <el-table-column width="300">
                   <template slot-scope="scope">
                     <p class="text-right actions">
-                      <el-button v-if="isMarkVariantPrimaryVisible(scope.row)" @click="markVariantPrimary(scope.row)" size="mini">
-                        Mark Primary
-                      </el-button>
-
-                      <el-button v-if="scope.row.status == 'draft'" type="primary" @click="markVariantActive(scope.row)" size="mini">
+                      <el-button v-if="scope.row.status == 'draft'" @click="markVariantActive(scope.row)" plain size="mini">
                         Mark Active
                       </el-button>
 
-                      <el-button @click="goTo({ name: 'EditProduct', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } })" size="mini">
+                      <el-button v-if="canMarkVariantPrimary(scope.row)" @click="markVariantPrimary(scope.row)" plain size="mini">
+                        Mark Primary
+                      </el-button>
+
+                      <el-button @click="editProduct(scope.row)" plain size="mini">
                         Edit
                       </el-button>
                     </p>
@@ -196,12 +195,12 @@
 
         <div class="clearfix"></div>
 
-        <template v-if="canHavePrice(record)">
+        <template v-if="canHavePrice(product)">
           <div class="block-title">
             <h3>Prices</h3>
 
             <span class="block-title-actions pull-right">
-              <router-link :to="{ name: 'NewPrice', query: { productKind: record.kind, productId: record.id, callbackPath: currentRoutePath } }">
+              <router-link :to="{ name: 'NewPrice', query: { productKind: product.kind, productId: product.id, callbackPath: currentRoutePath } }">
                 <icon name="plus" scale="0.8" class="v-middle"></icon>
                 <span>Add</span>
               </router-link>
@@ -210,14 +209,14 @@
 
           <div class="block">
             <div class="block-body full">
-              <el-table :data="record.prices" class="block-table" :show-header="false" style="width: 100%">
+              <el-table :data="product.prices" class="block-table" :show-header="false" style="width: 100%">
                 <el-table-column width="300">
                   <template scope="scope">
                     <router-link :to="{ name: 'ShowPrice', params: { id: scope.row.id } }">
                       <span v-if="scope.row.name">{{scope.row.name}}</span>
                       <span v-if="!scope.row.name">{{scope.row.label}}</span>
                       <el-tag v-if="scope.row.status != 'active'" type="gray" size="mini">
-                        {{$t(`attributes.price.status.${scope.row.status}`)}}
+                        {{$t(`fields.price.status.${scope.row.status}`)}}
                       </el-tag>
                     </router-link>
                   </template>
@@ -238,11 +237,11 @@
                 <el-table-column>
                   <template scope="scope">
                     <p class="text-right actions">
-                      <el-button v-if="scope.row.status == 'draft'" type="primary" @click="markPriceActive(scope.row)" size="mini">
+                      <el-button v-if="scope.row.status == 'draft'" @click="markPriceActive(scope.row)" plain size="mini">
                         Mark Active
                       </el-button>
 
-                      <el-button @click="goTo({ name: 'EditPrice', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } })" plain size="mini">
+                      <el-button @click="editPrice(scope.row)" plain size="mini">
                         Edit
                       </el-button>
                     </p>
@@ -261,7 +260,7 @@
           <h3>File Collections</h3>
 
           <span class="block-title-actions pull-right">
-            <router-link :to="{ name: 'NewExternalFileCollection', query: { productId: record.id, callbackPath: currentRoutePath } }">
+            <router-link :to="{ name: 'NewExternalFileCollection', query: { productId: product.id, callbackPath: currentRoutePath } }">
               <icon name="plus" scale="0.8" class="v-middle"></icon>
               <span>Add</span>
             </router-link>
@@ -270,7 +269,7 @@
 
         <div class="block">
           <div class="block-body full">
-            <el-table :data="record.externalFileCollections" stripe class="block-table" :show-header="false" style="width: 100%">
+            <el-table :data="product.externalFileCollections" stripe class="block-table" :show-header="false" style="width: 100%">
               <el-table-column width="500">
                 <template scope="scope">
                   <router-link :to="{ name: 'ShowExternalFileCollection', params: { id: scope.row.id } }">
@@ -311,7 +310,7 @@
         </div>
         <div class="block">
           <div class="block-body">
-            {{record.customData}}
+            {{product.customData}}
           </div>
         </div>
 
@@ -319,8 +318,12 @@
         <div class="block">
           <div class="block-body">
             <dl>
-              <dt v-if="record.avatar">Avatar</dt>
-              <dd v-if="record.avatar"><a href="#">{{record.avatar.id}}</a></dd>
+              <dt v-if="product.avatar">Avatar</dt>
+              <dd v-if="product.avatar"><a href="#">{{product.avatar.id}}</a></dd>
+            </dl>
+            <dl>
+              <dt v-if="product.parent">Parent</dt>
+              <dd v-if="product.parent"><a href="#">{{product.parent.id}}</a></dd>
             </dl>
           </div>
         </div>
@@ -341,7 +344,7 @@
       </div>
 
       <div class="footer text-right">
-        <delete-button @confirmed="deleteRecord" size="medium">Delete</delete-button>
+        <delete-button @confirmed="deleteProduct()" size="small">Delete</delete-button>
       </div>
     </el-card>
   </div>
@@ -350,12 +353,11 @@
 </template>
 
 <script>
-import 'vue-awesome/icons/times'
-import 'vue-awesome/icons/pencil'
 import 'vue-awesome/icons/plus'
-
 import _ from 'lodash'
-import ShowPage from '@/mixins/show-page'
+import freshcom from '@/freshcom-sdk'
+
+import Product from '@/models/product'
 import DeleteButton from '@/components/delete-button'
 import translateErrors from '@/helpers/translate-errors'
 import { chargeDollar } from '@/helpers/filters'
@@ -368,82 +370,157 @@ export default {
   filters: {
     chargeDollar
   },
-  mixins: [ShowPage({ storeNamespace: 'product', name: 'Product', include: 'prices,avatar,items,variants.defaultPrice,externalFileCollections' })],
+  props: ['id'],
+  data () {
+    return {
+      product: Product.objectWithDefaults(),
+      isLoading: false
+    }
+  },
+  beforeRouteUpdate (to, from, next) {
+    this.loadProduct(to.params.id)
+    next()
+  },
+  created () {
+    this.loadProduct(this.id)
+  },
   computed: {
     avatarUrl () {
-      if (this.record.avatar) {
-        return this.record.avatar.url
+      if (this.product.avatar) {
+        return this.product.avatar.url
       }
 
       return 'http://placehold.it/80x80'
+    },
+    currentRoutePath () {
+      return this.$store.state.route.fullPath
     }
   },
   methods: {
-    editRecord () {
-      this.$store.dispatch('pushRoute', { name: 'EditProduct', params: { id: this.record.id } })
+    loadProduct (id) {
+      this.isLoading = true
+
+      freshcom.retrieveProduct(id, {
+        include: 'prices,avatar,items,variants.defaultPrice,externalFileCollections'
+      }).then(response => {
+        this.product = response.data
+        this.isLoading = false
+      }).catch(errors => {
+        this.isLoading = false
+        throw errors
+      })
     },
-    recordDeleted () {
-      this.$store.dispatch('pushRoute', { name: 'ListProduct' })
+
+    editProduct (product) {
+      this.$store.dispatch('pushRoute', {
+        name: 'EditProduct',
+        params: { id: product.id },
+        query: { callbackPath: this.currentRoutePath }
+      })
     },
-    isMarkVariantPrimaryVisible (product) {
-      return this.record.kind === 'withVariants' && !product.primary
-    },
-    canHavePrice (record) {
-      return record.kind !== 'withVariants'
-    },
-    markVariantActive (variant) {
-      let variantDraft = _.cloneDeep(variant)
-      variantDraft.status = 'active'
-      this.$store.dispatch('product/updateVariant', { id: variantDraft.id, recordDraft: variantDraft }).then(updatedVariant => {
+
+    deleteProduct () {
+      freshcom.deleteProduct(this.product.id).then(() => {
         this.$message({
           showClose: true,
-          message: 'Product Variant updated successfully.',
+          message: `Product deleted successfully.`,
           type: 'success'
         })
 
-        return updatedVariant
+        this.back()
+      })
+    },
+
+    editPrice (price) {
+      this.$store.dispatch('pushRoute', {
+        name: 'EditPrice',
+        params: { id: price.id },
+        query: { callbackPath: this.currentRoutePath }
+      })
+    },
+
+    back () {
+      this.$store.dispatch('pushRoute', { name: 'ListProduct' })
+    },
+
+    canMarkVariantPrimary (product) {
+      return this.product.kind === 'withVariants' && !product.primary
+    },
+
+    canHavePrice (product) {
+      return product.kind !== 'withVariants'
+    },
+
+    markVariantActive (variant) {
+      let variantDraft = _.cloneDeep(variant)
+      variantDraft.status = 'active'
+
+      freshcom.updateProduct(variantDraft.id, variantDraft).then((response) => {
+        let updatedVariant = response.data
+
+        _.each(this.product.variants, (variant) => {
+          if (variant.id === updatedVariant.id) {
+            variant.status = updatedVariant.status
+          }
+        })
+
+        this.$message({
+          showClose: true,
+          message: 'Product variant updated successfully.',
+          type: 'success'
+        })
       }).catch(errors => {
         let translatedErrors = translateErrors(errors, 'product')
         this.$alert(translatedErrors.status, 'Error')
         throw errors
       })
     },
-    markVariantPrimary (item) {
-      let variantDraft = _.cloneDeep(item)
+
+    markVariantPrimary (variant) {
+      let variantDraft = _.cloneDeep(variant)
       variantDraft.primary = true
-      this.$store.dispatch('product/updateVariant', { id: variantDraft.id, recordDraft: variantDraft }).then(updatedItem => {
-        let product = _.cloneDeep(this.record)
-        _.each(product.items, (item) => {
-          if (item.id === updatedItem.id) {
-            item.primary = true
-          } else {
-            item.primary = false
+
+      freshcom.updateProduct(variantDraft.id, variantDraft).then((response) => {
+        let updatedVariant = response.data
+
+        _.each(this.product.variants, (variant) => {
+          variant.primary = false
+
+          if (variant.id === updatedVariant.id) {
+            variant.primary = updatedVariant.primary
           }
         })
 
-        return this.$store.dispatch('product/setRecord', product)
+        this.$message({
+          showClose: true,
+          message: 'Product variant marked as primary successfully.',
+          type: 'success'
+        })
+      }).catch(errors => {
+        let translatedErrors = translateErrors(errors, 'product')
+        this.$alert(translatedErrors.status, 'Error')
+        throw errors
       })
     },
+
     markPriceActive (price) {
       let priceDraft = _.cloneDeep(price)
       priceDraft.status = 'active'
-      return this.$store.dispatch('price/updateRecord', { id: priceDraft.id, recordDraft: priceDraft }).then(updatedPrice => {
-        let product = _.cloneDeep(this.record)
-        _.each(product.prices, (price) => {
+
+      freshcom.updatePrice(priceDraft.id, priceDraft).then((response) => {
+        let updatedPrice = response.data
+
+        _.each(this.product.prices, (price) => {
           if (price.id === updatedPrice.id) {
             price.status = updatedPrice.status
           }
         })
-
-        this.$store.dispatch('product/setRecord', product)
 
         this.$message({
           showClose: true,
           message: 'Price updated successfully.',
           type: 'success'
         })
-
-        return updatedPrice
       }).catch(errors => {
         let translatedErrors = translateErrors(errors, 'price')
         this.$alert(translatedErrors.status, 'Error')

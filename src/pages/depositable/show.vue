@@ -67,7 +67,7 @@
           <h3>File Collections</h3>
 
           <span class="block-title-actions pull-right">
-            <router-link :to="{ name: 'NewExternalFileCollection', query: { depositableId: depositable.id, callbackPath: currentRoutePath } }">
+            <router-link :to="{ name: 'NewExternalFileCollection', query: { ownerId: depositable.id, ownerType: 'Depositable', callbackPath: currentRoutePath } }">
               <icon name="plus" scale="0.8" class="v-middle"></icon>
               <span>Add</span>
             </router-link>
@@ -162,14 +162,12 @@
 </template>
 
 <script>
-import 'vue-awesome/icons/times'
-import 'vue-awesome/icons/pencil'
 import 'vue-awesome/icons/plus'
-
 import freshcom from '@/freshcom-sdk'
+
 import Depositable from '@/models/depositable'
 import DeleteButton from '@/components/delete-button'
-import { dollar, idLastPart } from '@/helpers/filters'
+import { idLastPart } from '@/helpers/filters'
 
 export default {
   name: 'ShowDepositable',
@@ -178,15 +176,12 @@ export default {
     DeleteButton
   },
   filters: {
-    dollar,
     idLastPart
   },
   data () {
     return {
       depositable: Depositable.objectWithDefaults(),
-      isLoading: false,
-
-      errors: {}
+      isLoading: false
     }
   },
   created () {

@@ -14,7 +14,7 @@ export default function (errors, namespace, interpolations = {}) {
     }
 
     let errorCode = errorObj['code']
-    let errorKey = `errors.${namespace}.${errorCode}`
+    let errorKey = `errors.${namespace}.${k}.${errorCode}`
     let errorInterpolations = Object.assign({}, { name: fieldName }, interpolations)
     let errorMsg = i18n.t(errorKey, errorInterpolations)
 

@@ -2,7 +2,12 @@
 <div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="/files" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">Files</el-menu-item>
+      <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">
+        Files
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="/file_collections">
+        Collections
+      </el-menu-item>
     </el-menu>
     <locale-selector class="pull-right"></locale-selector>
   </div>
@@ -13,14 +18,14 @@
 
           <div class="brief">
             <div class="avatar">
-              <img v-if="isImage(record)" :src="record.url">
+              <img v-if="isImage(externalFile)" :src="externalFile.url">
               <icon v-else name="file" class="avatar-icon"></icon>
             </div>
 
             <div class="detail">
-              <p>{{record.code}}</p>
-              <h2>{{record.name}}</h2>
-              <p class="id">{{record.id}}</p>
+              <p>{{externalFile.code}}</p>
+              <h2>{{externalFile.name}}</h2>
+              <p class="id">{{externalFile.id}}</p>
             </div>
           </div>
         </div>
@@ -34,31 +39,31 @@
             <div class="block-body">
               <dl>
                 <dt>ID</dt>
-                <dd>{{record.id}}</dd>
+                <dd>{{externalFile.id}}</dd>
 
                 <dt>Status</dt>
-                <dd>{{record.status}}</dd>
+                <dd>{{externalFile.status}}</dd>
 
                 <dt>Name</dt>
-                <dd>{{record.name}}</dd>
+                <dd>{{externalFile.name}}</dd>
 
                 <dt>Content Type</dt>
-                <dd>{{record.contentType}}</dd>
+                <dd>{{externalFile.contentType}}</dd>
 
                 <dt>Size</dt>
-                <dd>{{record.sizeBytes}} bytes</dd>
+                <dd>{{externalFile.sizeBytes}} bytes</dd>
 
                 <dt>Public Readable</dt>
-                <dd>{{record.publicReadable}}</dd>
+                <dd>{{externalFile.publicReadable}}</dd>
 
                 <dt>Version Name</dt>
-                <dd>{{record.versionName}}</dd>
+                <dd>{{externalFile.versionName}}</dd>
 
                 <dt>Version Label</dt>
-                <dd>{{record.versionLabel}}</dd>
+                <dd>{{externalFile.versionLabel}}</dd>
 
                 <dt>URL</dt>
-                <dd><a :href="record.url" target="_blank">Click to open</a></dd>
+                <dd><a :href="externalFile.url" target="_blank">Click to open</a></dd>
               </dl>
             </div>
           </div>
@@ -93,7 +98,7 @@
         </div>
 
         <div class="footer text-right">
-          <delete-button @confirmed="deleteRecord" size="medium">Delete</delete-button>
+          <delete-button @confirmed="deleteExternalFile()" size="small">Delete</delete-button>
         </div>
     </el-card>
   </div>
@@ -102,25 +107,57 @@
 </template>
 
 <script>
-import 'vue-awesome/icons/times'
-import 'vue-awesome/icons/pencil'
-import 'vue-awesome/icons/plus'
 import 'vue-awesome/icons/file'
+import freshcom from '@/freshcom-sdk'
 
-import ShowPage from '@/mixins/show-page'
+import ExternalFile from '@/models/external-file'
 import DeleteButton from '@/components/delete-button'
 
 export default {
   name: 'ShowExternalFile',
+  props: ['id'],
   components: {
     DeleteButton
   },
-  mixins: [ShowPage({ storeNamespace: 'externalFile', name: 'File' })],
+  data () {
+    return {
+      externalFile: ExternalFile.objectWithDefaults(),
+      isLoading: false,
+
+      errors: {}
+    }
+  },
+  created () {
+    this.loadExternalFile()
+  },
   methods: {
+    loadExternalFile () {
+      freshcom.retrieveExternalFile(this.id).then(response => {
+        this.externalFile = response.data
+        this.isLoading = false
+      }).catch(errors => {
+        this.isLoading = false
+        throw errors
+      })
+    },
+
     isImage (externalFile) {
       return externalFile.contentType.startsWith('image/')
     },
-    recordDeleted () {
+
+    deleteExternalFile () {
+      freshcom.deleteExternalFile(this.externalFile.id).then(() => {
+        this.$message({
+          showClose: true,
+          message: `File deleted successfully.`,
+          type: 'success'
+        })
+
+        this.back()
+      })
+    },
+
+    back () {
       this.$store.dispatch('pushRoute', { name: 'ListExternalFile' })
     }
   }

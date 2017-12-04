@@ -10,7 +10,9 @@ export default {
       printName: '',
 
       caption: '',
-      desecription: ''
+      desecription: '',
+
+      avatar: null
     }
   }
 }

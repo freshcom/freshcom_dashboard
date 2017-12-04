@@ -9,31 +9,31 @@
   </div>
 
   <div>
-    <el-card v-loading="isLoading" class="main-card">
+    <el-card class="main-card">
       <div slot="header">
         <span style="line-height: 36px;">Create a Product</span>
 
         <div class="pull-right">
-          <el-button @click="cancel" plain size="medium">
+          <el-button @click="back()" plain size="small">
             Cancel
           </el-button>
 
-          <el-button @click="submit(recordDraft)" size="medium" type="primary">
+          <el-button @click="submit()" size="small" type="primary">
             Save
           </el-button>
         </div>
       </div>
 
       <div class="data">
-        <product-form v-model="recordDraft" :errors="errors"></product-form>
+        <product-form v-model="productDraft" :errors="errors"></product-form>
       </div>
 
       <div class="footer">
-        <el-button @click="cancel" plain size="medium">
+        <el-button @click="back()" plain size="small">
           Cancel
         </el-button>
 
-        <el-button @click="submit(recordDraft)" size="medium" type="primary" class="pull-right">
+        <el-button @click="submit()" size="small" type="primary" class="pull-right">
           Save
         </el-button>
       </div>
@@ -43,8 +43,9 @@
 </template>
 
 <script>
-import _ from 'lodash'
-import NewPage from '@/mixins/new-page'
+import freshcom from '@/freshcom-sdk'
+
+import Product from '@/models/product'
 import ProductForm from '@/components/product-form'
 
 export default {
@@ -53,23 +54,33 @@ export default {
   components: {
     ProductForm
   },
-  mixins: [NewPage({ storeNamespace: 'product', name: 'Product' })],
-  created () {
-    let record = _.cloneDeep(this.record)
-
-    if (this.kind) {
-      record.kind = this.kind
+  data () {
+    return {
+      productDraft: Product.objectWithDefaults(),
+      isCreatingProduct: false,
+      errors: {}
     }
-
-    if (this.parentId) {
-      record.parent = { id: this.parentId, type: 'Product' }
-    }
-
-    this.$store.dispatch('product/setRecord', record)
   },
   methods: {
-    recordCreated (record) {
-      this.$store.dispatch('pushRoute', { name: 'ShowProduct', params: { id: record.id } })
+    submit () {
+      this.isCreatingProduct = true
+
+      freshcom.createProduct(this.productDraft).then(response => {
+        this.$message({
+          showClose: true,
+          message: `Product created successfully.`,
+          type: 'success'
+        })
+
+        this.isCreatingProduct = false
+        this.back()
+      }).catch(errors => {
+        this.errors = errors
+        this.isCreatingProduct = false
+      })
+    },
+    back () {
+      this.$store.dispatch('pushRoute', { name: 'ListProduct' })
     }
   }
 }

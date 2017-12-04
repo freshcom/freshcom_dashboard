@@ -79,7 +79,12 @@
           </el-menu-item>
         </el-submenu> -->
 
-        <el-submenu index="fileStorage">
+        <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">
+          <icon name="folder" scale="0.8"></icon>
+          <span>File Storage</span>
+        </el-menu-item>
+
+<!--         <el-submenu index="fileStorage">
           <template slot="title">
             <icon name="folder" scale="0.8"></icon>
             <span>File Storage</span>
@@ -92,7 +97,7 @@
             <icon name="file" scale="0.8"></icon>
             <span>Files</span>
           </el-menu-item>
-        </el-submenu>
+        </el-submenu> -->
 
         <el-menu-item :route="{ name: 'ShowBillingSettings' }" index="/billing">
           <icon name="id-card" scale="0.8"></icon>
@@ -163,8 +168,7 @@ export default {
 
       if (routePath.startsWith('/stockables')) { return '/stockables' }
       if (routePath.startsWith('/unlockables')) { return '/unlockables' }
-      if (routePath.startsWith('/file_collections')) { return '/file_collections' }
-      if (routePath.startsWith('/files')) { return '/files' }
+      if (routePath.startsWith('/file')) { return '/files' }
       if (routePath.startsWith('/products')) { return '/products' }
       if (routePath.startsWith('/product_items')) { return '/products' }
       if (routePath.startsWith('/prices')) { return '/products' }

@@ -4,20 +4,20 @@
     <el-menu :router="true" default-active="/unlockables" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListUnlockable' }" index="/unlockables">Unlockables</el-menu-item>
     </el-menu>
-    <locale-selector @change="search" class="pull-right"></locale-selector>
+    <locale-selector @change="searchUnlockable()" class="pull-right"></locale-selector>
   </div>
 
   <div>
     <el-card class="main-card">
       <div slot="header" class="clearfix">
-        <el-button size="small"><icon name="filter" scale="0.7" class="v-middle"></icon> Filter</el-button>
+        <el-button plain size="small"><icon name="filter" scale="0.7" class="v-middle"></icon> Filter</el-button>
         <div class="search">
-          <el-input :value="searchKeyword" @input="enteringKeyword" size="small" placeholder="Search...">
+          <el-input :value="searchKeyword" @input="updateSearchKeyword" size="small" placeholder="Search...">
             <template slot="prepend"><icon name="search" scale="1" class="v-middle"></icon></template>
           </el-input>
         </div>
 
-        <el-button @click="goTo({ name: 'NewUnlockable' })" class="pull-right" size="small">
+        <el-button @click="newUnlockable()" plain size="small" class="pull-right" >
           <icon name="plus" scale="0.7" class="v-middle"></icon> New
         </el-button>
       </div>
@@ -26,19 +26,18 @@
         <p v-if="noSearchResult" class="search-notice text-center">
           There is no result that matches "{{searchKeyword}}"
         </p>
-        <p v-if="isEnteringSearchKeyword" class="search-notice text-center">
-          Stop typing to search...
-        </p>
-        <el-table v-if="hasSearchResult" @row-click="viewRecord" :data="tableData" stripe class="full">
-          <el-table-column prop="name" label="Unlockable"></el-table-column>
+        <el-table v-if="hasSearchResult" @row-click="viewUnlockable" :data="unlockables" stripe class="full">
+          <el-table-column prop="name" label="Unlockable">
+            <template slot-scope="scope">
+              <span v-if="scope.row.code">
+                [{{scope.row.code}}]
+              </span>
+              <span>{{scope.row.name}}</span>
+            </template>
+          </el-table-column>
           <el-table-column prop="status" label="Status" width="100">
             <template slot-scope="scope">
-              <el-tag v-if="scope.row.status === 'active'" size="mini" type="primary">
-                {{$t(`attributes.unlockable.status.${scope.row.status}`)}}
-              </el-tag>
-              <el-tag v-else type="gray">
-                {{$t(`attributes.unlockable.status.${scope.row.status}`)}}
-              </el-tag>
+              {{$t(`fields.unlockable.status.${scope.row.status}`)}}
             </template>
           </el-table-column>
           <el-table-column prop="id" label="ID" width="120">
@@ -46,12 +45,16 @@
               <el-popover trigger="hover" placement="top">
                 <span>{{ scope.row.id }}</span>
                 <div slot="reference" class="name-wrapper">
-                  {{ scope.row.idLastPart }}
+                  {{ scope.row.id | idLastPart }}
                 </div>
               </el-popover>
             </template>
           </el-table-column>
-          <el-table-column prop="lastUpdated" label="Last Updated" align="right" width="130"></el-table-column>
+          <el-table-column prop="updatedAt" label="" align="right" width="200">
+            <template slot-scope="scope">
+              {{scope.row.updatedAt | moment}}
+            </template>
+          </el-table-column>
         </el-table>
 
         <div v-if="hasSearchResult" class="footer">
@@ -66,39 +69,91 @@
 
 <script>
 import 'vue-awesome/icons/search'
-import 'vue-awesome/icons/chevron-right'
-import 'vue-awesome/icons/chevron-left'
 
 import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+
 import Pagination from '@/components/pagination'
-import ListPage from '@/mixins/list-page'
+import { idLastPart } from '@/helpers/filters'
 
 export default {
   name: 'ListUnlockable',
   components: {
     Pagination
   },
-  mixins: [ListPage({ storeNamespace: 'unlockable', fields: { 'Unlockable': 'code,name,status' } })],
+  filters: {
+    idLastPart
+  },
+  props: {
+    searchKeyword: {
+      type: String,
+      default: ''
+    },
+    page: {
+      type: Object,
+      required: true
+    }
+  },
+  data () {
+    return {
+      unlockables: [],
+      isLoading: false,
+      totalCount: 0,
+      resultCount: 0
+    }
+  },
+  created () {
+    this.searchUnlockable()
+  },
   computed: {
-    tableData () {
-      return _.map(this.records, (record) => {
-        let name = record.name
-        if (record.code) { name = `[${record.code}] ` + name }
-        let idLastPart = _.last(record.id.split('-'))
-
-        return {
-          name: name,
-          status: record.status,
-          idLastPart: idLastPart,
-          id: record.id,
-          lastUpdated: this.$options.filters.moment(record.updatedAt, 'D MMM YYYY')
-        }
-      })
+    noSearchResult () {
+      return !this.isLoading && this.resultCount === 0 && this.totalCount > 0
+    },
+    hasSearchResult () {
+      return !this.isLoading && this.resultCount !== 0
+    },
+    currentRoutePath () {
+      return this.$store.state.route.fullPath
+    }
+  },
+  watch: {
+    searchKeyword (newKeyword) {
+      this.searchDepositable()
+    },
+    page (newPage, oldPage) {
+      if (_.isEqual(newPage, oldPage)) {
+        return
+      }
+      this.search()
     }
   },
   methods: {
-    viewRecord (row) {
-      this.goTo({ name: 'ShowUnlockable', params: { id: row.id } })
+    updateSearchKeyword: _.debounce(function (newSearchKeyword) {
+      // Remove page[number] from query to reset to the first page
+      let q = _.merge({}, _.omit(this.$route.query, ['page[number]']), { search: newSearchKeyword })
+      this.$router.replace({ name: this.$store.state.route.name, query: q })
+    }, 300),
+    searchUnlockable () {
+      this.isLoading = true
+
+      freshcom.listUnlockable({
+        search: this.searchKeyword,
+        page: this.page
+      }).then(response => {
+        this.unlockables = response.data
+        this.totalCount = response.meta.totalCount
+        this.resultCount = response.meta.resultCount
+
+        this.isLoading = false
+      }).catch(errors => {
+        this.isLoading = false
+      })
+    },
+    viewUnlockable (depositable) {
+      this.$store.dispatch('pushRoute', { name: 'ShowUnlockable', params: { id: depositable.id, callbackPath: this.currentRoutePath } })
+    },
+    newUnlockable () {
+      this.$store.dispatch('pushRoute', { name: 'NewUnlockable' })
     }
   }
 }

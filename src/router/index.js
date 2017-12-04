@@ -206,7 +206,7 @@ export default new Router({
         let queryString = route.fullPath.split('?')[1]
         let query = qs.parse(queryString)
 
-        return { stockableId: query.stockableId, productId: query.productId, callbackPath: query.callbackPath }
+        return { ownerId: query.ownerId, ownerType: query.ownerType, callbackPath: query.callbackPath }
       }
     },
     {
@@ -411,6 +411,17 @@ export default new Router({
       }
     },
     {
+      path: '/unlockables/new',
+      name: 'NewUnlockable',
+      component: NewUnlockablePage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { customerId: query.customerId, callbackPath: query.callbackPath }
+      }
+    },
+    {
       path: '/unlockables/:id',
       name: 'ShowUnlockable',
       component: ShowUnlockablePage,
@@ -427,17 +438,6 @@ export default new Router({
         let query = qs.parse(queryString)
 
         return { id: route.params.id, callbackPath: query.callbackPath }
-      }
-    },
-    {
-      path: '/unlockables/new',
-      name: 'NewUnlockable',
-      component: NewUnlockablePage,
-      props (route) {
-        let queryString = route.fullPath.split('?')[1]
-        let query = qs.parse(queryString)
-
-        return { customerId: query.customerId, callbackPath: query.callbackPath }
       }
     },
     {

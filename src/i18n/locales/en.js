@@ -17,7 +17,7 @@ export default {
         onlyDisabledCanBeDeleted: 'Only Disabled Price can be deleted. Please update the status of the Price to Disabled, then try again.'
       },
       status: {
-        canOnlyActiveOnePerMoq: 'There is already an Active Price that have the same Minimum Order Quantity.',
+        canOnlyActiveOnePerMoq: 'There is already an active price that have the same minimum order quantity.',
         cannotChangeStatusOfOnlyActivePriceOfActiveProduct: 'Can not change status of the only Active Price of a Active Product.',
         cannotChangeStatusOfOnlyInternalPriceOfInternalProduct: 'Can not change status of the only Active/Internal Price of a Internal Product.'
       }
@@ -39,7 +39,7 @@ export default {
         requireAtLeastOneInternalVariant: 'A Product must have at least one Active/Internal Variant in order to be marked Internal.',
         requireAllItemActive: 'A Product with Item Mode set to All must have all of its Item set to Active in order to be marked Active.',
         requireAllItemInternal: 'A Product with Item Mode set to All must have all of its Item set to Active/Internal in order to be marked Internal.',
-        requireActivePrice: 'A Product must have a Active Price in order to be marked Active.',
+        requireActivePrice: 'A product must have an active price in order to be marked active.',
         requireInternalPrice: 'A Product must have a Active/Internal Price in order to be marked Internal.'
       }
     },
@@ -50,11 +50,6 @@ export default {
     }
   },
   fields: {
-    depositable: {
-      printName: 'Print name'
-    }
-  },
-  attributes: {
     refund: {
       gateway: {
         online: 'Online',
@@ -63,7 +58,8 @@ export default {
     },
     depositable: {
       status: {
-        active: 'Active'
+        active: 'Active',
+        printName: 'Print name'
       }
     },
     stockable: {

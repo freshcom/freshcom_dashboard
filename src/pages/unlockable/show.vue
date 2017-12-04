@@ -2,9 +2,9 @@
 <div class="main-col">
   <div>
     <el-menu :router="true" default-active="/unlockables" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListUnlockable' }" index="/unlockables">Unlockable</el-menu-item>
+      <el-menu-item :route="{ name: 'ListUnlockable' }" index="/unlockables">Unlockables</el-menu-item>
     </el-menu>
-    <locale-selector @change="loadRecord" class="pull-right"></locale-selector>
+    <locale-selector @change="loadUnlockable()" class="pull-right"></locale-selector>
   </div>
 
   <div>
@@ -17,14 +17,14 @@
           </div>
 
           <div class="detail">
-            <p>Unlockable {{record.code}}</p>
-            <h2>{{record.name}}</h2>
-            <p class="id">{{record.id}}</p>
+            <p>Unlockable {{unlockable.code}}</p>
+            <h2>{{unlockable.name}}</h2>
+            <p class="id">{{unlockable.id}}</p>
           </div>
         </div>
 
         <div class="header-actions">
-          <el-button @click="editRecord()" size="medium">Edit</el-button>
+          <el-button @click="editUnlockable()" plain size="small">Edit</el-button>
         </div>
       </div>
 
@@ -36,27 +36,27 @@
           <div class="block-body">
             <dl>
               <dt>ID</dt>
-              <dd>{{record.id}}</dd>
+              <dd>{{unlockable.id}}</dd>
 
-              <template v-if="record.code">
+              <template v-if="unlockable.code">
                 <dt>Code</dt>
-                <dd>{{record.code}}</dd>
+                <dd>{{unlockable.code}}</dd>
               </template>
 
               <dt>Status</dt>
-              <dd>{{record.status}}</dd>
+              <dd>{{unlockable.status}}</dd>
 
               <dt>Name</dt>
-              <dd>{{record.name}}</dd>
+              <dd>{{unlockable.name}}</dd>
 
               <dt>Print Name</dt>
-              <dd>{{record.printName}}</dd>
+              <dd>{{unlockable.printName}}</dd>
 
               <dt>Caption</dt>
-              <dd>{{record.caption}}</dd>
+              <dd>{{unlockable.caption}}</dd>
 
               <dt>Description</dt>
-              <dd>{{record.description}}</dd>
+              <dd>{{unlockable.description}}</dd>
             </dl>
           </div>
         </div>
@@ -65,7 +65,7 @@
           <h3>File Collections</h3>
 
           <span class="block-title-actions pull-right">
-            <router-link :to="{ name: 'NewExternalFileCollection', query: { unlockableId: record.id, callbackPath: currentRoutePath } }">
+            <router-link :to="{ name: 'NewExternalFileCollection', query: { ownerId: unlockable.id, ownerType: 'Unlockable', callbackPath: currentRoutePath } }">
               <icon name="plus" scale="0.8" class="v-middle"></icon>
               <span>Add</span>
             </router-link>
@@ -74,7 +74,7 @@
 
         <div class="block">
           <div class="block-body full">
-            <el-table :data="record.externalFileCollections" stripe class="block-table" :show-header="false" style="width: 100%">
+            <el-table :data="unlockable.externalFileCollections" stripe class="block-table" :show-header="false" style="width: 100%">
               <el-table-column width="500">
                 <template scope="scope">
                   <router-link :to="{ name: 'ShowExternalFileCollection', params: { id: scope.row.id } }">
@@ -104,7 +104,7 @@
             </el-table>
           </div>
 
-          <div class="block-footer no-divider text-center">
+          <div class="block-footer text-center">
             <a class="view-more" href="#">View More</a>
           </div>
         </div>
@@ -115,7 +115,7 @@
         </div>
         <div class="block">
           <div class="block-body">
-            {{record.customData}}
+            {{unlockable.customData}}
           </div>
         </div>
 
@@ -142,7 +142,7 @@
       </div>
 
       <div class="footer text-right">
-        <delete-button @confirmed="deleteRecord" size="medium">Delete</delete-button>
+        <delete-button @confirmed="deleteUnlockable()" plain size="small">Delete</delete-button>
       </div>
     </el-card>
   </div>
@@ -151,23 +151,35 @@
 </template>
 
 <script>
-import 'vue-awesome/icons/times'
-import 'vue-awesome/icons/pencil'
 import 'vue-awesome/icons/plus'
+import freshcom from '@/freshcom-sdk'
 
-import ShowPage from '@/mixins/show-page'
+import Unlockable from '@/models/unlockable'
 import DeleteButton from '@/components/delete-button'
+import { idLastPart } from '@/helpers/filters'
 
 export default {
   name: 'ShowUnlockable',
+  props: ['id'],
   components: {
     DeleteButton
   },
-  mixins: [ShowPage({ storeNamespace: 'unlockable', name: 'Unlockable', include: 'avatar,externalFileCollections' })],
+  filters: {
+    idLastPart
+  },
+  data () {
+    return {
+      unlockable: Unlockable.objectWithDefaults(),
+      isLoading: false
+    }
+  },
+  created () {
+    this.loadUnlockable()
+  },
   computed: {
     avatarUrl () {
-      if (this.record.avatar) {
-        return this.record.avatar.url
+      if (this.unlockable.avatar) {
+        return this.unlockable.avatar.url
       }
 
       return 'http://placehold.it/80x80'
@@ -177,10 +189,37 @@ export default {
     }
   },
   methods: {
-    editRecord () {
-      this.$store.dispatch('pushRoute', { name: 'EditUnlockable', params: { id: this.record.id } })
+    loadUnlockable () {
+      this.isLoading = true
+
+      freshcom.retrieveUnlockable(this.id, {
+        include: 'avatar,externalFileCollections'
+      }).then(response => {
+        this.unlockable = response.data
+        this.isLoading = false
+      }).catch(errors => {
+        this.isLoading = false
+        throw errors
+      })
     },
-    recordDeleted () {
+
+    editUnlockable () {
+      this.$store.dispatch('pushRoute', { name: 'EditUnlockable', params: { id: this.unlockable.id } })
+    },
+
+    deleteUnlockable () {
+      freshcom.deleteUnlockable(this.unlockable.id).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Unlockable deleted successfully.`,
+          type: 'success'
+        })
+
+        this.back()
+      })
+    },
+
+    back () {
       this.$store.dispatch('pushRoute', { name: 'ListUnlockable' })
     }
   }

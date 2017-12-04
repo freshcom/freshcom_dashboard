@@ -46,6 +46,7 @@
 <script>
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
+
 import Depositable from '@/models/depositable'
 import DepositableForm from '@/components/depositable-form'
 

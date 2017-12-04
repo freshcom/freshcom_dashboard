@@ -1,7 +1,6 @@
 <template>
 <el-form :model="formModel" @input.native="updateValue" label-width="150px" size="small" class="efc-form">
 
-  {{formModel.files}}
   <el-form-item v-if="formModel.owner" label="Owner ID" :error="errorMsgs.owner">
     {{formModel.owner.id}}
   </el-form-item>
@@ -26,7 +25,7 @@
       <div class="block-body">
         <el-upload
           :http-request="uploadExternalFile"
-          :file-list="formModel.files"
+          :file-list="fileList"
           :on-remove="deleteExternalFile"
           action=""
           multiple
@@ -55,55 +54,33 @@ export default {
     return {
       formModel: _.cloneDeep(this.value),
       pendingAvatarId: '',
-      data: null
-      // fileList: [{ name: 'hi', percentage: 0, status: 'uploading' }]
+      data: null,
+      uploadingFiles: []
     }
-  },
-  created () {
-    // setTimeout(() => {
-    //   this.fileList[0].percentage = 30
-    //   this.fileList[0].status = 'uploading'
-    // }, 3000)
   },
   computed: {
     errorMsgs () {
       return translateErrors(this.errors, 'externalFileCollection')
     },
     fileList () {
-      return _.reduce(this.formModel.files, (result, item) => {
-        return result.concat({ id: item.id, name: item.name, url: item.url, percentage: item.percentage, status: 'uploading' })
-      }, [])
-    },
-    pendingExternalFiles () {
-      return this.$store.state.externalFile.pendingRecords
-    },
-    uploadedExternalFiles () {
-      return this.$store.state.externalFile.uploadedRecords
-    },
-    isUploading () {
-      return this.pendingExternalFiles.length > 0
+      return _.concat(this.uploadingFiles, this.toFileList(this.formModel.files))
     }
   },
   watch: {
     value (v) {
       this.formModel = _.cloneDeep(v)
-    },
-    uploadedExternalFiles (uploadedEfs) {
-      if (uploadedEfs.length === 0) {
-        return
-      }
-
-      this.$store.dispatch('externalFile/popUploadedRecords', uploadedEfs)
-
-      let files = _.concat(this.formModel.files, uploadedEfs)
-      this.formModel.files = _.uniqBy(files, (ef) => { return ef.id })
-      this.updateValue()
     }
   },
   methods: {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
+
+    toFileList (efList) {
+      return _.reduce(efList, (result, ef) => {
+        return result.concat({ id: ef.id, name: ef.name, url: ef.url, status: 'success' })
+      }, [])
+    },
 
     uploadExternalFile (e) {
       let file = e.file
@@ -112,28 +89,27 @@ export default {
       freshcom.uploadExternalFile(externalFile, {}, {
         created: (response) => {
           let externalFile = response.data
-          this.formModel.files.push(externalFile)
+          let f = {
+            id: externalFile.id,
+            name: externalFile.name,
+            status: 'uploading',
+            percentage: 0
+          }
 
-          this.updateValue()
+          this.uploadingFiles.push(f)
         },
         progress: _.throttle((percentage, ef) => {
-          let targetEf = _.find(this.formModel.files, { id: ef.id })
+          let targetEf = _.find(this.uploadingFiles, { id: ef.id })
           targetEf.percentage = percentage
           targetEf.status = 'uploading'
         }, 300)
       }).then(response => {
-        let targetEf = _.find(this.formModel.files, { id: response.data.id })
-        targetEf.status = 'success'
+        _.remove(this.uploadingFiles, (f) => { return f.id === response.data.id })
+
+        this.formModel.files.push(response.data)
+        this.updateValue()
       })
     },
-
-    // uploadExternalFile (e) {
-    //   let file = e.file
-    //   let externalFile = { type: 'ExternalFile', name: file.name, sizeBytes: file.size, contentType: file.type, file: file }
-    //   this.$store.dispatch('externalFile/pushPendingRecords', [externalFile]).then(files => {
-    //     this.pendingAvatarId = files[0].id
-    //   })
-    // },
     deleteExternalFile (targetEf) {
       this.formModel.files = _.reject(this.formModel.files, (ef) => { return ef.id === targetEf.id })
       this.updateValue()

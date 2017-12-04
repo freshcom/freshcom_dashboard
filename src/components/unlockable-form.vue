@@ -5,7 +5,7 @@
       <img v-if="avatarUrl" :src="avatarUrl" class="file">
       <i v-else class="el-icon-plus file-uploader-icon"></i>
     </el-upload>
-    <el-progress v-if="pendingAvatar" :show-text="false" :percentage="pendingAvatar.percentage"></el-progress>
+    <el-progress v-if="isUploadingAvatar" :show-text="false" :percentage="formModel.avatar.percentage"></el-progress>
   </div>
 
   <el-form-item label="Code" :error="errorMsgs.code">
@@ -39,6 +39,8 @@
 
 <script>
 import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+
 import translateErrors from '@/helpers/translate-errors'
 
 export default {
@@ -47,13 +49,12 @@ export default {
   data () {
     return {
       formModel: _.cloneDeep(this.value),
-      imageUrl: '',
-      pendingAvatarId: ''
+      isUploadingAvatar: false
     }
   },
   computed: {
     errorMsgs () {
-      return translateErrors(this.errors, 'depositable')
+      return translateErrors(this.errors, 'unlockable')
     },
     avatarUrl () {
       if (!this.formModel.avatar) {
@@ -65,43 +66,36 @@ export default {
       }
 
       return URL.createObjectURL(this.formModel.avatar.file)
-    },
-    pendingAvatar () {
-      return _.find(this.$store.state.externalFile.pendingRecords, (externalFile) => { return externalFile.id === this.pendingAvatarId })
-    },
-    uploadedAvatar () {
-      return _.find(this.$store.state.externalFile.uploadedRecords, (externalFile) => { return externalFile.id === this.pendingAvatarId })
     }
   },
   watch: {
     value (v) {
       this.formModel = _.cloneDeep(v)
-    },
-    uploadedAvatar (externalFile) {
-      if (!externalFile) {
-        return
-      }
-
-      this.$store.dispatch('externalFile/popUploadedRecords', [externalFile])
-      this.formModel = _.merge({}, this.formModel, { avatar: externalFile })
-      this.updateValue()
     }
   },
   methods: {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
-    beforeAvatarUpload () {
-
-    },
-    handleAvatarSuccess () {
-
-    },
     uploadAvatar (e) {
       let file = e.file
       let externalFile = { type: 'ExternalFile', name: file.name, sizeBytes: file.size, contentType: file.type, file: file }
-      this.$store.dispatch('externalFile/pushPendingRecords', [externalFile]).then(externalFiles => {
-        this.pendingAvatarId = externalFiles[0].id
+
+      freshcom.uploadExternalFile(externalFile, {}, {
+        created: (response) => {
+          this.formModel.avatar = _.merge({}, response.data, { percentage: 0, file: file })
+          this.isUploadingAvatar = true
+        },
+        progress: _.throttle((percentage) => {
+          this.formModel.avatar.percentage = percentage
+        }, 300)
+      }).then(response => {
+        let externalFile = response.data
+        this.formModel.avatar = externalFile
+        this.updateValue()
+        this.isUploadingAvatar = false
+      }).catch(() => {
+        this.isUploadingAvatar = false
       })
     }
   }

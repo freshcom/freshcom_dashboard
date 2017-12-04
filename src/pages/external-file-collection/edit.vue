@@ -1,8 +1,13 @@
 <template>
 <div class="page-wrapper">
   <div>
-    <el-menu :router="true" default-active="file_collections" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="file_collections">Collections</el-menu-item>
+    <el-menu :router="true" default-active="/file_collections" mode="horizontal" class="secondary-nav">
+      <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">
+        Files
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="/file_collections">
+        Collections
+      </el-menu-item>
     </el-menu>
     <locale-selector class="pull-right"></locale-selector>
   </div>
@@ -13,26 +18,26 @@
         <span style="line-height: 36px;">Edit File Collection</span>
 
         <div class="pull-right">
-          <el-button @click="cancel" plain size="medium">
+          <el-button @click="back()" plain size="small">
             Cancel
           </el-button>
 
-          <el-button @click="submit(recordDraft)" type="primary" size="medium">
+          <el-button @click="submit()" type="primary" size="small">
             Save
           </el-button>
         </div>
       </div>
 
       <div class="data">
-        <external-file-collection-form v-model="recordDraft" :errors="errors"></external-file-collection-form>
+        <external-file-collection-form v-model="efcDraft" :errors="errors"></external-file-collection-form>
       </div>
 
       <div class="footer">
-        <el-button @click="cancel" plain size="medium">
+        <el-button @click="back()" plain size="small">
           Cancel
         </el-button>
 
-        <el-button @click="submit(recordDraft)" size="medium" type="primary" class="pull-right">
+        <el-button @click="submit()" size="small" type="primary" class="pull-right">
           Save
         </el-button>
       </div>
@@ -42,18 +47,68 @@
 </template>
 
 <script>
-import EditPage from '@/mixins/edit-page'
+import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
 import ExternalFileCollectionForm from '@/components/external-file-collection-form'
+import ExternalFileCollection from '@/models/external-file-collection'
 
 export default {
   name: 'EditExternalFileCollection',
+  props: ['id'],
   components: {
     ExternalFileCollectionForm
   },
-  mixins: [EditPage({ storeNamespace: 'externalFileCollection', name: 'File Collection', include: 'files' })],
+  data () {
+    return {
+      isLoading: false,
+      efc: ExternalFileCollection.objectWithDefaults(),
+      efcDraft: ExternalFileCollection.objectWithDefaults(),
+
+      isUpadingEfc: false,
+      errors: {}
+    }
+  },
+  created () {
+    this.loadEfc()
+  },
   methods: {
-    recordUpdated (record) {
-      this.$store.dispatch('pushRoute', { name: 'ShowExternalFileCollection', params: { id: record.id } })
+    loadEfc () {
+      this.isLoading = true
+
+      freshcom.retrieveExternalFileCollection(this.id, {
+        include: 'files'
+      }).then(response => {
+        this.efc = response.data
+        this.efcDraft = _.cloneDeep(response.data)
+        this.isLoading = false
+      }).catch(errors => {
+        this.isLoading = false
+        throw errors
+      })
+    },
+    submit () {
+      this.isUpdatingEfc = true
+
+      freshcom.updateExternalFileCollection(
+        this.efcDraft.id,
+        this.efcDraft
+      ).then(efc => {
+        this.$message({
+          showClose: true,
+          message: `File collection saved successfully.`,
+          type: 'success'
+        })
+
+        this.isUpdatingEfc = false
+        this.back()
+      }).catch(errors => {
+        this.errors = errors
+        this.isUpdatingEfc = false
+      })
+    },
+
+    back () {
+      this.$store.dispatch('pushRoute', { name: 'ShowExternalFileCollection', params: { id: this.efc.id } })
     }
   }
 }

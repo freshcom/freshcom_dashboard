@@ -44,7 +44,7 @@
           </el-table-column>
           <el-table-column prop="status" label="Status" width="100">
             <template slot-scope="scope">
-              {{$t(`attributes.depositable.status.${scope.row.status}`)}}
+              {{$t(`fields.depositable.status.${scope.row.status}`)}}
             </template>
           </el-table-column>
           <el-table-column prop="id" label="ID" width="120">
@@ -77,13 +77,11 @@
 
 <script>
 import 'vue-awesome/icons/search'
-import 'vue-awesome/icons/chevron-right'
-import 'vue-awesome/icons/chevron-left'
-
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
+
 import Pagination from '@/components/pagination'
-import { dollar, idLastPart } from '@/helpers/filters'
+import { idLastPart } from '@/helpers/filters'
 
 export default {
   name: 'ListDepositable',
@@ -91,7 +89,6 @@ export default {
     Pagination
   },
   filters: {
-    dollar,
     idLastPart
   },
   props: {

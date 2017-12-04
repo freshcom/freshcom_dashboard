@@ -43,8 +43,9 @@
 
 <script>
 import _ from 'lodash'
-import translateErrors from '@/helpers/translate-errors'
 import freshcom from '@/freshcom-sdk'
+
+import translateErrors from '@/helpers/translate-errors'
 
 export default {
   name: 'DepositableForm',
@@ -52,7 +53,6 @@ export default {
   data () {
     return {
       formModel: _.cloneDeep(this.value),
-
       isUploadingAvatar: false
     }
   },
@@ -88,9 +88,12 @@ export default {
 
       freshcom.uploadExternalFile(externalFile, {}, {
         created: (response) => {
-          this.formModel.avatar = response.data
+          this.formModel.avatar = _.merge({}, response.data, { percentage: 0, file: file })
           this.isUploadingAvatar = true
-        }
+        },
+        progress: _.throttle((percentage) => {
+          this.formModel.avatar.percentage = percentage
+        }, 300)
       }).then(response => {
         let externalFile = response.data
         this.formModel.avatar = externalFile

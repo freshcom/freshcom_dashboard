@@ -318,15 +318,15 @@ import { createToken as createStripeToken } from 'vue-stripe-elements-plus'
 
 export default {
   name: 'ShowOrder',
-  filters: {
-    dollar
-  },
   components: {
     RefundForm,
     PaymentForm,
     OrderLineItemForm,
     DeleteButton,
     OrderLineItemTable
+  },
+  filters: {
+    dollar
   },
   props: ['id'],
   data () {

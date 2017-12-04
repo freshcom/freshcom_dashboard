@@ -2,7 +2,12 @@
 <div class="page-warpper">
   <div>
     <el-menu :router="true" default-active="/file_collections" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="/file_collections">File collections</el-menu-item>
+      <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">
+        Files
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="/file_collections">
+        Collections
+      </el-menu-item>
     </el-menu>
     <locale-selector class="pull-right"></locale-selector>
   </div>
@@ -43,6 +48,7 @@
 
 <script>
 import freshcom from '@/freshcom-sdk'
+
 import ExternalFileCollection from '@/models/external-file-collection'
 import ExternalFileCollectionForm from '@/components/external-file-collection-form'
 

@@ -2,7 +2,12 @@
 <div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="/file_collections" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="/file_collections">Collections</el-menu-item>
+      <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">
+        Files
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="/file_collections">
+        Collections
+      </el-menu-item>
     </el-menu>
     <locale-selector class="pull-right"></locale-selector>
   </div>
@@ -17,14 +22,14 @@
           </div>
 
           <div class="detail">
-            <p>{{record.code}}</p>
-            <h2>{{record.name}}</h2>
-            <p class="id">{{record.id}}</p>
+            <p>{{efc.code}}</p>
+            <h2>{{efc.name}}</h2>
+            <p class="id">{{efc.id}}</p>
           </div>
         </div>
 
         <div class="header-actions">
-          <el-button @click="editRecord()" size="medium">Edit</el-button>
+          <el-button @click="editEfc()" plain size="small">Edit</el-button>
         </div>
       </div>
 
@@ -36,13 +41,13 @@
           <div class="block-body">
             <dl>
               <dt>ID</dt>
-              <dd>{{record.id}}</dd>
+              <dd>{{efc.id}}</dd>
 
               <dt>Name</dt>
-              <dd>{{record.name}}</dd>
+              <dd>{{efc.name}}</dd>
 
               <dt>Label</dt>
-              <dd>{{record.label}}</dd>
+              <dd>{{efc.label}}</dd>
             </dl>
           </div>
         </div>
@@ -52,7 +57,7 @@
         </div>
         <div class="block">
           <div class="block-body full">
-            <el-table :data="record.files" stripe class="block-table" :show-header="false" style="width: 100%">
+            <el-table :data="efc.files" class="block-table" :show-header="false" style="width: 100%">
               <el-table-column>
                 <template scope="scope">
                   {{scope.row.name}}
@@ -73,7 +78,7 @@
 
               <el-table-column width="200">
                 <template scope="scope">
-                  <span>{{scope.row.updatedAt | moment("MMM Do YYYY hh:mm:ss")}}</span>
+                  <span>{{scope.row.updatedAt | moment}}</span>
                 </template>
               </el-table-column>
             </el-table>
@@ -91,23 +96,23 @@
         <div class="block">
           <div class="block-body">
             <dl>
-              <dt v-if="record.product">Product</dt>
-              <dd v-if="record.product">
-                <router-link :to="{ name: 'ShowProduct', params: { id: record.product.id }}">
-                  {{record.product.id}}
+              <dt v-if="efc.product">Product</dt>
+              <dd v-if="efc.product">
+                <router-link :to="{ name: 'ShowProduct', params: { id: efc.product.id }}">
+                  {{efc.product.id}}
                 </router-link>
               </dd>
 
-              <dt v-if="record.stockable">Stockable</dt>
-              <dd v-if="record.stockable">
-                <router-link :to="{ name: 'ShowStockable', params: { id: record.stockable.id }}">
-                  {{record.stockable.id}}
+              <dt v-if="efc.stockable">Stockable</dt>
+              <dd v-if="efc.stockable">
+                <router-link :to="{ name: 'ShowStockable', params: { id: efc.stockable.id }}">
+                  {{efc.stockable.id}}
                 </router-link>
               </dd>
 
-              <dt v-if="record.unlockable">Unlockable</dt>
-              <dd v-if="record.unlockable">
-                <a href="#">{{record.unlockable.id}}</a>
+              <dt v-if="efc.unlockable">Unlockable</dt>
+              <dd v-if="efc.unlockable">
+                <a href="#">{{efc.unlockable.id}}</a>
               </dd>
             </dl>
           </div>
@@ -129,7 +134,7 @@
       </div>
 
       <div class="footer text-right">
-        <delete-button @confirmed="deleteRecord" size="medium">Delete</delete-button>
+        <delete-button @confirmed="deleteEfc()" size="small">Delete</delete-button>
       </div>
     </el-card>
   </div>
@@ -138,33 +143,57 @@
 </template>
 
 <script>
-import 'vue-awesome/icons/times'
-import 'vue-awesome/icons/pencil'
-import 'vue-awesome/icons/plus'
-import 'vue-awesome/icons/file'
 import 'vue-awesome/icons/folder'
+import freshcom from '@/freshcom-sdk'
 
-import ShowPage from '@/mixins/show-page'
+import ExternalFileCollection from '@/models/external-file-collection'
 import DeleteButton from '@/components/delete-button'
 
 export default {
   name: 'ShowExternalFileCollection',
+  props: ['id'],
   components: {
     DeleteButton
   },
-  mixins: [ShowPage({ storeNamespace: 'externalFileCollection', name: 'File Collection', include: 'files' })],
+  data () {
+    return {
+      efc: ExternalFileCollection.objectWithDefaults(),
+      isLoading: false
+    }
+  },
+  created () {
+    this.loadEfc()
+  },
   methods: {
-    isImage (record) {
-      return record.contentType.startsWith('image/')
+    loadEfc () {
+      this.isLoading = true
+
+      freshcom.retrieveExternalFileCollection(this.id, {
+        include: 'files'
+      }).then(response => {
+        this.efc = response.data
+        this.isLoading = false
+      }).catch(errors => {
+        this.isLoading = false
+        throw errors
+      })
     },
-    editRecord () {
-      this.$store.dispatch('pushRoute', { name: 'EditExternalFileCollection', params: { id: this.record.id } })
+    editEfc () {
+      this.$store.dispatch('pushRoute', { name: 'EditExternalFileCollection', params: { id: this.efc.id } })
     },
-    recordDeleted (record) {
-      if (record.stockable) {
-        this.$store.dispatch('stockable/resetRecord')
-      }
-      this.$store.dispatch('popRoute', 1)
+    deleteEfc () {
+      freshcom.deleteExternalFileCollection(this.efc.id).then(() => {
+        this.$message({
+          showClose: true,
+          message: `File collection deleted successfully.`,
+          type: 'success'
+        })
+
+        this.back()
+      })
+    },
+    back () {
+      this.$store.dispatch('pushRoute', { name: 'ListExternalFileCollection' })
     }
   }
 }

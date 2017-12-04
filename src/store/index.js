@@ -4,6 +4,8 @@ import Vuex from 'vuex'
 import router from '@/router'
 import createLogger from 'vuex/dist/logger'
 
+import freshcom from '@/freshcom-sdk'
+
 import { DEFAULT_LOCALE } from '@/env'
 
 import SessionStore from '@/store/modules/session'
@@ -76,6 +78,7 @@ export default new Vuex.Store({
 
     [MT.SET_RESOURCE_LOCALE] (state, locale) {
       state.resourceLocale = locale
+      freshcom.setLocale(locale)
     }
   }
 })

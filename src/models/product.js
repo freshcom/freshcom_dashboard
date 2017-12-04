@@ -22,7 +22,7 @@ export default {
       avatar: null,
       items: [],
       variants: [],
-      source: {}
+      source: null
     }
   }
 }

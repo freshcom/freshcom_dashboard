@@ -4,35 +4,35 @@
     <el-menu :router="true" default-active="/stockables" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListStockable' }" index="/stockables">Stockables</el-menu-item>
     </el-menu>
-    <locale-selector :before-change="confirmResourceLocaleChange" @change="loadRecord" class="pull-right"></locale-selector>
+    <locale-selector @change="loadStockable" class="pull-right"></locale-selector>
   </div>
 
   <div>
     <el-card class="main-card">
       <div slot="header">
-        <span style="line-height: 36px;">Edit Stockable</span>
+        <span style="line-height: 36px;">Edit stockable</span>
 
         <div style="float: right;">
-          <el-button @click="cancel" plain size="medium">
+          <el-button @click="back()" plain size="small">
             Cancel
           </el-button>
 
-          <el-button @click="submit(recordDraft)" type="primary" size="medium">
+          <el-button @click="submit()" type="primary" size="small">
             Save
           </el-button>
         </div>
       </div>
 
       <div class="data">
-        <stockable-form v-model="recordDraft" :errors="errors"></stockable-form>
+        <stockable-form v-model="stockableDraft" :errors="errors"></stockable-form>
       </div>
 
       <div class="footer">
-        <el-button @click="cancel" plain size="medium">
+        <el-button @click="back()" plain size="small">
           Cancel
         </el-button>
 
-        <el-button @click="submit(recordDraft)" type="primary" class="pull-right" size="medium">
+        <el-button @click="submit()" type="primary" class="pull-right" size="small">
           Save
         </el-button>
       </div>
@@ -42,18 +42,71 @@
 </template>
 
 <script>
+import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+
+import Stockable from '@/models/stockable'
 import StockableForm from '@/components/stockable-form'
-import EditPage from '@/mixins/edit-page'
 
 export default {
   name: 'EditStockable',
   components: {
     StockableForm
   },
-  mixins: [EditPage({ storeNamespace: 'stockable', name: 'Stockable', include: 'avatar,externalFileCollections' })],
+  props: ['id'],
+  data () {
+    return {
+      isLoading: false,
+      stockable: Stockable.objectWithDefaults(),
+      stockableDraft: Stockable.objectWithDefaults(),
+
+      isUpdatingStockable: false,
+      errors: {}
+    }
+  },
+  created () {
+    this.loadStockable()
+  },
   methods: {
-    recordUpdated (record) {
-      this.$store.dispatch('pushRoute', { name: 'ShowStockable', params: { id: record.id } })
+    loadStockable () {
+      this.isLoading = true
+
+      freshcom.retrieveStockable(this.id, {
+        include: 'avatar,externalFileCollections'
+      }).then(response => {
+        this.stockable = response.data
+        this.stockableDraft = _.cloneDeep(response.data)
+
+        this.isLoading = false
+      }).catch(errors => {
+        this.isLoading = false
+        throw errors
+      })
+    },
+
+    submit () {
+      this.isUpdatingStockable = true
+
+      freshcom.updateStockable(
+        this.stockableDraft.id,
+        this.stockableDraft
+      ).then(stockable => {
+        this.$message({
+          showClose: true,
+          message: `Stockable saved successfully.`,
+          type: 'success'
+        })
+
+        this.isUpdatingStockable = false
+        this.back()
+      }).catch(errors => {
+        this.errors = errors
+        this.isUpdatingStockable = false
+      })
+    },
+
+    back () {
+      this.$store.dispatch('pushRoute', { name: 'ShowStockable', params: { id: this.stockable.id } })
     }
   }
 }

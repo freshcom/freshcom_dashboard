@@ -2,7 +2,12 @@
 <div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="/files" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">Files</el-menu-item>
+      <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">
+        Files
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="/file_collections">
+        Collections
+      </el-menu-item>
     </el-menu>
     <locale-selector @change="searchExternalFile()" class="pull-right"></locale-selector>
   </div>

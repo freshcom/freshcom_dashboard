@@ -5,7 +5,7 @@
     <el-menu :router="true" default-active="/stockables" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListStockable' }" index="/stockables">Stockables</el-menu-item>
     </el-menu>
-    <locale-selector @change="loadRecord" class="pull-right"></locale-selector>
+    <locale-selector @change="loadStockable()" class="pull-right"></locale-selector>
   </div>
 
   <div>
@@ -18,14 +18,14 @@
           </div>
 
           <div class="detail">
-            <p>{{record.code}}</p>
-            <h2>{{record.name}}</h2>
-            <p class="id">{{record.id}}</p>
+            <p>{{stockable.code}}</p>
+            <h2>{{stockable.name}}</h2>
+            <p class="id">{{stockable.id}}</p>
           </div>
         </div>
 
         <div class="header-actions">
-          <el-button @click="editRecord()" size="medium">Edit</el-button>
+          <el-button @click="editStockable()" plain size="small">Edit</el-button>
         </div>
       </div>
 
@@ -37,46 +37,46 @@
           <div class="block-body">
             <dl>
               <dt>ID</dt>
-              <dd>{{record.id}}</dd>
+              <dd>{{stockable.id}}</dd>
 
               <dt>Code</dt>
-              <dd>{{record.code}}</dd>
+              <dd>{{stockable.code}}</dd>
 
               <dt>Status</dt>
-              <dd>{{record.status}}</dd>
+              <dd>{{stockable.status}}</dd>
 
               <dt>Name</dt>
-              <dd>{{record.name}}</dd>
+              <dd>{{stockable.name}}</dd>
 
               <dt>Print Name</dt>
-              <dd>{{record.printName}}</dd>
+              <dd>{{stockable.printName}}</dd>
 
               <dt>Unit of Measure</dt>
-              <dd>{{record.unitOfMeasure}}</dd>
+              <dd>{{stockable.unitOfMeasure}}</dd>
 
               <dt>Variable Weight</dt>
-              <dd>{{record.variableWeight}}</dd>
+              <dd>{{stockable.variableWeight}}</dd>
 
               <dt>Storage Type</dt>
-              <dd>{{record.storageType}}</dd>
+              <dd>{{stockable.storageType}}</dd>
 
               <dt>Stackable</dt>
-              <dd>{{record.stackable}}</dd>
+              <dd>{{stockable.stackable}}</dd>
 
               <dt>Storage Size</dt>
-              <dd>{{record.storageSize}}</dd>
+              <dd>{{stockable.storageSize}}</dd>
 
               <dt>Storage Description</dt>
-              <dd>{{record.storageDescription}}</dd>
+              <dd>{{stockable.storageDescription}}</dd>
 
               <dt>Specification</dt>
-              <dd>{{record.specification}}</dd>
+              <dd>{{stockable.specification}}</dd>
 
               <dt>Caption</dt>
-              <dd>{{record.caption}}</dd>
+              <dd>{{stockable.caption}}</dd>
 
               <dt>Description</dt>
-              <dd>{{record.description}}</dd>
+              <dd>{{stockable.description}}</dd>
             </dl>
           </div>
         </div>
@@ -85,7 +85,7 @@
           <h3>File Collections</h3>
 
           <span class="block-title-actions pull-right">
-            <router-link :to="{ name: 'NewExternalFileCollection', query: { stockableId: record.id, callbackPath: currentRoutePath } }">
+            <router-link :to="{ name: 'NewExternalFileCollection', query: { stockableId: stockable.id, callbackPath: currentRoutePath } }">
               <icon name="plus" scale="0.8" class="v-middle"></icon>
               <span>Add</span>
             </router-link>
@@ -94,7 +94,7 @@
 
         <div class="block">
           <div class="block-body full">
-            <el-table :data="record.externalFileCollections" stripe class="block-table" :show-header="false">
+            <el-table :data="stockable.externalFileCollections" stripe class="block-table" :show-header="false">
               <el-table-column width="500">
                 <template scope="scope">
                   <router-link :to="{ name: 'ShowExternalFileCollection', params: { id: scope.row.id } }">
@@ -135,7 +135,7 @@
         </div>
         <div class="block">
           <div class="block-body">
-            {{record.customData}}
+            {{stockable.customData}}
           </div>
         </div>
 
@@ -162,7 +162,7 @@
       </div>
 
       <div class="footer text-right">
-        <delete-button @confirmed="deleteRecord" size="small">Delete</delete-button>
+        <delete-button @confirmed="deleteStockable()" size="small">Delete</delete-button>
       </div>
     </el-card>
   </div>
@@ -171,23 +171,35 @@
 </template>
 
 <script>
-import 'vue-awesome/icons/times'
-import 'vue-awesome/icons/pencil'
 import 'vue-awesome/icons/plus'
+import freshcom from '@/freshcom-sdk'
 
-import ShowPage from '@/mixins/show-page'
+import Stockable from '@/models/stockable'
 import DeleteButton from '@/components/delete-button'
+import { idLastPart } from '@/helpers/filters'
 
 export default {
   name: 'ShowStockable',
+  props: ['id'],
   components: {
     DeleteButton
   },
-  mixins: [ShowPage({ storeNamespace: 'stockable', name: 'Stockable', include: 'avatar,externalFileCollections' })],
+  filters: {
+    idLastPart
+  },
+  data () {
+    return {
+      stockable: Stockable.objectWithDefaults(),
+      isLoading: false
+    }
+  },
+  created () {
+    this.loadStockable()
+  },
   computed: {
     avatarUrl () {
-      if (this.record.avatar) {
-        return this.record.avatar.url
+      if (this.stockable.avatar) {
+        return this.stockable.avatar.url
       }
 
       return 'http://placehold.it/80x80'
@@ -197,10 +209,37 @@ export default {
     }
   },
   methods: {
-    editRecord () {
-      this.$store.dispatch('pushRoute', { name: 'EditStockable', params: { id: this.record.id } })
+    loadStockable () {
+      this.isLoading = true
+
+      freshcom.retrieveStockable(this.id, {
+        include: 'avatar,externalFileCollections'
+      }).then(response => {
+        this.stockable = response.data
+        this.isLoading = false
+      }).catch(errors => {
+        this.isLoading = false
+        throw errors
+      })
     },
-    recordDeleted () {
+
+    editStockable () {
+      this.$store.dispatch('pushRoute', { name: 'EditStockable', params: { id: this.stockable.id } })
+    },
+
+    deleteStockable () {
+      freshcom.deleteStockable(this.stockable.id).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Stockable deleted successfully.`,
+          type: 'success'
+        })
+
+        this.back()
+      })
+    },
+
+    back () {
       this.$store.dispatch('pushRoute', { name: 'ListStockable' })
     }
   }
