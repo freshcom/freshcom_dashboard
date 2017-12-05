@@ -9,31 +9,31 @@
   </div>
 
   <div>
-    <el-card v-loading="isLoading" class="main-card">
+    <el-card class="main-card">
       <div slot="header">
-        <span style="line-height: 36px;">Create a Price</span>
+        <span style="line-height: 36px;">Create a price</span>
 
         <div class="pull-right">
-          <el-button @click="cancel" plain size="medium">
+          <el-button @click="back()" plain size="small">
             Cancel
           </el-button>
 
-          <el-button @click="submit(recordDraft)" type="primary" size="medium">
+          <el-button @click="submit()" type="primary" size="small">
             Save
           </el-button>
         </div>
       </div>
 
       <div class="data">
-        <price-form v-model="recordDraft" :record="record" :errors="errors"></price-form>
+        <price-form v-model="priceDraft" :record="priceDraft" :errors="errors"></price-form>
       </div>
 
       <div class="footer">
-        <el-button @click="cancel" plain size="medium">
+        <el-button @click="back()" plain size="small">
           Cancel
         </el-button>
 
-        <el-button @click="submit(recordDraft)" type="primary" size="medium" class="pull-right">
+        <el-button @click="submit()" type="primary" size="small" class="pull-right">
           Save
         </el-button>
       </div>
@@ -43,8 +43,9 @@
 </template>
 
 <script>
-import _ from 'lodash'
-import NewPage from '@/mixins/new-page'
+import freshcom from '@/freshcom-sdk'
+
+import Price from '@/models/price'
 import PriceForm from '@/components/price-form'
 
 export default {
@@ -52,34 +53,43 @@ export default {
   components: {
     PriceForm
   },
-  mixins: [NewPage({ storeNamespace: 'price', name: 'Price' })],
-  props: ['productKind', 'productId'],
-  created () {
-    if (this.productId) {
-      let record = _.cloneDeep(this.record)
-      record.product = { id: this.productId, type: 'Product', kind: this.productKind }
-      this.$store.dispatch('price/setRecord', record)
+  data () {
+    return {
+      priceDraft: Price.objectWithDefaults(),
+      isCreatingPrice: false,
+      errors: {}
     }
   },
-  computed: {
-    session () {
-      return this.$store.state.session.record
+  props: ['productKind', 'productId', 'callbackPath'],
+  created () {
+    if (this.productId) {
+      this.priceDraft.product = { id: this.productId, type: 'Product', kind: this.productKind }
     }
   },
   methods: {
-    recordCreated (record) {
-      this.$store.dispatch('productItem/resetRecord')
-      this.$store.dispatch('product/resetRecord')
+    submit () {
+      this.isCreatingPrice = true
 
+      freshcom.createPrice(this.priceDraft).then(response => {
+        this.$message({
+          showClose: true,
+          message: `Price created successfully.`,
+          type: 'success'
+        })
+
+        this.isCreatingPrice = false
+        this.back()
+      }).catch(errors => {
+        this.errors = errors
+        this.isCreatingPrice = false
+      })
+    },
+
+    back () {
       if (this.callbackPath) {
         return this.$store.dispatch('pushRoute', { path: this.callbackPath })
       }
-
-      if (record.productItem) {
-        return this.$store.dispatch('pushRoute', { name: 'ShowProductItem', params: { id: record.productItem.id } })
-      }
-
-      this.$store.dispatch('pushRoute', { name: 'ShowPrice', params: { id: record.id } })
+      this.$store.dispatch('pushRoute', { name: 'ListPrice' })
     }
   }
 }

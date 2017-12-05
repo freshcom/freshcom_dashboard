@@ -6,7 +6,7 @@
         <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
         <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">Collections</el-menu-item>
       </el-menu>
-      <locale-selector @change="loadRecord" class="pull-right"></locale-selector>
+      <locale-selector @change="loadPrice()" class="pull-right"></locale-selector>
     </div>
 
     <div>
@@ -15,14 +15,14 @@
 
           <div class="brief no-avatar">
             <div class="detail">
-              <p>Price {{record.code}}</p>
-              <h2>{{record.name}}</h2>
-              <p class="id">{{record.id}}</p>
+              <p>Price {{price.code}}</p>
+              <h2>{{price.name}}</h2>
+              <p class="id">{{price.id}}</p>
             </div>
           </div>
 
           <div class="header-actions">
-            <el-button @click="editRecord()" size="medium">Edit</el-button>
+            <el-button @click="editPrice()" plain size="small">Edit</el-button>
           </div>
         </div>
 
@@ -34,52 +34,52 @@
             <div class="block-body">
               <dl>
                 <dt>ID</dt>
-                <dd>{{record.id}}</dd>
+                <dd>{{price.id}}</dd>
 
                 <dt>Code</dt>
-                <dd>{{record.code}}</dd>
+                <dd>{{price.code}}</dd>
 
                 <dt>Status</dt>
                 <dd>
-                  {{$t(`attributes.price.status.${record.status}`)}}
+                  {{$t(`fields.price.status.${price.status}`)}}
                 </dd>
 
                 <dt>Name</dt>
-                <dd>{{record.name}}</dd>
+                <dd>{{price.name}}</dd>
 
                 <dt>Label</dt>
-                <dd>{{record.label}}</dd>
+                <dd>{{price.label}}</dd>
 
                 <dt>Charge Amount</dt>
-                <dd>${{record.chargeCents / 100}} / {{record.chargeUnit}}</dd>
+                <dd>${{price.chargeCents / 100}} / {{price.chargeUnit}}</dd>
 
                 <dt>Order Unit</dt>
-                <dd>{{record.orderUnit}}</dd>
+                <dd>{{price.orderUnit}}</dd>
 
                 <dt>Estimate By Default</dt>
-                <dd>{{record.estimateByDefault}}</dd>
+                <dd>{{price.estimateByDefault}}</dd>
 
                 <dt>Estimate Average</dt>
                 <dd>
-                  {{record.estimateAveragePercentage}}<span v-if="record.estimateAveragePercentage">%</span>
+                  {{price.estimateAveragePercentage}}<span v-if="price.estimateAveragePercentage">%</span>
                 </dd>
 
                 <dt>Maximum Average</dt>
                 <dd>
-                  {{record.estimateMaximumPercentage}}<span v-if="record.estimateMaximumPercentage">%</span>
+                  {{price.estimateMaximumPercentage}}<span v-if="price.estimateMaximumPercentage">%</span>
                 </dd>
 
                 <dt>Minimum OQ</dt>
-                <dd>{{record.minimumOrderQuantity}}</dd>
+                <dd>{{price.minimumOrderQuantity}}</dd>
 
                 <dt>Tax One</dt>
-                <dd>{{record.taxOnePercentage}}%</dd>
+                <dd>{{price.taxOnePercentage}}%</dd>
 
                 <dt>Tax Two</dt>
-                <dd>{{record.taxTwoPercentage}}%</dd>
+                <dd>{{price.taxTwoPercentage}}%</dd>
 
                 <dt>Tax Three</dt>
-                <dd>{{record.taxThreePercentage}}%</dd>
+                <dd>{{price.taxThreePercentage}}%</dd>
               </dl>
             </div>
           </div>
@@ -89,7 +89,7 @@
           </div>
           <div class="block">
             <div class="block-body">
-              {{record.customData}}
+              {{price.customData}}
             </div>
           </div>
 
@@ -97,17 +97,17 @@
           <div class="block">
             <div class="block-body">
               <dl>
-                <dt v-if="record.productItem">Product Item</dt>
-                <dd v-if="record.productItem">
-                  <router-link :to="{ name: 'ShowProductItem', params: { id: record.productItem.id }}">
-                    {{record.productItem.id}}
+                <dt v-if="price.productItem">Product Item</dt>
+                <dd v-if="price.productItem">
+                  <router-link :to="{ name: 'ShowProductItem', params: { id: price.productItem.id }}">
+                    {{price.productItem.id}}
                   </router-link>
                 </dd>
 
-                <dt v-if="record.product">Product</dt>
-                <dd v-if="record.product">
-                  <router-link :to="{ name: 'ShowProduct', params: { id: record.product.id }}">
-                    {{record.product.id}}
+                <dt v-if="price.product">Product</dt>
+                <dd v-if="price.product">
+                  <router-link :to="{ name: 'ShowProduct', params: { id: price.product.id }}">
+                    {{price.product.id}}
                   </router-link>
                 </dd>
               </dl>
@@ -130,7 +130,7 @@
         </div>
 
         <div class="footer text-right">
-          <delete-button @confirmed="deleteRecord" size="medium">Delete</delete-button>
+          <delete-button @confirmed="deletePrice()" size="small">Delete</delete-button>
         </div>
       </el-card>
     </div>
@@ -140,28 +140,75 @@
 </template>
 
 <script>
-import 'vue-awesome/icons/times'
-import 'vue-awesome/icons/pencil'
 import 'vue-awesome/icons/plus'
+import freshcom from '@/freshcom-sdk'
 
-import ShowPage from '@/mixins/show-page'
+import Price from '@/models/price'
 import DeleteButton from '@/components/delete-button'
+import { idLastPart } from '@/helpers/filters'
 
 export default {
   name: 'ShowPrice',
   components: {
     DeleteButton
   },
-  mixins: [ShowPage({ storeNamespace: 'price', name: 'Price', include: 'children.product' })],
+  filters: {
+    idLastPart
+  },
+  props: ['id'],
+  data () {
+    return {
+      price: Price.objectWithDefaults(),
+      isLoading: false
+    }
+  },
+  created () {
+    this.loadPrice()
+  },
+  computed: {
+    currentRoutePath () {
+      return this.$store.state.route.fullPath
+    }
+  },
   methods: {
-    editRecord () {
-      this.$store.dispatch('pushRoute', { name: 'EditPrice', params: { id: this.record.id } })
-    },
-    recordDeleted () {
-      this.$store.dispatch('productItem/resetRecord')
-      this.$store.dispatch('product/resetRecord')
+    loadPrice () {
+      this.isLoading = true
 
-      this.$store.dispatch('popRoute', 1)
+      freshcom.retrievePrice(this.id, {
+        include: 'children'
+      }).then(response => {
+        this.price = response.data
+        this.isLoading = false
+      }).catch(errors => {
+        this.isLoading = false
+        throw errors
+      })
+    },
+
+    editPrice () {
+      this.$store.dispatch('pushRoute', {
+        name: 'EditPrice',
+        params: { id: this.price.id }
+      })
+    },
+
+    deletePrice () {
+      freshcom.deletePrice(this.price.id).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Price deleted successfully.`,
+          type: 'success'
+        })
+
+        this.back()
+      })
+    },
+
+    back () {
+      if (this.callbackPath) {
+        return this.$store.dispatch('pushRoute', { path: this.callbackPath })
+      }
+      this.$store.dispatch('pushRoute', { name: 'ListPrice' })
     }
   }
 }

@@ -11,7 +11,7 @@
   <div>
     <el-card class="main-card">
       <div slot="header">
-        <span style="line-height: 36px;">Create a Product</span>
+        <span style="line-height: 36px;">Create a product</span>
 
         <div class="pull-right">
           <el-button @click="back()" plain size="small">

@@ -5,7 +5,7 @@
       <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
       <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">Collections</el-menu-item>
     </el-menu>
-    <locale-selector @change="loadProduct()" class="pull-right"></locale-selector>
+    <locale-selector @change="loadProduct(id)" class="pull-right"></locale-selector>
   </div>
 
   <div>
@@ -212,7 +212,7 @@
               <el-table :data="product.prices" class="block-table" :show-header="false" style="width: 100%">
                 <el-table-column width="300">
                   <template scope="scope">
-                    <router-link :to="{ name: 'ShowPrice', params: { id: scope.row.id } }">
+                    <router-link :to="{ name: 'ShowPrice', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }">
                       <span v-if="scope.row.name">{{scope.row.name}}</span>
                       <span v-if="!scope.row.name">{{scope.row.label}}</span>
                       <el-tag v-if="scope.row.status != 'active'" type="gray" size="mini">

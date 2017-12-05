@@ -5,7 +5,7 @@
       <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
       <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">Collections</el-menu-item>
     </el-menu>
-    <locale-selector :before-change="confirmResourceLocaleChange" @change="loadRecord" class="pull-right"></locale-selector>
+    <locale-selector @change="loadPrice()" class="pull-right"></locale-selector>
   </div>
 
   <div>
@@ -14,26 +14,26 @@
         <span style="line-height: 36px;">Edit Price</span>
 
         <div style="float: right;">
-          <el-button @click="cancel" plain size="medium">
+          <el-button @click="back()" plain size="small">
             Cancel
           </el-button>
 
-          <el-button @click="submit(recordDraft)" type="primary" size="medium">
+          <el-button @click="submit()" type="primary" size="small">
             Save
           </el-button>
         </div>
       </div>
 
       <div class="data">
-        <price-form v-model="recordDraft" :record="record" :errors="errors"></price-form>
+        <price-form v-model="priceDraft" :record="price" :errors="errors"></price-form>
       </div>
 
       <div class="footer">
-        <el-button @click="cancel" plain size="medium">
+        <el-button @click="back()" plain size="small">
           Cancel
         </el-button>
 
-        <el-button @click="submit(recordDraft)" type="primary" size="medium" class="pull-right">
+        <el-button @click="submit()" type="primary" size="small" class="pull-right">
           Save
         </el-button>
       </div>
@@ -43,29 +43,74 @@
 </template>
 
 <script>
+import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+
+import Price from '@/models/price'
 import PriceForm from '@/components/price-form'
-import EditPage from '@/mixins/edit-page'
 
 export default {
   name: 'EditPrice',
   components: {
     PriceForm
   },
-  mixins: [EditPage({ storeNamespace: 'price', name: 'Price', include: 'product,children.product' })],
-  methods: {
-    recordUpdated (record) {
-      this.$store.dispatch('productItem/resetRecord')
-      this.$store.dispatch('product/resetRecord')
+  props: ['id', 'callbackPath'],
+  data () {
+    return {
+      isLoading: false,
+      price: Price.objectWithDefaults(),
+      priceDraft: Price.objectWithDefaults(),
 
+      isUpdatingPrice: false,
+      errors: {}
+    }
+  },
+  created () {
+    this.loadPrice()
+  },
+  methods: {
+    loadPrice () {
+      this.isLoading = true
+
+      freshcom.retrievePrice(this.id, {
+        include: 'product,children.product'
+      }).then(response => {
+        this.price = response.data
+        this.priceDraft = _.cloneDeep(response.data)
+
+        this.isLoading = false
+      }).catch(errors => {
+        this.isLoading = false
+        throw errors
+      })
+    },
+
+    submit () {
+      this.isUpdatingPrice = true
+
+      freshcom.updatePrice(
+        this.priceDraft.id,
+        this.priceDraft
+      ).then(price => {
+        this.$message({
+          showClose: true,
+          message: `Price saved successfully.`,
+          type: 'success'
+        })
+
+        this.isUpdatingPrice = false
+        this.back()
+      }).catch(errors => {
+        this.errors = errors
+        this.isUpdatingPrice = false
+      })
+    },
+
+    back () {
       if (this.callbackPath) {
         return this.$store.dispatch('pushRoute', { path: this.callbackPath })
       }
-
-      if (record.productItem) {
-        return this.$store.dispatch('pushRoute', { name: 'ShowProductItem', params: { id: record.productItem.id } })
-      }
-
-      this.$store.dispatch('pushRoute', { name: 'ShowPrice', params: { id: record.id } })
+      this.$store.dispatch('pushRoute', { name: 'ShowPrice', params: { id: this.price.id } })
     }
   }
 }

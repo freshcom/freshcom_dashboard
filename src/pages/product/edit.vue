@@ -6,35 +6,35 @@
       <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
       <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">Collections</el-menu-item>
     </el-menu>
-    <locale-selector :before-change="confirmResourceLocaleChange" @change="loadRecord" class="pull-right"></locale-selector>
+    <locale-selector @change="loadProduct()" class="pull-right"></locale-selector>
   </div>
 
   <div>
     <el-card class="main-card">
       <div slot="header">
-        <span style="line-height: 36px;">Edit Product</span>
+        <span style="line-height: 36px;">Edit product</span>
 
         <div style="float: right;">
-          <el-button @click="cancel" plain size="medium">
+          <el-button @click="back()" plain size="small">
             Cancel
           </el-button>
 
-          <el-button @click="submit(recordDraft)" type="primary" size="medium">
+          <el-button @click="submit()" type="primary" size="small">
             Save
           </el-button>
         </div>
       </div>
 
       <div class="data">
-        <product-form v-model="recordDraft" :errors="errors"></product-form>
+        <product-form v-model="productDraft" :errors="errors"></product-form>
       </div>
 
       <div class="footer">
-        <el-button @click="cancel" plain size="medium">
+        <el-button @click="back()" plain size="small">
           Cancel
         </el-button>
 
-        <el-button @click="submit(recordDraft)" type="primary" size="medium" class="pull-right">
+        <el-button @click="submit()" type="primary" size="small" class="pull-right">
           Save
         </el-button>
       </div>
@@ -45,18 +45,71 @@
 </template>
 
 <script>
+import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+
+import Product from '@/models/product'
 import ProductForm from '@/components/product-form'
-import EditPage from '@/mixins/edit-page'
 
 export default {
   name: 'EditProduct',
   components: {
     ProductForm
   },
-  mixins: [EditPage({ storeNamespace: 'product', name: 'Product', include: 'avatar,items,externalFileCollections' })],
+  props: ['id'],
+  data () {
+    return {
+      isLoading: false,
+      product: Product.objectWithDefaults(),
+      productDraft: Product.objectWithDefaults(),
+
+      isUpdatingProduct: false,
+      errors: {}
+    }
+  },
+  created () {
+    this.loadProduct()
+  },
   methods: {
-    recordUpdated (record) {
-      this.$store.dispatch('pushRoute', { name: 'ShowProduct', params: { id: record.id } })
+    loadProduct () {
+      this.isLoading = true
+
+      freshcom.retrieveProduct(this.id, {
+        include: 'avatar'
+      }).then(response => {
+        this.product = response.data
+        this.productDraft = _.cloneDeep(response.data)
+
+        this.isLoading = false
+      }).catch(errors => {
+        this.isLoading = false
+        throw errors
+      })
+    },
+
+    submit () {
+      this.isUpdatingProduct = true
+
+      freshcom.updateProduct(
+        this.productDraft.id,
+        this.productDraft
+      ).then(product => {
+        this.$message({
+          showClose: true,
+          message: `Product saved successfully.`,
+          type: 'success'
+        })
+
+        this.isUpdatingProduct = false
+        this.back()
+      }).catch(errors => {
+        this.errors = errors
+        this.isUpdatingProduct = false
+      })
+    },
+
+    back () {
+      this.$store.dispatch('pushRoute', { name: 'ShowProduct', params: { id: this.product.id } })
     }
   }
 }

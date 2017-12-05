@@ -1,6 +1,6 @@
 <template>
 <el-form :model="formModel" @input.native="updateValue" size="small" label-width="180px">
-  <el-form-item label="Product">
+  <el-form-item v-if="formModel.product" label="Product">
     {{formModel.product.id}}
   </el-form-item>
 
@@ -104,20 +104,16 @@
 
 <script>
 import _ from 'lodash'
+
 import MoneyInput from '@/components/money-input'
 import PercentageInput from '@/components/percentage-input'
 import translateErrors from '@/helpers/translate-errors'
-import ProductItemSelect from '@/components/product-item-select'
-import ProductItemAPI from '@/api/product-item'
-import JSONAPI from '@/jsonapi'
-import Price from '@/models/price'
 
 export default {
   name: 'PriceForm',
   components: {
     MoneyInput,
-    PercentageInput,
-    ProductItemSelect
+    PercentageInput
   },
   props: ['value', 'errors', 'record'],
   data () {
@@ -127,15 +123,7 @@ export default {
       productItems: []
     }
   },
-  created () {
-    if (this.session && this.formModel.product) {
-      this.setPriceChildren()
-    }
-  },
   computed: {
-    session () {
-      return this.$store.state.session.record
-    },
     errorMsgs () {
       return translateErrors(this.errors, 'price')
     },
@@ -175,13 +163,6 @@ export default {
     value (v) {
       this.formModel = _.cloneDeep(v)
     },
-    session (newSession) {
-      if (!newSession) { return }
-
-      if (this.formModel.product) {
-        this.setPriceChildren()
-      }
-    },
     subTotalCents (subTotalCents) {
       this.formModel.chargeCents = subTotalCents
     }
@@ -191,28 +172,11 @@ export default {
       this.$emit('input', this.formModel)
     }, 300),
     isRootPrice (formModel) {
-      if (formModel.product.kind === 'simple' || formModel.product.kind === 'variant') {
+      if (formModel.product && (formModel.product.kind === 'simple' || formModel.product.kind === 'variant')) {
         return true
       }
 
       return false
-    },
-    setPriceChildren () {
-      if (this.formModel.id) { return }
-      ProductItemAPI.queryRecord({ filter: { productId: this.formModel.product.id } }).then(response => {
-        let apiPayload = response.data
-        let productItems = JSONAPI.deserialize(apiPayload.data)
-
-        this.formModel.children = _.map(productItems, pi => {
-          let price = Price.objectWithDefaults()
-          price.productItem = pi
-          price.chargeCents = 0
-          return price
-        })
-
-        this.formModel.chargeCents = 0
-        this.updateValue()
-      })
     }
   }
 }
