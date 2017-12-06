@@ -1,5 +1,5 @@
 import { MessageBox } from 'element-ui'
-import { i18n } from '@/main'
+import i18n from '@/i18n'
 
 export function warnDanger (options = {}) {
   options.type = options.type || 'nav'

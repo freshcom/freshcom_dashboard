@@ -34,11 +34,6 @@ import NewProductPage from '@/pages/product/new'
 import ShowProductPage from '@/pages/product/show'
 import EditProductPage from '@/pages/product/edit'
 
-import NewProductItemPage from '@/pages/product-item/new'
-import ShowProductItemPage from '@/pages/product-item/show'
-import ListProductItemPage from '@/pages/product-item/list'
-import EditProductItemPage from '@/pages/product-item/edit'
-
 import NewPricePage from '@/pages/price/new'
 import EditPricePage from '@/pages/price/edit'
 import ShowPricePage from '@/pages/price/show'
@@ -282,48 +277,6 @@ export default new Router({
       component: EditProductPage,
       props (route) {
         return { id: route.params.id }
-      }
-    },
-    {
-      path: '/product_items',
-      name: 'ListProductItem',
-      component: ListProductItemPage,
-      props (route) {
-        let page = extractPagination(route)
-        return {
-          searchKeyword: route.query.search,
-          page: page
-        }
-      }
-    },
-    {
-      path: '/product_items/new',
-      name: 'NewProductItem',
-      component: NewProductItemPage,
-      props (route) {
-        let queryString = route.fullPath.split('?')[1]
-        let query = qs.parse(queryString)
-
-        return { productId: query.productId, callbackPath: query.callbackPath }
-      }
-    },
-    {
-      path: '/product_items/:id',
-      name: 'ShowProductItem',
-      component: ShowProductItemPage,
-      props (route) {
-        return { id: route.params.id }
-      }
-    },
-    {
-      path: '/product_items/:id/edit',
-      name: 'EditProductItem',
-      component: EditProductItemPage,
-      props (route) {
-        let queryString = route.fullPath.split('?')[1]
-        let query = qs.parse(queryString)
-
-        return { id: route.params.id, callbackPath: query.callbackPath }
       }
     },
     {

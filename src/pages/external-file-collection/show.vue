@@ -59,25 +59,25 @@
           <div class="block-body full">
             <el-table :data="efc.files" class="block-table" :show-header="false" style="width: 100%">
               <el-table-column>
-                <template scope="scope">
+                <template slot-scope="scope">
                   {{scope.row.name}}
                 </template>
               </el-table-column>
 
               <el-table-column width="150">
-                <template scope="scope">
+                <template slot-scope="scope">
                   <span>{{scope.row.contentType}}</span>
                 </template>
               </el-table-column>
 
               <el-table-column width="120">
-                <template scope="scope">
+                <template slot-scope="scope">
                   <span>{{scope.row.sizeBytes}} Bytes</span>
                 </template>
               </el-table-column>
 
               <el-table-column width="200">
-                <template scope="scope">
+                <template slot-scope="scope">
                   <span>{{scope.row.updatedAt | moment}}</span>
                 </template>
               </el-table-column>

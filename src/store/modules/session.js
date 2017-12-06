@@ -30,7 +30,6 @@ export default {
       let payload = { refresh_token: token.refresh_token, grant_type: 'refresh_token' }
 
       return freshcom.createToken(payload).then(token => {
-        console.log(token)
         localStorage.setItem('state.session.token', JSON.stringify(token))
         commit(MT.TOKEN_CHANGED, token)
 

@@ -96,7 +96,7 @@
           <div class="block-body full">
             <el-table :data="stockable.externalFileCollections" stripe class="block-table" :show-header="false">
               <el-table-column width="500">
-                <template scope="scope">
+                <template slot-scope="scope">
                   <router-link :to="{ name: 'ShowExternalFileCollection', params: { id: scope.row.id } }">
                     <span>{{scope.row.name}}</span>
                     <span v-if="scope.row.name"> - </span>
@@ -106,13 +106,13 @@
               </el-table-column>
 
               <el-table-column width="100">
-                <template scope="scope">
+                <template slot-scope="scope">
                   <span>{{scope.row.fileCount}} files</span>
                 </template>
               </el-table-column>
 
               <el-table-column>
-                <template scope="scope">
+                <template slot-scope="scope">
                   <p class="text-right actions">
                     <router-link :to="{ name: 'EditExternalFileCollection', params: { id: scope.row.id }}">
                       <icon name="pencil" scale="0.8" class="v-middle"></icon>

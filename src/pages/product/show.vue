@@ -101,7 +101,7 @@
             <div class="block-body full">
               <el-table :data="product.items" :show-header="false" class="block-table" style="width: 100%">
                 <el-table-column>
-                  <template scope="scope">
+                  <template slot-scope="scope">
                     <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id } }">
                       <span>{{scope.row.name}}</span>
                       <el-tag v-if="scope.row.status != 'active'" type="gray" size="mini">
@@ -112,7 +112,7 @@
                 </el-table-column>
 
                 <el-table-column width="300">
-                  <template scope="scope">
+                  <template slot-scope="scope">
                     <p class="text-right actions">
                       <el-button @click="editProduct(scope.row)" plain size="mini">
                         Edit
@@ -211,7 +211,7 @@
             <div class="block-body full">
               <el-table :data="product.prices" class="block-table" :show-header="false" style="width: 100%">
                 <el-table-column width="300">
-                  <template scope="scope">
+                  <template slot-scope="scope">
                     <router-link :to="{ name: 'ShowPrice', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }">
                       <span v-if="scope.row.name">{{scope.row.name}}</span>
                       <span v-if="!scope.row.name">{{scope.row.label}}</span>
@@ -223,19 +223,19 @@
                 </el-table-column>
 
                 <el-table-column width="100">
-                  <template scope="scope">
+                  <template slot-scope="scope">
                     <span>{{scope.row.minimumOrderQuantity}}+</span>
                   </template>
                 </el-table-column>
 
                 <el-table-column width="150">
-                  <template scope="scope">
+                  <template slot-scope="scope">
                     <span>${{scope.row.chargeCents / 100}}/{{scope.row.chargeUnit}}</span>
                   </template>
                 </el-table-column>
 
                 <el-table-column>
-                  <template scope="scope">
+                  <template slot-scope="scope">
                     <p class="text-right actions">
                       <el-button v-if="scope.row.status == 'draft'" @click="markPriceActive(scope.row)" plain size="mini">
                         Mark Active
@@ -271,7 +271,7 @@
           <div class="block-body full">
             <el-table :data="product.externalFileCollections" stripe class="block-table" :show-header="false" style="width: 100%">
               <el-table-column width="500">
-                <template scope="scope">
+                <template slot-scope="scope">
                   <router-link :to="{ name: 'ShowExternalFileCollection', params: { id: scope.row.id } }">
                     <span>{{scope.row.name}}</span>
                     <span v-if="scope.row.name"> - </span>
@@ -281,13 +281,13 @@
               </el-table-column>
 
               <el-table-column width="100">
-                <template scope="scope">
+                <template slot-scope="scope">
                   <span>{{scope.row.fileCount}} files</span>
                 </template>
               </el-table-column>
 
               <el-table-column>
-                <template scope="scope">
+                <template slot-scope="scope">
                   <p class="text-right actions">
                     <router-link :to="{ name: 'EditExternalFileCollection', params: { id: scope.row.id }}">
                       <icon name="pencil" scale="0.8" class="v-middle"></icon>
