@@ -187,6 +187,8 @@
 
 <script>
 import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+
 import translateErrors from '@/helpers/translate-errors'
 import { dollar, chargeDollar } from '@/helpers/filters'
 import Price from '@/models/price'
@@ -305,10 +307,12 @@ export default {
     }, 300),
 
     searchProducts (keyword) {
-      return this.$store.dispatch('orderLineItem/searchProducts', {
+      return freshcom.listProduct({
         search: keyword,
         filter: { status: ['active', 'internal'] },
         include: 'prices,defaultPrice'
+      }).then(response => {
+        return response.data
       })
     },
 

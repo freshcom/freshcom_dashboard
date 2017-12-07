@@ -74,10 +74,11 @@ export default {
       })
     },
 
-    getAccount ({ state, commit }) {
+    getAccount ({ state, commit, dispatch }) {
       return freshcom.retrieveAccount().then(response => {
         let account = response.data
         commit(MT.ACCOUNT_CHANGED, account)
+        dispatch('setResourceLocale', account.defaultLocale, { root: true })
 
         return account
       })
