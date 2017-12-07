@@ -1,6 +1,3 @@
-import _ from 'lodash'
-import AccountAPI from '@/api/account'
-import JSONAPI from '@/jsonapi'
 import freshcom from '@/freshcom-sdk'
 
 const MT = {
@@ -83,21 +80,6 @@ export default {
         commit(MT.ACCOUNT_CHANGED, account)
 
         return account
-      })
-    },
-
-    updateAccount ({ state, commit, rootState }, actionPayload) {
-      let apiPayload = { data: JSONAPI.serialize(actionPayload.recordDraft) }
-
-      let options = _.merge({}, actionPayload, { locale: rootState.resourceLocale })
-      return AccountAPI.updateRecord(apiPayload, options).then(response => {
-        let apiPayload = response.data
-        let record = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        commit(MT.ACCOUNT_CHANGED, record)
-
-        return record
-      }).catch(error => {
-        throw JSONAPI.deserializeErrors(error.response.data.errors)
       })
     }
   },

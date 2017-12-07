@@ -270,6 +270,22 @@ export default {
   },
 
   //
+  // BillingSettings
+  //
+  retrieveBillingSettings (params = {}, options = {}) {
+    return this.http.get('/billing_settings', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  updateBillingSettings (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.patch('/billing_settings', payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  //
   // Product
   //
   listProduct (id, params = {}, options = {}) {

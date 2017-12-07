@@ -17,24 +17,12 @@ import 'element-ui/lib/theme-chalk/index.css'
 import vueMoment from 'vue-moment'
 import money from 'v-money'
 
-import jsonapiAxios from './api/jsonapi-axios'
-
 import App from './app'
 import LeftNav from '@/components/left-nav'
 import LocaleSelector from '@/components/locale-selector'
 
 // -- Sync Store & Router --
 sync(store, router)
-
-// -- Authentication for API --
-jsonapiAxios.interceptors.request.use(function (config) {
-  let accessToken = store.state.session.token.access_token
-  config.headers = config.headers || {}
-  config.headers['Authorization'] = `Bearer ${accessToken}`
-  return config
-}, function (error) {
-  return Promise.reject(error)
-})
 
 // -- Global Component --
 Vue.component('icon', Icon)

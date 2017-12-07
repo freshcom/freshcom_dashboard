@@ -9,19 +9,6 @@ import freshcom from '@/freshcom-sdk'
 import { DEFAULT_LOCALE } from '@/env'
 
 import SessionStore from '@/store/modules/session'
-import StockableStore from '@/store/modules/stockable'
-import { Store as ExternalFileStore, Plugin as ExternalFilePlugin } from '@/store/modules/external-file'
-import ExternalFileCollectionStore from '@/store/modules/external-file-collection'
-import ProductStore from '@/store/modules/product'
-import ProductItemStore from '@/store/modules/product-item'
-import PriceStore from '@/store/modules/price'
-import OrderStore from '@/store/modules/order'
-import OrderLineItemStore from '@/store/modules/order-line-item'
-import PaymentStore from '@/store/modules/payment'
-import UnlockableStore from '@/store/modules/unlockable'
-import CustomerStore from '@/store/modules/customer'
-import BillingStore from '@/store/modules/billing'
-import DepositableStore from '@/store/modules/depositable'
 
 Vue.use(Vuex)
 
@@ -33,22 +20,9 @@ const MT = {
 
 export default new Vuex.Store({
   strict: true,
-  plugins: [createLogger(), ExternalFilePlugin],
+  plugins: [createLogger()],
   modules: {
-    session: SessionStore,
-    externalFileCollection: ExternalFileCollectionStore,
-    externalFile: ExternalFileStore,
-    stockable: StockableStore,
-    product: ProductStore,
-    productItem: ProductItemStore,
-    price: PriceStore,
-    order: OrderStore,
-    orderLineItem: OrderLineItemStore,
-    payment: PaymentStore,
-    unlockable: UnlockableStore,
-    customer: CustomerStore,
-    billing: BillingStore,
-    depositable: DepositableStore
+    session: SessionStore
   },
   state: {
     uiLocale: DEFAULT_LOCALE,

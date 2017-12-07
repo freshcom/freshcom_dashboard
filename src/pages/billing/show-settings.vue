@@ -27,6 +27,8 @@
 
 <script>
 import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+
 import BillingSettings from '@/models/billing-settings'
 import { STRIPE_CLIENT_ID } from '@/env'
 import translateErrors from '@/helpers/translate-errors'
@@ -58,29 +60,29 @@ export default {
     updateBillingSettings () {
       this.isLoading = true
 
-      this.$store.dispatch('billing/updateSettings', { settingsDraft: this.billingSettingsDraft }).then(billingSettings => {
-        this.billingSettings = billingSettings
-        this.billingSettingsDraft = _.cloneDeep(billingSettings)
+      freshcom.updateBillingSettings(this.billingSettingsDraft).then(response => {
+        this.billingSettings = response.data
+        this.billingSettingsDraft = _.cloneDeep(response.data)
 
         this.isLoading = false
-      }).catch(errors => {
+      }).catch(response => {
         this.isLoading = false
 
-        let translatedErrors = translateErrors(errors, 'billingSettings')
+        let translatedErrors = translateErrors(response.errors, 'billingSettings')
         this.$message({
           showClose: true,
           message: translatedErrors.stripeAuthCode,
           type: 'error'
         })
 
-        throw errors
+        throw response
       })
     },
+
     loadBillingSettings () {
       this.isLoading = true
-      this.$store.dispatch('billing/getSettings').then(billingSettings => {
-        this.billingSettings = billingSettings
-
+      freshcom.retrieveBillingSettings().then(response => {
+        this.billingSettings = response.data
         this.isLoading = false
       }).catch(errors => {
         this.isLoading = false
