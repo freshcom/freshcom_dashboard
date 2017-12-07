@@ -110,6 +110,8 @@
 
 <script>
 import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+
 import translateErrors from '@/helpers/translate-errors'
 import RemoteSelect from '@/components/remote-select'
 
@@ -151,7 +153,11 @@ export default {
     },
 
     searchCustomers (keyword) {
-      return this.$store.dispatch('order/searchCustomers', { search: keyword })
+      return freshcom.listCustomer({
+        search: keyword
+      }).then(response => {
+        return response.data
+      })
     },
 
     customerToOption (customer) {

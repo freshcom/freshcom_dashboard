@@ -157,6 +157,8 @@
 
 <script>
 import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+
 import translateErrors from '@/helpers/translate-errors'
 import MoneyInput from '@/components/money-input'
 import { Card } from 'vue-stripe-elements-plus'
@@ -261,15 +263,16 @@ export default {
     loadCards (owner) {
       this.isLoadingCards = true
 
-      return this.$store.dispatch('payment/loadCards', {
+      return freshcom.listCard({
         filter: { ownerId: owner.id, ownerType: owner.type }
-      }).then(cards => {
-        this.cards = cards
+      }).then(response => {
+        this.cards = response.data
         this.isLoadingCards = false
 
-        return cards
-      }).catch(() => {
+        return response.data
+      }).catch(response => {
         this.isLoadingCards = false
+        throw response
       })
     }
   }

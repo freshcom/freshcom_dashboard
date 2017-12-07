@@ -366,10 +366,11 @@ export default {
       }
 
       if (product.kind === 'withVariants') {
-        this.$store.dispatch('orderLineItem/loadProductVariants', {
+        freshcom.listProduct({
           filter: { parentId: product.id, status: ['active', 'internal'] },
           include: 'prices,defaultPrice'
-        }).then(variants => {
+        }).then(response => {
+          let variants = response.data
           this.productVariants = variants
           this.formModel.product = _.find(variants, { primary: true })
 
