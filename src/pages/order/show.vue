@@ -220,7 +220,11 @@
           <div class="block-body">
              <dl>
                 <dt v-if="order.customer">Customer</dt>
-                <dd v-if="order.customer"><a href="#">{{order.customer.id}}</a></dd>
+                <dd v-if="order.customer">
+                  <router-link :to="{ name: 'ShowCustomer', params: { id: order.customer.id }}">
+                    {{order.customer.id}}
+                  </router-link>
+                </dd>
               </dl>
           </div>
         </div>
@@ -394,8 +398,7 @@ export default {
 
     loadPayments () {
       return freshcom.listPayment({
-        targetId: this.id,
-        targetType: 'Order'
+        filter: { targetId: this.id, targetType: 'Order' }
       }).then(response => {
         this.payments = response.data
         return response

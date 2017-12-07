@@ -246,6 +246,15 @@ export default {
   },
 
   //
+  // Unlock
+  //
+  listUnlock (params = {}, options = {}) {
+    return this.http.get('/unlocks', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  //
   // Card
   //
   listCard (params = {}, options = {}) {

@@ -82,7 +82,7 @@
 
         <div class="block">
           <div class="block-body full">
-            <el-table :data="customer.orders" class="block-table" :show-header="false" style="width: 100%">
+            <el-table :data="orders" class="block-table" :show-header="false" style="width: 100%">
               <el-table-column>
                 <template slot-scope="scope">
                   <router-link :to="{ name: 'ShowOrder', params: { id: scope.row.id } }">
@@ -188,7 +188,7 @@
 
         <div class="block">
           <div class="block-body full">
-            <el-table :data="customer.unlocks" class="block-table" :show-header="false" style="width: 100%">
+            <el-table :data="unlocks" class="block-table" :show-header="false" style="width: 100%">
               <el-table-column>
                 <template slot-scope="scope">
                   <router-link :to="{ name: 'ShowUnlockable', params: { id: scope.row.unlockable.id } }">
@@ -359,6 +359,12 @@ export default {
       isLoadingCards: false,
       cards: [],
 
+      isLoadingOrders: false,
+      orders: [],
+
+      isLoadingUnlocks: false,
+      unlocks: [],
+
       cardDraftForEdit: Card.objectWithDefaults(),
       isEditingCard: false,
       isUpdatingCard: false,
@@ -368,6 +374,8 @@ export default {
   },
   created () {
     this.loadCustomer()
+    this.loadOrders()
+    this.loadUnlocks()
     this.loadCards()
   },
   computed: {
@@ -387,13 +395,30 @@ export default {
       this.isLoading = true
 
       freshcom.retrieveCustomer(this.id, {
-        include: 'orders,unlocks.unlockable'
+        include: 'unlocks.unlockable'
       }).then(response => {
         this.customer = response.data
         this.isLoading = false
-      }).catch(errors => {
+      }).catch(response => {
         this.isLoading = false
-        throw errors
+        throw response
+      })
+    },
+
+    loadOrders () {
+      freshcom.listOrder({
+        filter: { customerId: this.id }
+      }).then(response => {
+        this.orders = response.data
+      })
+    },
+
+    loadUnlocks () {
+      freshcom.listUnlock({
+        filter: { customerId: this.id },
+        include: 'unlockable'
+      }).then(response => {
+        this.unlocks = response.data
       })
     },
 
