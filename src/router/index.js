@@ -114,7 +114,10 @@ export default new Router({
       name: 'ShowOrder',
       component: ShowOrderPage,
       props (route) {
-        return { id: route.params.id }
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { id: route.params.id, callbackPath: query.callbackPath }
       }
     },
     {

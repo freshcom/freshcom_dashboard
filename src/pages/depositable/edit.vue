@@ -101,9 +101,10 @@ export default {
 
         this.isUpdatingDepositable = false
         this.back()
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.data
         this.isUpdatingDepositable = false
+        throw response
       })
     },
 

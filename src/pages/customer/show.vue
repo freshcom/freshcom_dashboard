@@ -45,7 +45,7 @@
               </template>
 
               <dt>Status</dt>
-              <dd>{{$t(`attributes.customer.status.${customer.status}`)}}</dd>
+              <dd>{{$t(`fields.customer.status.${customer.status}`)}}</dd>
 
               <dt>Name</dt>
               <dd>{{customer.firstName}} {{customer.lastName}}</dd>
@@ -89,7 +89,7 @@
                     <span v-if="scope.row.code">[{{scope.row.code}}]</span>
                     <b>{{scope.row.grandTotalCents | dollar}}</b>
                     <el-tag size="mini" type="info" class="m-l-10">
-                      {{$t(`attributes.order.status.${scope.row.status}`)}}
+                      {{$t(`fields.order.status.${scope.row.status}`)}}
                     </el-tag>
                   </router-link>
                 </template>
@@ -330,11 +330,10 @@
 </template>
 
 <script>
-import 'vue-awesome/icons/times'
-import 'vue-awesome/icons/pencil'
 import 'vue-awesome/icons/plus'
-
 import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+
 import Customer from '@/models/customer'
 import Card from '@/models/card'
 import DeleteButton from '@/components/delete-button'
@@ -386,21 +385,23 @@ export default {
   methods: {
     loadCustomer () {
       this.isLoading = true
-      this.$store.dispatch('customer/getCustomer', {
-        id: this.id,
-        include: 'orders,unlocks.unlockable'
-      }).then(customer => {
-        this.customer = customer
 
+      freshcom.retrieveCustomer(this.id, {
+        include: 'orders,unlocks.unlockable'
+      }).then(response => {
+        this.customer = response.data
         this.isLoading = false
       }).catch(errors => {
         this.isLoading = false
         throw errors
       })
     },
+
     loadCards () {
-      return this.$store.dispatch('customer/listCard', { customerId: this.id }).then(cards => {
-        this.cards = cards
+      return freshcom.listCard({
+        filter: { ownerId: this.id, ownerType: 'Customer' }
+      }).then(response => {
+        this.cards = response.data
       })
     },
 
@@ -409,7 +410,7 @@ export default {
     },
 
     deleteCustomer () {
-      this.$store.dispatch('customer/deleteCustomer', this.customer.id).then(() => {
+      freshcom.deleteCustomer(this.id).then(() => {
         this.$message({
           showClose: true,
           message: `Customer deleted successfully.`,
@@ -436,10 +437,7 @@ export default {
     updateCard () {
       this.isUpdatingCard = true
 
-      this.$store.dispatch('customer/updateCard', {
-        id: this.cardDraftForEdit.id,
-        cardDraft: this.cardDraftForEdit
-      }).then(() => {
+      freshcom.updateCard(this.cardDraftForEdit.id, this.cardDraftForEdit).then(() => {
         return this.loadCards()
       }).then(() => {
         this.$message({
@@ -449,14 +447,15 @@ export default {
         })
 
         this.closeEditCardDialog()
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
         this.isUpdatingCard = false
+        throw response
       })
     },
 
     deleteCard (card) {
-      this.$store.dispatch('customer/deleteCard', card.id).then(() => {
+      freshcom.deleteCard(card.id).then(() => {
         return this.loadCards()
       }).then(() => {
         this.$message({

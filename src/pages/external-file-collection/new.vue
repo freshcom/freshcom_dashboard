@@ -83,9 +83,10 @@ export default {
 
         this.isCreatingEfc = false
         this.back()
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
         this.isCreatingEfc = false
+        throw response
       })
     },
 

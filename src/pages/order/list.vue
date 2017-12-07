@@ -43,7 +43,7 @@
           </el-table-column>
           <el-table-column prop="status" label="Status" width="200">
             <template slot-scope="scope">
-              {{$t(`attributes.order.status.${scope.row.status}`)}}
+              {{$t(`fields.order.status.${scope.row.status}`)}}
             </template>
           </el-table-column>
           <el-table-column prop="id" label="ID" width="120">
@@ -76,10 +76,9 @@
 
 <script>
 import 'vue-awesome/icons/search'
-import 'vue-awesome/icons/chevron-right'
-import 'vue-awesome/icons/chevron-left'
-
 import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+
 import Pagination from '@/components/pagination'
 import { dollar, idLastPart } from '@/helpers/filters'
 
@@ -144,17 +143,18 @@ export default {
     searchOrder () {
       this.isLoading = true
 
-      this.$store.dispatch('order/listOrder', {
+      freshcom.listOrder({
         search: this.searchKeyword,
         page: this.page
       }).then(response => {
-        this.orders = response.orders
+        this.orders = response.data
         this.totalCount = response.meta.totalCount
         this.resultCount = response.meta.resultCount
 
         this.isLoading = false
-      }).catch(errors => {
+      }).catch(response => {
         this.isLoading = false
+        throw response
       })
     },
     viewOrder (order) {

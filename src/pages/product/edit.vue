@@ -102,9 +102,10 @@ export default {
 
         this.isUpdatingProduct = false
         this.back()
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
         this.isUpdatingProduct = false
+        throw response
       })
     },
 

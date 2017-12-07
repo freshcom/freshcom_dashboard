@@ -79,9 +79,10 @@ export default {
 
         this.isCreatingPrice = false
         this.back()
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
         this.isCreatingPrice = false
+        throw response
       })
     },
 

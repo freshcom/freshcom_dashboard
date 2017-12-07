@@ -99,9 +99,10 @@ export default {
 
         this.isUpdatingStockable = false
         this.back()
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
         this.isUpdatingStockable = false
+        throw response
       })
     },
 

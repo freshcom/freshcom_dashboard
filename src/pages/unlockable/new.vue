@@ -72,9 +72,10 @@ export default {
 
         this.isCreatingUnlockable = false
         this.back()
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
         this.isCreatingUnlockable = false
+        throw response
       })
     },
     back () {

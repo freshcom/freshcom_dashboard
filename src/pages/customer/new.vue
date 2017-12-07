@@ -18,7 +18,7 @@
             Cancel
           </el-button>
 
-          <el-button @click="submit(customerDraft)" type="primary" size="small">
+          <el-button @click="submit()" type="primary" size="small">
             Save
           </el-button>
         </div>
@@ -33,7 +33,7 @@
           Cancel
         </el-button>
 
-        <el-button @click="submit(customerDraft)" type="primary" size="small" class="pull-right">
+        <el-button @click="submit()" type="primary" size="small" class="pull-right">
           Save
         </el-button>
       </div>
@@ -44,6 +44,8 @@
 </template>
 
 <script>
+import freshcom from '@/freshcom-sdk'
+
 import Customer from '@/models/customer'
 import CustomerForm from '@/components/customer-form'
 
@@ -63,7 +65,7 @@ export default {
     submit () {
       this.isCreatingCustomer = true
 
-      this.$store.dispatch('customer/createCustomer', this.customerDraft).then(customer => {
+      freshcom.createCustomer(this.customerDraft).then(customer => {
         this.$message({
           showClose: true,
           message: `Customer created successfully.`,
@@ -72,9 +74,10 @@ export default {
 
         this.isCreatingCustomer = false
         this.back()
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
         this.isCreatingCustomer = false
+        throw response
       })
     },
     back () {

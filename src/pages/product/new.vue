@@ -74,9 +74,10 @@ export default {
 
         this.isCreatingProduct = false
         this.back()
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
         this.isCreatingProduct = false
+        throw response
       })
     },
     back () {

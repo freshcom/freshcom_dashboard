@@ -52,7 +52,7 @@
           </el-table-column>
           <el-table-column prop="status" label="Status" width="150">
             <template slot-scope="scope">
-              {{$t(`attributes.customer.status.${scope.row.status}`)}}
+              {{$t(`fields.customer.status.${scope.row.status}`)}}
             </template>
           </el-table-column>
           <el-table-column prop="id" label="ID" width="120">
@@ -60,14 +60,14 @@
               <el-popover trigger="hover" placement="top">
                 <span>{{ scope.row.id }}</span>
                 <div slot="reference" class="name-wrapper">
-                  {{ scope.row.id | idLastPart }}
+                  {{scope.row.id | idLastPart}}
                 </div>
               </el-popover>
             </template>
           </el-table-column>
-          <el-table-column prop="createdAt" label="Created At" align="right" width="200">
+          <el-table-column prop="updatedAt" label="Last updated" align="right" width="200">
             <template slot-scope="scope">
-              {{scope.row.insertedAt | moment}}
+              {{scope.row.updatedAt | moment}}
             </template>
           </el-table-column>
         </el-table>
@@ -95,8 +95,9 @@
 
 <script>
 import 'vue-awesome/icons/search'
-
 import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+
 import Pagination from '@/components/pagination'
 import { idLastPart } from '@/helpers/filters'
 import DataImportForm from '@/components/data-import-form'
@@ -170,17 +171,18 @@ export default {
     searchCustomer () {
       this.isLoading = true
 
-      this.$store.dispatch('customer/listCustomer', {
+      freshcom.listCustomer({
         search: this.searchKeyword,
         page: this.page
       }).then(response => {
-        this.customers = response.customers
+        this.customers = response.data
         this.totalCount = response.meta.totalCount
         this.resultCount = response.meta.resultCount
 
         this.isLoading = false
-      }).catch(errors => {
+      }).catch(response => {
         this.isLoading = false
+        throw response
       })
     },
 
@@ -208,7 +210,7 @@ export default {
     createDataImport () {
       this.isCreatingDataImport = true
 
-      this.$store.dispatch('customer/createDataImport', this.dataImportDraftForAdd).then(dataImport => {
+      freshcom.createDataImport(this.dataImportDraftForAdd).then(response => {
         this.$message({
           showClose: true,
           message: `Import started successfully.`,
@@ -216,9 +218,10 @@ export default {
         })
 
         this.closeAddDataImportDialog()
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
         this.isCreatingDataImport = false
+        throw response
       })
     }
   }

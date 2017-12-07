@@ -36,12 +36,12 @@
 
               <dt>Status</dt>
               <dd>
-                {{$t(`attributes.payment.status.${payment.status}`)}}
+                {{$t(`fields.payment.status.${payment.status}`)}}
               </dd>
 
               <dt v-if="payment.gateway">Gateway</dt>
               <dd v-if="payment.gateway">
-                {{$t(`attributes.payment.gateway.${payment.gateway}`)}}
+                {{$t(`fields.payment.gateway.${payment.gateway}`)}}
               </dd>
 
               <dt v-if="payment.method">Method</dt>
@@ -88,7 +88,7 @@
                 <template slot-scope="scope">
                   <b>{{scope.row.amountCents | dollar}}</b>
                   <el-tag v-if="scope.row.gateway !== payment.gateway" size="mini" type="info" class="m-l-10">
-                    {{$t(`attributes.refund.gateway.${scope.row.gateway}`)}}
+                    {{$t(`fields.refund.gateway.${scope.row.gateway}`)}}
                   </el-tag>
                 </template>
               </el-table-column>
@@ -170,10 +170,8 @@
 </template>
 
 <script>
-// import _ from 'lodash'
-import 'vue-awesome/icons/times'
-import 'vue-awesome/icons/pencil'
 import 'vue-awesome/icons/plus'
+import freshcom from '@/freshcom-sdk'
 
 import Payment from '@/models/payment'
 import Refund from '@/models/refund'
@@ -216,14 +214,15 @@ export default {
     }
   },
   methods: {
-    loadPayment () {
-      this.isLoading = true
-      this.$store.dispatch('payment/getPayment', {
-        id: this.id,
-        include: 'refunds'
-      }).then(payment => {
-        this.payment = payment
+    loadPayment (options = { shouldShowLoading: true }) {
+      if (options.shouldShowLoading) {
+        this.isLoading = true
+      }
 
+      freshcom.retrievePayment(this.id, {
+        include: 'refunds'
+      }).then(response => {
+        this.payment = response.data
         this.isLoading = false
       }).catch(errors => {
         this.isLoading = false
@@ -254,9 +253,9 @@ export default {
     createRefund () {
       this.isCreatingRefund = true
 
-      this.$store.dispatch('payment/createRefund', this.refundDraftForAdd).then(payment => {
-        this.payment = payment
-
+      freshcom.createRefund(this.payment.id, this.refundDraftForAdd).then(() => {
+        return this.loadPayment({ shouldShowLoading: false })
+      }).then(() => {
         this.$message({
           showClose: true,
           message: `Refund created successfully.`,
@@ -264,16 +263,16 @@ export default {
         })
 
         this.closeAddRefundDialog()
-      }).catch(errors => {
-        this.errors = errors
-
+      }).catch(response => {
+        this.errors = response.errors
         this.isCreatingRefund = false
+        throw response
       })
     },
 
     deletePayment () {
       let orderId = this.payment.target.id
-      this.$store.dispatch('payment/deletePayment', this.payment.id).then(response => {
+      freshcom.deletePayment(this.payment.id).then(() => {
         this.$message({
           showClose: true,
           message: `Payment deleted successfully.`,

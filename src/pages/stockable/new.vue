@@ -72,9 +72,10 @@ export default {
 
         this.isCreatingStockable = false
         this.back()
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
         this.isCreatingStockable = false
+        throw response
       })
     },
     back () {

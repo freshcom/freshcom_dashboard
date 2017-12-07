@@ -33,12 +33,12 @@
           </el-table-column>
           <el-table-column prop="status" label="Status" width="200">
             <template slot-scope="scope">
-              {{$t(`attributes.payment.status.${scope.row.status}`)}}
+              {{$t(`fields.payment.status.${scope.row.status}`)}}
             </template>
           </el-table-column>
           <el-table-column prop="status" label="Gateway" width="100">
             <template slot-scope="scope">
-              {{$t(`attributes.payment.gateway.${scope.row.gateway}`)}}
+              {{$t(`fields.payment.gateway.${scope.row.gateway}`)}}
             </template>
           </el-table-column>
           <el-table-column prop="id" label="ID" width="120">
@@ -46,7 +46,7 @@
               <el-popover trigger="hover" placement="top">
                 <span>{{ scope.row.id }}</span>
                 <div slot="reference" class="name-wrapper">
-                  {{ scope.row.id | idLastPart }}
+                  {{scope.row.id | idLastPart}}
                 </div>
               </el-popover>
             </template>
@@ -71,10 +71,9 @@
 
 <script>
 import 'vue-awesome/icons/search'
-import 'vue-awesome/icons/chevron-right'
-import 'vue-awesome/icons/chevron-left'
-
 import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+
 import Pagination from '@/components/pagination'
 import { dollar, idLastPart } from '@/helpers/filters'
 
@@ -139,11 +138,11 @@ export default {
     searchPayment () {
       this.isLoading = true
 
-      this.$store.dispatch('payment/listPayment', {
+      freshcom.listPayment({
         search: this.searchKeyword,
         page: this.page
       }).then(response => {
-        this.payments = response.payments
+        this.payments = response.data
         this.totalCount = response.meta.totalCount
         this.resultCount = response.meta.resultCount
 

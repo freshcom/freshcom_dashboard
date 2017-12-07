@@ -100,9 +100,10 @@ export default {
 
         this.isUpdatingPrice = false
         this.back()
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
         this.isUpdatingPrice = false
+        throw response
       })
     },
 

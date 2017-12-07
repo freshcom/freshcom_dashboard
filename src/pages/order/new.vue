@@ -138,6 +138,8 @@
 
 <script>
 import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+
 import OrderLineItemForm from '@/components/order-line-item-form'
 import PaymentForm from '@/components/payment-form'
 import OrderForm from '@/components/order-form'
@@ -245,18 +247,38 @@ export default {
     }
   },
   methods: {
+    loadOrder (id) {
+      freshcom.retrieveOrder(id, {
+        include: 'rootLineItems.children,customer'
+      }).then(response => {
+        this.order = response.data
+        this.orderDraft = _.cloneDeep(response.data)
+        return response
+      })
+    },
+
     createLineItem () {
       this.isCreatingLineItem = true
-      this.lineItemDraftForAdd.order = this.order
 
-      this.$store.dispatch('order/createLineItem', this.lineItemDraftForAdd).then(order => {
-        this.order = order
-        this.orderDraft = _.cloneDeep(this.order)
+      let orderCreated = new Promise((resolve, reject) => {
+        resolve(this.order)
+      })
+      if (!this.order.id) {
+        orderCreated = freshcom.createOrder(this.order).then(response => {
+          return response.data
+        })
+      }
+
+      orderCreated.then(order => {
+        this.lineItemDraftForAdd.order = order
+        return freshcom.createOrderLineItem(order.id, this.lineItemDraftForAdd)
+      }).then(response => {
+        return this.loadOrder(response.data.order.id)
+      }).then(() => {
         this.lineItemDraftForAdd = OrderLineItem.objectWithDefaults()
-
         this.isCreatingLineItem = false
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
         this.isCreatingLineItem = false
       })
     },
@@ -276,13 +298,9 @@ export default {
       this.isUpdatingLineItem = true
       this.lineItemDraftForEdit.order = this.order
 
-      this.$store.dispatch('order/updateLineItem', {
-        id: this.lineItemDraftForEdit.id,
-        lineItemDraft: this.lineItemDraftForEdit
-      }).then(order => {
-        this.order = order
-        this.orderDraft = _.cloneDeep(this.order)
-
+      freshcom.updateOrderLineItem(this.lineItemDraftForEdit.id, this.lineItemDraftForEdit).then(() => {
+        return this.loadOrder(this.order.id)
+      }).then(() => {
         this.$message({
           showClose: true,
           message: `Line Item saved successfully.`,
@@ -291,20 +309,17 @@ export default {
 
         this.isUpdatingLineItem = false
         this.isEditingLineItem = false
-      }).catch(errors => {
-        this.errors = errors
-
+      }).catch(response => {
+        this.errors = response.errors
         this.isEditingLineItem = false
         this.isUpdatingLineItem = false
+        throw response
       })
     },
 
     deleteLineItem (id) {
-      let lineItem = _.find(this.order.rootLineItems, { id: id })
-
-      this.$store.dispatch('order/deleteLineItem', lineItem).then(order => {
-        this.order = order
-        this.orderDraft = _.cloneDeep(this.order)
+      freshcom.deleteOrderLineItem(id).then(() => {
+        return this.loadOrder(this.order.id)
       })
     },
 
@@ -321,16 +336,14 @@ export default {
     updateOrder () {
       this.isUpdatingOrder = true
 
-      return this.$store.dispatch('order/updateOrder', {
-        id: this.orderDraft.id,
-        orderDraft: this.orderDraft,
+      return freshcom.updateOrder(this.order.id, this.orderDraft, {
         include: 'customer,rootLineItems.children'
-      }).then(order => {
+      }).then(response => {
+        let order = response.data
         this.order = order
         this.orderDraft = _.cloneDeep(order)
 
         let paymentDraft = _.cloneDeep(this.paymentDraft)
-
         paymentDraft.target = order
         paymentDraft.owner = order.customer
 
@@ -344,8 +357,8 @@ export default {
 
         this.paymentDraft = paymentDraft
         this.isUpdatingOrder = false
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
 
         this.$message({
           showClose: true,
@@ -354,7 +367,7 @@ export default {
         })
 
         this.isUpdatingOrder = false
-        throw errors
+        throw response
       })
     },
 
@@ -365,13 +378,13 @@ export default {
       if (this.paymentDraft.gateway === 'online' && this.paymentDraft.useCardFrom === 'newCard') {
         paymentCreated = createStripeToken().then(data => {
           this.paymentDraft.source = data.token.id
-          return this.$store.dispatch('order/createPayment', this.paymentDraft)
+          return freshcom.createPayment(this.paymentDraft)
         })
       } else {
-        paymentCreated = this.$store.dispatch('order/createPayment', this.paymentDraft)
+        paymentCreated = freshcom.createPayment(this.paymentDraft)
       }
 
-      paymentCreated.then(payment => {
+      paymentCreated.then(() => {
         this.$message({
           showClose: true,
           message: `Order placed successfully.`,
@@ -379,12 +392,11 @@ export default {
         })
 
         this.isCreatingPayment = false
-        this.$store.dispatch('order/resetRecord')
         return this.$store.dispatch('pushRoute', { name: 'ListOrder' })
-      }).catch(errors => {
-        this.errors = errors
-        let translatedErrors = translateErrors(errors, 'payment')
-        if (errors.source) {
+      }).catch(response => {
+        this.errors = response.errors
+        let translatedErrors = translateErrors(this.errors, 'payment')
+        if (this.errors.source) {
           this.$message({
             showClose: true,
             message: translatedErrors.source,
@@ -393,6 +405,7 @@ export default {
         }
 
         this.isCreatingPayment = false
+        throw response
       })
     },
 

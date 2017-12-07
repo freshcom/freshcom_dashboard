@@ -45,6 +45,8 @@
 
 <script>
 import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+
 import Order from '@/models/order'
 import OrderForm from '@/components/order-form'
 
@@ -72,23 +74,23 @@ export default {
     loadOrder () {
       this.isLoading = true
 
-      this.$store.dispatch('order/getOrder', {
-        id: this.id,
+      freshcom.retrieveOrder(this.id, {
         include: 'customer'
-      }).then(order => {
-        this.order = order
-        this.orderDraft = _.cloneDeep(order)
+      }).then(response => {
+        this.order = response.data
+        this.orderDraft = _.cloneDeep(response.data)
 
         this.isLoading = false
-      }).catch(errors => {
+      }).catch(response => {
         this.isLoading = false
-        throw errors
+        throw response
       })
     },
 
     submit () {
       this.isUpdatingOrder = true
-      this.$store.dispatch('order/updateOrder', { id: this.orderDraft.id, orderDraft: this.orderDraft }).then(order => {
+
+      freshcom.updateOrder(this.orderDraft.id, this.orderDraft).then(() => {
         this.$message({
           showClose: true,
           message: `Order saved successfully.`,
@@ -97,8 +99,8 @@ export default {
 
         this.isUpdatingOrder = false
         this.back()
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
         this.isUpdatingOrder = false
       })
     },

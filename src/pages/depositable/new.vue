@@ -74,9 +74,10 @@ export default {
 
         this.isCreatingDepositable = false
         this.back()
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
         this.isCreatingDepositable = false
+        throw response
       })
     },
     back () {

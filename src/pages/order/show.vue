@@ -42,12 +42,12 @@
 
               <dt>Status</dt>
               <dd>
-                {{$t(`attributes.order.status.${order.status}`)}}
+                {{$t(`fields.order.status.${order.status}`)}}
               </dd>
 
               <dt>Payment Status</dt>
               <dd>
-                {{$t(`attributes.order.paymentStatus.${order.paymentStatus}`)}}
+                {{$t(`fields.order.paymentStatus.${order.paymentStatus}`)}}
               </dd>
 
               <dt>Name</dt>
@@ -69,7 +69,7 @@
               <hr>
 
               <dt>Fulfillment Method</dt>
-              <dd>{{$t(`attributes.order.fulfillmentMethod.${order.fulfillmentMethod}`)}}</dd>
+              <dd>{{$t(`fields.order.fulfillmentMethod.${order.fulfillmentMethod}`)}}</dd>
 
               <template v-if="order.fulfillmentMethod === 'ship'">
                 <dt>Delivery Address</dt>
@@ -170,7 +170,7 @@
                   </router-link>
 
                   <el-tag size="mini" type="info" class="m-l-10">
-                    {{$t(`attributes.payment.status.${scope.row.status}`)}}
+                    {{$t(`fields.payment.status.${scope.row.status}`)}}
                   </el-tag>
                 </template>
               </el-table-column>
@@ -196,7 +196,7 @@
                       Refund
                     </el-button>
 
-                    <delete-button v-if="scope.row.status === 'pending'" @confirmed="deletePayment(scope.row)" size="mini">
+                    <delete-button v-if="scope.row.status === 'pending'" @confirmed="deletePayment(scope.row.id)" size="mini">
                       Delete
                     </delete-button>
                   </p>
@@ -297,11 +297,10 @@
 </template>
 
 <script>
-import 'vue-awesome/icons/times'
-import 'vue-awesome/icons/pencil'
 import 'vue-awesome/icons/plus'
-
 import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+
 import Order from '@/models/order'
 import OrderLineItem from '@/models/order-line-item'
 import Payment from '@/models/payment'
@@ -328,7 +327,7 @@ export default {
   filters: {
     dollar
   },
-  props: ['id'],
+  props: ['id', 'callbackPath'],
   data () {
     return {
       order: Order.objectWithDefaults(),
@@ -364,6 +363,7 @@ export default {
   },
   created () {
     this.loadOrder()
+    this.loadPayments()
   },
   methods: {
     canEditPayment (payment) {
@@ -374,23 +374,31 @@ export default {
       return payment.status === 'partially_refunded' || payment.status === 'paid'
     },
 
-    loadOrder () {
-      this.isLoading = true
+    loadOrder (options = { shouldShowLoading: true }) {
+      if (options.shouldShowLoading) {
+        this.isLoading = true
+      }
 
-      this.$store.dispatch('order/getOrder', {
-        id: this.id,
+      return freshcom.retrieveOrder(this.id, {
         include: 'rootLineItems.children'
-      }).then(order => {
-        this.order = order
-
-        return this.$store.dispatch('order/listPayment', { orderId: order.id })
-      }).then(payments => {
-        this.payments = payments
-
+      }).then(response => {
+        this.order = response.data
         this.isLoading = false
+
+        return response
       }).catch(errors => {
         this.isLoading = false
         throw errors
+      })
+    },
+
+    loadPayments () {
+      return freshcom.listPayment({
+        targetId: this.id,
+        targetType: 'Order'
+      }).then(response => {
+        this.payments = response.data
+        return response
       })
     },
 
@@ -414,9 +422,9 @@ export default {
     createLineItem () {
       this.isCreatingLineItem = true
 
-      this.$store.dispatch('order/createLineItem', this.lineItemDraftForAdd).then(order => {
-        this.order = order
-
+      freshcom.createOrderLineItem(this.id, this.lineItemDraftForAdd).then(() => {
+        return this.loadOrder({ shouldShowLoading: false })
+      }).then(response => {
         this.$message({
           showClose: true,
           message: `Line Item created successfully.`,
@@ -424,10 +432,10 @@ export default {
         })
 
         this.closeAddLineItemDialog()
-      }).catch(errors => {
-        this.errors = errors
-
+      }).catch(response => {
+        this.errors = response.errors
         this.isCreatingLineItem = false
+        throw response
       })
     },
 
@@ -444,15 +452,12 @@ export default {
       this.isUpdatingLineItem = false
     },
 
-    updateLineItem (formModel) {
+    updateLineItem () {
       this.isUpdatingLineItem = true
 
-      this.$store.dispatch('order/updateLineItem', {
-        id: this.lineItemDraftForEdit.id,
-        lineItemDraft: this.lineItemDraftForEdit
-      }).then(order => {
-        this.order = order
-
+      freshcom.updateOrderLineItem(this.lineItemDraftForEdit.id, this.lineItemDraftForEdit).then(() => {
+        return this.loadOrder({ shouldShowLoading: false })
+      }).then(response => {
         this.$message({
           showClose: true,
           message: `Line item saved successfully.`,
@@ -460,18 +465,22 @@ export default {
         })
 
         this.closeEditLineItemDialog()
-      }).catch(errors => {
-        this.errors = errors
-
+      }).catch(response => {
+        this.errors = response.errors
         this.isUpdatingLineItem = false
+        throw response
       })
     },
 
     deleteLineItem (id) {
-      let orderLineItem = _.find(this.order.rootLineItems, { id: id })
-
-      this.$store.dispatch('order/deleteLineItem', orderLineItem).then(order => {
-        this.order = order
+      freshcom.deleteOrderLineItem(id).then(() => {
+        return this.loadOrder({ shouldShowLoading: false })
+      }).then(response => {
+        this.$message({
+          showClose: true,
+          message: `Line item deleted successfully.`,
+          type: 'success'
+        })
       })
     },
 
@@ -497,18 +506,18 @@ export default {
       if (this.paymentDraftForAdd.gateway === 'online') {
         paymentCreated = createStripeToken().then(data => {
           this.paymentDraftForAdd.source = data.token.id
-          return this.$store.dispatch('order/createPayment', this.paymentDraftForAdd)
+          return freshcom.createPayment(this.paymentDraftForAdd)
         })
       } else {
-        paymentCreated = this.$store.dispatch('order/createPayment', this.paymentDraftForAdd)
+        paymentCreated = freshcom.createPayment(this.paymentDraftForAdd)
       }
 
-      paymentCreated.then(order => {
-        this.order = order
-        return this.$store.dispatch('order/listPayment', { orderId: order.id })
-      }).then(payments => {
-        this.payments = payments
-
+      paymentCreated.then(() => {
+        return Promise.all([
+          this.loadOrder({ shouldShowLoading: false }),
+          this.loadPayments()
+        ])
+      }).then(() => {
         this.$message({
           showClose: true,
           message: `Payment created successfully.`,
@@ -516,10 +525,10 @@ export default {
         })
 
         this.closeAddPaymentDialog()
-      }).catch(errors => {
-        this.errors = errors
-
+      }).catch(response => {
+        this.errors = response.errors
         this.isCreatingPayment = false
+        throw response
       })
     },
 
@@ -546,12 +555,12 @@ export default {
     createRefund () {
       this.isCreatingRefund = true
 
-      this.$store.dispatch('order/createRefund', this.refundDraftForAdd).then(order => {
-        this.order = order
-        return this.$store.dispatch('order/listPayment', { orderId: order.id })
-      }).then(payments => {
-        this.payments = payments
-
+      freshcom.createRefund(this.refundDraftForAdd.payment.id, this.refundDraftForAdd).then(() => {
+        return Promise.all([
+          this.loadOrder({ shouldShowLoading: false }),
+          this.loadPayments()
+        ])
+      }).then(() => {
         this.$message({
           showClose: true,
           message: `Refund created successfully.`,
@@ -559,10 +568,10 @@ export default {
         })
 
         this.closeAddRefundDialog()
-      }).catch(errors => {
-        this.errors = errors
-
+      }).catch(response => {
+        this.errors = response.errors
         this.isCreatingRefund = false
+        throw response
       })
     },
 
@@ -582,15 +591,12 @@ export default {
     updatePayment () {
       this.isUpdatingPayment = true
 
-      this.$store.dispatch('order/updatePayment', {
-        id: this.paymentDraftForEdit.id,
-        paymentDraft: this.paymentDraftForEdit
-      }).then(order => {
-        this.order = order
-        return this.$store.dispatch('order/listPayment', { orderId: order.id })
-      }).then(payments => {
-        this.payments = payments
-
+      freshcom.updatePayment(this.paymentDraftForEdit.id, this.paymentDraftForEdit).then(() => {
+        return Promise.all([
+          this.loadOrder({ shouldShowLoading: false }),
+          this.loadPayments()
+        ])
+      }).then(() => {
         this.$message({
           showClose: true,
           message: `Payment updated successfully.`,
@@ -598,20 +604,20 @@ export default {
         })
 
         this.closeEditPaymentDialog()
-      }).catch(errors => {
-        this.errors = errors
-
+      }).catch(response => {
+        this.errors = response.errors
         this.isUpdatingPayment = false
+        throw response
       })
     },
 
-    deletePayment (payment) {
-      this.$store.dispatch('order/deletePayment', payment).then(order => {
-        this.order = order
-        return this.$store.dispatch('order/listPayment', { orderId: order.id })
-      }).then(payments => {
-        this.payments = payments
-
+    deletePayment (id) {
+      freshcom.deletePayment(id).then(() => {
+        return Promise.all([
+          this.loadOrder({ shouldShowLoading: false }),
+          this.loadPayments()
+        ])
+      }).then(() => {
         this.$message({
           showClose: true,
           message: `Payment deleted successfully.`,
@@ -621,17 +627,22 @@ export default {
     },
 
     deleteOrder () {
-      this.$store.dispatch('order/deleteOrder', this.order.id).then(() => {
+      freshcom.deleteOrder(this.id).then(() => {
         this.$message({
           showClose: true,
           message: `Order deleted successfully.`,
           type: 'success'
         })
+
+        this.back()
       })
     },
 
     back () {
-
+      if (this.callbackPath) {
+        return this.$store.dispatch('pushRoute', { path: this.callbackPath })
+      }
+      this.$store.dispatch('pushRoute', { name: 'ListOrder' })
     }
   }
 }

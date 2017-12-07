@@ -45,6 +45,8 @@
 
 <script>
 import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+
 import Customer from '@/models/customer'
 import CustomerForm from '@/components/customer-form'
 
@@ -71,28 +73,23 @@ export default {
     loadCustomer () {
       this.isLoading = true
 
-      this.$store.dispatch('customer/getCustomer', {
-        id: this.id
-      }).then(customer => {
-        this.customer = customer
-        this.customerDraft = _.cloneDeep(customer)
+      freshcom.retrieveCustomer(this.id).then(response => {
+        this.customer = response.data
+        this.customerDraft = _.cloneDeep(response.data)
 
         this.isLoading = false
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
         this.isLoading = false
 
-        throw errors
+        throw response
       })
     },
 
     submit () {
       this.isUpdatingCustomer = true
 
-      this.$store.dispatch('customer/updateCustomer', {
-        id: this.customerDraft.id,
-        customerDraft: this.customerDraft
-      }).then(customer => {
+      freshcom.updateCustomer(this.customerDraft.id, this.customerDraft).then(() => {
         this.$message({
           showClose: true,
           message: `Customer saved successfully.`,
@@ -101,9 +98,11 @@ export default {
 
         this.isUpdatingCustomer = false
         this.back()
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
         this.isUpdatingCustomer = false
+
+        throw response
       })
     },
 

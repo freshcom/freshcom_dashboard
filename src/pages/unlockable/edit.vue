@@ -99,9 +99,10 @@ export default {
 
         this.isUpdatingUnlockable = false
         this.back()
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
         this.isUpdatingUnlockable = false
+        throw response
       })
     },
 

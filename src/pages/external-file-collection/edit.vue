@@ -81,9 +81,9 @@ export default {
         this.efc = response.data
         this.efcDraft = _.cloneDeep(response.data)
         this.isLoading = false
-      }).catch(errors => {
+      }).catch(response => {
         this.isLoading = false
-        throw errors
+        throw response
       })
     },
     submit () {
@@ -101,9 +101,10 @@ export default {
 
         this.isUpdatingEfc = false
         this.back()
-      }).catch(errors => {
-        this.errors = errors
+      }).catch(response => {
+        this.errors = response.errors
         this.isUpdatingEfc = false
+        throw response
       })
     },
 

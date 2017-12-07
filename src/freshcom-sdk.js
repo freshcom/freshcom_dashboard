@@ -63,48 +63,210 @@ export default {
     })
   },
 
+  retrieveAccount (params = {}, options = {}) {
+    return this.http.get('/account', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
   retrieveUser (params = {}, options = {}) {
     return this.http.get('/user', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
+  },
+
+  createDataImport (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post('/data_imports', payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  //
+  // Order
+  //
+  listOrder (params = {}, options = {}) {
+    return this.http.get('/orders', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  createOrder (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post('/orders', payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  retrieveOrder (id, params = {}, options = {}) {
+    return this.http.get(`/orders/${id}`, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  updateOrder (id, fields = {}, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+
+    return this.http.patch(`/orders/${id}`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  deleteOrder (id, params = {}, options = {}) {
+    return this.http.delete(`/orders/${id}`, { params: params }).then(response => {
+      if (response.data) {
+        return SimpleJAS.deserialize(response.data)
+      }
+    }).catch(this._processHttpError)
+  },
+
+  //
+  // OrderLineItem
+  //
+  createOrderLineItem (orderId, fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post(`/orders/${orderId}/line_items`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  updateOrderLineItem (id, fields = {}, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+
+    return this.http.patch(`/order_line_items/${id}`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  deleteOrderLineItem (id, params = {}, options = {}) {
+    return this.http.delete(`/order_line_items/${id}`, { params: params }).then(response => {
+      if (response.data) {
+        return SimpleJAS.deserialize(response.data)
+      }
+    }).catch(this._processHttpError)
+  },
+
+  //
+  // Payment
+  //
+  listPayment (params = {}, options = {}) {
+    return this.http.get('/payments', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  createPayment (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post('/payments', payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  retrievePayment (id, params = {}, options = {}) {
+    return this.http.get(`/payments/${id}`, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  updatePayment (id, fields = {}, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+
+    return this.http.patch(`/payments/${id}`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  deletePayment (id, params = {}, options = {}) {
+    return this.http.delete(`/payments/${id}`, { params: params }).then(response => {
+      if (response.data) {
+        return SimpleJAS.deserialize(response.data)
+      }
+    }).catch(this._processHttpError)
+  },
+
+  //
+  // Refund
+  //
+  listRefund (params = {}, options = {}) {
+    return this.http.get('/refunds', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  createRefund (paymentId, fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post(`payments/${paymentId}/refunds`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  //
+  // Customer
+  //
+  listCustomer (params = {}, options = {}) {
+    return this.http.get('/customers', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  createCustomer (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post('/customers', payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
   },
 
   retrieveCustomer (id, params = {}, options = {}) {
     return this.http.get(`/customers/${id}`, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   retrieveCustomerByCode (code, params = {}, options = {}) {
     params = Object.assign({}, params, { code: code })
     return this.http.get('/customer', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      return this._processHttpError(error)
-    })
+    }).catch(this._processHttpError)
   },
 
   updateCustomer (id, fields = {}, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
-    console.log(payload)
 
     return this.http.patch(`/customers/${id}`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      return this._processHttpError(error)
-    })
+    }).catch(this._processHttpError)
   },
 
-  retrieveAccount (params = {}, options = {}) {
-    return this.http.get('/account', { params: params }).then(response => {
+  deleteCustomer (id, params = {}, options = {}) {
+    return this.http.delete(`/customers/${id}`, { params: params }).then(response => {
+      if (response.data) {
+        return SimpleJAS.deserialize(response.data)
+      }
+    }).catch(this._processHttpError)
+  },
+
+  //
+  // Card
+  //
+  listCard (params = {}, options = {}) {
+    return this.http.get('/cards', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
+  },
+
+  updateCard (id, fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.patch(`/cards/${id}`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  deleteCard (id, params = {}, options = {}) {
+    return this.http.delete(`/cards/${id}`, { params: params }).then(response => {
+      if (response.data) {
+        return SimpleJAS.deserialize(response.data)
+      }
+    }).catch(this._processHttpError)
   },
 
   //
@@ -113,35 +275,27 @@ export default {
   listProduct (id, params = {}, options = {}) {
     return this.http.get('/products', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   createProduct (fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.post('/products', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   retrieveProduct (id, params = {}, options = {}) {
     return this.http.get(`/products/${id}`, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   updateProduct (id, fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.patch(`/products/${id}`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   deleteProduct (id, params = {}, options = {}) {
@@ -149,9 +303,7 @@ export default {
       if (response.data) {
         return SimpleJAS.deserialize(response.data)
       }
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   //
@@ -160,35 +312,27 @@ export default {
   listPrice (id, params = {}, options = {}) {
     return this.http.get('/prices', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   createPrice (fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.post('/prices', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   retrievePrice (id, params = {}, options = {}) {
     return this.http.get(`/prices/${id}`, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   updatePrice (id, fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.patch(`/prices/${id}`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   deletePrice (id, params = {}, options = {}) {
@@ -196,9 +340,7 @@ export default {
       if (response.data) {
         return SimpleJAS.deserialize(response.data)
       }
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   //
@@ -207,35 +349,27 @@ export default {
   listStockable (id, params = {}, options = {}) {
     return this.http.get('/stockables', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   createStockable (fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.post('/stockables', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   retrieveStockable (id, params = {}, options = {}) {
     return this.http.get(`/stockables/${id}`, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   updateStockable (id, fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.patch(`/stockables/${id}`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   deleteStockable (id, params = {}, options = {}) {
@@ -243,9 +377,7 @@ export default {
       if (response.data) {
         return SimpleJAS.deserialize(response.data)
       }
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   //
@@ -254,35 +386,27 @@ export default {
   listUnlockable (id, params = {}, options = {}) {
     return this.http.get('/unlockables', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   createUnlockable (fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.post('/unlockables', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   retrieveUnlockable (id, params = {}, options = {}) {
     return this.http.get(`/unlockables/${id}`, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   updateUnlockable (id, fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.patch(`/unlockables/${id}`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   deleteUnlockable (id, params = {}, options = {}) {
@@ -290,9 +414,7 @@ export default {
       if (response.data) {
         return SimpleJAS.deserialize(response.data)
       }
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   //
@@ -301,35 +423,27 @@ export default {
   listDepositable (id, params = {}, options = {}) {
     return this.http.get('/depositables', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   createDepositable (fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.post('/depositables', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   retrieveDepositable (id, params = {}, options = {}) {
     return this.http.get(`/depositables/${id}`, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   updateDepositable (id, fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.patch(`/depositables/${id}`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   deleteDepositable (id, params = {}, options = {}) {
@@ -337,9 +451,7 @@ export default {
       if (response.data) {
         return SimpleJAS.deserialize(response.data)
       }
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   //
@@ -348,35 +460,27 @@ export default {
   listExternalFile (params = {}, options = {}) {
     return this.http.get('/external_files', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   createExternalFile (fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.post('/external_files', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   retrieveExternalFile (id, params = {}, options = {}) {
     return this.http.get(`/external_files/${id}`, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   updateExternalFile (id, fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.patch(`/external_files/${id}`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   uploadExternalFile (fields, params = {}, options = {}) {
@@ -404,7 +508,7 @@ export default {
       let externalFile = response.data
       externalFile.status = 'uploaded'
       return this.updateExternalFile(externalFile.id, externalFile, params, options)
-    })
+    }).catch(this._processHttpError)
   },
 
   deleteExternalFile (id, params = {}, options = {}) {
@@ -412,9 +516,7 @@ export default {
       if (response.data) {
         return SimpleJAS.deserialize(response.data)
       }
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   //
@@ -423,35 +525,27 @@ export default {
   listExternalFileCollection (params = {}, options = {}) {
     return this.http.get('/external_file_collections', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   createExternalFileCollection (fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.post('/external_file_collections', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   retrieveExternalFileCollection (id, params = {}, options = {}) {
     return this.http.get(`/external_file_collections/${id}`, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   updateExternalFileCollection (id, fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.patch(`/external_file_collections/${id}`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   },
 
   deleteExternalFileCollection (id, params = {}, options = {}) {
@@ -459,8 +553,6 @@ export default {
       if (response.data) {
         return SimpleJAS.deserialize(response.data)
       }
-    }).catch(error => {
-      throw SimpleJAS.deserializeErrors(error.response.data.errors)
-    })
+    }).catch(this._processHttpError)
   }
 }
