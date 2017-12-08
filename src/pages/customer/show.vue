@@ -65,6 +65,11 @@
                 <dt>Label</dt>
                 <dd>{{customer.label}}</dd>
               </template>
+
+              <template v-if="customer.pointAccount">
+                <dt>Point Balance</dt>
+                <dd>{{customer.pointAccount.balance}}</dd>
+              </template>
             </dl>
           </div>
         </div>
@@ -211,6 +216,40 @@
                       Delete
                     </delete-button>
                   </p>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+
+          <div class="block-footer text-center">
+            <a class="view-more" href="#">View More</a>
+          </div>
+        </div>
+
+        <div class="block-title">
+          <h3>Point Transactions</h3>
+
+          <span class="block-title-actions pull-right">
+          </span>
+        </div>
+
+        <div class="block">
+          <div class="block-body full">
+            <el-table :data="customer.pointAccount.transactions" class="block-table" :show-header="false" style="width: 100%">
+              <el-table-column>
+                <template slot-scope="scope">
+                  {{scope.row.insertedAt | moment}}
+                </template>
+              </el-table-column>
+
+              <el-table-column align="right" width="200">
+                <template slot-scope="scope">
+                  {{scope.row.amount}}
+                </template>
+              </el-table-column>
+
+              <el-table-column width="100">
+                <template slot-scope="scope">
                 </template>
               </el-table-column>
             </el-table>
@@ -395,7 +434,7 @@ export default {
       this.isLoading = true
 
       freshcom.retrieveCustomer(this.id, {
-        include: 'unlocks.unlockable'
+        include: 'unlocks.unlockable,point_account.transactions'
       }).then(response => {
         this.customer = response.data
         this.isLoading = false

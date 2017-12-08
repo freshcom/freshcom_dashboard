@@ -19,6 +19,13 @@
     </el-select>
   </el-form-item>
 
+  <el-form-item label="Target Type" :error="errorMsgs.targetType" required>
+    <el-select @change="updateValue" v-model="formModel.targetType">
+      <el-option label="Point Account" value="PointAccount"></el-option>
+      <el-option label="Custom" value="Custom"></el-option>
+    </el-select>
+  </el-form-item>
+
   <el-form-item label="Amount" :error="errorMsgs.amount" required>
     <el-input-number v-model="formModel.amount" :controls="false" :step="1" :min="1"></el-input-number>
   </el-form-item>

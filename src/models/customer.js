@@ -7,7 +7,8 @@ export default {
       code: '',
       status: 'internal',
       firstName: '',
-      lastName: ''
+      lastName: '',
+      pointAccount: {}
     }
   },
 

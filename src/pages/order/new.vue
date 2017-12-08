@@ -76,7 +76,9 @@
         <div v-show="activeStep === this.step.PAYMENT">
           <el-row>
             <el-col :span="8" :offset="8">
-              <el-button plain size="mini" class="pull-right">Use Points</el-button>
+              <p v-if="order.customer" class="text-right">
+                <el-button plain size="mini">Use Points</el-button>
+              </p>
 
               <div class="block">
                 <div class="block-body full">
