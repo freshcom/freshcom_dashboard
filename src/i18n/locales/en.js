@@ -131,6 +131,13 @@ export default {
         syncWithSource: 'Sync with source'
       }
     },
+    productCollection: {
+      status: {
+        draft: 'Draft',
+        active: 'Active',
+        disabled: 'Disabled'
+      }
+    },
     price: {
       status: {
         draft: 'Draft',

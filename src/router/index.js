@@ -34,6 +34,10 @@ import NewProductPage from '@/pages/product/new'
 import ShowProductPage from '@/pages/product/show'
 import EditProductPage from '@/pages/product/edit'
 
+import ListProductCollectionPage from '@/pages/product-collection/list'
+import NewProductCollectionPage from '@/pages/product-collection/new'
+import ShowProductCollectionPage from '@/pages/product-collection/show'
+
 import NewPricePage from '@/pages/price/new'
 import EditPricePage from '@/pages/price/edit'
 import ShowPricePage from '@/pages/price/show'
@@ -278,6 +282,37 @@ export default new Router({
       path: '/products/:id/edit',
       name: 'EditProduct',
       component: EditProductPage,
+      props (route) {
+        return { id: route.params.id }
+      }
+    },
+    {
+      path: '/product_collections',
+      name: 'ListProductCollection',
+      component: ListProductCollectionPage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          page: page
+        }
+      }
+    },
+    {
+      path: '/product_collections/new',
+      name: 'NewProductCollection',
+      component: NewProductCollectionPage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { callbackPath: query.callbackPath }
+      }
+    },
+    {
+      path: '/product_collections/:id',
+      name: 'ShowProductCollection',
+      component: ShowProductCollectionPage,
       props (route) {
         return { id: route.params.id }
       }
