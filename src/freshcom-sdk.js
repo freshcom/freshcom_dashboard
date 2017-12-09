@@ -63,6 +63,12 @@ export default {
     })
   },
 
+  retrieveRefreshToken (params = {}, options = {}) {
+    return this.http.get('/refresh_token', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
   retrieveAccount (params = {}, options = {}) {
     return this.http.get('/account', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
@@ -359,6 +365,20 @@ export default {
     }).catch(this._processHttpError)
   },
 
+  retrieveProductCollectionByCode (code, params = {}, options = {}) {
+    params = Object.assign({}, params, { code: code })
+    return this.http.get('/product_collection', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  updateProductCollection (id, fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.patch(`/product_collections/${id}`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
   //
   // ProductCollectionMembership
   //
@@ -366,6 +386,14 @@ export default {
     let payload = SimpleJAS.serialize(fields)
     return this.http.post(`/product_collections/${collectionId}/memberships`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  deleteProductCollectionMembership (id, params = {}, options = {}) {
+    return this.http.delete(`/product_collection_memberships/${id}`, { params: params }).then(response => {
+      if (response.data) {
+        return SimpleJAS.deserialize(response.data)
+      }
     }).catch(this._processHttpError)
   },
 

@@ -19,6 +19,10 @@
     <el-input v-model="formModel.lastName" placeholder="Last Name" class="name-input"></el-input>
   </el-form-item>
 
+  <el-form-item label="Other Name" :error="errorMsgs.otherName">
+    <el-input v-model="formModel.otherName"></el-input>
+  </el-form-item>
+
   <el-form-item label="Email" :error="errorMsgs.email" :required="formModel.status === 'registered'">
     <el-input v-model="formModel.email"></el-input>
   </el-form-item>

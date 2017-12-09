@@ -29,7 +29,7 @@
         </div>
 
         <div class="header-actions">
-          <el-button @click="editEfc()" plain size="small">Edit</el-button>
+          <el-button @click="editProductCollection()" plain size="small">Edit</el-button>
         </div>
       </div>
 
@@ -64,28 +64,38 @@
         </div>
         <div class="block">
           <div class="block-body full">
-            <el-table :data="productCollection.products" class="block-table" :show-header="false" style="width: 100%">
+            <el-table :data="productCollection.memberships" class="block-table" :show-header="false" style="width: 100%">
               <el-table-column>
                 <template slot-scope="scope">
-                  {{scope.row.name}}
+                  <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.product.id } }">
+                    {{scope.row.product.name}}
+                  </router-link>
                 </template>
               </el-table-column>
 
               <el-table-column width="150">
                 <template slot-scope="scope">
-                  <span>{{scope.row.contentType}}</span>
-                </template>
-              </el-table-column>
-
-              <el-table-column width="120">
-                <template slot-scope="scope">
-                  <span>{{scope.row.sizeBytes}} Bytes</span>
+                  <span>{{scope.row.sortIndex}}</span>
                 </template>
               </el-table-column>
 
               <el-table-column width="200">
                 <template slot-scope="scope">
-                  <span>{{scope.row.updatedAt | moment}}</span>
+                  <span>{{scope.row.insertedAt | moment}}</span>
+                </template>
+              </el-table-column>
+
+              <el-table-column width="200">
+                <template slot-scope="scope">
+                  <p class="text-right actions">
+                    <el-button @click="openEditMembershipDialog(scope.row)" plain size="mini">
+                      Edit
+                    </el-button>
+
+                    <delete-button @confirmed="deleteMembership(scope.row.id)" size="mini">
+                      Delete
+                    </delete-button>
+                  </p>
                 </template>
               </el-table-column>
             </el-table>
@@ -135,7 +145,7 @@
   </div>
 
   <div class="launchable">
-    <el-dialog :show-close="false" :visible="isAddingMembership" title="Add product to collection" width="750px">
+    <el-dialog :show-close="false" :visible="isAddingMembership" title="Add product to collection" width="500px">
       <product-collection-membership-form v-model="membershipForAdd" :errors="errors"></product-collection-membership-form>
 
       <div slot="footer" class="dialog-footer">
@@ -185,7 +195,7 @@ export default {
       }
 
       freshcom.retrieveProductCollection(this.id, {
-        include: 'products'
+        include: 'memberships.product'
       }).then(response => {
         this.productCollection = response.data
         this.isLoading = false
@@ -209,28 +219,41 @@ export default {
       this.isCreatingMembership = true
 
       freshcom.createProductCollectionMembership(this.productCollection.id, this.membershipForAdd).then(() => {
-        this.isCreatingMembership = false
-        return this.loadProductCollection()
+        this.$message({
+          showClose: true,
+          message: `Product add to collection successfully.`,
+          type: 'success'
+        })
+
+        this.closeAddMembershipDialog()
+        return this.loadProductCollection({ shouldShowLoading: false })
       }).catch(response => {
         this.errors = response.errors
         this.isCreatingMembership = false
         return response
       })
     },
-    editMembership () {
-      this.$store.dispatch('pushRoute', { name: 'EditProductCollection', params: { id: this.productCollection.id } })
+
+    openEditMembershipDialog () {
+
     },
+
     deleteMembership (id) {
       freshcom.deleteProductCollectionMembership(id).then(() => {
+        return this.loadProductCollection({ shouldShowLoading: false })
+      }).then(() => {
         this.$message({
           showClose: true,
           message: `Product removed from collection successfully.`,
           type: 'success'
         })
-
-        this.back()
       })
     },
+
+    editProductCollection () {
+      this.$store.dispatch('pushRoute', { name: 'EditProductCollection', params: { id: this.id } })
+    },
+
     back () {
       this.$store.dispatch('pushRoute', { name: 'ListProductCollection' })
     }

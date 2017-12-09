@@ -37,6 +37,7 @@ import EditProductPage from '@/pages/product/edit'
 import ListProductCollectionPage from '@/pages/product-collection/list'
 import NewProductCollectionPage from '@/pages/product-collection/new'
 import ShowProductCollectionPage from '@/pages/product-collection/show'
+import EditProductCollectionPage from '@/pages/product-collection/edit'
 
 import NewPricePage from '@/pages/price/new'
 import EditPricePage from '@/pages/price/edit'
@@ -58,6 +59,7 @@ import ShowDepositablePage from '@/pages/depositable/show'
 import EditDepositablePage from '@/pages/depositable/edit'
 
 import ShowBillingSettingsPage from '@/pages/billing/show-settings'
+import APIHomePage from '@/pages/api/home'
 
 Vue.use(Router)
 
@@ -318,6 +320,14 @@ export default new Router({
       }
     },
     {
+      path: '/product_collections/:id/edit',
+      name: 'EditProductCollection',
+      component: EditProductCollectionPage,
+      props (route) {
+        return { id: route.params.id }
+      }
+    },
+    {
       path: '/prices/new',
       name: 'NewPrice',
       component: NewPricePage,
@@ -480,6 +490,11 @@ export default new Router({
 
         return { stripeCode: query.code, stripeScope: query.scope }
       }
+    },
+    {
+      path: '/api',
+      name: 'APIHome',
+      component: APIHomePage
     }
   ]
 })

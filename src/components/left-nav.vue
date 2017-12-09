@@ -109,7 +109,7 @@
           <span>Operators</span>
         </el-menu-item>
 
-        <el-menu-item index="api">
+        <el-menu-item :router="{ name: 'APIHome' }" index="/api">
           <icon name="terminal" scale="0.8"></icon>
           <span>API</span>
         </el-menu-item>

@@ -1,10 +1,10 @@
 <template>
 <el-form :model="formModel" @input.native="updateValue" label-width="150px" size="small" class="efc-form">
-  <el-form-item label="Product" :error="errorMsgs.product">
+  <el-form-item label="Product" :error="errorMsgs.product" required>
     <remote-select
       :value="formModel.product"
       :search-method="searchProducts"
-      @change="handleCustomerChange($event)"
+      @change="handleProductChange($event)"
       placeholder="Type to start searching..."
       class="product-select"
     >
@@ -50,6 +50,17 @@ export default {
     updateValue: _.debounce(function () {
       this.$emit('input', this.formModel)
     }, 300),
+
+    handleProductChange (product) {
+      if (product) {
+        this.formModel.product = product
+      } else {
+        this.formModel.product = null
+      }
+
+      this.$emit('input', this.formModel)
+    },
+
     searchProducts (keyword) {
       return freshcom.listProduct({
         search: keyword,
@@ -63,5 +74,8 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
+<style scoped>
+.product-select {
+  width: 100%;
+}
 </style>

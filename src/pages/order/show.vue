@@ -53,6 +53,9 @@
               <dt>Name</dt>
               <dd>{{order.firstName}} {{order.lastName}}</dd>
 
+              <dt>Other Name</dt>
+              <dd>{{order.otherName}}</dd>
+
               <dt>Email</dt>
               <dd>{{order.email}}</dd>
 

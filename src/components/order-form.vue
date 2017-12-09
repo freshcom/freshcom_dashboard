@@ -53,6 +53,14 @@
     </el-col>
   </el-row>
 
+  <el-row :gutter="20">
+    <el-col :span="24">
+      <el-form-item label="Other Name" :error="errorMsgs.otherName">
+        <el-input v-model="formModel.otherName"></el-input>
+      </el-form-item>
+    </el-col>
+  </el-row>
+
   <hr class="m-t-10 m-b-10">
 
   <el-row>
