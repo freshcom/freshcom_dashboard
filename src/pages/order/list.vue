@@ -32,7 +32,12 @@
         <el-table v-if="hasSearchResult" @row-click="viewOrder" :data="orders">
           <el-table-column prop="name" label="Order">
             <template slot-scope="scope">
-              {{scope.row.firstName}} {{scope.row.lastName}}
+              <span v-if="scope.row.firstName">
+                {{scope.row.firstName}} {{scope.row.lastName}}
+              </span>
+              <span v-else>
+                {{scope.row.otherName}}
+              </span>
             </template>
           </el-table-column>
 

@@ -110,6 +110,7 @@ export default {
         this.updateValue()
       })
     },
+
     deleteExternalFile (targetEf) {
       this.formModel.files = _.reject(this.formModel.files, (ef) => { return ef.id === targetEf.id })
       this.updateValue()

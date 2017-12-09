@@ -15,7 +15,8 @@
         <div class="brief no-avatar">
           <div class="detail">
             <p>Order {{order.code}}</p>
-            <h2>{{order.firstName}} {{order.lastName}}</h2>
+            <h2 v-if="order.firstName">{{order.firstName}} {{order.lastName}}</h2>
+            <h2 v-else>{{order.otherName}}</h2>
             <p class="id">{{order.id}}</p>
           </div>
         </div>
