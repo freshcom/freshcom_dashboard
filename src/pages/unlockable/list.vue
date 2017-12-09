@@ -79,7 +79,7 @@
   </div>
 
   <div class="launchable">
-    <el-dialog :show-close="false" :visible="isAddingDataImport" title="Import customer" width="750px">
+    <el-dialog :show-close="false" :visible="isAddingDataImport" title="Import unlockable" width="750px">
       <data-import-form v-model="dataImportDraftForAdd" :errors="errors"></data-import-form>
 
       <div slot="footer" class="dialog-footer">

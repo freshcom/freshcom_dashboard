@@ -63,8 +63,7 @@ export default {
 
     searchProducts (keyword) {
       return freshcom.listProduct({
-        search: keyword,
-        filter: { status: ['active', 'internal'] }
+        search: keyword
       }).then(response => {
         return response.data
       })

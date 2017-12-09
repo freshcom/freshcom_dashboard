@@ -14,17 +14,28 @@
 
   <div>
     <el-card class="main-card">
-      <div slot="header" class="clearfix">
-        <el-button plain size="small"><icon name="filter" scale="0.7" class="v-middle"></icon> Filter</el-button>
-        <div class="search">
-          <el-input :value="searchKeyword" @input="updateSearchKeyword" size="small" placeholder="Search...">
-            <template slot="prepend"><icon name="search" scale="1" class="v-middle"></icon></template>
-          </el-input>
-        </div>
+      <div slot="header">
+        <el-row>
+          <el-col :span="18">
+            <el-button plain size="small"><icon name="filter" scale="0.7" class="v-middle"></icon> Filter</el-button>
+            <div class="search">
+              <el-input :value="searchKeyword" @input="updateSearchKeyword" size="small" placeholder="Search...">
+                <template slot="prepend"><icon name="search" scale="1" class="v-middle"></icon></template>
+              </el-input>
+            </div>
+          </el-col>
 
-        <el-button @click="newProduct()" plain size="small" class="pull-right">
-          <icon name="plus" scale="0.7" class="v-middle"></icon> New
-        </el-button>
+          <el-col :span="6">
+            <div class="text-right">
+               <el-button @click="openAddDataImportDialog()" plain size="small">
+                <icon name="plus" scale="0.7" class="v-middle"></icon> Import
+              </el-button>
+              <el-button @click="newProduct()" plain size="small" class="pull-right">
+                <icon name="plus" scale="0.7" class="v-middle"></icon> New
+              </el-button>
+            </div>
+          </el-col>
+        </el-row>
       </div>
 
       <div class="data full" v-loading="isLoading">
@@ -69,6 +80,16 @@
       </div>
     </el-card>
   </div>
+  <div class="launchable">
+    <el-dialog :show-close="false" :visible="isAddingDataImport" title="Import product" width="750px">
+      <data-import-form v-model="dataImportDraftForAdd" :errors="errors"></data-import-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button :disabled="isCreatingDataImport" @click="closeAddDataImportDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isCreatingDataImport" @click="createDataImport()" type="primary" size="small">Save</el-button>
+      </div>
+    </el-dialog>
+  </div>
 </div>
 </template>
 
@@ -79,11 +100,14 @@ import freshcom from '@/freshcom-sdk'
 
 import Pagination from '@/components/pagination'
 import { idLastPart } from '@/helpers/filters'
+import DataImportForm from '@/components/data-import-form'
+import DataImport from '@/models/data-import'
 
 export default {
   name: 'ListProduct',
   components: {
-    Pagination
+    Pagination,
+    DataImportForm
   },
   filters: {
     idLastPart
@@ -103,7 +127,13 @@ export default {
       products: [],
       isLoading: false,
       totalCount: 0,
-      resultCount: 0
+      resultCount: 0,
+
+      isAddingDataImport: false,
+      isCreatingDataImport: false,
+      dataImportDraftForAdd: DataImport.objectWithDefaults(),
+
+      errors: {}
     }
   },
   created () {
@@ -128,7 +158,7 @@ export default {
       if (_.isEqual(newPage, oldPage)) {
         return
       }
-      this.search()
+      this.searchProduct()
     }
   },
   methods: {
@@ -137,6 +167,7 @@ export default {
       let q = _.merge({}, _.omit(this.$route.query, ['page[number]']), { search: newSearchKeyword })
       this.$router.replace({ name: this.$store.state.route.name, query: q })
     }, 300),
+
     searchProduct () {
       this.isLoading = true
 
@@ -153,11 +184,44 @@ export default {
         this.isLoading = false
       })
     },
+
     viewProduct (product) {
       this.$store.dispatch('pushRoute', { name: 'ShowProduct', params: { id: product.id, callbackPath: this.currentRoutePath } })
     },
+
     newProduct () {
       this.$store.dispatch('pushRoute', { name: 'NewProduct' })
+    },
+
+    openAddDataImportDialog () {
+      let dataImport = DataImport.objectWithDefaults()
+      dataImport.dataType = 'Product'
+
+      this.dataImportDraftForAdd = dataImport
+      this.isAddingDataImport = true
+    },
+
+    closeAddDataImportDialog () {
+      this.isAddingDataImport = false
+      this.isCreatingDataImport = false
+    },
+
+    createDataImport () {
+      this.isCreatingDataImport = true
+
+      freshcom.createDataImport(this.dataImportDraftForAdd).then(response => {
+        this.$message({
+          showClose: true,
+          message: `Import started successfully.`,
+          type: 'success'
+        })
+
+        this.closeAddDataImportDialog()
+      }).catch(response => {
+        this.errors = response.errors
+        this.isCreatingDataImport = false
+        throw response
+      })
     }
   }
 }
