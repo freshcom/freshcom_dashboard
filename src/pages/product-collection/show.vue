@@ -99,7 +99,7 @@
               <el-table-column width="220">
                 <template slot-scope="scope">
                   <p class="text-right actions">
-                    <el-button plain size="mini">
+                    <el-button @click="markProductActive(scope.row.product)" v-if="scope.row.product.status === 'draft'" plain size="mini">
                       Mark Active
                     </el-button>
 
@@ -175,6 +175,7 @@
 
 <script>
 import 'vue-awesome/icons/folder'
+import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
 import ProductCollection from '@/models/product-collection'
@@ -251,6 +252,21 @@ export default {
 
     openEditMembershipDialog () {
 
+    },
+
+    markProductActive (product) {
+      let productDraft = _.cloneDeep(product)
+      productDraft.status = 'active'
+
+      freshcom.updateProduct(product.id, productDraft).then(() => {
+        return this.loadProductCollection({ shouldShowLoading: false })
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Product marked as active successfully.`,
+          type: 'success'
+        })
+      })
     },
 
     deleteMembership (id) {
