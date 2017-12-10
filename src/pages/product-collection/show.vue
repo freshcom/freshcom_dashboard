@@ -56,10 +56,13 @@
           <h3>Products</h3>
 
           <span class="block-title-actions pull-right">
-            <a @click="openAddMembershipDialog()" href="javascript:;">
-              <icon name="plus" scale="0.8" class="v-middle"></icon>
-              <span>Add</span>
-            </a>
+            <el-button @click="openAddMembershipDialog()" plain size="mini">
+              Mark All Active
+            </el-button>
+
+            <el-button @click="openAddMembershipDialog()" plain size="mini">
+              Add Product
+            </el-button>
           </span>
         </div>
         <div class="block">
@@ -73,21 +76,33 @@
                 </template>
               </el-table-column>
 
-              <el-table-column width="150">
+              <el-table-column width="80">
+                <template slot-scope="scope">
+                  <el-tag size="mini" type="info">
+                    {{$t(`fields.product.status.${scope.row.product.status}`)}}
+                  </el-tag>
+                </template>
+              </el-table-column>
+
+              <el-table-column width="80">
                 <template slot-scope="scope">
                   <span>{{scope.row.sortIndex}}</span>
                 </template>
               </el-table-column>
 
-              <el-table-column width="200">
+              <el-table-column width="180">
                 <template slot-scope="scope">
                   <span>{{scope.row.insertedAt | moment}}</span>
                 </template>
               </el-table-column>
 
-              <el-table-column width="200">
+              <el-table-column width="220">
                 <template slot-scope="scope">
                   <p class="text-right actions">
+                    <el-button plain size="mini">
+                      Mark Active
+                    </el-button>
+
                     <el-button @click="openEditMembershipDialog(scope.row)" plain size="mini">
                       Edit
                     </el-button>

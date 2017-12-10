@@ -258,13 +258,24 @@ a:hover {
     font-size: 16px;
   }
 
-  .block-title-actions a {
-    line-height: 35px;
-    color: #888;
-    font-size: 15px;
+  .block-title-actions {
+    line-height: 30px;
+    a {
+      line-height: 35px;
+      color: #888;
+      font-size: 15px;
 
-    span {
-      vertical-align: middle;
+      span {
+        vertical-align: middle;
+      }
+    }
+
+    .el-button.el-button--mini {
+      padding: 5px 10px;
+    }
+
+    .el-button+.el-button {
+      margin-left: 0px;
     }
   }
 }

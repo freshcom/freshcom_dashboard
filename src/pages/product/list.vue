@@ -27,11 +27,18 @@
 
           <el-col :span="6">
             <div class="text-right">
-               <el-button @click="openAddDataImportDialog()" plain size="small">
-                <icon name="plus" scale="0.7" class="v-middle"></icon> Import
-              </el-button>
+              <el-dropdown @command="openAddDataImportDialog" trigger="click" class="m-r-10">
+                <el-button plain size="small">
+                  Import<i class="el-icon-arrow-down el-icon--right"></i>
+                </el-button>
+
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item command="Product">Import products</el-dropdown-item>
+                  <el-dropdown-item command="Price">Import prices</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
               <el-button @click="newProduct()" plain size="small" class="pull-right">
-                <icon name="plus" scale="0.7" class="v-middle"></icon> New
+                New
               </el-button>
             </div>
           </el-col>
@@ -81,7 +88,7 @@
     </el-card>
   </div>
   <div class="launchable">
-    <el-dialog :show-close="false" :visible="isAddingDataImport" title="Import product" width="750px">
+    <el-dialog :show-close="false" :visible="isAddingDataImport" title="Import data" width="750px">
       <data-import-form v-model="dataImportDraftForAdd" :errors="errors"></data-import-form>
 
       <div slot="footer" class="dialog-footer">
@@ -193,9 +200,9 @@ export default {
       this.$store.dispatch('pushRoute', { name: 'NewProduct' })
     },
 
-    openAddDataImportDialog () {
+    openAddDataImportDialog (type) {
       let dataImport = DataImport.objectWithDefaults()
-      dataImport.dataType = 'Product'
+      dataImport.dataType = type
 
       this.dataImportDraftForAdd = dataImport
       this.isAddingDataImport = true
