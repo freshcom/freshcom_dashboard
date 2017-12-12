@@ -75,6 +75,9 @@
               <dt>Fulfillment Method</dt>
               <dd>{{$t(`fields.order.fulfillmentMethod.${order.fulfillmentMethod}`)}}</dd>
 
+              <dt>Fulfillment Status</dt>
+              <dd>{{$t(`fields.order.fulfillmentStatus.${order.fulfillmentStatus}`)}}</dd>
+
               <template v-if="order.fulfillmentMethod === 'ship'">
                 <dt>Delivery Address</dt>
                 <dd>

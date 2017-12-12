@@ -73,6 +73,17 @@
     </el-form-item>
   </el-row>
 
+  <el-row>
+    <el-form-item v-if="formModel.status != 'cart'" label="Fulfillment Status" :error="errorMsgs.fulfillmentStatus" required>
+      <el-select @change="updateValue" v-model="formModel.fulfillmentStatus">
+        <el-option label="Pending" value="pending"></el-option>
+        <el-option label="Fulfilled" value="fulfilled"></el-option>
+        <el-option label="Returned" value="returned"></el-option>
+        <el-option label="Discarded" value="discarded"></el-option>
+      </el-select>
+    </el-form-item>
+  </el-row>
+
   <template v-if="formModel.fulfillmentMethod === 'ship'">
     <el-row :gutter="10">
       <el-col :span="12">

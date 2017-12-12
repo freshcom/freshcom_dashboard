@@ -20,12 +20,12 @@
         <div class="block">
           <div class="block-body">
             <dl>
-              <dt>Live Account ID</dt>
+              <dt>Account ID</dt>
               <dd>{{account.id}}</dd>
             </dl>
 
             <dl>
-              <dt>Storefront Refresh Token</dt>
+              <dt>Publishable Refresh Token</dt>
               <dd>{{refreshToken.id}}</dd>
             </dl>
           </div>

@@ -109,7 +109,12 @@ export default {
       },
       fulfillmentMethod: {
         pickup: 'Pick Up',
-        ship: 'Ship'
+        ship: 'Ship',
+        digital: 'Digital'
+      },
+      fulfillmentStatus: {
+        pending: 'Pending',
+        fulfilled: 'Fulfilled'
       }
     },
     product: {
