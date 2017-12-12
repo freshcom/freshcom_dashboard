@@ -95,7 +95,6 @@
                 <template slot-scope="scope">
                   <p class="text-right actions">
                     <router-link :to="{ name: 'EditExternalFileCollection', params: { id: scope.row.id }}">
-                      <icon name="pencil" scale="0.8" class="v-middle"></icon>
                       <span class="v-middle">Edit</span>
                     </router-link>
                   </p>

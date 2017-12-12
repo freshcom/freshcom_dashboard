@@ -79,6 +79,11 @@
           </el-menu-item>
         </el-submenu> -->
 
+        <el-menu-item :route="{ name: 'ShowBillingSettings' }" index="/billing">
+          <icon name="id-card" scale="0.8"></icon>
+          <span>Balance</span>
+        </el-menu-item>
+
         <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">
           <icon name="folder" scale="0.8"></icon>
           <span>File Storage</span>
@@ -99,9 +104,14 @@
           </el-menu-item>
         </el-submenu> -->
 
-        <el-menu-item :route="{ name: 'ShowBillingSettings' }" index="/billing">
-          <icon name="id-card" scale="0.8"></icon>
-          <span>Billing</span>
+        <el-menu-item :router="{ name: 'APIHome' }" index="/api">
+          <icon name="terminal" scale="0.8"></icon>
+          <span>API</span>
+        </el-menu-item>
+
+        <el-menu-item index="/api">
+          <icon name="terminal" scale="0.8"></icon>
+          <span>View test data</span>
         </el-menu-item>
 
         <el-menu-item index="operators">
@@ -109,14 +119,6 @@
           <span>Operators</span>
         </el-menu-item>
 
-        <el-menu-item :router="{ name: 'APIHome' }" index="/api">
-          <icon name="terminal" scale="0.8"></icon>
-          <span>API</span>
-        </el-menu-item>
-        <el-menu-item index="webhook">
-          <icon name="podcast" scale="0.8"></icon>
-          <span>Webhook</span>
-        </el-menu-item>
         <el-menu-item index="settings">
           <icon name="cog" scale="0.8"></icon>
           <span>Settings</span>
