@@ -116,6 +116,7 @@
           <span @click="toggleMode()" :class="{ 'mode-test': isViewingTestData }">
             <span v-if="isViewingTestData">Viewing test data</span>
             <span v-else>View test data</span>
+            <span v-loading="isTogglingMode" element-loading-spinner="el-icon-loading" class="test-toggle-loading"></span>
           </span>
         </el-menu-item>
 
@@ -162,6 +163,11 @@ import 'vue-awesome/icons/globe'
 
 export default {
   name: 'LeftNav',
+  data () {
+    return {
+      isTogglingMode: false
+    }
+  },
   computed: {
     isViewingTestData () {
       return this.$store.state.session.mode === 'test'
@@ -173,9 +179,11 @@ export default {
 
       return {}
     },
+    currentRoutePath () {
+      return this.$store.state.route.fullPath
+    },
     selected () {
-      let routePath = this.$store.state.route.fullPath
-
+      let routePath = this.currentRoutePath
       if (routePath.startsWith('/stockables')) { return '/stockables' }
       if (routePath.startsWith('/unlockables')) { return '/unlockables' }
       if (routePath.startsWith('/file')) { return '/files' }
@@ -204,11 +212,24 @@ export default {
   },
   methods: {
     toggleMode () {
+      this.isTogglingMode = true
+
+      let toggled
       if (this.isViewingTestData) {
-        this.$store.dispatch('session/setMode', 'live')
+        toggled = this.$store.dispatch('session/setMode', 'live')
       } else {
-        this.$store.dispatch('session/setMode', 'test')
+        toggled = this.$store.dispatch('session/setMode', 'test')
       }
+
+      toggled.then(() => {
+        let routeInfo = this.currentRoutePath.split('/')
+        if (routeInfo.length > 2) {
+          this.$store.dispatch('pushRoute', { path: `/${routeInfo[1]}` })
+        }
+        this.isTogglingMode = false
+      }).catch(() => {
+        this.isTogglingMode = false
+      })
     }
   }
 }
@@ -276,5 +297,14 @@ export default {
 
 .el-menu-item.is-active.no-active {
   color: #2d2f33;
+}
+
+.test-toggle-loading {
+  float: right;
+  margin-top: 22px;
+
+  .el-icon-loading {
+    font-size: 16px;
+  }
 }
 </style>

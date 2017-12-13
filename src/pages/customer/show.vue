@@ -12,6 +12,10 @@
       <div slot="header">
 
         <div class="brief">
+          <div v-if="isViewingTestData" class="test-data-banner">
+            <div class="banner-content">TEST DATA</div>
+          </div>
+
           <div class="avatar">
             <img :src="avatarUrl">
           </div>
@@ -427,6 +431,9 @@ export default {
     },
     currentRoutePath () {
       return this.$store.state.route.fullPath
+    },
+    isViewingTestData () {
+      return this.$store.state.session.mode === 'test'
     }
   },
   methods: {

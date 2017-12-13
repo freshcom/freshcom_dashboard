@@ -11,6 +11,10 @@
   <div>
     <el-card class="main-card">
       <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
+
         <span style="line-height: 36px;">Create a customer</span>
 
         <div class="pull-right">
@@ -46,11 +50,13 @@
 <script>
 import freshcom from '@/freshcom-sdk'
 
+import PageMixin from '@/mixins/page'
 import Customer from '@/models/customer'
 import CustomerForm from '@/components/customer-form'
 
 export default {
   name: 'NewCustomer',
+  mixins: [PageMixin],
   components: {
     CustomerForm
   },

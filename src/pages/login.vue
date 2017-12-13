@@ -48,7 +48,7 @@ export default {
   },
   methods: {
     attemptLogin (form) {
-      this.$store.dispatch('session/login', form).then(data => {
+      this.$store.dispatch('session/create', form).then(data => {
         let user = data[1]
 
         this.$message({

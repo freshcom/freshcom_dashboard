@@ -1,12 +1,12 @@
 <template>
 <div class="wrapper">
 
-  <el-container v-if="isSessionReady">
+  <el-container>
     <el-aside width="200px" v-if="shouldShowAside">
       <left-nav></left-nav>
     </el-aside>
 
-    <el-container>
+    <el-container v-if="isSessionReady">
       <el-header style="text-align: right; font-size: 12px">
         <el-dropdown>
           <i class="el-icon-setting" style="margin-right: 15px"></i>
@@ -35,7 +35,7 @@ export default {
     this.spinner = this.$loading({ text: 'Loading...', lock: true })
   },
   created () {
-    return this.$store.dispatch('session/getToken').then(() => {
+    return this.$store.dispatch('session/retrieveFromStorage').then(() => {
       this.spinner.close()
     }).catch(() => {
       this.$store.dispatch('pushRoute', { name: 'Login' })
@@ -70,6 +70,29 @@ input::-webkit-inner-spin-button {
     /* display: none; <- Crashes Chrome on hover */
     -webkit-appearance: none;
     margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+.test-data-banner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  border-top: 1px solid #f79a59;
+
+  .banner-content {
+    line-height: 9px;
+    position: absolute;
+    left: 50%;
+    top: 0;
+    font-size: 10px;
+    color: white;
+    font-weight: 500;
+    background-color: #f79a59;
+    padding: 0px 10px 1px 10px;
+    border: solid 1px #f79a59;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+  }
 }
 
 .wrapper {
@@ -557,6 +580,7 @@ small {
 
   .el-card__header {
     padding: 20px;
+    position: relative;
   }
 
   .el-card__body {

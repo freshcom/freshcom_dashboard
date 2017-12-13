@@ -15,6 +15,10 @@
   <div>
     <el-card class="main-card">
       <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
+
         <el-row>
           <el-col :span="18">
             <el-button plain size="small"><icon name="filter" scale="0.7" class="v-middle"></icon> Filter</el-button>
@@ -105,6 +109,7 @@ import 'vue-awesome/icons/search'
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
+import PageMixin from '@/mixins/page'
 import Pagination from '@/components/pagination'
 import { idLastPart } from '@/helpers/filters'
 import DataImportForm from '@/components/data-import-form'
@@ -112,6 +117,7 @@ import DataImport from '@/models/data-import'
 
 export default {
   name: 'ListProduct',
+  mixins: [PageMixin],
   components: {
     Pagination,
     DataImportForm
@@ -152,12 +158,12 @@ export default {
     },
     hasSearchResult () {
       return !this.isLoading && this.resultCount !== 0
-    },
-    currentRoutePath () {
-      return this.$store.state.route.fullPath
     }
   },
   watch: {
+    isViewingTestData () {
+      this.searchProduct()
+    },
     searchKeyword (newKeyword) {
       this.searchProduct()
     },
