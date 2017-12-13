@@ -109,9 +109,14 @@
           <span>API</span>
         </el-menu-item>
 
-        <el-menu-item index="/api">
-          <icon name="terminal" scale="0.8"></icon>
-          <span>View test data</span>
+        <el-menu-item index="" style="padding-left: 10px;" class="no-active">
+          <el-switch :value="isViewingTestData" @input="toggleMode()" :width="23" active-color="#f79a59" class="nav-switch">
+          </el-switch>
+
+          <span @click="toggleMode()" :class="{ 'mode-test': isViewingTestData }">
+            <span v-if="isViewingTestData">Viewing test data</span>
+            <span v-else>View test data</span>
+          </span>
         </el-menu-item>
 
         <el-menu-item index="operators">
@@ -158,6 +163,9 @@ import 'vue-awesome/icons/globe'
 export default {
   name: 'LeftNav',
   computed: {
+    isViewingTestData () {
+      return this.$store.state.session.mode === 'test'
+    },
     sessionAccount () {
       if (this.$store.state.session.account) {
         return this.$store.state.session.account
@@ -192,6 +200,15 @@ export default {
     },
     isMenuActive: function () {
       return this.selected === 'menu'
+    }
+  },
+  methods: {
+    toggleMode () {
+      if (this.isViewingTestData) {
+        this.$store.dispatch('session/setMode', 'live')
+      } else {
+        this.$store.dispatch('session/setMode', 'test')
+      }
     }
   }
 }
@@ -231,5 +248,33 @@ export default {
 
 .primary-nav {
   padding-bottom: 20px;
+}
+
+.nav-switch {
+  .el-switch__core {
+    height: 14px;
+  }
+
+  .el-switch__button {
+    top: 0px;
+    left: 0px;
+    height: 12px;
+    width: 12px;
+  }
+
+  &.is-checked {
+    .el-switch__core > .el-switch__button {
+      transform: translate3d(9px, 0px, 0px) !important;
+    }
+  }
+}
+
+.mode-test {
+  color: #f79a59;
+  font-weight: 500;
+}
+
+.el-menu-item.is-active.no-active {
+  color: #2d2f33;
 }
 </style>
