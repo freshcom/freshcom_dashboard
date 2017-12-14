@@ -9,7 +9,10 @@
 
   <div>
     <el-card class="main-card">
-      <div slot="header" class="clearfix">
+      <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
         API
       </div>
 
@@ -20,13 +23,8 @@
         <div class="block">
           <div class="block-body">
             <dl>
-              <dt>Account ID</dt>
-              <dd>{{account.id}}</dd>
-            </dl>
-
-            <dl>
               <dt>Publishable Refresh Token</dt>
-              <dd>{{refreshToken.id}}</dd>
+              <dd>{{refreshToken.prefixedId}}</dd>
             </dl>
           </div>
         </div>
@@ -38,23 +36,30 @@
 </template>
 
 <script>
+import PageMixin from '@/mixins/page'
 import freshcom from '@/freshcom-sdk'
 
 export default {
   name: 'APIHome',
+  mixins: [PageMixin],
   data () {
     return {
       isLoading: false,
       refreshToken: {}
     }
   },
+  created () {
+    this.loadRefreshToken()
+  },
   computed: {
     account () {
       return this.$store.state.session.account
     }
   },
-  created () {
-    this.loadRefreshToken()
+  watch: {
+    isViewingTestData () {
+      this.loadRefreshToken()
+    }
   },
   methods: {
     loadRefreshToken () {

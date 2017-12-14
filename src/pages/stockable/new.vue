@@ -10,6 +10,10 @@
   <div>
     <el-card class="main-card">
       <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
+
         <span style="line-height: 36px;">Create a stockable</span>
 
         <div class="pull-right">
@@ -44,11 +48,13 @@
 <script>
 import freshcom from '@/freshcom-sdk'
 
+import PageMixin from '@/mixins/page'
 import Stockable from '@/models/stockable'
 import StockableForm from '@/components/stockable-form'
 
 export default {
   name: 'NewStockable',
+  mixins: [PageMixin],
   components: {
     StockableForm
   },

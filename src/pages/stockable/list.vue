@@ -10,7 +10,11 @@
 
   <div>
     <el-card class="main-card">
-      <div slot="header" class="clearfix">
+      <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
+
         <el-button plain size="small"><icon name="filter" scale="0.7" class="v-middle"></icon> Filter</el-button>
         <div class="search">
           <el-input @input="updateSearchKeyword" :value="searchKeyword" size="small" placeholder="Search...">
@@ -74,11 +78,13 @@ import 'vue-awesome/icons/search'
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
+import PageMixin from '@/mixins/page'
 import Pagination from '@/components/pagination'
 import { idLastPart } from '@/helpers/filters'
 
 export default {
   name: 'ListStockable',
+  mixins: [PageMixin],
   components: {
     Pagination
   },
@@ -118,6 +124,9 @@ export default {
     }
   },
   watch: {
+    isViewingTestData () {
+      this.searchStockable()
+    },
     searchKeyword (newKeyword) {
       this.searchStockable()
     },

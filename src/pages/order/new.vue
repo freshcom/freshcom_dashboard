@@ -11,6 +11,10 @@
   <div>
     <el-card class="main-card">
       <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
+
         <span>Create an order</span>
       </div>
 
@@ -150,6 +154,7 @@ import Order from '@/models/order'
 import OrderLineItem from '@/models/order-line-item'
 import Payment from '@/models/payment'
 
+import PageMixin from '@/mixins/page'
 import { dollar } from '@/helpers/filters'
 import { createToken as createStripeToken } from 'vue-stripe-elements-plus'
 import translateErrors from '@/helpers/translate-errors'
@@ -157,6 +162,7 @@ import OrderLineItemTable from '@/components/order-line-item-table'
 
 export default {
   name: 'NewOrder',
+  mixins: [PageMixin],
   components: {
     OrderLineItemForm,
     OrderLineItemTable,

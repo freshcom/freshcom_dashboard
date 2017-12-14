@@ -316,14 +316,24 @@ export default {
   // BillingSettings
   //
   retrieveBillingSettings (params = {}, options = {}) {
-    return this.http.get('/billing_settings', { params: params }).then(response => {
+    let config = { params: params }
+    if (options.accessToken) {
+      config.headers = { 'Authorization': `Bearer ${options.accessToken}` }
+    }
+
+    return this.http.get('/billing_settings', config).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
 
   updateBillingSettings (fields, params = {}, options = {}) {
+    let config = { params: params }
+    if (options.accessToken) {
+      config.headers = { 'Authorization': `Bearer ${options.accessToken}` }
+    }
+
     let payload = SimpleJAS.serialize(fields)
-    return this.http.patch('/billing_settings', payload, { params: params }).then(response => {
+    return this.http.patch('/billing_settings', payload, config).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },

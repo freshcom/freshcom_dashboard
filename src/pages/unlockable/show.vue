@@ -10,6 +10,9 @@
   <div>
     <el-card v-loading="isLoading" class="main-card">
       <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
 
         <div class="brief">
           <div class="avatar">
@@ -153,19 +156,21 @@
 import 'vue-awesome/icons/plus'
 import freshcom from '@/freshcom-sdk'
 
+import PageMixin from '@/mixins/page'
 import Unlockable from '@/models/unlockable'
 import DeleteButton from '@/components/delete-button'
 import { idLastPart } from '@/helpers/filters'
 
 export default {
   name: 'ShowUnlockable',
-  props: ['id'],
+  mixins: [PageMixin],
   components: {
     DeleteButton
   },
   filters: {
     idLastPart
   },
+  props: ['id'],
   data () {
     return {
       unlockable: Unlockable.objectWithDefaults(),

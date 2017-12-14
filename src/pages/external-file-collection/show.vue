@@ -15,6 +15,9 @@
   <div>
     <el-card v-loading="isLoading" class="main-card">
       <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
 
         <div class="brief">
           <div class="avatar">
@@ -146,15 +149,17 @@
 import 'vue-awesome/icons/folder'
 import freshcom from '@/freshcom-sdk'
 
+import PageMixin from '@/mixins/page'
 import ExternalFileCollection from '@/models/external-file-collection'
 import DeleteButton from '@/components/delete-button'
 
 export default {
   name: 'ShowExternalFileCollection',
-  props: ['id'],
+  mixins: [PageMixin],
   components: {
     DeleteButton
   },
+  props: ['id'],
   data () {
     return {
       efc: ExternalFileCollection.objectWithDefaults(),

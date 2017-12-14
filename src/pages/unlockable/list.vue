@@ -10,6 +10,10 @@
   <div>
     <el-card class="main-card">
       <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
+
         <el-row>
           <el-col :span="18">
             <el-button plain size="small">
@@ -97,6 +101,7 @@ import 'vue-awesome/icons/search'
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
+import PageMixin from '@/mixins/page'
 import Pagination from '@/components/pagination'
 import { idLastPart } from '@/helpers/filters'
 import DataImportForm from '@/components/data-import-form'
@@ -104,6 +109,7 @@ import DataImport from '@/models/data-import'
 
 export default {
   name: 'ListUnlockable',
+  mixins: [PageMixin],
   components: {
     Pagination,
     DataImportForm
@@ -150,6 +156,9 @@ export default {
     }
   },
   watch: {
+    isViewingTestData () {
+      this.searchUnlockable()
+    },
     searchKeyword (newKeyword) {
       this.searchUnlockable()
     },

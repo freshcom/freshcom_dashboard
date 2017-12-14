@@ -10,6 +10,9 @@
   <div>
     <el-card class="main-card">
       <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
         <span style="line-height: 36px;">Edit stockable</span>
 
         <div style="float: right;">
@@ -45,11 +48,13 @@
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
+import PageMixin from '@/mixins/page'
 import Stockable from '@/models/stockable'
 import StockableForm from '@/components/stockable-form'
 
 export default {
   name: 'EditStockable',
+  mixins: [PageMixin],
   components: {
     StockableForm
   },

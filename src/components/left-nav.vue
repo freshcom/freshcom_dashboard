@@ -109,7 +109,7 @@
           <span>API</span>
         </el-menu-item>
 
-        <el-menu-item index="" style="padding-left: 10px;" class="no-active">
+        <el-menu-item index="" style="padding-left: 12px;" class="no-active">
           <el-switch :value="isViewingTestData" @input="toggleMode()" :width="23" active-color="#f79a59" class="nav-switch">
           </el-switch>
 

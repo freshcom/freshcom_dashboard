@@ -11,6 +11,9 @@
   <div>
     <el-card v-loading="isLoading" class="main-card">
       <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
 
         <div class="brief no-avatar">
           <div class="detail">
@@ -321,6 +324,7 @@ import OrderLineItemForm from '@/components/order-line-item-form'
 import PaymentForm from '@/components/payment-form'
 import RefundForm from '@/components/refund-form'
 
+import PageMixin from '@/mixins/page'
 import DeleteButton from '@/components/delete-button'
 import OrderLineItemTable from '@/components/order-line-item-table'
 import { dollar } from '@/helpers/filters'
@@ -328,6 +332,7 @@ import { createToken as createStripeToken } from 'vue-stripe-elements-plus'
 
 export default {
   name: 'ShowOrder',
+  mixins: [PageMixin],
   components: {
     RefundForm,
     PaymentForm,

@@ -15,6 +15,10 @@
   <div>
     <el-card v-loading="isLoading" class="main-card">
       <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
+
         <span style="line-height: 36px;">Edit File Collection</span>
 
         <div class="pull-right">
@@ -49,15 +53,18 @@
 <script>
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
+
+import PageMixin from '@/mixins/page'
 import ExternalFileCollectionForm from '@/components/external-file-collection-form'
 import ExternalFileCollection from '@/models/external-file-collection'
 
 export default {
   name: 'EditExternalFileCollection',
-  props: ['id'],
+  mixins: [PageMixin],
   components: {
     ExternalFileCollectionForm
   },
+  props: ['id'],
   data () {
     return {
       isLoading: false,

@@ -15,6 +15,10 @@
   <div>
     <el-card class="main-card">
       <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
+
         <span style="line-height: 36px;">Create a file collection</span>
 
         <div class="pull-right">
@@ -49,15 +53,17 @@
 <script>
 import freshcom from '@/freshcom-sdk'
 
+import PageMixin from '@/mixins/page'
 import ExternalFileCollection from '@/models/external-file-collection'
 import ExternalFileCollectionForm from '@/components/external-file-collection-form'
 
 export default {
   name: 'NewExternalFileCollection',
-  props: ['ownerId', 'ownerType'],
+  mixins: [PageMixin],
   components: {
     ExternalFileCollectionForm
   },
+  props: ['ownerId', 'ownerType'],
   data () {
     return {
       efcDraft: ExternalFileCollection.objectWithDefaults(),

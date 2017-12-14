@@ -10,6 +10,10 @@
   <div>
     <el-card class="main-card">
       <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
+
         <span style="line-height: 36px;">Edit unlockable</span>
 
         <div style="float: right;">
@@ -45,11 +49,13 @@
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
+import PageMixin from '@/mixins/page'
 import Unlockable from '@/models/unlockable'
 import UnlockableForm from '@/components/unlockable-form'
 
 export default {
   name: 'EditUnlockable',
+  mixins: [PageMixin],
   components: {
     UnlockableForm
   },

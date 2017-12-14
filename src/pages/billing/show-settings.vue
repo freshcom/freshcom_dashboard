@@ -54,13 +54,16 @@ export default {
   computed: {
     stripeAuthorizeUrl () {
       return `https://connect.stripe.com/oauth/authorize?response_type=code&client_id=${STRIPE_CLIENT_ID}&scope=read_write`
+    },
+    liveAccessToken () {
+      return this.$store.state.session.liveToken.access_token
     }
   },
   methods: {
     updateBillingSettings () {
       this.isLoading = true
 
-      freshcom.updateBillingSettings(this.billingSettingsDraft).then(response => {
+      freshcom.updateBillingSettings(this.billingSettingsDraft, {}, { accessToken: this.liveAccessToken }).then(response => {
         this.billingSettings = response.data
         this.billingSettingsDraft = _.cloneDeep(response.data)
 
@@ -81,7 +84,7 @@ export default {
 
     loadBillingSettings () {
       this.isLoading = true
-      freshcom.retrieveBillingSettings().then(response => {
+      freshcom.retrieveBillingSettings({}, { accessToken: this.liveAccessToken }).then(response => {
         this.billingSettings = response.data
         this.isLoading = false
       }).catch(errors => {

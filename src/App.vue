@@ -78,12 +78,13 @@ input::-webkit-inner-spin-button {
   top: 0;
   width: 100%;
   border-top: 1px solid #f79a59;
+  text-align: center;
 
   .banner-content {
     line-height: 9px;
-    position: absolute;
-    left: 50%;
-    top: 0;
+    position: relative;
+    vertical-align: top;
+    display: inline-block;
     font-size: 10px;
     color: white;
     font-weight: 500;
