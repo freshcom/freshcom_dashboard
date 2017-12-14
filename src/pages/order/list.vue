@@ -135,6 +135,9 @@ export default {
     }
   },
   watch: {
+    isViewingTestData () {
+      this.searchOrder()
+    },
     searchKeyword (newKeyword) {
       this.searchOrder()
     },
