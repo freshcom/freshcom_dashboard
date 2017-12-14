@@ -129,6 +129,12 @@ export default {
   //
   // OrderLineItem
   //
+  listOrderLineItem (params = {}, options = {}) {
+    return this.http.get('/order_line_items', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
   createOrderLineItem (orderId, fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.post(`/orders/${orderId}/line_items`, payload, { params: params }).then(response => {
@@ -258,10 +264,26 @@ export default {
   },
 
   //
+  // PointTransaction
+  //
+  createPointTransaction (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post('/point_transactions', payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  //
   // Unlock
   //
   listUnlock (params = {}, options = {}) {
     return this.http.get('/unlocks', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  retrieveUnlock (id, params = {}, options = {}) {
+    return this.http.get(`/unlocks/${id}`, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
