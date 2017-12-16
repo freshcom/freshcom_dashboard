@@ -15,7 +15,9 @@
   <div>
     <el-card v-loading="isLoading" class="main-card">
       <div slot="header">
-
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
         <div class="brief">
           <div class="avatar">
             <icon name="folder" class="avatar-icon"></icon>
@@ -178,6 +180,7 @@ import 'vue-awesome/icons/folder'
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
+import PageMixin from '@/mixins/page'
 import ProductCollection from '@/models/product-collection'
 import ProductCollectionMembership from '@/models/product-collection-membership'
 import ProductCollectionMembershipForm from '@/components/product-collection-membership-form'
@@ -185,11 +188,12 @@ import DeleteButton from '@/components/delete-button'
 
 export default {
   name: 'ShowProductCollection',
-  props: ['id'],
+  mixins: [PageMixin],
   components: {
     ProductCollectionMembershipForm,
     DeleteButton
   },
+  props: ['id'],
   data () {
     return {
       productCollection: ProductCollection.objectWithDefaults(),

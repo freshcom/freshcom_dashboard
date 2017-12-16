@@ -11,6 +11,10 @@
   <div>
     <el-card class="main-card">
       <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
+        mixins: [PageMixin],
         <span style="line-height: 36px;">Edit Customer</span>
 
         <div style="float: right;">
@@ -47,11 +51,13 @@
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
+import PageMixin from '@/mixins/page'
 import Customer from '@/models/customer'
 import CustomerForm from '@/components/customer-form'
 
 export default {
   name: 'EditCustomer',
+  mixins: [PageMixin],
   components: {
     CustomerForm
   },

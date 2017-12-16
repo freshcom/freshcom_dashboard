@@ -11,6 +11,9 @@
   <div>
     <el-card v-loading="isLoading" class="main-card">
       <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
 
         <div class="brief">
           <div class="avatar">
@@ -357,6 +360,7 @@ import 'vue-awesome/icons/plus'
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
+import PageMixin from '@/mixins/page'
 import Product from '@/models/product'
 import DeleteButton from '@/components/delete-button'
 import translateErrors from '@/helpers/translate-errors'
@@ -364,6 +368,7 @@ import { chargeDollar } from '@/helpers/filters'
 
 export default {
   name: 'ShowProduct',
+  mixins: [PageMixin],
   components: {
     DeleteButton
   },

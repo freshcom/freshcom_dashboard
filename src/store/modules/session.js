@@ -29,6 +29,7 @@ export default {
     retrieveFromStorage ({ commit, dispatch }) {
       let rawLiveToken = localStorage.getItem('state.session.liveToken')
       if (!rawLiveToken) {
+        commit(MT.READY, true)
         return Promise.reject(new Error('no token'))
       }
 

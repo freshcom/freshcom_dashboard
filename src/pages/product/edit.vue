@@ -12,6 +12,9 @@
   <div>
     <el-card class="main-card">
       <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
         <span style="line-height: 36px;">Edit product</span>
 
         <div style="float: right;">
@@ -48,11 +51,13 @@
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
+import PageMixin from '@/mixins/page'
 import Product from '@/models/product'
 import ProductForm from '@/components/product-form'
 
 export default {
   name: 'EditProduct',
+  mixins: [PageMixin],
   components: {
     ProductForm
   },

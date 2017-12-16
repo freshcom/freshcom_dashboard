@@ -1,6 +1,5 @@
 <template>
 <div class="page-wrapper">
-
   <div>
     <el-menu :router="true" default-active="/product_collections" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
@@ -16,6 +15,9 @@
   <div>
     <el-card class="main-card">
       <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
         <span style="line-height: 36px;">Edit product collection</span>
 
         <div style="float: right;">
@@ -52,11 +54,13 @@
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
+import PageMixin from '@/mixins/page'
 import ProductCollection from '@/models/product-collection'
 import ProductCollectionForm from '@/components/product-collection-form'
 
 export default {
   name: 'EditProductCollection',
+  mixins: [PageMixin],
   components: {
     ProductCollectionForm
   },

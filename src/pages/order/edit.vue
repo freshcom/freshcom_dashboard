@@ -11,6 +11,9 @@
   <div>
     <el-card v-loading="isLoading" class="main-card">
       <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
         <span style="line-height: 36px;">Edit Order</span>
 
         <div style="float: right;">
@@ -47,11 +50,13 @@
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
+import PageMixin from '@/mixins/page'
 import Order from '@/models/order'
 import OrderForm from '@/components/order-form'
 
 export default {
   name: 'EditOrder',
+  mixins: [PageMixin],
   components: {
     OrderForm
   },
