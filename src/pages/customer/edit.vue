@@ -14,7 +14,6 @@
         <div v-if="isViewingTestData" class="test-data-banner">
           <div class="banner-content">TEST DATA</div>
         </div>
-        mixins: [PageMixin],
         <span style="line-height: 36px;">Edit Customer</span>
 
         <div style="float: right;">

@@ -274,13 +274,13 @@ export default {
 .nav-switch {
   .el-switch__core {
     height: 14px;
-  }
 
-  .el-switch__button {
-    top: 0px;
-    left: 0px;
-    height: 12px;
-    width: 12px;
+    .el-switch__button {
+      top: 0px;
+      left: 0px;
+      height: 12px;
+      width: 12px;
+    }
   }
 
   &.is-checked {

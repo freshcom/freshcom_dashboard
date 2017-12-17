@@ -2,7 +2,7 @@
 <div id="login" class="page-wrapper">
   <div class="center">
 
-    <h1>FreshCom</h1>
+    <h1>Freshcom</h1>
 
     <el-card class="box-card">
       <div slot="header" class="clearfix text-center">
