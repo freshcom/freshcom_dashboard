@@ -1,8 +1,14 @@
 <template>
 <div class="wrapper">
 
-  <el-container>
-    <el-aside width="200px" v-if="shouldShowAside">
+  <el-container v-if="!isLoggedIn">
+    <el-main>
+      <router-view></router-view>
+    </el-main>
+  </el-container>
+
+  <el-container v-else>
+    <el-aside width="200px">
       <left-nav></left-nav>
     </el-aside>
 
@@ -19,7 +25,7 @@
         <span>王小虎</span>
       </el-header>
 
-      <el-main>
+      <el-main class="app">
         <router-view></router-view>
       </el-main>
     </el-container>
@@ -43,7 +49,7 @@ export default {
     })
   },
   computed: {
-    shouldShowAside () {
+    isLoggedIn () {
       return this.$store.state.route.name !== 'Login'
     },
     isSessionReady () {
@@ -114,7 +120,7 @@ input::-webkit-inner-spin-button {
   }
 }
 
-.el-main {
+.el-main.app {
   padding-left: 5px;
 }
 
