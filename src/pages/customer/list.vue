@@ -50,7 +50,7 @@
                 {{scope.row.firstName}} {{scope.row.lastName}}
               </span>
               <span v-else>
-                {{scope.row.otherName}}
+                {{scope.row.name}}
               </span>
             </template>
           </el-table-column>
@@ -77,8 +77,8 @@
         </el-table>
 
         <div v-if="hasSearchResult" class="footer">
-          <span class="total">around {{resultCount}} results</span>
-          <pagination :number="page.number" :size="page.size" :total="resultCount"></pagination>
+          <span class="total">around {{totalCount}} results</span>
+          <pagination :number="page.number" :size="page.size" :total="totalCount"></pagination>
         </div>
       </div>
     </el-card>
@@ -132,8 +132,8 @@ export default {
     return {
       customers: [],
       isLoading: false,
+      allCount: 0,
       totalCount: 0,
-      resultCount: 0,
 
       isAddingDataImport: false,
       isCreatingDataImport: false,
@@ -147,10 +147,10 @@ export default {
   },
   computed: {
     noSearchResult () {
-      return !this.isLoading && this.resultCount === 0 && this.totalCount > 0
+      return !this.isLoading && this.totalCount === 0 && this.allCount > 0
     },
     hasSearchResult () {
-      return !this.isLoading && this.resultCount !== 0
+      return !this.isLoading && this.totalCount !== 0
     }
   },
   watch: {
@@ -182,8 +182,8 @@ export default {
         page: this.page
       }).then(response => {
         this.customers = response.data
+        this.allCount = response.meta.allCount
         this.totalCount = response.meta.totalCount
-        this.resultCount = response.meta.resultCount
 
         this.isLoading = false
       }).catch(response => {

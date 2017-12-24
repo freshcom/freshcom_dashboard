@@ -79,6 +79,9 @@
               <dt>Maximum Public OQ</dt>
               <dd>{{product.maximumPublicOrderQuantity}}</dd>
 
+              <dt>Auto Fulfill</dt>
+              <dd>{{product.autoFulfill}}</dd>
+
               <dt>Caption</dt>
               <dd>{{product.caption}}</dd>
 
@@ -233,7 +236,7 @@
 
                 <el-table-column width="150">
                   <template slot-scope="scope">
-                    <span>${{scope.row.chargeCents / 100}}/{{scope.row.chargeUnit}}</span>
+                    <span>${{scope.row.chargeAmountCents / 100}}/{{scope.row.chargeUnit}}</span>
                   </template>
                 </el-table-column>
 
@@ -263,7 +266,7 @@
           <h3>File Collections</h3>
 
           <span class="block-title-actions pull-right">
-            <router-link :to="{ name: 'NewExternalFileCollection', query: { productId: product.id, callbackPath: currentRoutePath } }">
+            <router-link :to="{ name: 'NewExternalFileCollection', query: { ownerId: product.id, ownerType: 'Product', callbackPath: currentRoutePath } }">
               <icon name="plus" scale="0.8" class="v-middle"></icon>
               <span>Add</span>
             </router-link>

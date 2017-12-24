@@ -100,7 +100,7 @@
 
     <el-form-item label="Price" class="price">
       <el-tag v-if="formModel.id" :disable-transitions="true">
-        {{formModel.priceChargeCents | dollar}}/{{formModel.priceChargeUnit}}
+        {{formModel.priceChargeAmountCents | dollar}}/{{formModel.priceChargeUnit}}
       </el-tag>
 
       <el-select v-else
@@ -374,6 +374,7 @@ export default {
           this.productVariants = variants
           this.formModel.product = _.find(variants, { primary: true })
 
+          console.log(variants)
           this.updateValue(OrderLineItem.balanceByProduct(this.formModel))
         })
       } else {

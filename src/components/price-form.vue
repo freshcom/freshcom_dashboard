@@ -28,7 +28,7 @@
   </el-form-item>
 
   <el-form-item v-if="isRootPrice(formModel)" label="Charge Amount" :error="chargeAmountError" required>
-    <money-input v-model="formModel.chargeCents" @change="updateValue" class="charge-amount-input">
+    <money-input v-model="formModel.chargeAmountCents" @change="updateValue" class="charge-amount-input">
     </money-input>
     <span> / </span>
     <el-input v-model="formModel.chargeUnit" class="unit-input" placeholder="Unit"></el-input>
@@ -87,7 +87,7 @@
       <div class="product-item">{{child.product.name}}</div>
 
       <div class="price">
-        <money-input v-model="child.chargeCents" class="child-price-input">
+        <money-input v-model="child.chargeAmountCents" class="child-price-input">
         </money-input>
       </div>
     </div>
@@ -128,8 +128,8 @@ export default {
       return translateErrors(this.errors, 'price')
     },
     chargeAmountError () {
-      if (this.errorMsgs.chargeCents) {
-        return this.errorMsgs.chargeCents
+      if (this.errorMsgs.chargeAmountCents) {
+        return this.errorMsgs.chargeAmountCents
       }
 
       if (this.errorMsgs.chargeUnit) {
@@ -138,7 +138,7 @@ export default {
     },
     subTotalCents () {
       return _.reduce(this.formModel.children, (acc, price) => {
-        let cc = price.chargeCents || 0
+        let cc = price.chargeAmountCents || 0
         return acc + cc
       }, 0)
     },
@@ -147,7 +147,7 @@ export default {
     },
     grandTotalCents () {
       return _.reduce(this.formModel.children, (acc, price) => {
-        let cc = price.chargeCents || 0
+        let cc = price.chargeAmountCents || 0
         let t1p = price.taxOnePercentage / 100
         let t2p = price.taxTwoPercentage / 100
         let t3p = price.taxThreePercentage / 100
@@ -164,7 +164,7 @@ export default {
       this.formModel = _.cloneDeep(v)
     },
     subTotalCents (subTotalCents) {
-      this.formModel.chargeCents = subTotalCents
+      this.formModel.chargeAmountCents = subTotalCents
     }
   },
   methods: {

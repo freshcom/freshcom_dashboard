@@ -11,7 +11,7 @@ export default {
       name: '',
       label: '',
       currencyCode: 'CAD',
-      chargeCents: null,
+      chargeAmountCents: null,
       estimateByDefault: false,
       estimateAveragePercentage: null,
       estimateMaximumPercentage: null,

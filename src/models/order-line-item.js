@@ -46,7 +46,7 @@ export default {
 
     let lineItem = _.cloneDeep(sourceLineItem)
     if (lineItem.isEstimate && lineItem.price) {
-      lineItem.chargeQuantity = lineItem.subTotalCents / lineItem.priceChargeCents
+      lineItem.chargeQuantity = lineItem.subTotalCents / lineItem.priceChargeAmountCents
     }
 
     if (lineItem.price) {
@@ -76,13 +76,13 @@ export default {
   },
 
   balanceByChargeQuantity (sourceLineItem) {
-    if (isNaN(sourceLineItem.chargeQuantity) || isNaN(sourceLineItem.priceChargeCents)) {
+    if (isNaN(sourceLineItem.chargeQuantity) || isNaN(sourceLineItem.priceChargeAmountCents)) {
       return sourceLineItem
     }
 
     let lineItem = _.cloneDeep(sourceLineItem)
 
-    lineItem.subTotalCents = Math.round(lineItem.chargeQuantity * lineItem.priceChargeCents)
+    lineItem.subTotalCents = Math.round(lineItem.chargeQuantity * lineItem.priceChargeAmountCents)
     lineItem.taxOneCents = Math.round(lineItem.subTotalCents * (lineItem.priceTaxOnePercentage / 100))
     lineItem.taxTwoCents = Math.round(lineItem.subTotalCents * (lineItem.priceTaxTwoPercentage / 100))
     lineItem.taxThreeCents = Math.round(lineItem.subTotalCents * (lineItem.priceTaxThreePercentage / 100))
@@ -101,7 +101,7 @@ export default {
 
     lineItem.priceEstimateAveragePercentage = price.estimateAveragePercentage
     lineItem.priceEstimateByDefault = price.estimateByDefault
-    lineItem.priceChargeCents = price.chargeCents
+    lineItem.priceChargeAmountCents = price.chargeAmountCents
     lineItem.priceTaxOnePercentage = price.taxOnePercentage
     lineItem.priceTaxTwoPercentage = price.taxTwoPercentage
     lineItem.priceTaxThreePercentage = price.taxThreePercentage

@@ -23,6 +23,11 @@
         <div class="block">
           <div class="block-body">
             <dl>
+              <dt>Account ID</dt>
+              <dd v-if="isViewingTestData">{{account.testAccountId}}</dd>
+              <dd v-else="isViewingTestData">{{account.id}}</dd>
+            </dl>
+            <dl>
               <dt>Publishable Refresh Token</dt>
               <dd>{{refreshToken.prefixedId}}</dd>
             </dl>

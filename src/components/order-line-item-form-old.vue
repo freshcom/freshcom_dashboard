@@ -194,7 +194,7 @@
         <p v-if="order.taxTwoCents"><span>{{order.taxTwoCents | dollar}}</span></p>
         <p v-if="order.taxThreeCents"><span>{{order.taxThreeCents | dollar}}</span></p>
         <p v-if="order.grandTotalCents"><span v-if="order.isEstimate">~</span> <span>{{order.grandTotalCents | dollar}}</span></p>
-        <p v-if="order.isEstimate">{{order.authorizationCents | dollar}}</p>
+        <p v-if="order.isEstimate">{{order.authorizationTotalCents | dollar}}</p>
       </div>
     </div>
 
@@ -297,7 +297,7 @@ export default {
 
       if (price && !price.estimateByDefault) {
         this.chargeQuantity = null
-        this.subTotalCents = this.orderQuantity * this.price.chargeCents
+        this.subTotalCents = this.orderQuantity * this.price.chargeAmountCents
         return
       }
 
@@ -305,12 +305,12 @@ export default {
     },
     chargeQuantity (chargeQuantity) {
       if (chargeQuantity && this.price && this.price.estimateByDefault) {
-        this.subTotalCents = chargeQuantity * this.price.chargeCents
+        this.subTotalCents = chargeQuantity * this.price.chargeAmountCents
       }
     },
     orderQuantity (orderQuantity) {
       if (this.price && !this.price.estimateByDefault) {
-        this.subTotalCents = orderQuantity * this.price.chargeCents
+        this.subTotalCents = orderQuantity * this.price.chargeAmountCents
       }
 
       if (this.price && this.price.estimateByDefault) {
@@ -420,7 +420,7 @@ export default {
     },
     refreshChargeQuantity (subTotalCents) {
       if (this.price && this.price.estimateByDefault) {
-        this.chargeQuantity = subTotalCents / this.price.chargeCents
+        this.chargeQuantity = subTotalCents / this.price.chargeAmountCents
       }
     },
     addProductLineItem () {

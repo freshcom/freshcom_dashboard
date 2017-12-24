@@ -51,7 +51,7 @@
                 <dd>{{price.label}}</dd>
 
                 <dt>Charge Amount</dt>
-                <dd>${{price.chargeCents / 100}} / {{price.chargeUnit}}</dd>
+                <dd>${{price.chargeAmountCents / 100}} / {{price.chargeUnit}}</dd>
 
                 <dt>Order Unit</dt>
                 <dd>{{price.orderUnit}}</dd>

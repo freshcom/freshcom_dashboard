@@ -68,7 +68,7 @@
               <p><span>{{order.taxTwoCents | dollar}}</span></p>
               <p><span>{{order.taxThreeCents | dollar}}</span></p>
               <p><span v-if="order.isEstimate">~</span> <span>{{order.grandTotalCents | dollar}}</span></p>
-              <p v-if="order.isEstimate">{{order.authorizationCents | dollar}}</p>
+              <p v-if="order.isEstimate">{{order.authorizationTotalCents | dollar}}</p>
             </div>
           </div>
         </div>
@@ -244,10 +244,10 @@ export default {
         valueCents: this.order.grandTotalCents
       })
 
-      if (this.order.authorizationCents !== this.order.grandTotalCents) {
+      if (this.order.authorizationTotalCents !== this.order.grandTotalCents) {
         tableData.push({
           name: 'Authorization total',
-          valueCents: this.order.authorizationCents
+          valueCents: this.order.authorizationTotalCents
         })
       }
 
@@ -356,7 +356,7 @@ export default {
         paymentDraft.owner = order.customer
 
         if (order.isEstimate) {
-          paymentDraft.amountCents = order.authorizationCents
+          paymentDraft.amountCents = order.authorizationTotalCents
           paymentDraft.capture = false
         } else {
           paymentDraft.amountCents = order.grandTotalCents

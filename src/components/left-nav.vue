@@ -79,7 +79,7 @@
           </el-menu-item>
         </el-submenu> -->
 
-        <el-menu-item :route="{ name: 'ShowBillingSettings' }" index="/billing">
+        <el-menu-item :route="{ name: 'ShowBalanceSettings' }" index="/billing/settings">
           <icon name="id-card" scale="0.8"></icon>
           <span>Balance</span>
         </el-menu-item>

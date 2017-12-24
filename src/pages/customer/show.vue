@@ -54,8 +54,8 @@
               <dt>Name</dt>
               <dd>{{customer.firstName}} {{customer.lastName}}</dd>
 
-              <dt v-if="customer.otherName">Display Name</dt>
-              <dd v-if="customer.otherName">{{customer.otherName}}</dd>
+              <dt v-if="customer.name">Display Name</dt>
+              <dd v-if="customer.name">{{customer.name}}</dd>
 
               <dt>Email</dt>
               <dd>{{customer.email}}</dd>

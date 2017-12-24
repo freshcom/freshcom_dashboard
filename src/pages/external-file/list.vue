@@ -37,8 +37,8 @@
         </el-table>
 
         <div v-if="hasSearchResult" class="footer">
-          <span class="total">around {{resultCount}} results</span>
-          <pagination :number="page.number" :size="page.size" :total="resultCount"></pagination>
+          <span class="total">around {{totalCount}} results</span>
+          <pagination :number="page.number" :size="page.size" :total="totalCount"></pagination>
         </div>
       </div>
     </el-card>
@@ -79,8 +79,8 @@ export default {
     return {
       externalFiles: [],
       isLoading: false,
+      allCount: 0,
       totalCount: 0,
-      resultCount: 0,
 
       errors: {}
     }
@@ -90,10 +90,10 @@ export default {
   },
   computed: {
     noSearchResult () {
-      return !this.isLoading && this.resultCount === 0 && this.totalCount > 0
+      return !this.isLoading && this.totalCount === 0 && this.allCount > 0
     },
     hasSearchResult () {
-      return !this.isLoading && this.resultCount !== 0
+      return !this.isLoading && this.totalCount !== 0
     },
     currentRoutePath () {
       return this.$store.state.route.fullPath
@@ -127,8 +127,8 @@ export default {
         page: this.page
       }).then(response => {
         this.externalFiles = response.data
+        this.allCount = response.meta.allCount
         this.totalCount = response.meta.totalCount
-        this.resultCount = response.meta.resultCount
 
         this.isLoading = false
       }).catch(errors => {

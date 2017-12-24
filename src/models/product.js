@@ -15,6 +15,7 @@ export default {
       sourceQuantity: 1,
       sortIndex: 0,
       maximumPublicOrderQuantity: 9999,
+      autoFulfill: false,
 
       caption: '',
       description: '',

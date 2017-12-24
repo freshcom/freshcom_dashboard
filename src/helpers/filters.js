@@ -9,7 +9,7 @@ export function chargeDollar (price) {
     return ''
   }
 
-  let str = (price.chargeCents / 100).toFixed(2)
+  let str = (price.chargeAmountCents / 100).toFixed(2)
   return `$ ${str}/${price.chargeUnit}`
 }
 

@@ -58,7 +58,7 @@ import NewDepositablePage from '@/pages/depositable/new'
 import ShowDepositablePage from '@/pages/depositable/show'
 import EditDepositablePage from '@/pages/depositable/edit'
 
-import ShowBillingSettingsPage from '@/pages/billing/show-settings'
+import ShowBalanceSettingsPage from '@/pages/balance/settings'
 import APIHomePage from '@/pages/api/home'
 
 Vue.use(Router)
@@ -481,9 +481,9 @@ export default new Router({
       }
     },
     {
-      path: '/billing/settings',
-      name: 'ShowBillingSettings',
-      component: ShowBillingSettingsPage,
+      path: '/balance/settings',
+      name: 'ShowBalanceSettings',
+      component: ShowBalanceSettingsPage,
       props (route) {
         let queryString = route.fullPath.split('?')[1]
         let query = qs.parse(queryString)

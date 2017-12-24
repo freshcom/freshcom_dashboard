@@ -16,7 +16,7 @@ export default {
       taxTwoCents: 0,
       taxThreeCents: 0,
       grandTotalCents: 0,
-      authorizationCents: 0,
+      authorizationTotalCents: 0,
 
       rootLineItems: [],
 

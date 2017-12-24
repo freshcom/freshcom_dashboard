@@ -55,8 +55,8 @@
 
   <el-row :gutter="20">
     <el-col :span="24">
-      <el-form-item label="Other Name" :error="errorMsgs.otherName">
-        <el-input v-model="formModel.otherName"></el-input>
+      <el-form-item label="Name" :error="errorMsgs.name">
+        <el-input v-model="formModel.name"></el-input>
       </el-form-item>
     </el-col>
   </el-row>

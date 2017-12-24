@@ -107,6 +107,16 @@
     <el-input-number @change="updateValue" v-model="formModel.maximumPublicOrderQuantity" :min="1" :step="1"></el-input-number>
   </el-form-item>
 
+  <el-form-item :error="errorMsgs.autoFulfill" label="Auto Fulfill" required>
+    <el-switch
+      v-model="formModel.autoFulfill"
+      active-text="Yes"
+      inactive-text="No"
+      @change="updateValue"
+    >
+    </el-switch>
+  </el-form-item>
+
   <el-form-item v-if="formModel.kind === 'item' || formModel.kind === 'variant'" label="Sort Index" :error="errorMsgs.sortIndex" required>
     <el-input-number @change="updateValue" v-model="formModel.sortIndex" :min="0" :step="100"></el-input-number>
   </el-form-item>

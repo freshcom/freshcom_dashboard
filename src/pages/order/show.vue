@@ -19,7 +19,7 @@
           <div class="detail">
             <p>Order {{order.code}}</p>
             <h2 v-if="order.firstName">{{order.firstName}} {{order.lastName}}</h2>
-            <h2 v-else>{{order.otherName}}</h2>
+            <h2 v-else>{{order.name}}</h2>
             <p class="id">{{order.id}}</p>
           </div>
         </div>
@@ -57,8 +57,8 @@
               <dt>Name</dt>
               <dd>{{order.firstName}} {{order.lastName}}</dd>
 
-              <dt>Other Name</dt>
-              <dd>{{order.otherName}}</dd>
+              <dt>Name</dt>
+              <dd>{{order.name}}</dd>
 
               <dt>Email</dt>
               <dd>{{order.email}}</dd>
@@ -127,8 +127,8 @@
                 {{order.grandTotalCents | dollar}}
               </dd>
 
-              <dt v-if="order.authorizationCents != order.grandTotalCents">Authorization Total</dt>
-              <dd v-if="order.authorizationCents != order.grandTotalCents">{{order.authorizationCents | dollar}}</dd>
+              <dt v-if="order.authorizationTotalCents != order.grandTotalCents">Authorization Total</dt>
+              <dd v-if="order.authorizationTotalCents != order.grandTotalCents">{{order.authorizationTotalCents | dollar}}</dd>
 
               <dt>Opened At</dt>
               <dd>{{order.openedAt | moment}}</dd>
