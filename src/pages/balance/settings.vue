@@ -2,8 +2,8 @@
 <div class="page-wrapper">
 
   <div>
-    <el-menu :router="true" default-active="/billing/settings" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ShowBillingSettings' }" index="/billing/settings">Settings</el-menu-item>
+    <el-menu :router="true" default-active="/balance/settings" mode="horizontal" class="secondary-nav">
+      <el-menu-item :route="{ name: 'ShowBalanceSettings' }" index="/balance/settings">Settings</el-menu-item>
     </el-menu>
   </div>
 
@@ -15,8 +15,8 @@
 
       <div class="data full">
         <p class="text-center">
-          <a v-if="!billingSettings.stripeUserId" :href="stripeAuthorizeUrl">Connect with Stripe</a>
-          <span v-if="billingSettings.stripeUserId">Stripe Connected</span>
+          <a v-if="!balanceSettings.stripeUserId" :href="stripeAuthorizeUrl">Connect with Stripe</a>
+          <span v-if="balanceSettings.stripeUserId">Stripe Connected</span>
         </p>
       </div>
     </el-card>
@@ -29,49 +29,49 @@
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
-import BillingSettings from '@/models/billing-settings'
-import { STRIPE_CLIENT_ID } from '@/env'
+import BalanceSettings from '@/models/balance-settings'
+import { STRIPE_CLIENT_ID, HOST_URL } from '@/env'
 import translateErrors from '@/helpers/translate-errors'
 
 export default {
-  name: 'ShowBillingSettings',
+  name: 'ShowBalanceSettings',
   props: ['stripeCode', 'stripeScope'],
   data () {
     return {
-      billingSettings: BillingSettings.objectWithDefaults(),
-      billingSettingsDraft: BillingSettings.objectWithDefaults(),
+      balanceSettings: BalanceSettings.objectWithDefaults(),
+      balanceSettingsDraft: BalanceSettings.objectWithDefaults(),
       isLoading: false
     }
   },
   created () {
     if (this.stripeCode) {
-      this.billingSettingsDraft.stripeAuthCode = this.stripeCode
-      this.updateBillingSettings()
+      this.balanceSettingsDraft.stripeAuthCode = this.stripeCode
+      this.updateBalanceSettings()
     } else {
-      this.loadBillingSettings()
+      this.loadBalanceSettings()
     }
   },
   computed: {
     stripeAuthorizeUrl () {
-      return `https://connect.stripe.com/oauth/authorize?response_type=code&client_id=${STRIPE_CLIENT_ID}&scope=read_write`
+      return `https://connect.stripe.com/oauth/authorize?response_type=code&client_id=${STRIPE_CLIENT_ID}&scope=read_write&redirect_uri=${HOST_URL}/balance/settings`
     },
     liveAccessToken () {
       return this.$store.state.session.liveToken.access_token
     }
   },
   methods: {
-    updateBillingSettings () {
+    updateBalanceSettings () {
       this.isLoading = true
 
-      freshcom.updateBillingSettings(this.billingSettingsDraft, {}, { accessToken: this.liveAccessToken }).then(response => {
-        this.billingSettings = response.data
-        this.billingSettingsDraft = _.cloneDeep(response.data)
+      freshcom.updateBalanceSettings(this.balanceSettingsDraft, {}, { accessToken: this.liveAccessToken }).then(response => {
+        this.balanceSettings = response.data
+        this.balanceSettingsDraft = _.cloneDeep(response.data)
 
         this.isLoading = false
       }).catch(response => {
         this.isLoading = false
 
-        let translatedErrors = translateErrors(response.errors, 'billingSettings')
+        let translatedErrors = translateErrors(response.errors, 'balanceSettings')
         this.$message({
           showClose: true,
           message: translatedErrors.stripeAuthCode,
@@ -82,10 +82,10 @@ export default {
       })
     },
 
-    loadBillingSettings () {
+    loadBalanceSettings () {
       this.isLoading = true
-      freshcom.retrieveBillingSettings({}, { accessToken: this.liveAccessToken }).then(response => {
-        this.billingSettings = response.data
+      freshcom.retrieveBalanceSettings({}, { accessToken: this.liveAccessToken }).then(response => {
+        this.balanceSettings = response.data
         this.isLoading = false
       }).catch(errors => {
         this.isLoading = false
