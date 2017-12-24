@@ -50,6 +50,13 @@ export default {
     }
   },
   fields: {
+    fulfillmentLineItem: {
+      status: {
+        fulfilled: 'Fulfilled',
+        pending: 'Pending',
+        returned: 'Returned'
+      }
+    },
     refund: {
       gateway: {
         online: 'Online',

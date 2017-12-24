@@ -677,5 +677,11 @@ export default {
         return SimpleJAS.deserialize(response.data)
       }
     }).catch(this._processHttpError)
+  },
+
+  listFulfillment (params = {}, options = {}) {
+    return this.http.get('/fulfillments', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
   }
 }

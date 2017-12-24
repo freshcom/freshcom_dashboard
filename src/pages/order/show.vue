@@ -217,6 +217,97 @@
         </div>
 
         <div class="block-title">
+          <h3>Fulfillments</h3>
+
+          <span class="block-title-actions pull-right">
+            <a @click="openAddLineItemDialog()" href="javascript:;">
+              <icon name="plus" scale="0.8" class="v-middle"></icon>
+              <span>Add</span>
+            </a>
+          </span>
+        </div>
+        <div class="block">
+          <div class="block-body full">
+            <el-table
+              :data="fulfillments"
+              :show-header="false"
+              row-key="id"
+              class="nested-block-table column-compact"
+              style="width: 100%"
+            >
+              <el-table-column type="expand" width="30px">
+                <template slot-scope="props">
+                  <el-table :data="props.row.lineItems" :show-header="false" style="width: 100%">
+                    <el-table-column width="30px"></el-table-column>
+                    <el-table-column width="400px" label="Name" prop="name">
+                      <template slot-scope="scope">
+                        <span>{{scope.row.name}}</span>
+
+                        <el-tag size="mini" type="info" class="m-l-10">
+                          {{$t(`fields.fulfillmentLineItem.status.${scope.row.status}`)}}
+                        </el-tag>
+                      </template>
+
+                    </el-table-column>
+                    <el-table-column width="80px" label="Qty" prop="quantity">
+                      <template slot-scope="scope">
+                        x {{scope.row.quantity}}
+                      </template>
+                    </el-table-column>
+                    <el-table-column>
+                      <template slot-scope="scope">
+                        <p class="text-right actions">
+                          <delete-button v-if="scope.row.status === 'pending'" size="mini">
+                            Mark Fulfilled
+                          </delete-button>
+
+                          <delete-button v-if="scope.row.status === 'fulfilled'" size="mini">
+                            Mark Returned
+                          </delete-button>
+
+                          <delete-button v-if="scope.row.status === 'fulfilled'" size="mini">
+                            Mark Discarded
+                          </delete-button>
+
+                          <delete-button v-if="scope.row.status === 'pending'" size="mini">
+                            Delete
+                          </delete-button>
+                        </p>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </template>
+              </el-table-column>
+              <el-table-column label="Name" prop="name">
+                <template slot-scope="scope">
+                  <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }">
+                    <b>
+                      <span>
+                        {{scope.row.insertedAt | moment}}
+                      </span>
+                    </b>
+                  </router-link>
+                </template>
+              </el-table-column>
+              <el-table-column width="120px" label="Qty" prop="quantity"></el-table-column>
+              <el-table-column width="100px" label="ST Amt." prop="subTotal" align="right"></el-table-column>
+              <el-table-column width="80px" label="Tax" prop="taxTotal" align="right"></el-table-column>
+              <el-table-column width="100px" label="GT Amt." prop="grandTotal" align="right"></el-table-column>
+
+              <el-table-column width="120">
+                <template slot-scope="scope">
+                  <p class="text-right actions">
+                    <delete-button @confirmed="deleteLineItem(scope.row.id)" size="mini">
+                      Delete
+                    </delete-button>
+                  </p>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+        </div>
+
+        <div class="block-title">
           <h3>Custom Data</h3>
         </div>
         <div class="block">
@@ -350,6 +441,7 @@ export default {
       isLoading: false,
 
       payments: [],
+      fulfillments: [],
 
       lineItemDraftForAdd: OrderLineItem.objectWithDefaults(),
       isAddingLineItem: false,
@@ -380,6 +472,7 @@ export default {
   created () {
     this.loadOrder()
     this.loadPayments()
+    this.loadFulfillments()
   },
   methods: {
     canEditPayment (payment) {
@@ -413,6 +506,16 @@ export default {
         filter: { targetId: this.id, targetType: 'Order' }
       }).then(response => {
         this.payments = response.data
+        return response
+      })
+    },
+
+    loadFulfillments () {
+      return freshcom.listFulfillment({
+        filter: { sourceId: this.id, sourceType: 'Order' },
+        include: 'lineItems'
+      }).then(response => {
+        this.fulfillments = response.data
         return response
       })
     },
