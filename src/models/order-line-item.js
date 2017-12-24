@@ -163,6 +163,7 @@ export default {
         subTotal: subTotal,
         taxTotal: taxTotal,
         grandTotal: grandTotal,
+        fulfillmentStatus: lineItem.fulfillmentStatus,
         amount: `${subTotal} | ${taxTotal} | ${grandTotal}`
       })
     }, [])

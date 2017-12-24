@@ -50,6 +50,11 @@ export default {
     }
   },
   fields: {
+    orderLineItem: {
+      fulfillmentStatus: {
+        returned: 'Returned'
+      }
+    },
     fulfillmentLineItem: {
       status: {
         fulfilled: 'Fulfilled',

@@ -17,11 +17,18 @@
       </el-table>
     </template>
   </el-table-column>
-  <el-table-column label="Name" prop="name"></el-table-column>
-  <el-table-column width="120px" label="Qty" prop="quantity"></el-table-column>
-  <el-table-column width="100px" label="ST Amt." prop="subTotal" align="right"></el-table-column>
+  <el-table-column label="Name" prop="name">
+    <template slot-scope="scope">
+      <span>{{scope.row.name}}</span>
+      <el-tag size="mini" type="info" class="m-l-10">
+        {{$t(`fields.orderLineItem.fulfillmentStatus.${scope.row.fulfillmentStatus}`)}}
+      </el-tag>
+    </template>
+  </el-table-column>
+  <el-table-column width="100px" label="Qty" prop="quantity"></el-table-column>
+  <el-table-column width="80px" label="ST Amt." prop="subTotal" align="right"></el-table-column>
   <el-table-column width="80px" label="Tax" prop="taxTotal" align="right"></el-table-column>
-  <el-table-column width="100px" label="GT Amt." prop="grandTotal" align="right"></el-table-column>
+  <el-table-column width="80px" label="GT Amt." prop="grandTotal" align="right"></el-table-column>
 
   <el-table-column width="120">
     <template slot-scope="scope">
