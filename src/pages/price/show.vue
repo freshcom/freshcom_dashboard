@@ -130,7 +130,7 @@
         </div>
 
         <div class="footer text-right">
-          <delete-button @confirmed="deletePrice()" size="small">Delete</delete-button>
+          <confirm-button @confirmed="deletePrice()" size="small">Delete</confirm-button>
         </div>
       </el-card>
     </div>
@@ -144,13 +144,13 @@ import 'vue-awesome/icons/plus'
 import freshcom from '@/freshcom-sdk'
 
 import Price from '@/models/price'
-import DeleteButton from '@/components/delete-button'
+import ConfirmButton from '@/components/confirm-button'
 import { idLastPart } from '@/helpers/filters'
 
 export default {
   name: 'ShowPrice',
   components: {
-    DeleteButton
+    ConfirmButton
   },
   filters: {
     idLastPart

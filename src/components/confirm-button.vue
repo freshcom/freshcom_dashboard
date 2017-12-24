@@ -1,6 +1,6 @@
 <template>
 
-<div class="delete-button">
+<div class="confirm-button">
   <el-popover
     ref="warnDelete"
     placement="left"
@@ -21,7 +21,7 @@
 
 <script>
 export default {
-  name: 'DeleteButton',
+  name: 'ConfirmButton',
   props: {
     size: {
       type: String,
@@ -50,7 +50,7 @@ export default {
 </script>
 
 <style scoped>
-.delete-button {
+.confirm-button {
   display: inline-block;
 }
 </style>

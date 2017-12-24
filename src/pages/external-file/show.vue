@@ -101,7 +101,7 @@
         </div>
 
         <div class="footer text-right">
-          <delete-button @confirmed="deleteExternalFile()" size="small">Delete</delete-button>
+          <confirm-button @confirmed="deleteExternalFile()" size="small">Delete</confirm-button>
         </div>
     </el-card>
   </div>
@@ -115,13 +115,13 @@ import freshcom from '@/freshcom-sdk'
 
 import PageMixin from '@/mixins/page'
 import ExternalFile from '@/models/external-file'
-import DeleteButton from '@/components/delete-button'
+import ConfirmButton from '@/components/confirm-button'
 
 export default {
   name: 'ShowExternalFile',
   mixins: [PageMixin],
   components: {
-    DeleteButton
+    ConfirmButton
   },
   props: ['id'],
   data () {

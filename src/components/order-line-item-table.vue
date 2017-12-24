@@ -30,9 +30,9 @@
           Edit
         </el-button>
 
-        <delete-button @confirmed="deleteLineItem(scope.row.id)" size="mini">
+        <confirm-button @confirmed="deleteLineItem(scope.row.id)" size="mini">
           Delete
-        </delete-button>
+        </confirm-button>
       </p>
     </template>
   </el-table-column>
@@ -43,13 +43,13 @@
 <script>
 import _ from 'lodash'
 import OrderLineItem from '@/models/order-line-item'
-import DeleteButton from '@/components/delete-button'
+import ConfirmButton from '@/components/confirm-button'
 
 export default {
   name: 'OrderLineItemTable',
   props: ['records'],
   components: {
-    DeleteButton
+    ConfirmButton
   },
   data: function () {
     return {

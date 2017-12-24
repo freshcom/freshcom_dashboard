@@ -218,7 +218,7 @@ import RemoteSelect from '@/components/remote-select'
 import ProductItemSelect from '@/components/product-item-select'
 import ProductSelect from '@/components/product-select'
 import PriceAmountInput from '@/components/price-amount-input'
-import DeleteButton from '@/components/delete-button'
+import ConfirmButton from '@/components/confirm-button'
 import OrderLineItemTable from '@/components/order-line-item-table'
 
 export default {
@@ -233,7 +233,7 @@ export default {
     ProductItemSelect,
     ProductSelect,
     PriceAmountInput,
-    DeleteButton,
+    ConfirmButton,
     OrderLineItemTable
   },
   data () {

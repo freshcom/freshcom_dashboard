@@ -169,9 +169,9 @@
                       Edit
                     </el-button>
 
-                    <delete-button @confirmed="deleteCard(scope.row)" size="mini">
+                    <confirm-button @confirmed="deleteCard(scope.row)" size="mini">
                       Delete
-                    </delete-button>
+                    </confirm-button>
                   </p>
                 </template>
               </el-table-column>
@@ -216,9 +216,9 @@
               <el-table-column width="100">
                 <template slot-scope="scope">
                   <p class="text-right actions">
-                    <delete-button @confirmed="deleteUnlock(scope.row.id)" size="mini">
+                    <confirm-button @confirmed="deleteUnlock(scope.row.id)" size="mini">
                       Delete
-                    </delete-button>
+                    </confirm-button>
                   </p>
                 </template>
               </el-table-column>
@@ -354,7 +354,7 @@
       </div>
 
       <div class="footer text-right">
-        <delete-button @confirmed="deleteCustomer()" plain size="small">Delete</delete-button>
+        <confirm-button @confirmed="deleteCustomer()" plain size="small">Delete</confirm-button>
       </div>
     </el-card>
   </div>
@@ -379,7 +379,7 @@ import freshcom from '@/freshcom-sdk'
 
 import Customer from '@/models/customer'
 import Card from '@/models/card'
-import DeleteButton from '@/components/delete-button'
+import ConfirmButton from '@/components/confirm-button'
 import CardForm from '@/components/card-form'
 import { dollar, idLastPart } from '@/helpers/filters'
 
@@ -387,7 +387,7 @@ export default {
   name: 'ShowCustomer',
   props: ['id'],
   components: {
-    DeleteButton,
+    ConfirmButton,
     CardForm
   },
   filters: {

@@ -350,7 +350,7 @@
       </div>
 
       <div class="footer text-right">
-        <delete-button @confirmed="deleteProduct()" size="small">Delete</delete-button>
+        <confirm-button @confirmed="deleteProduct()" size="small">Delete</confirm-button>
       </div>
     </el-card>
   </div>
@@ -365,7 +365,7 @@ import freshcom from '@/freshcom-sdk'
 
 import PageMixin from '@/mixins/page'
 import Product from '@/models/product'
-import DeleteButton from '@/components/delete-button'
+import ConfirmButton from '@/components/confirm-button'
 import translateErrors from '@/helpers/translate-errors'
 import { chargeDollar } from '@/helpers/filters'
 
@@ -373,7 +373,7 @@ export default {
   name: 'ShowProduct',
   mixins: [PageMixin],
   components: {
-    DeleteButton
+    ConfirmButton
   },
   filters: {
     chargeDollar

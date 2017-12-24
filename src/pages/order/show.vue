@@ -206,9 +206,9 @@
                       Refund
                     </el-button>
 
-                    <delete-button v-if="scope.row.status === 'pending'" @confirmed="deletePayment(scope.row.id)" size="mini">
+                    <confirm-button v-if="scope.row.status === 'pending'" @confirmed="deletePayment(scope.row.id)" size="mini">
                       Delete
-                    </delete-button>
+                    </confirm-button>
                   </p>
                 </template>
               </el-table-column>
@@ -257,21 +257,21 @@
                     <el-table-column>
                       <template slot-scope="scope">
                         <p class="text-right actions">
-                          <delete-button v-if="scope.row.status === 'pending'" size="mini">
+                          <confirm-button v-if="scope.row.status === 'pending'" size="mini">
                             Mark Fulfilled
-                          </delete-button>
+                          </confirm-button>
 
-                          <delete-button v-if="scope.row.status === 'fulfilled'" size="mini">
+                          <confirm-button v-if="scope.row.status === 'fulfilled'" size="mini">
                             Mark Returned
-                          </delete-button>
+                          </confirm-button>
 
-                          <delete-button v-if="scope.row.status === 'fulfilled'" size="mini">
+                          <confirm-button v-if="scope.row.status === 'fulfilled'" size="mini">
                             Mark Discarded
-                          </delete-button>
+                          </confirm-button>
 
-                          <delete-button v-if="scope.row.status === 'pending'" size="mini">
+                          <confirm-button v-if="scope.row.status === 'pending'" size="mini">
                             Delete
-                          </delete-button>
+                          </confirm-button>
                         </p>
                       </template>
                     </el-table-column>
@@ -297,9 +297,9 @@
               <el-table-column width="120">
                 <template slot-scope="scope">
                   <p class="text-right actions">
-                    <delete-button @confirmed="deleteLineItem(scope.row.id)" size="mini">
+                    <confirm-button @confirmed="deleteLineItem(scope.row.id)" size="mini">
                       Delete
-                    </delete-button>
+                    </confirm-button>
                   </p>
                 </template>
               </el-table-column>
@@ -346,7 +346,7 @@
       </div>
 
       <div class="footer text-right">
-        <delete-button @confirmed="deleteOrder()" size="small">Delete</delete-button>
+        <confirm-button @confirmed="deleteOrder()" size="small">Delete</confirm-button>
       </div>
     </el-card>
   </div>
@@ -416,7 +416,7 @@ import PaymentForm from '@/components/payment-form'
 import RefundForm from '@/components/refund-form'
 
 import PageMixin from '@/mixins/page'
-import DeleteButton from '@/components/delete-button'
+import ConfirmButton from '@/components/confirm-button'
 import OrderLineItemTable from '@/components/order-line-item-table'
 import { dollar } from '@/helpers/filters'
 import { createToken as createStripeToken } from 'vue-stripe-elements-plus'
@@ -428,7 +428,7 @@ export default {
     RefundForm,
     PaymentForm,
     OrderLineItemForm,
-    DeleteButton,
+    ConfirmButton,
     OrderLineItemTable
   },
   filters: {

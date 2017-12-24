@@ -144,7 +144,7 @@
       </div>
 
       <div class="footer text-right">
-        <delete-button @confirmed="deleteUnlockable()" plain size="small">Delete</delete-button>
+        <confirm-button @confirmed="deleteUnlockable()" plain size="small">Delete</confirm-button>
       </div>
     </el-card>
   </div>
@@ -158,14 +158,14 @@ import freshcom from '@/freshcom-sdk'
 
 import PageMixin from '@/mixins/page'
 import Unlockable from '@/models/unlockable'
-import DeleteButton from '@/components/delete-button'
+import ConfirmButton from '@/components/confirm-button'
 import { idLastPart } from '@/helpers/filters'
 
 export default {
   name: 'ShowUnlockable',
   mixins: [PageMixin],
   components: {
-    DeleteButton
+    ConfirmButton
   },
   filters: {
     idLastPart

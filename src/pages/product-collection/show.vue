@@ -109,9 +109,9 @@
                       Edit
                     </el-button>
 
-                    <delete-button @confirmed="deleteMembership(scope.row.id)" size="mini">
+                    <confirm-button @confirmed="deleteMembership(scope.row.id)" size="mini">
                       Delete
-                    </delete-button>
+                    </confirm-button>
                   </p>
                 </template>
               </el-table-column>
@@ -156,7 +156,7 @@
       </div>
 
       <div class="footer text-right">
-        <delete-button @confirmed="deleteEfc()" size="small">Delete</delete-button>
+        <confirm-button @confirmed="deleteEfc()" size="small">Delete</confirm-button>
       </div>
     </el-card>
   </div>
@@ -184,14 +184,14 @@ import PageMixin from '@/mixins/page'
 import ProductCollection from '@/models/product-collection'
 import ProductCollectionMembership from '@/models/product-collection-membership'
 import ProductCollectionMembershipForm from '@/components/product-collection-membership-form'
-import DeleteButton from '@/components/delete-button'
+import ConfirmButton from '@/components/confirm-button'
 
 export default {
   name: 'ShowProductCollection',
   mixins: [PageMixin],
   components: {
     ProductCollectionMembershipForm,
-    DeleteButton
+    ConfirmButton
   },
   props: ['id'],
   data () {

@@ -153,7 +153,7 @@
       </div>
 
       <div v-if="canDelete" class="footer text-right">
-        <delete-button @confirmed="deletePayment" size="small">Delete</delete-button>
+        <confirm-button @confirmed="deletePayment" size="small">Delete</confirm-button>
       </div>
     </el-card>
   </div>
@@ -180,7 +180,7 @@ import PageMixin from '@/mixins/page'
 import Payment from '@/models/payment'
 import Refund from '@/models/refund'
 import RefundForm from '@/components/refund-form'
-import DeleteButton from '@/components/delete-button'
+import ConfirmButton from '@/components/confirm-button'
 import { chargeDollar, dollar } from '@/helpers/filters'
 
 export default {
@@ -188,7 +188,7 @@ export default {
   mixins: [PageMixin],
   props: ['id'],
   components: {
-    DeleteButton,
+    ConfirmButton,
     RefundForm
   },
   filters: {
