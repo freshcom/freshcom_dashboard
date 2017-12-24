@@ -679,8 +679,21 @@ export default {
     }).catch(this._processHttpError)
   },
 
+  //
+  // Fulfillment
+  //
   listFulfillment (params = {}, options = {}) {
     return this.http.get('/fulfillments', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  //
+  //
+  //
+  updateFulfillmentLineItem (id, fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.patch(`/fulfillment_line_items/${id}`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   }

@@ -261,7 +261,7 @@
                             Mark Fulfilled
                           </confirm-button>
 
-                          <confirm-button v-if="scope.row.status === 'fulfilled'" size="mini">
+                          <confirm-button v-if="scope.row.status === 'fulfilled'" @confirmed="markFulfillmentLineItemReturned(scope.row)" confirm-button-text="Yes" size="mini">
                             Mark Returned
                           </confirm-button>
 
@@ -739,6 +739,26 @@ export default {
         this.$message({
           showClose: true,
           message: `Payment deleted successfully.`,
+          type: 'success'
+        })
+      })
+    },
+
+    markFulfillmentLineItemReturned (fli) {
+      let fliDraft = _.cloneDeep(fli)
+      fliDraft.status = 'returned'
+
+      let fulfillment = _.find(this.fulfillments, { id: fli.fulfillment.id })
+      freshcom.updateFulfillmentLineItem(fli.id, fliDraft).then(response => {
+        let fli = response.data
+        let lineItem = _.find(fulfillment.lineItems, { id: fli.id })
+        lineItem.status = fli.status
+
+        return this.loadOrder({ shouldShowLoading: false })
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Fulfillment line item marked as returned successfully.`,
           type: 'success'
         })
       })

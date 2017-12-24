@@ -9,7 +9,7 @@
     <p>Are you sure?</p>
     <div style="text-align: right; margin: 0">
       <el-button @click="isConfirmVisible = false" plain size="mini">Cancel</el-button>
-      <el-button type="danger" size="mini" @click="confirmed">Delete</el-button>
+      <el-button type="danger" size="mini" @click="confirmed">{{confirmButtonText}}</el-button>
     </div>
   </el-popover>
   <el-button :type="type" :size="size" :class="iconOnly ? 'icon' : ''" plain v-popover:warnDelete>
@@ -33,6 +33,10 @@ export default {
     iconOnly: {
       type: Boolean,
       default: false
+    },
+    confirmButtonText: {
+      type: String,
+      default: 'Delete'
     }
   },
   data () {

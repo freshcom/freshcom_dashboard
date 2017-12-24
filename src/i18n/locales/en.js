@@ -121,7 +121,8 @@ export default {
       },
       fulfillmentStatus: {
         pending: 'Pending',
-        fulfilled: 'Fulfilled'
+        fulfilled: 'Fulfilled',
+        returned: 'Returned'
       }
     },
     product: {
