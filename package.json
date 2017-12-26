@@ -16,7 +16,7 @@
     "element-ui": "^2.0.5",
     "lodash": "^4.17.4",
     "qs": "^6.5.1",
-    "simple-jas": "^0.4.11",
+    "simple-jas": "^0.4.13",
     "v-money": "0.8.1",
     "vue": "^2.5.9",
     "vue-awesome": "^2.3.2",
