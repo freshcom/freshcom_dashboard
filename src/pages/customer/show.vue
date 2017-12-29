@@ -453,7 +453,8 @@ export default {
 
     loadOrders () {
       freshcom.listOrder({
-        filter: { customerId: this.id }
+        filter: { customerId: this.id },
+        page: { size: 5, number: 1 }
       }).then(response => {
         this.orders = response.data
       })
