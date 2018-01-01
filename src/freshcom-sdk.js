@@ -414,6 +414,12 @@ export default {
   //
   // ProductCollectionMembership
   //
+  listProductCollectionMembership (collectionId, params = {}, options = {}) {
+    return this.http.get(`/product_collections/${collectionId}/memberships`, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
   createProductCollectionMembership (collectionId, fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.post(`/product_collections/${collectionId}/memberships`, payload, { params: params }).then(response => {

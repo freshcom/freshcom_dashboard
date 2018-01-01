@@ -467,6 +467,10 @@ p.search-notice {
 /* END Utils */
 
 /* START Common Overwrite */
+.card-wrapper {
+  min-height: 300px;
+}
+
 .el-table {
   th, td {
     padding-top: 10px;

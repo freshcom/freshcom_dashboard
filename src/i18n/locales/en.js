@@ -59,7 +59,8 @@ export default {
       status: {
         fulfilled: 'Fulfilled',
         pending: 'Pending',
-        returned: 'Returned'
+        returned: 'Returned',
+        discarded: 'Discarded'
       }
     },
     refund: {

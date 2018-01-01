@@ -8,8 +8,8 @@
     <locale-selector @change="loadOrder" class="pull-right"></locale-selector>
   </div>
 
-  <div>
-    <el-card v-loading="isLoading" class="main-card">
+  <div v-loading="isLoading" element-loading-background="transparent" class="card-wrapper">
+    <el-card v-if="isReady" class="main-card">
       <div slot="header">
         <div v-if="isViewingTestData" class="test-data-banner">
           <div class="banner-content">TEST DATA</div>
@@ -53,9 +53,6 @@
               <dd>
                 {{$t(`fields.order.paymentStatus.${order.paymentStatus}`)}}
               </dd>
-
-              <dt>Name</dt>
-              <dd>{{order.firstName}} {{order.lastName}}</dd>
 
               <dt>Name</dt>
               <dd>{{order.name}}</dd>
@@ -220,7 +217,7 @@
           <h3>Fulfillments</h3>
 
           <span class="block-title-actions pull-right">
-            <a @click="openAddLineItemDialog()" href="javascript:;">
+            <a @click="openAddFulfillmentDialog()" href="javascript:;">
               <icon name="plus" scale="0.8" class="v-middle"></icon>
               <span>Add</span>
             </a>
@@ -265,7 +262,7 @@
                             Mark Returned
                           </confirm-button>
 
-                          <confirm-button v-if="scope.row.status === 'fulfilled'" size="mini">
+                          <confirm-button v-if="scope.row.status === 'fulfilled'" @confirmed="markFulfillmentLineItemDiscarded(scope.row)" confirm-button-text="Yes" size="mini">
                             Mark Discarded
                           </confirm-button>
 
@@ -297,7 +294,7 @@
               <el-table-column width="120">
                 <template slot-scope="scope">
                   <p class="text-right actions">
-                    <confirm-button @confirmed="deleteLineItem(scope.row.id)" size="mini">
+                    <confirm-button @confirmed="deleteFulfillment(scope.row.id)" size="mini">
                       Delete
                     </confirm-button>
                   </p>
@@ -437,8 +434,9 @@ export default {
   props: ['id', 'callbackPath'],
   data () {
     return {
-      order: Order.objectWithDefaults(),
       isLoading: false,
+      isReady: false,
+      order: Order.objectWithDefaults(),
 
       payments: [],
       fulfillments: [],
@@ -470,34 +468,27 @@ export default {
     }
   },
   created () {
-    this.loadOrder()
-    this.loadPayments()
-    this.loadFulfillments()
+    this.loadResources().then(() => {
+      this.isReady = true
+    })
   },
   methods: {
-    canEditPayment (payment) {
-      return payment.status === 'pending'
-    },
-
-    canRefundPayment (payment) {
-      return payment.status === 'partially_refunded' || payment.status === 'paid'
-    },
-
-    loadOrder (options = { shouldShowLoading: true }) {
+    loadResources (options = { shouldShowLoading: true }) {
       if (options.shouldShowLoading) {
         this.isLoading = true
       }
 
+      return Promise.all([this.loadOrder(), this.loadPayments(), this.loadFulfillments()]).then(() => {
+        this.isLoading = false
+      })
+    },
+
+    loadOrder () {
       return freshcom.retrieveOrder(this.id, {
         include: 'rootLineItems.children'
       }).then(response => {
         this.order = response.data
-        this.isLoading = false
-
         return response
-      }).catch(errors => {
-        this.isLoading = false
-        throw errors
       })
     },
 
@@ -524,6 +515,8 @@ export default {
       this.$router.push({ name: 'EditOrder', params: { id: this.order.id }, query: { callbackPath: this.currentRoutePath } })
     },
 
+    // MARK: Line Item
+
     openAddLineItemDialog () {
       let lineItem = OrderLineItem.objectWithDefaults()
       lineItem.order = this.order
@@ -541,7 +534,7 @@ export default {
       this.isCreatingLineItem = true
 
       freshcom.createOrderLineItem(this.id, this.lineItemDraftForAdd).then(() => {
-        return this.loadOrder({ shouldShowLoading: false })
+        return this.loadOrder()
       }).then(response => {
         this.$message({
           showClose: true,
@@ -574,7 +567,7 @@ export default {
       this.isUpdatingLineItem = true
 
       freshcom.updateOrderLineItem(this.lineItemDraftForEdit.id, this.lineItemDraftForEdit).then(() => {
-        return this.loadOrder({ shouldShowLoading: false })
+        return this.loadOrder()
       }).then(response => {
         this.$message({
           showClose: true,
@@ -592,7 +585,7 @@ export default {
 
     deleteLineItem (id) {
       freshcom.deleteOrderLineItem(id).then(() => {
-        return this.loadOrder({ shouldShowLoading: false })
+        return this.loadOrder()
       }).then(response => {
         this.$message({
           showClose: true,
@@ -600,6 +593,16 @@ export default {
           type: 'success'
         })
       })
+    },
+
+    // MARK: Payment
+
+    canEditPayment (payment) {
+      return payment.status === 'pending'
+    },
+
+    canRefundPayment (payment) {
+      return payment.status === 'partially_refunded' || payment.status === 'paid'
     },
 
     openAddPaymentDialog () {
@@ -632,7 +635,7 @@ export default {
 
       paymentCreated.then(() => {
         return Promise.all([
-          this.loadOrder({ shouldShowLoading: false }),
+          this.loadOrder(),
           this.loadPayments()
         ])
       }).then(() => {
@@ -675,7 +678,7 @@ export default {
 
       freshcom.createRefund(this.refundDraftForAdd.payment.id, this.refundDraftForAdd).then(() => {
         return Promise.all([
-          this.loadOrder({ shouldShowLoading: false }),
+          this.loadOrder(),
           this.loadPayments()
         ])
       }).then(() => {
@@ -711,7 +714,7 @@ export default {
 
       freshcom.updatePayment(this.paymentDraftForEdit.id, this.paymentDraftForEdit).then(() => {
         return Promise.all([
-          this.loadOrder({ shouldShowLoading: false }),
+          this.loadOrder(),
           this.loadPayments()
         ])
       }).then(() => {
@@ -732,7 +735,7 @@ export default {
     deletePayment (id) {
       freshcom.deletePayment(id).then(() => {
         return Promise.all([
-          this.loadOrder({ shouldShowLoading: false }),
+          this.loadOrder(),
           this.loadPayments()
         ])
       }).then(() => {
@@ -742,6 +745,16 @@ export default {
           type: 'success'
         })
       })
+    },
+
+    // MARK: Fulfillment
+
+    openAddFulfillmentDialog () {
+
+    },
+
+    deleteFulfillment (id) {
+
     },
 
     markFulfillmentLineItemReturned (fli) {
@@ -754,11 +767,31 @@ export default {
         let lineItem = _.find(fulfillment.lineItems, { id: fli.id })
         lineItem.status = fli.status
 
-        return this.loadOrder({ shouldShowLoading: false })
+        return this.loadOrder()
       }).then(() => {
         this.$message({
           showClose: true,
           message: `Fulfillment line item marked as returned successfully.`,
+          type: 'success'
+        })
+      })
+    },
+
+    markFulfillmentLineItemDiscarded (fli) {
+      let fliDraft = _.cloneDeep(fli)
+      fliDraft.status = 'discarded'
+
+      let fulfillment = _.find(this.fulfillments, { id: fli.fulfillment.id })
+      freshcom.updateFulfillmentLineItem(fli.id, fliDraft).then(response => {
+        let fli = response.data
+        let lineItem = _.find(fulfillment.lineItems, { id: fli.id })
+        lineItem.status = fli.status
+
+        return this.loadOrder()
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Fulfillment line item marked as discarded successfully.`,
           type: 'success'
         })
       })

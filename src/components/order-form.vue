@@ -188,10 +188,11 @@ export default {
       if (customer.code) {
         info += `[${customer.code}] `
       }
-      if (!customer.firstName && !customer.lastName) {
-        info += `Anonymous`
+
+      if (customer.name) {
+        info += customer.name
       } else {
-        info += [customer.firstName, customer.lastName].join(' ')
+        info += `Anonymous`
       }
 
       info += ' :: ' + customer.status

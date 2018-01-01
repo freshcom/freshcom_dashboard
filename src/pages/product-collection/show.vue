@@ -69,7 +69,7 @@
         </div>
         <div class="block">
           <div class="block-body full">
-            <el-table :data="productCollection.memberships" class="block-table" :show-header="false" style="width: 100%">
+            <el-table :data="memberships" class="block-table" :show-header="false" style="width: 100%">
               <el-table-column>
                 <template slot-scope="scope">
                   <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.product.id } }">
@@ -196,8 +196,9 @@ export default {
   props: ['id'],
   data () {
     return {
-      productCollection: ProductCollection.objectWithDefaults(),
       isLoading: false,
+      productCollection: ProductCollection.objectWithDefaults(),
+      memberships: [],
       errors: {},
 
       isAddingMembership: false,
@@ -206,24 +207,34 @@ export default {
     }
   },
   created () {
-    this.loadProductCollection()
+    this.loadResources()
   },
   methods: {
-    loadProductCollection (options = { shouldShowLoading: true }) {
+    loadResources (options = { shouldShowLoading: true }) {
       if (options.shouldShowLoading) {
         this.isLoading = true
       }
 
-      freshcom.retrieveProductCollection(this.id, {
-        include: 'memberships.product'
-      }).then(response => {
-        this.productCollection = response.data
+      Promise.all([this.loadProductCollection(), this.loadMemberships()]).then(() => {
         this.isLoading = false
-      }).catch(errors => {
-        this.isLoading = false
-        throw errors
       })
     },
+
+    loadProductCollection () {
+      freshcom.retrieveProductCollection(this.id).then(response => {
+        this.productCollection = response.data
+      })
+    },
+
+    loadMemberships () {
+      freshcom.listProductCollectionMembership(this.id, {
+        include: 'product',
+        page: { size: 10 }
+      }).then(response => {
+        this.memberships = response.data
+      })
+    },
+
     openAddMembershipDialog () {
       let membership = ProductCollectionMembership.objectWithDefaults()
       membership.collection = this.productCollection
@@ -231,10 +242,12 @@ export default {
       this.membershipForAdd = membership
       this.isAddingMembership = true
     },
+
     closeAddMembershipDialog () {
       this.isAddingMembership = false
       this.isCreatingMembership = false
     },
+
     createMembership () {
       this.isCreatingMembership = true
 
@@ -246,7 +259,7 @@ export default {
         })
 
         this.closeAddMembershipDialog()
-        return this.loadProductCollection({ shouldShowLoading: false })
+        return this.loadMemberships()
       }).catch(response => {
         this.errors = response.errors
         this.isCreatingMembership = false
@@ -263,7 +276,7 @@ export default {
       productDraft.status = 'active'
 
       freshcom.updateProduct(product.id, productDraft).then(() => {
-        return this.loadProductCollection({ shouldShowLoading: false })
+        return this.loadMemberships()
       }).then(() => {
         this.$message({
           showClose: true,
@@ -275,7 +288,7 @@ export default {
 
     deleteMembership (id) {
       freshcom.deleteProductCollectionMembership(id).then(() => {
-        return this.loadProductCollection({ shouldShowLoading: false })
+        return this.loadMemberships()
       }).then(() => {
         this.$message({
           showClose: true,
