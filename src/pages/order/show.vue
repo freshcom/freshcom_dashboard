@@ -468,20 +468,33 @@ export default {
     }
   },
   created () {
+    this.isLoading = true
+
     this.loadResources().then(() => {
+      this.isLoading = false
       this.isReady = true
+    }).catch(response => {
+      this.isLoading = false
+      throw response
     })
   },
   methods: {
-    loadResources (options = { shouldShowLoading: true }) {
-      if (options.shouldShowLoading) {
-        this.isLoading = true
+    back () {
+      if (this.callbackPath) {
+        return this.$store.dispatch('pushRoute', { path: this.callbackPath })
       }
-
-      return Promise.all([this.loadOrder(), this.loadPayments(), this.loadFulfillments()]).then(() => {
-        this.isLoading = false
-      })
+      this.$store.dispatch('pushRoute', { name: 'ListOrder' })
     },
+
+    loadResources () {
+      return Promise.all([
+        this.loadOrder(),
+        this.loadPayments(),
+        this.loadFulfillments()
+      ])
+    },
+
+    // MARK: Order
 
     loadOrder () {
       return freshcom.retrieveOrder(this.id, {
@@ -492,22 +505,15 @@ export default {
       })
     },
 
-    loadPayments () {
-      return freshcom.listPayment({
-        filter: { targetId: this.id, targetType: 'Order' }
-      }).then(response => {
-        this.payments = response.data
-        return response
-      })
-    },
+    deleteOrder () {
+      freshcom.deleteOrder(this.id).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Order deleted successfully.`,
+          type: 'success'
+        })
 
-    loadFulfillments () {
-      return freshcom.listFulfillment({
-        filter: { sourceId: this.id, sourceType: 'Order' },
-        include: 'lineItems'
-      }).then(response => {
-        this.fulfillments = response.data
-        return response
+        this.back()
       })
     },
 
@@ -596,6 +602,15 @@ export default {
     },
 
     // MARK: Payment
+
+    loadPayments () {
+      return freshcom.listPayment({
+        filter: { targetId: this.id, targetType: 'Order' }
+      }).then(response => {
+        this.payments = response.data
+        return response
+      })
+    },
 
     canEditPayment (payment) {
       return payment.status === 'pending'
@@ -749,6 +764,16 @@ export default {
 
     // MARK: Fulfillment
 
+    loadFulfillments () {
+      return freshcom.listFulfillment({
+        filter: { sourceId: this.id, sourceType: 'Order' },
+        include: 'lineItems'
+      }).then(response => {
+        this.fulfillments = response.data
+        return response
+      })
+    },
+
     openAddFulfillmentDialog () {
 
     },
@@ -795,25 +820,6 @@ export default {
           type: 'success'
         })
       })
-    },
-
-    deleteOrder () {
-      freshcom.deleteOrder(this.id).then(() => {
-        this.$message({
-          showClose: true,
-          message: `Order deleted successfully.`,
-          type: 'success'
-        })
-
-        this.back()
-      })
-    },
-
-    back () {
-      if (this.callbackPath) {
-        return this.$store.dispatch('pushRoute', { path: this.callbackPath })
-      }
-      this.$store.dispatch('pushRoute', { name: 'ListOrder' })
     }
   }
 }

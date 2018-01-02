@@ -7,8 +7,8 @@
     <locale-selector @change="loadCustomer()" class="pull-right"></locale-selector>
   </div>
 
-  <div>
-    <el-card v-loading="isLoading" class="main-card">
+  <div v-loading="isLoading" element-loading-background="transparent" class="card-wrapper">
+    <el-card v-if="isReady" class="main-card">
       <div slot="header">
 
         <div class="brief">
@@ -52,10 +52,7 @@
               <dd>{{$t(`fields.customer.status.${customer.status}`)}}</dd>
 
               <dt>Name</dt>
-              <dd>{{customer.firstName}} {{customer.lastName}}</dd>
-
-              <dt v-if="customer.name">Display Name</dt>
-              <dd v-if="customer.name">{{customer.name}}</dd>
+              <dd>{{customer.name}}</dd>
 
               <dt>Email</dt>
               <dd>{{customer.email}}</dd>
@@ -183,7 +180,6 @@
           </div>
         </div>
 
-
         <div class="block-title">
           <h3>Unlocks</h3>
 
@@ -239,21 +235,22 @@
 
         <div class="block">
           <div class="block-body full">
-            <el-table :data="customer.pointAccount.transactions" class="block-table" :show-header="false" style="width: 100%">
+            <el-table :data="pointTransactions" class="block-table" :show-header="false" style="width: 100%">
               <el-table-column>
                 <template slot-scope="scope">
-                  {{scope.row.insertedAt | moment}}
+                  {{scope.row.committedAt | moment}}
                 </template>
               </el-table-column>
 
-              <el-table-column align="right" width="200">
+              <el-table-column align="right" width="120">
                 <template slot-scope="scope">
                   {{scope.row.amount}}
                 </template>
               </el-table-column>
 
-              <el-table-column width="100">
+              <el-table-column align="right" width="120">
                 <template slot-scope="scope">
+                  {{scope.row.balanceAfterCommit}}
                 </template>
               </el-table-column>
             </el-table>
@@ -396,6 +393,8 @@ export default {
   },
   data () {
     return {
+      isReady: false,
+
       customer: Customer.objectWithDefaults(),
       isLoading: false,
 
@@ -408,6 +407,8 @@ export default {
       isLoadingUnlocks: false,
       unlocks: [],
 
+      pointTransactions: [],
+
       cardDraftForEdit: Card.objectWithDefaults(),
       isEditingCard: false,
       isUpdatingCard: false,
@@ -416,10 +417,15 @@ export default {
     }
   },
   created () {
-    this.loadCustomer()
-    this.loadOrders()
-    this.loadUnlocks()
-    this.loadCards()
+    this.isLoading = true
+
+    this.loadResources().then(() => {
+      this.isLoading = false
+      this.isReady = true
+    }).catch(response => {
+      this.isLoading = false
+      throw response
+    })
   },
   computed: {
     avatarUrl () {
@@ -437,43 +443,28 @@ export default {
     }
   },
   methods: {
-    loadCustomer () {
-      this.isLoading = true
+    back () {
+      this.$store.dispatch('pushRoute', { name: 'ListCustomer' })
+    },
 
-      freshcom.retrieveCustomer(this.id, {
-        include: 'unlocks.unlockable,point_account.transactions'
+    loadResources () {
+      return Promise.all([
+        this.loadCustomer().then(() => {
+          return this.loadPointTransactions()
+        }),
+        this.loadOrders(),
+        this.loadUnlocks(),
+        this.loadCards()
+      ])
+    },
+
+    // MARK: Customer
+
+    loadCustomer () {
+      return freshcom.retrieveCustomer(this.id, {
+        include: 'unlocks.unlockable,point_account'
       }).then(response => {
         this.customer = response.data
-        this.isLoading = false
-      }).catch(response => {
-        this.isLoading = false
-        throw response
-      })
-    },
-
-    loadOrders () {
-      freshcom.listOrder({
-        filter: { customerId: this.id },
-        page: { size: 5, number: 1 }
-      }).then(response => {
-        this.orders = response.data
-      })
-    },
-
-    loadUnlocks () {
-      freshcom.listUnlock({
-        filter: { customerId: this.id },
-        include: 'unlockable'
-      }).then(response => {
-        this.unlocks = response.data
-      })
-    },
-
-    loadCards () {
-      return freshcom.listCard({
-        filter: { ownerId: this.id, ownerType: 'Customer' }
-      }).then(response => {
-        this.cards = response.data
       })
     },
 
@@ -490,6 +481,27 @@ export default {
         })
 
         this.back()
+      })
+    },
+
+    // MARK: Order
+
+    loadOrders () {
+      freshcom.listOrder({
+        filter: { customerId: this.id },
+        page: { size: 5, number: 1 }
+      }).then(response => {
+        this.orders = response.data
+      })
+    },
+
+    // MARK: Card
+
+    loadCards () {
+      return freshcom.listCard({
+        filter: { ownerId: this.id, ownerType: 'Customer' }
+      }).then(response => {
+        this.cards = response.data
       })
     },
 
@@ -538,8 +550,27 @@ export default {
       })
     },
 
-    back () {
-      this.$store.dispatch('pushRoute', { name: 'ListCustomer' })
+    // MARK: Unlock
+
+    loadUnlocks () {
+      freshcom.listUnlock({
+        filter: { customerId: this.id },
+        include: 'unlockable'
+      }).then(response => {
+        this.unlocks = response.data
+      })
+    },
+
+    // MARK: Point Transaction
+
+    // openAddPointTransactionDialog () {
+    //   let pointTransaction = PointTransaction.objectWithDefaults()
+    // },
+
+    loadPointTransactions () {
+      freshcom.listPointTransaction(this.customer.pointAccount.id).then(response => {
+        this.pointTransactions = response.data
+      })
     }
   }
 }

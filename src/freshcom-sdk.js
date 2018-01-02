@@ -266,9 +266,15 @@ export default {
   //
   // PointTransaction
   //
-  createPointTransaction (fields, params = {}, options = {}) {
+  createPointTransaction (pointAccountId, fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
-    return this.http.post('/point_transactions', payload, { params: params }).then(response => {
+    return this.http.post(`/point_accounts/${pointAccountId}/transactions`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  listPointTransaction (pointAccountId, params = {}, options = {}) {
+    return this.http.get(`/point_accounts/${pointAccountId}/transactions`, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
