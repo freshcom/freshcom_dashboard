@@ -6,12 +6,27 @@ const MT = {
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
   MODE_CHANGED: 'MODE_CHANGED',
   LIVE_TOKEN_CHANGED: 'LIVE_TOKEN_CHANGED',
-  LIVE_TOKEN_REFRESHER_ID_CHANGED: 'LIVE_TOKEN_REFRESHER_ID_CHANGED',
-  TEST_TOKEN_REFRESHER_ID_CHANGED: 'TEST_TOKEN_REFRESHER_ID_CHANGED',
+  LIVE_TOKEN_REFRESHER_STARTED: 'LIVE_TOKEN_REFRESHER_STARTED',
+  LIVE_TOKEN_REFRESHER_STOPPED: 'LIVE_TOKEN_REFRESHER_STOPPED',
+  TEST_TOKEN_REFRESHER_STARTED: 'TEST_TOKEN_REFRESHER_STARTED',
+  TEST_TOKEN_REFRESHER_STOPPED: 'TEST_TOKEN_REFRESHER_STOPPED',
   READY: 'READY'
 }
 
 const FIFTY_MINUTES = 3000000
+
+function getObjectFromStorage (key) {
+  let rawData = localStorage.getItem(key)
+  if (!rawData) {
+    return
+  }
+
+  return JSON.parse(rawData)
+}
+
+function setObjectToStorage (key, value) {
+  localStorage.setItem(key, JSON.stringify(value))
+}
 
 export default {
   namespaced: true,
@@ -27,29 +42,25 @@ export default {
   },
   actions: {
     retrieveFromStorage ({ commit, dispatch }) {
-      let rawLiveToken = localStorage.getItem('state.session.liveToken')
-      if (!rawLiveToken) {
-        commit(MT.READY, true)
-        return Promise.reject(new Error('no token'))
+      // Retrive live token
+      let liveToken = getObjectFromStorage('state.session.liveToken')
+      if (!liveToken) {
+        console.warn('No token')
+        return commit(MT.READY, true)
       }
-
-      let liveToken = JSON.parse(rawLiveToken)
       commit(MT.LIVE_TOKEN_CHANGED, liveToken)
 
+      // Retrieve mode
+      let mode = localStorage.getItem('state.session.mode')
+      if (mode === 'test') {
+        return dispatch('setMode', mode)
+      }
+
+      // Setup session
       return dispatch('refreshLiveToken').then(() => {
-        let refresherId = setInterval(() => {
-          dispatch('refreshLiveToken')
-        }, FIFTY_MINUTES)
-        commit(MT.LIVE_TOKEN_REFRESHER_ID_CHANGED, refresherId)
+        dispatch('startLiveTokenRefresher')
 
         return Promise.all([dispatch('getAccount'), dispatch('getUser')])
-      }).then((resolved) => {
-        let mode = localStorage.getItem('state.session.mode')
-        if (mode === 'test') {
-          return dispatch('setMode', mode)
-        }
-
-        return resolved
       }).then(() => {
         commit(MT.READY, true)
       }).catch(error => {
@@ -66,22 +77,14 @@ export default {
       }
 
       return freshcom.createToken(payload).then(token => {
-        localStorage.setItem('state.session.liveToken', JSON.stringify(token))
+        setObjectToStorage('state.session.liveToken', token)
         commit(MT.LIVE_TOKEN_CHANGED, token)
         commit(MT.TOKEN_CHANGED, token)
         commit(MT.MODE_CHANGED, 'live')
 
-        let refresherId = setInterval(() => {
-          dispatch('refreshLiveToken')
-        }, FIFTY_MINUTES)
-        commit(MT.LIVE_TOKEN_REFRESHER_ID_CHANGED, refresherId)
+        dispatch('startLiveTokenRefresher')
 
         return Promise.all([dispatch('getAccount'), dispatch('getUser')])
-      }).then(resolved => {
-        commit(MT.ACCOUNT_CHANGED, resolved[0])
-        commit(MT.USER_CHANGED, resolved[1])
-
-        return resolved
       })
     },
 
@@ -90,12 +93,8 @@ export default {
       localStorage.removeItem('state.session.testToken')
       localStorage.removeItem('state.session.mode')
 
-      if (state.liveTokenRefresherId) {
-        clearInterval(state.liveTokenRefresherId)
-      }
-      if (state.testTokenRefresherId) {
-        clearInterval(state.testTokenRefresherId)
-      }
+      commit(MT.LIVE_TOKEN_REFRESHER_STOPPED)
+      commit(MT.TEST_TOKEN_REFRESHER_STOPPED)
       commit(MT.READY, true)
     },
 
@@ -103,10 +102,7 @@ export default {
       if (state.mode === mode) { return }
 
       if (mode === 'live') {
-        if (state.testTokenRefresherId) {
-          clearInterval(state.testTokenRefresherId)
-        }
-
+        commit(MT.TEST_TOKEN_REFRESHER_STOPPED)
         commit(MT.TOKEN_CHANGED, state.liveToken)
         commit(MT.MODE_CHANGED, 'live')
         return
@@ -117,15 +113,8 @@ export default {
       }).then(token => {
         commit(MT.TOKEN_CHANGED, token)
         commit(MT.MODE_CHANGED, 'test')
-        commit(MT.READY, true)
 
-        let refresherId = setInterval(() => {
-          dispatch('refreshTestToken')
-        }, FIFTY_MINUTES)
-        commit(MT.TEST_TOKEN_REFRESHER_ID_CHANGED, refresherId)
-      }).catch(response => {
-        commit(MT.READY, true)
-        throw response
+        dispatch('startTestTokenRefresher')
       })
     },
 
@@ -133,10 +122,11 @@ export default {
       return freshcom.createToken({
         refresh_token: state.liveToken.refresh_token, grant_type: 'refresh_token'
       }).then(liveToken => {
-        localStorage.setItem('state.session.liveToken', JSON.stringify(liveToken))
+        console.log('Refreshed live token')
 
-        console.log('refreshed live token')
+        setObjectToStorage('state.session.liveToken', liveToken)
         commit(MT.LIVE_TOKEN_CHANGED, liveToken)
+
         if (state.mode === 'live') {
           commit(MT.TOKEN_CHANGED, liveToken)
         }
@@ -145,19 +135,44 @@ export default {
       })
     },
 
+    startLiveTokenRefresher ({ dispatch, state, commit }) {
+      if (state.liveTokenRefresherId) {
+        return console.warn('Live token refresher already started')
+      }
+
+      let refresherId = setInterval(() => {
+        dispatch('refreshLiveToken')
+      }, FIFTY_MINUTES)
+
+      commit(MT.LIVE_TOKEN_REFRESHER_STARTED, refresherId)
+    },
+
     refreshTestToken ({ state, commit }) {
-      if (state.mode === 'live') { Promise.reject(new Error('currently in live mode')) }
+      if (state.mode === 'live') { Promise.reject(new Error('Currently in live mode')) }
 
       return freshcom.createToken({
         refresh_token: state.token.refresh_token, grant_type: 'refresh_token'
       }).then(testToken => {
-        console.log('refreshed test token')
+        console.log('Refreshed test token')
+
         if (state.mode === 'test') {
           commit(MT.TOKEN_CHANGED, testToken)
         }
 
         return testToken
       })
+    },
+
+    startTestTokenRefresher ({ dispatch, state, commit }) {
+      if (state.testTokenRefresherId) {
+        return console.warn('Test token refresher already started')
+      }
+
+      let refresherId = setInterval(() => {
+        dispatch('refreshTestToken')
+      }, FIFTY_MINUTES)
+
+      commit(MT.TEST_TOKEN_REFRESHER_STARTED, refresherId)
     },
 
     getUser ({ state, commit }) {
@@ -190,11 +205,23 @@ export default {
     [MT.LIVE_TOKEN_CHANGED] (state, liveToken) {
       state.liveToken = liveToken
     },
-    [MT.LIVE_TOKEN_REFRESHER_ID_CHANGED] (state, refresherId) {
+    [MT.LIVE_TOKEN_REFRESHER_STARTED] (state, refresherId) {
       state.liveTokenRefresherId = refresherId
     },
-    [MT.TEST_TOKEN_REFRESHER_ID_CHANGED] (state, refresherId) {
+    [MT.LIVE_TOKEN_REFRESHER_STOPPED] (state) {
+      if (state.liveTokenRefresherId) {
+        clearInterval(state.liveTokenRefresherId)
+      }
+      state.liveTokenRefresherId = undefined
+    },
+    [MT.TEST_TOKEN_REFRESHER_STARTED] (state, refresherId) {
       state.testTokenRefresherId = refresherId
+    },
+    [MT.TEST_TOKEN_REFRESHER_STOPPED] (state) {
+      if (state.testTokenRefresherId) {
+        clearInterval(state.testTokenRefresherId)
+      }
+      state.testTokenRefresherId = undefined
     },
     [MT.USER_CHANGED] (state, user) {
       state.user = user

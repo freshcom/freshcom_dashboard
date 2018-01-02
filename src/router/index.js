@@ -1,9 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-
 import qs from 'qs'
+import _ from 'lodash'
 
 import { DEFAULT_PAGE_SIZE } from '@/env'
+import store from '@/store'
 
 import HomePage from '@/pages/home'
 import LoginPage from '@/pages/login'
@@ -79,7 +80,7 @@ function extractPagination (route) {
   return { number: parseInt(pageNumber), size: parseInt(pageSize) }
 }
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   routes: [
     {
@@ -498,3 +499,33 @@ export default new Router({
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  let isSessionReady = store.state.session.ready
+  let excludedRouteNames = ['Login', 'Register', 'ForgotPassword']
+
+  let _resolve
+  let currentUserPromise = new Promise((resolve) => {
+    _resolve = resolve
+  })
+
+  if (!isSessionReady) {
+    store.dispatch('setLoading', true)
+    store.dispatch('session/retrieveFromStorage').then(() => {
+      store.dispatch('setLoading', false)
+      _resolve(store.state.session.user)
+    })
+  } else {
+    _resolve(store.state.session.user)
+  }
+
+  currentUserPromise.then(currentUser => {
+    if (!currentUser && !_.includes(excludedRouteNames, to.name)) {
+      store.dispatch('pushRoute', { name: 'Login' })
+    } else {
+      next()
+    }
+  })
+})
+
+export default router

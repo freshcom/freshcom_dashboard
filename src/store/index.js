@@ -15,7 +15,8 @@ Vue.use(Vuex)
 const MT = {
   PUSH_ROUTE: 'PUSH_ROUTE',
   POP_ROUTE: 'POP_ROUTE',
-  SET_RESOURCE_LOCALE: 'SET_RESOURCE_LOCALE'
+  SET_RESOURCE_LOCALE: 'SET_RESOURCE_LOCALE',
+  LOADING_CHANGED: 'LOADING_CHANGED'
 }
 
 export default new Vuex.Store({
@@ -25,6 +26,9 @@ export default new Vuex.Store({
     session: SessionStore
   },
   state: {
+    isLoading: false,
+    loadingInstance: undefined,
+
     uiLocale: DEFAULT_LOCALE,
     resourceLocale: DEFAULT_LOCALE
   },
@@ -39,6 +43,10 @@ export default new Vuex.Store({
 
     setResourceLocale ({ commit }, locale) {
       commit(MT.SET_RESOURCE_LOCALE, locale)
+    },
+
+    setLoading ({ commit }, isLoading) {
+      commit(MT.LOADING_CHANGED, isLoading)
     }
   },
   mutations: {
@@ -53,6 +61,10 @@ export default new Vuex.Store({
     [MT.SET_RESOURCE_LOCALE] (state, locale) {
       state.resourceLocale = locale
       freshcom.setLocale(locale)
+    },
+
+    [MT.LOADING_CHANGED] (state, isLoading) {
+      state.isLoading = isLoading
     }
   }
 })

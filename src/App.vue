@@ -37,23 +37,31 @@
 <script>
 export default {
   name: 'app',
-  beforeCreate () {
-    this.spinner = this.$loading({ text: 'Loading...', lock: true })
-  },
   created () {
-    return this.$store.dispatch('session/retrieveFromStorage').then(() => {
-      this.spinner.close()
-    }).catch(() => {
-      this.$store.dispatch('pushRoute', { name: 'Login' })
-      this.spinner.close()
-    })
+    if (this.isLoading) {
+      this.spinner = this.$loading({ text: 'Loading...', lock: true })
+    }
   },
   computed: {
+    isLoading () {
+      return this.$store.state.isLoading
+    },
     isLoggedIn () {
       return this.$store.state.route.name !== 'Login'
     },
     isSessionReady () {
       return this.$store.state.session.ready
+    }
+  },
+  watch: {
+    isLoading (isLoading) {
+      if (isLoading) {
+        this.spinner = this.$loading({ text: 'Loading...', lock: true })
+      } else {
+        if (this.spinner) {
+          this.spinner.close()
+        }
+      }
     }
   }
 }

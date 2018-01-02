@@ -13,7 +13,7 @@
   "dependencies": {
     "axios": "^0.17.1",
     "dotenv": "^4.0.0",
-    "element-ui": "^2.0.5",
+    "element-ui": "^2.0.10",
     "lodash": "^4.17.4",
     "qs": "^6.5.1",
     "simple-jas": "^0.4.13",
