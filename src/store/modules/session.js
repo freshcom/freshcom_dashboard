@@ -49,12 +49,7 @@ export default {
         return commit(MT.READY, true)
       }
       commit(MT.LIVE_TOKEN_CHANGED, liveToken)
-
-      // Retrieve mode
-      let mode = localStorage.getItem('state.session.mode')
-      if (mode === 'test') {
-        return dispatch('setMode', mode)
-      }
+      commit(MT.TOKEN_CHANGED, liveToken)
 
       // Setup session
       return dispatch('refreshLiveToken').then(() => {
@@ -62,10 +57,16 @@ export default {
 
         return Promise.all([dispatch('getAccount'), dispatch('getUser')])
       }).then(() => {
+        // Retrieve mode
+        let mode = localStorage.getItem('state.session.mode')
+        if (mode === 'test') {
+          return dispatch('setMode', mode)
+        }
+      }).then(() => {
         commit(MT.READY, true)
       }).catch(error => {
         dispatch('reset')
-        throw error.response.data
+        throw error
       })
     },
 

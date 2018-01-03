@@ -475,6 +475,10 @@ p.search-notice {
 /* END Utils */
 
 /* START Common Overwrite */
+.hidden {
+  display: none;
+}
+
 .card-wrapper {
   min-height: 300px;
 }

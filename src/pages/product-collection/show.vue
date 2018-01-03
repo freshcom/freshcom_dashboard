@@ -226,6 +226,8 @@ export default {
       })
     },
 
+    // MARK: Memberships
+
     loadMemberships () {
       freshcom.listProductCollectionMembership(this.id, {
         include: 'product',
@@ -270,6 +272,8 @@ export default {
     openEditMembershipDialog () {
 
     },
+
+    // MARK: Product
 
     markProductActive (product) {
       let productDraft = _.cloneDeep(product)

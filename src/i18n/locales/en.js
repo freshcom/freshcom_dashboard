@@ -6,6 +6,11 @@ export default {
     },
     required: '{name} is required.',
     invalid: '{name} is invalid.',
+    unlock: {
+      unlockable: {
+        invalid: 'Unlockable is invalid or already unlocked.'
+      }
+    },
     payment: {
       source: {
         cardDeclined: 'Your card was declined, please try another card.',

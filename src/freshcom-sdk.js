@@ -289,11 +289,17 @@ export default {
     }).catch(this._processHttpError)
   },
 
-  //
-  // Unlock
-  //
+  // MARK: Unlock
+
   listUnlock (params = {}, options = {}) {
     return this.http.get('/unlocks', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  createUnlock (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post('/unlocks', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
@@ -304,9 +310,8 @@ export default {
     }).catch(this._processHttpError)
   },
 
-  //
-  // Card
-  //
+  // MARK: Card
+
   listCard (params = {}, options = {}) {
     return this.http.get('/cards', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)

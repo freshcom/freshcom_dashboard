@@ -184,10 +184,10 @@
           <h3>Unlocks</h3>
 
           <span class="block-title-actions pull-right">
-            <router-link :to="{ name: 'NewUnlock', query: { customerId: customer.id, callbackPath: currentRoutePath } }">
+            <a @click="openAddUnlockDialog()" href="javascript:;">
               <icon name="plus" scale="0.8" class="v-middle"></icon>
               <span>Add</span>
-            </router-link>
+            </a>
           </span>
         </div>
 
@@ -364,6 +364,18 @@
         <el-button :loading="isUpdatingCard" @click="updateCard()" type="primary" size="small">Save</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog :show-close="false" :visible="isAddingUnlock" title="Add Unlock" width="600px">
+      <el-form label-width="150px" size="small" @submit.native.prevent="createUnlock()">
+        <unlock-fieldset v-model="unlockDraftForAdd" :errors="errors"></unlock-fieldset>
+        <button class="hidden" type="submit"></button>
+      </el-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button :disabled="isCreatingUnlock" @click="closeAddUnlockDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isCreatingUnlock" @click="createUnlock()" type="primary" size="small">Save</el-button>
+      </div>
+    </el-dialog>
   </div>
 </div>
 
@@ -376,8 +388,10 @@ import freshcom from '@/freshcom-sdk'
 
 import Customer from '@/models/customer'
 import Card from '@/models/card'
+import Unlock from '@/models/unlock'
 import ConfirmButton from '@/components/confirm-button'
 import CardForm from '@/components/card-form'
+import UnlockFieldset from '@/components/unlock-fieldset'
 import { dollar, idLastPart } from '@/helpers/filters'
 
 export default {
@@ -385,7 +399,8 @@ export default {
   props: ['id'],
   components: {
     ConfirmButton,
-    CardForm
+    CardForm,
+    UnlockFieldset
   },
   filters: {
     dollar,
@@ -395,23 +410,25 @@ export default {
     return {
       isReady: false,
 
-      customer: Customer.objectWithDefaults(),
       isLoading: false,
+      customer: Customer.objectWithDefaults(),
 
       isLoadingCards: false,
       cards: [],
+      cardDraftForEdit: Card.objectWithDefaults(),
+      isEditingCard: false,
+      isUpdatingCard: false,
 
       isLoadingOrders: false,
       orders: [],
 
       isLoadingUnlocks: false,
+      isCreatingUnlock: false,
       unlocks: [],
+      isAddingUnlock: false,
+      unlockDraftForAdd: Unlock.objectWithDefaults(),
 
       pointTransactions: [],
-
-      cardDraftForEdit: Card.objectWithDefaults(),
-      isEditingCard: false,
-      isUpdatingCard: false,
 
       errors: {}
     }
@@ -558,6 +575,36 @@ export default {
         include: 'unlockable'
       }).then(response => {
         this.unlocks = response.data
+      })
+    },
+
+    openAddUnlockDialog () {
+      this.unlockDraftForAdd = Unlock.objectWithDefaults()
+      this.unlockDraftForAdd.customer = this.customer
+      this.isAddingUnlock = true
+    },
+
+    closeAddUnlockDialog () {
+      this.isAddingUnlock = false
+      this.isCreatingUnlock = false
+    },
+
+    createUnlock () {
+      this.isCreatingUnlock = true
+      return freshcom.createUnlock(this.unlockDraftForAdd).then(() => {
+        return this.loadUnlocks()
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Unlock created successfully.`,
+          type: 'success'
+        })
+
+        this.closeAddUnlockDialog()
+      }).catch(response => {
+        this.errors = response.errors
+        this.isCreatingUnlock = false
+        throw response
       })
     },
 
