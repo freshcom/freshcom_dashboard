@@ -310,6 +310,14 @@ export default {
     }).catch(this._processHttpError)
   },
 
+  deleteUnlock (id, params = {}, options = {}) {
+    return this.http.delete(`/unlocks/${id}`, { params: params }).then(response => {
+      if (response.data) {
+        return SimpleJAS.deserialize(response.data)
+      }
+    }).catch(this._processHttpError)
+  },
+
   // MARK: Card
 
   listCard (params = {}, options = {}) {

@@ -572,7 +572,8 @@ export default {
     loadUnlocks () {
       freshcom.listUnlock({
         filter: { customerId: this.id },
-        include: 'unlockable'
+        include: 'unlockable',
+        page: { size: 10 }
       }).then(response => {
         this.unlocks = response.data
       })
@@ -605,6 +606,18 @@ export default {
         this.errors = response.errors
         this.isCreatingUnlock = false
         throw response
+      })
+    },
+
+    deleteUnlock (unlockId) {
+      return freshcom.deleteUnlock(unlockId).then(() => {
+        return this.loadUnlocks()
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Unlock deleted successfully.`,
+          type: 'success'
+        })
       })
     },
 
