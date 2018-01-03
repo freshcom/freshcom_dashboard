@@ -25,7 +25,7 @@ import translateErrors from '@/helpers/translate-errors'
 import RemoteSelect from '@/components/remote-select'
 
 export default {
-  name: 'ProductCollelctionCollectionForm',
+  name: 'UnlockFieldset',
   props: ['value', 'errors'],
   components: {
     RemoteSelect

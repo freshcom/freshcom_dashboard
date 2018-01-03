@@ -230,6 +230,10 @@
           <h3>Point Transactions</h3>
 
           <span class="block-title-actions pull-right">
+            <a @click="openAddPointTransactionDialog()" href="javascript:;">
+              <icon name="plus" scale="0.8" class="v-middle"></icon>
+              <span>Add</span>
+            </a>
           </span>
         </div>
 
@@ -251,6 +255,16 @@
               <el-table-column align="right" width="120">
                 <template slot-scope="scope">
                   {{scope.row.balanceAfterCommit}}
+                </template>
+              </el-table-column>
+
+              <el-table-column width="100">
+                <template slot-scope="scope">
+                  <p class="text-right actions">
+                    <confirm-button v-if="scope.row.amount === 0" @confirmed="deletePointTransaction(scope.row.id)" size="mini">
+                      Delete
+                    </confirm-button>
+                  </p>
                 </template>
               </el-table-column>
             </el-table>
@@ -365,6 +379,18 @@
       </div>
     </el-dialog>
 
+    <el-dialog :show-close="false" :visible="isAddingPointTransaction" title="Add Point Transaction" width="600px">
+      <el-form label-width="150px" size="small" @submit.native.prevent="createPointTransaction()">
+        <point-transaction-fieldset v-model="pointTransactionDraftForAdd" :errors="errors"></point-transaction-fieldset>
+        <button class="hidden" type="submit"></button>
+      </el-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button :disabled="isCreatingPointTransaction" @click="closeAddPointTransactionDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isCreatingPointTransaction" @click="createPointTransaction()" type="primary" size="small">Save</el-button>
+      </div>
+    </el-dialog>
+
     <el-dialog :show-close="false" :visible="isAddingUnlock" title="Add Unlock" width="600px">
       <el-form label-width="150px" size="small" @submit.native.prevent="createUnlock()">
         <unlock-fieldset v-model="unlockDraftForAdd" :errors="errors"></unlock-fieldset>
@@ -389,9 +415,11 @@ import freshcom from '@/freshcom-sdk'
 import Customer from '@/models/customer'
 import Card from '@/models/card'
 import Unlock from '@/models/unlock'
+import PointTransaction from '@/models/point-transaction'
 import ConfirmButton from '@/components/confirm-button'
 import CardForm from '@/components/card-form'
 import UnlockFieldset from '@/components/unlock-fieldset'
+import PointTransactionFieldset from '@/components/point-transaction-fieldset'
 import { dollar, idLastPart } from '@/helpers/filters'
 
 export default {
@@ -400,7 +428,8 @@ export default {
   components: {
     ConfirmButton,
     CardForm,
-    UnlockFieldset
+    UnlockFieldset,
+    PointTransactionFieldset
   },
   filters: {
     dollar,
@@ -423,12 +452,18 @@ export default {
       orders: [],
 
       isLoadingUnlocks: false,
-      isCreatingUnlock: false,
       unlocks: [],
+
       isAddingUnlock: false,
+      isCreatingUnlock: false,
       unlockDraftForAdd: Unlock.objectWithDefaults(),
 
+      isLoadingPointTransaction: false,
       pointTransactions: [],
+
+      isAddingPointTransaction: false,
+      isCreatingPointTransaction: false,
+      pointTransactionDraftForAdd: PointTransaction.objectWithDefaults(),
 
       errors: {}
     }
@@ -479,7 +514,7 @@ export default {
 
     loadCustomer () {
       return freshcom.retrieveCustomer(this.id, {
-        include: 'unlocks.unlockable,point_account'
+        include: 'point_account'
       }).then(response => {
         this.customer = response.data
       })
@@ -609,8 +644,8 @@ export default {
       })
     },
 
-    deleteUnlock (unlockId) {
-      return freshcom.deleteUnlock(unlockId).then(() => {
+    deleteUnlock (id) {
+      return freshcom.deleteUnlock(id).then(() => {
         return this.loadUnlocks()
       }).then(() => {
         this.$message({
@@ -623,13 +658,50 @@ export default {
 
     // MARK: Point Transaction
 
-    // openAddPointTransactionDialog () {
-    //   let pointTransaction = PointTransaction.objectWithDefaults()
-    // },
-
     loadPointTransactions () {
       freshcom.listPointTransaction(this.customer.pointAccount.id).then(response => {
         this.pointTransactions = response.data
+      })
+    },
+
+    openAddPointTransactionDialog () {
+      this.pointTransactionDraftForAdd = PointTransaction.objectWithDefaults()
+      this.isAddingPointTransaction = true
+    },
+
+    closeAddPointTransactionDialog () {
+      this.isAddingPointTransaction = false
+      this.isCreatingPointTransaction = false
+    },
+
+    createPointTransaction () {
+      this.isCreatingPointTransaction = true
+      return freshcom.createPointTransaction(this.customer.pointAccount.id, this.pointTransactionDraftForAdd).then(() => {
+        return Promise.all([this.loadPointTransactions(), this.loadCustomer()])
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Point transaction created successfully.`,
+          type: 'success'
+        })
+
+        this.closeAddPointTransactionDialog()
+      }).catch(response => {
+        this.errors = response.errors
+        this.isCreatingPointTransaction = false
+        throw response
+      })
+    },
+
+    deletePointTransaction (id) {
+      return freshcom.deletePointTransaction(id).then(() => {
+        return this.loadPointTransactions()
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Point transaction deleted successfully.`,
+          type: 'success'
+        })
       })
     }
   }

@@ -289,6 +289,14 @@ export default {
     }).catch(this._processHttpError)
   },
 
+  deletePointTransaction (id, params = {}, options = {}) {
+    return this.http.delete(`/point_transactions/${id}`, { params: params }).then(response => {
+      if (response.data) {
+        return SimpleJAS.deserialize(response.data)
+      }
+    }).catch(this._processHttpError)
+  },
+
   // MARK: Unlock
 
   listUnlock (params = {}, options = {}) {
