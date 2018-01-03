@@ -75,8 +75,18 @@ export default {
     }).catch(this._processHttpError)
   },
 
+  // MARK: User
+
   retrieveUser (params = {}, options = {}) {
     return this.http.get('/user', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  updateCurrentUser (fields = {}, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    console.log(payload)
+    return this.http.patch('/user', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
