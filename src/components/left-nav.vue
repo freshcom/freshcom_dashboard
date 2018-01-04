@@ -78,15 +78,14 @@
             <span>Vehicles</span>
           </el-menu-item>
         </el-submenu> -->
-
-        <el-menu-item :route="{ name: 'ShowBalanceSettings' }" index="/billing/settings">
-          <icon name="id-card" scale="0.8"></icon>
-          <span>Balance</span>
-        </el-menu-item>
-
         <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">
           <icon name="folder" scale="0.8"></icon>
           <span>File Storage</span>
+        </el-menu-item>
+
+        <el-menu-item :route="{ name: 'ShowBalanceSettings' }" index="/billing/settings">
+          <icon name="bank" scale="0.8"></icon>
+          <span>Balance</span>
         </el-menu-item>
 
 <!--         <el-submenu index="fileStorage">

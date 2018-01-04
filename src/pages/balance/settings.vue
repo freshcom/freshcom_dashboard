@@ -14,7 +14,7 @@
           <div class="banner-content">TEST DATA</div>
         </div>
 
-        Billing Settings
+        Balance Settings
       </div>
 
       <div class="data full">
