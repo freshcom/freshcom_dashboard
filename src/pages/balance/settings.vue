@@ -9,7 +9,11 @@
 
   <div>
     <el-card class="main-card">
-      <div slot="header" class="clearfix">
+      <div slot="header">
+        <div v-if="isViewingTestData" class="test-data-banner">
+          <div class="banner-content">TEST DATA</div>
+        </div>
+
         Billing Settings
       </div>
 
@@ -29,12 +33,14 @@
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
+import PageMixin from '@/mixins/page'
 import BalanceSettings from '@/models/balance-settings'
-import { STRIPE_CLIENT_ID, HOST_URL } from '@/env'
+import { STRIPE_TEST_CLIENT_ID, STRIPE_LIVE_CLIENT_ID, HOST_URL } from '@/env'
 import translateErrors from '@/helpers/translate-errors'
 
 export default {
   name: 'ShowBalanceSettings',
+  mixins: [PageMixin],
   props: ['stripeCode', 'stripeScope'],
   data () {
     return {
@@ -52,18 +58,27 @@ export default {
     }
   },
   computed: {
-    stripeAuthorizeUrl () {
-      return `https://connect.stripe.com/oauth/authorize?response_type=code&client_id=${STRIPE_CLIENT_ID}&scope=read_write&redirect_uri=${HOST_URL}/balance/settings`
+    stripeClientId () {
+      if (this.isViewingTestData) {
+        return STRIPE_TEST_CLIENT_ID
+      } else {
+        return STRIPE_LIVE_CLIENT_ID
+      }
     },
-    liveAccessToken () {
-      return this.$store.state.session.liveToken.access_token
+    stripeAuthorizeUrl () {
+      return `https://connect.stripe.com/oauth/authorize?response_type=code&client_id=${this.stripeClientId}&scope=read_write&redirect_uri=${HOST_URL}/balance/settings`
+    }
+  },
+  watch: {
+    isViewingTestData () {
+      this.loadBalanceSettings()
     }
   },
   methods: {
     updateBalanceSettings () {
       this.isLoading = true
 
-      freshcom.updateBalanceSettings(this.balanceSettingsDraft, {}, { accessToken: this.liveAccessToken }).then(response => {
+      freshcom.updateBalanceSettings(this.balanceSettingsDraft).then(response => {
         this.balanceSettings = response.data
         this.balanceSettingsDraft = _.cloneDeep(response.data)
 
@@ -84,7 +99,7 @@ export default {
 
     loadBalanceSettings () {
       this.isLoading = true
-      freshcom.retrieveBalanceSettings({}, { accessToken: this.liveAccessToken }).then(response => {
+      freshcom.retrieveBalanceSettings().then(response => {
         this.balanceSettings = response.data
         this.isLoading = false
       }).catch(errors => {

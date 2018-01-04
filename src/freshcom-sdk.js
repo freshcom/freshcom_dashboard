@@ -353,24 +353,14 @@ export default {
   // BalanceSettings
   //
   retrieveBalanceSettings (params = {}, options = {}) {
-    let config = { params: params }
-    if (options.accessToken) {
-      config.headers = { 'Authorization': `Bearer ${options.accessToken}` }
-    }
-
-    return this.http.get('/balance_settings', config).then(response => {
+    return this.http.get('/balance_settings', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
 
   updateBalanceSettings (fields, params = {}, options = {}) {
-    let config = { params: params }
-    if (options.accessToken) {
-      config.headers = { 'Authorization': `Bearer ${options.accessToken}` }
-    }
-
     let payload = SimpleJAS.serialize(fields)
-    return this.http.patch('/balance_settings', payload, config).then(response => {
+    return this.http.patch('/balance_settings', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },

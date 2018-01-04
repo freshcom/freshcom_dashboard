@@ -136,6 +136,8 @@
 
 
 <script>
+import _ from 'lodash'
+
 import 'vue-awesome/icons/home'
 import 'vue-awesome/icons/inbox'
 import 'vue-awesome/icons/shopping-bag'
@@ -221,9 +223,10 @@ export default {
         toggled = this.$store.dispatch('session/setMode', 'test')
       }
 
+      let excludedRoute = ['ShowBalanceSettings']
       toggled.then(() => {
         let routeInfo = this.currentRoutePath.split('/')
-        if (routeInfo.length > 2) {
+        if (routeInfo.length > 2 && !_.includes(excludedRoute, this.$store.state.route.name)) {
           this.$store.dispatch('pushRoute', { path: `/${routeInfo[1]}` })
         }
         this.isTogglingMode = false
