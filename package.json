@@ -20,6 +20,7 @@
     "v-money": "0.8.1",
     "vue": "^2.5.9",
     "vue-awesome": "^2.3.2",
+    "vue-codemirror": "^4.0.2",
     "vue-i18n": "^7.3.2",
     "vue-moment": "^2.1.0",
     "vue-router": "^3.0.1",

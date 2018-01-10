@@ -62,6 +62,12 @@ import EditDepositablePage from '@/pages/depositable/edit'
 import ShowBalanceSettingsPage from '@/pages/balance/settings'
 import APIHomePage from '@/pages/api/home'
 
+import ListEmailPage from '@/pages/email/list'
+import ListEmailTemplatePage from '@/pages/email-template/list'
+import NewEmailTemplatePage from '@/pages/email-template/new'
+import ShowEmailTemplatePage from '@/pages/email-template/show'
+import EditEmailTemplatePage from '@/pages/email-template/edit'
+
 Vue.use(Router)
 
 function extractPagination (route) {
@@ -290,7 +296,7 @@ const router = new Router({
       }
     },
     {
-      path: '/product_collections',
+      path: '/product-collections',
       name: 'ListProductCollection',
       component: ListProductCollectionPage,
       props (route) {
@@ -302,7 +308,7 @@ const router = new Router({
       }
     },
     {
-      path: '/product_collections/new',
+      path: '/product-collections/new',
       name: 'NewProductCollection',
       component: NewProductCollectionPage,
       props (route) {
@@ -313,7 +319,7 @@ const router = new Router({
       }
     },
     {
-      path: '/product_collections/:id',
+      path: '/product-collections/:id',
       name: 'ShowProductCollection',
       component: ShowProductCollectionPage,
       props (route) {
@@ -321,7 +327,7 @@ const router = new Router({
       }
     },
     {
-      path: '/product_collections/:id/edit',
+      path: '/product-collections/:id/edit',
       name: 'EditProductCollection',
       component: EditProductCollectionPage,
       props (route) {
@@ -457,10 +463,7 @@ const router = new Router({
     {
       path: '/customers/new',
       name: 'NewCustomer',
-      component: NewCustomerPage,
-      props (route) {
-        return { id: route.params.id }
-      }
+      component: NewCustomerPage
     },
     {
       path: '/customers/:id',
@@ -479,6 +482,57 @@ const router = new Router({
         let query = qs.parse(queryString)
 
         return { id: route.params.id, callbackPath: query.callbackPath }
+      }
+    },
+    {
+      path: '/emails',
+      name: 'ListEmail',
+      component: ListEmailPage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          page: page
+        }
+      }
+    },
+    {
+      path: '/email-templates',
+      name: 'ListEmailTemplate',
+      component: ListEmailTemplatePage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          page: page
+        }
+      }
+    },
+    {
+      path: '/email-templates/new',
+      name: 'NewEmailTemplate',
+      component: NewEmailTemplatePage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { callbackPath: query.callbackPath }
+      }
+    },
+    {
+      path: '/email-templates/:id',
+      name: 'ShowEmailTemplate',
+      component: ShowEmailTemplatePage,
+      props (route) {
+        return { id: route.params.id }
+      }
+    },
+    {
+      path: '/email-templates/:id/edit',
+      name: 'EditEmailTemplate',
+      component: EditEmailTemplatePage,
+      props (route) {
+        return { id: route.params.id }
       }
     },
     {

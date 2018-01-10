@@ -417,6 +417,10 @@ p.search-notice {
 .el-button.icon {
   padding: 5px;
 }
+
+.component-wrapper.email-template-fieldset .CodeMirror {
+  height: 800px;
+}
 /* END Layout */
 
 

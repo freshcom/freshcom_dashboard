@@ -713,7 +713,7 @@ export default {
   },
 
   //
-  // Fulfillment
+  // MARK: Fulfillment
   //
   listFulfillment (params = {}, options = {}) {
     return this.http.get('/fulfillments', { params: params }).then(response => {
@@ -722,12 +722,58 @@ export default {
   },
 
   //
-  //
+  // MARK: Fulfillment Line Item
   //
   updateFulfillmentLineItem (id, fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.patch(`/fulfillment_line_items/${id}`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  //
+  // MARK: Email
+  //
+  listEmail (params = {}, options = {}) {
+    return this.http.get('/emails', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  //
+  // MARK: Email Template
+  //
+  listEmailTemplate (params = {}, options = {}) {
+    return this.http.get('/email_templates', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  createEmailTemplate (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post('/email_templates', payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  retrieveEmailTemplate (id, params = {}, options = {}) {
+    return this.http.get(`/email_templates/${id}`, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  updateEmailTemplate (id, fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.patch(`/email_templates/${id}`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  deleteEmailTemplate (id, params = {}, options = {}) {
+    return this.http.delete(`/email_templates/${id}`, { params: params }).then(response => {
+      if (response.data) {
+        return SimpleJAS.deserialize(response.data)
+      }
     }).catch(this._processHttpError)
   }
 }

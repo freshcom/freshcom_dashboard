@@ -78,6 +78,23 @@
             <span>Vehicles</span>
           </el-menu-item>
         </el-submenu> -->
+
+        <el-submenu index="notification">
+          <template slot="title">
+            <icon name="send" scale="0.8"></icon>
+            <span>Notification</span>
+          </template>
+
+          <el-menu-item :route="{ name: 'ListNotificationTrigger' }" index="/notification-triggers">
+            <icon name="external-link" scale="0.8"></icon>
+            <span>Triggers</span>
+          </el-menu-item>
+          <el-menu-item :route="{ name: 'ListEmail' }" index="/emails">
+            <icon name="envelope" scale="0.8"></icon>
+            <span>Emails</span>
+          </el-menu-item>
+        </el-submenu>
+
         <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">
           <icon name="folder" scale="0.8"></icon>
           <span>File Storage</span>
@@ -137,6 +154,9 @@
 <script>
 import _ from 'lodash'
 
+import 'vue-awesome/icons/external-link'
+import 'vue-awesome/icons/send'
+import 'vue-awesome/icons/envelope'
 import 'vue-awesome/icons/home'
 import 'vue-awesome/icons/inbox'
 import 'vue-awesome/icons/shopping-bag'
@@ -188,13 +208,17 @@ export default {
       if (routePath.startsWith('/stockables')) { return '/stockables' }
       if (routePath.startsWith('/unlockables')) { return '/unlockables' }
       if (routePath.startsWith('/file')) { return '/files' }
+
       if (routePath.startsWith('/products')) { return '/products' }
-      if (routePath.startsWith('/product_items')) { return '/products' }
       if (routePath.startsWith('/prices')) { return '/products' }
-      if (routePath.startsWith('/product_collections')) { return '/products' }
+      if (routePath.startsWith('/product-collections')) { return '/products' }
+
       if (routePath.startsWith('/orders') || routePath.startsWith('/payments')) { return '/orders' }
       if (routePath.startsWith('/customers') || routePath.startsWith('/customers')) { return '/customers' }
       if (routePath.startsWith('/depositables') || routePath.startsWith('/depositables')) { return '/depositables' }
+
+      if (routePath.startsWith('/emails')) { return '/emails' }
+      if (routePath.startsWith('/email-templates')) { return '/emails' }
 
       return routePath
     },
