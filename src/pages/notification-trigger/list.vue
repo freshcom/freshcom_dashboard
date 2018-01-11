@@ -36,13 +36,13 @@
           <el-table-column prop="name" label="Name">
           </el-table-column>
 
-          <el-table-column label="Action" width="200">
+          <el-table-column prop="event" label="Event" width="360">
+          </el-table-column>
+
+          <el-table-column label="Action" width="100">
             <template slot-scope="scope">
               {{scope.row.actionType}}
             </template>
-          </el-table-column>
-
-          <el-table-column prop="event" align="right" label="Event">
           </el-table-column>
         </el-table>
 
