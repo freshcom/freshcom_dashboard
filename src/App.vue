@@ -47,7 +47,7 @@ export default {
       return this.$store.state.isLoading
     },
     isLoggedIn () {
-      return this.$store.state.route.name !== 'Login'
+      return !!this.$store.state.session.user
     },
     isSessionReady () {
       return this.$store.state.session.ready
@@ -187,6 +187,10 @@ p.btn-group {
 
 .pull-right {
   float: right;
+}
+
+.pull-left {
+  float: left;
 }
 
 .clearfix:before, .clearfix:after {

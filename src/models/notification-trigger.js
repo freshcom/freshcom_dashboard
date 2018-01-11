@@ -2,14 +2,13 @@ export default {
   objectWithDefaults () {
     return {
       id: undefined,
-      type: 'EmailTemplate',
+      type: 'NotificationTrigger',
 
       name: '',
+      event: '',
       description: undefined,
-      to: '',
-      replyTo: undefined,
-      subject: '',
-      contentHtml: ''
+      actionType: 'sendEmail',
+      actionTarget: ''
     }
   }
 }

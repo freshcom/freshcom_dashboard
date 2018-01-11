@@ -8,27 +8,21 @@ import store from '@/store'
 
 import HomePage from '@/pages/home'
 import LoginPage from '@/pages/login'
+import ForgotPasswordPage from '@/pages/forgot-password'
 
+// Storefront
 import ListOrderPage from '@/pages/order/list'
 import NewOrderPage from '@/pages/order/new'
 import ShowOrderPage from '@/pages/order/show'
 import EditOrderPage from '@/pages/order/edit'
 
+import ListCustomerPage from '@/pages/customer/list'
+import ShowCustomerPage from '@/pages/customer/show'
+import NewCustomerPage from '@/pages/customer/new'
+import EditCustomerPage from '@/pages/customer/edit'
+
 import ListPaymentPage from '@/pages/payment/list'
 import ShowPaymentPage from '@/pages/payment/show'
-
-import ListStockablePage from '@/pages/stockable/list'
-import ShowStockablePage from '@/pages/stockable/show'
-import EditStockablePage from '@/pages/stockable/edit'
-import NewStockablePage from '@/pages/stockable/new'
-
-import NewExternalFileCollectionPage from '@/pages/external-file-collection/new'
-import EditExternalFileCollectionPage from '@/pages/external-file-collection/edit'
-import ShowExternalFileCollectionPage from '@/pages/external-file-collection/show'
-import ListExternalFileCollectionPage from '@/pages/external-file-collection/list'
-
-import ListExternalFilePage from '@/pages/external-file/list'
-import ShowExternalFilePage from '@/pages/external-file/show'
 
 import ListProductPage from '@/pages/product/list'
 import NewProductPage from '@/pages/product/new'
@@ -44,29 +38,43 @@ import NewPricePage from '@/pages/price/new'
 import EditPricePage from '@/pages/price/edit'
 import ShowPricePage from '@/pages/price/show'
 
+// Goods
+import ListStockablePage from '@/pages/stockable/list'
+import ShowStockablePage from '@/pages/stockable/show'
+import EditStockablePage from '@/pages/stockable/edit'
+import NewStockablePage from '@/pages/stockable/new'
+
 import ListUnlockablePage from '@/pages/unlockable/list'
 import ShowUnlockablePage from '@/pages/unlockable/show'
 import EditUnlockablePage from '@/pages/unlockable/edit'
 import NewUnlockablePage from '@/pages/unlockable/new'
-
-import ListCustomerPage from '@/pages/customer/list'
-import ShowCustomerPage from '@/pages/customer/show'
-import NewCustomerPage from '@/pages/customer/new'
-import EditCustomerPage from '@/pages/customer/edit'
 
 import ListDepositablePage from '@/pages/depositable/list'
 import NewDepositablePage from '@/pages/depositable/new'
 import ShowDepositablePage from '@/pages/depositable/show'
 import EditDepositablePage from '@/pages/depositable/edit'
 
-import ShowBalanceSettingsPage from '@/pages/balance/settings'
-import APIHomePage from '@/pages/api/home'
-
+// Notification
 import ListEmailPage from '@/pages/email/list'
 import ListEmailTemplatePage from '@/pages/email-template/list'
 import NewEmailTemplatePage from '@/pages/email-template/new'
 import ShowEmailTemplatePage from '@/pages/email-template/show'
 import EditEmailTemplatePage from '@/pages/email-template/edit'
+
+import ListNotificationTriggerPage from '@/pages/notification-trigger/list'
+import NewNotificationTriggerPage from '@/pages/notification-trigger/new'
+
+// File Storage
+import NewExternalFileCollectionPage from '@/pages/external-file-collection/new'
+import EditExternalFileCollectionPage from '@/pages/external-file-collection/edit'
+import ShowExternalFileCollectionPage from '@/pages/external-file-collection/show'
+import ListExternalFileCollectionPage from '@/pages/external-file-collection/list'
+
+import ListExternalFilePage from '@/pages/external-file/list'
+import ShowExternalFilePage from '@/pages/external-file/show'
+
+import ShowBalanceSettingsPage from '@/pages/balance/settings'
+import APIHomePage from '@/pages/api/home'
 
 Vue.use(Router)
 
@@ -98,6 +106,11 @@ const router = new Router({
       path: '/login',
       name: 'Login',
       component: LoginPage
+    },
+    {
+      path: '/forgot-password',
+      name: 'ForgotPassword',
+      component: ForgotPasswordPage
     },
     {
       path: '/orders',
@@ -533,6 +546,30 @@ const router = new Router({
       component: EditEmailTemplatePage,
       props (route) {
         return { id: route.params.id }
+      }
+    },
+    {
+      path: '/notification-triggers',
+      name: 'ListNotificationTrigger',
+      component: ListNotificationTriggerPage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          page: page
+        }
+      }
+    },
+    {
+      path: '/notification-triggers/new',
+      name: 'NewNotificationTrigger',
+      component: NewNotificationTriggerPage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          page: page
+        }
       }
     },
     {

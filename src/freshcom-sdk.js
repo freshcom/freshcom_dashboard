@@ -50,6 +50,9 @@ export default {
     this.http.defaults.headers = defaultHeaders
   },
 
+  //
+  // MARK: Token
+  //
   createToken (payload) {
     let config = {
       headers: {
@@ -61,6 +64,16 @@ export default {
     }).catch(error => {
       throw error.response.data
     })
+  },
+
+  //
+  // MARK: Password Reset Token
+  //
+  createPasswordResetToken (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post('/password_reset_tokens', payload, { params: params }).then(response => {
+      return {}
+    }).catch(this._processHttpError)
   },
 
   retrieveRefreshToken (params = {}, options = {}) {
@@ -774,6 +787,22 @@ export default {
       if (response.data) {
         return SimpleJAS.deserialize(response.data)
       }
+    }).catch(this._processHttpError)
+  },
+
+  //
+  // MARK: Notification Trigger
+  //
+  listNotificationTrigger (params = {}, options = {}) {
+    return this.http.get('/notification_triggers', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  createNotificationTrigger (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post('/notification_triggers', payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   }
 }

@@ -8,18 +8,29 @@
       <el-input type="textarea" v-model="formModel.description" @input="updateValue"></el-input>
     </el-form-item>
 
+    <el-form-item label="To" :error="errorMsgs.to" required>
+      <el-input v-model="formModel.to" @input="updateValue"></el-input>
+    </el-form-item>
+
+    <el-form-item label="Reply To" :error="errorMsgs.replyTo">
+      <el-input v-model="formModel.replyTo" @input="updateValue"></el-input>
+    </el-form-item>
+
+    <el-form-item label="Subject" :error="errorMsgs.subject" required>
+      <el-input v-model="formModel.subject" @input="updateValue"></el-input>
+    </el-form-item>
+
     <el-row>
       <el-col :span="24" class="content-input">
         <p class="text-center">Code</p>
-        <codemirror v-model="formModel.content" :options="cmOptions" @input="updateValue"></codemirror>
+        <codemirror v-model="formModel.contentHtml" :options="cmOptions" @input="updateValue"></codemirror>
       </el-col>
 
       <el-col :span="24" class="content-preview">
         <p class="text-center">Preview</p>
-        <iframe :srcdoc="formModel.content"></iframe>
+        <iframe :srcdoc="formModel.contentHtml"></iframe>
       </el-col>
     </el-row>
-
   </div>
 </template>
 

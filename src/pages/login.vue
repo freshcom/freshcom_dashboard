@@ -19,7 +19,7 @@
 
         <el-form-item class="thin">
           <el-checkbox v-model="form.rememberMe">Remember me</el-checkbox>
-          <a href="#" class="pull-right">Forgot your password?</a>
+          <router-link :to="{ name: 'ForgotPassword'} " class="pull-right">Forgot your password?</router-link>
         </el-form-item>
 
         <el-form-item>

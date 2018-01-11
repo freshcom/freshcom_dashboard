@@ -2,7 +2,8 @@ export default {
   hello: 'Hi',
   errors: {
     common: {
-      required: '{name} is required.'
+      required: '{name} is required.',
+      format: '{name} is invalid.'
     },
     required: '{name} is required.',
     invalid: '{name} is invalid.',
