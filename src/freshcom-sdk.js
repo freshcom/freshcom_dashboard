@@ -810,5 +810,13 @@ export default {
     return this.http.get(`/notification_triggers/${id}`, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
+  },
+
+  deleteNotificationTrigger (id, params = {}, options = {}) {
+    return this.http.delete(`/notification_triggers/${id}`, { params: params }).then(response => {
+      if (response.data) {
+        return SimpleJAS.deserialize(response.data)
+      }
+    }).catch(this._processHttpError)
   }
 }

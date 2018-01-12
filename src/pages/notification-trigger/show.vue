@@ -137,7 +137,7 @@ export default {
       freshcom.deleteNotificationTrigger(this.notificationTrigger.id).then(() => {
         this.$message({
           showClose: true,
-          message: `File deleted successfully.`,
+          message: `Trigger deleted successfully.`,
           type: 'success'
         })
 
