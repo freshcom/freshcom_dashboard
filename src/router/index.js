@@ -63,6 +63,7 @@ import EditEmailTemplatePage from '@/pages/email-template/edit'
 
 import ListNotificationTriggerPage from '@/pages/notification-trigger/list'
 import NewNotificationTriggerPage from '@/pages/notification-trigger/new'
+import ShowNotificationTriggerPage from '@/pages/notification-trigger/show'
 
 // File Storage
 import NewExternalFileCollectionPage from '@/pages/external-file-collection/new'
@@ -570,6 +571,14 @@ const router = new Router({
           searchKeyword: route.query.search,
           page: page
         }
+      }
+    },
+    {
+      path: '/notification-triggers/:id',
+      name: 'ShowNotificationTrigger',
+      component: ShowNotificationTriggerPage,
+      props (route) {
+        return { id: route.params.id }
       }
     },
     {

@@ -219,6 +219,7 @@ export default {
 
       if (routePath.startsWith('/emails')) { return '/emails' }
       if (routePath.startsWith('/email-templates')) { return '/emails' }
+      if (routePath.startsWith('/notification-triggers')) { return '/notification-triggers' }
 
       return routePath
     },

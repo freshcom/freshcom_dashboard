@@ -804,5 +804,11 @@ export default {
     return this.http.post('/notification_triggers', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
+  },
+
+  retrieveNotificationTrigger (id, params = {}, options = {}) {
+    return this.http.get(`/notification_triggers/${id}`, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
   }
 }

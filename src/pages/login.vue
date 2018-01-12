@@ -23,7 +23,7 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" size="medium" @click="attemptLogin(form)">Login to your account</el-button>
+          <el-button :loading="isSubmitting" type="primary" size="medium" @click="attemptLogin(form)">Login to your account</el-button>
         </el-form-item>
 
       </el-form>
@@ -39,6 +39,7 @@ export default {
   name: 'Login',
   data () {
     return {
+      isSubmitting: false,
       form: {
         username: '',
         password: '',
@@ -48,7 +49,9 @@ export default {
   },
   methods: {
     attemptLogin (form) {
+      this.isSubmitting = true
       this.$store.dispatch('session/create', form).then(data => {
+        this.isSubmitting = false
         let user = data[1]
 
         this.$message({
@@ -64,6 +67,8 @@ export default {
           message: response.error_description,
           type: 'error'
         })
+
+        this.isSubmitting = false
       })
     }
   }

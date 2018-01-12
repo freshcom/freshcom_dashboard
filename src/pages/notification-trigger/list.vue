@@ -5,7 +5,6 @@
     <el-menu :router="true" default-active="/notification-triggers" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListNotificationTrigger' }" index="/notification-triggers">Triggers</el-menu-item>
     </el-menu>
-    <locale-selector @change="searchNotificationTrigger" class="pull-right"></locale-selector>
   </div>
 
   <div>
