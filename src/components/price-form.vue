@@ -19,11 +19,11 @@
     </el-select>
   </el-form-item>
 
-  <el-form-item label="Name" :error="errorMsgs.name">
+  <el-form-item label="Name" :error="errorMsgs.name" required>
     <el-input v-model="formModel.name"></el-input>
   </el-form-item>
 
-  <el-form-item label="Label" :error="errorMsgs.label" required>
+  <el-form-item label="Label" :error="errorMsgs.label">
     <el-input v-model="formModel.label"></el-input>
   </el-form-item>
 

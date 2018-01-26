@@ -65,8 +65,8 @@ export default {
       }).then(() => {
         commit(MT.READY, true)
       }).catch(error => {
+        console.log(error)
         dispatch('reset')
-        throw error
       })
     },
 
@@ -96,6 +96,11 @@ export default {
 
       commit(MT.LIVE_TOKEN_REFRESHER_STOPPED)
       commit(MT.TEST_TOKEN_REFRESHER_STOPPED)
+      commit(MT.USER_CHANGED, undefined)
+      commit(MT.ACCOUNT_CHANGED, undefined)
+      commit(MT.LIVE_TOKEN_CHANGED, undefined)
+      commit(MT.TOKEN_CHANGED, undefined)
+      commit(MT.MODE_CHANGED, 'live')
       commit(MT.READY, true)
     },
 
@@ -119,7 +124,7 @@ export default {
       })
     },
 
-    refreshLiveToken ({ state, commit }) {
+    refreshLiveToken ({ dispatch, state, commit }) {
       return freshcom.createToken({
         refresh_token: state.liveToken.refresh_token, grant_type: 'refresh_token'
       }).then(liveToken => {
@@ -133,6 +138,9 @@ export default {
         }
 
         return liveToken
+      }).catch(error => {
+        console.log(error)
+        return dispatch('reset')
       })
     },
 
@@ -201,7 +209,12 @@ export default {
   mutations: {
     [MT.TOKEN_CHANGED] (state, token) {
       state.token = token
-      freshcom.setAccessToken(token.access_token)
+
+      if (token) {
+        freshcom.setAccessToken(token.access_token)
+      } else {
+        freshcom.setAccessToken(undefined)
+      }
     },
     [MT.LIVE_TOKEN_CHANGED] (state, liveToken) {
       state.liveToken = liveToken

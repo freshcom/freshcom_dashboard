@@ -1,6 +1,6 @@
 <template>
 <el-table
-  @expand="lineItemExpanded"
+  @expand-change="lineItemExpanded"
   :data="tableData"
   :expand-row-keys="expandedLineItemIds"
   row-key="id"

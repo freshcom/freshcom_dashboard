@@ -9,7 +9,7 @@
         <span>Please login to continue</span>
       </div>
 
-      <el-form :model="form" label-width="80px" size="small">
+      <el-form :model="form" @submit.native.prevent="attemptLogin(form)" label-width="80px" size="small">
         <el-form-item label="Email">
           <el-input v-model="form.username"></el-input>
         </el-form-item>
@@ -23,7 +23,7 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button :loading="isSubmitting" type="primary" size="medium" @click="attemptLogin(form)">Login to your account</el-button>
+          <el-button :loading="isSubmitting" type="primary" native-type="submit" size="medium">Login to your account</el-button>
         </el-form-item>
 
       </el-form>
@@ -45,6 +45,16 @@ export default {
         password: '',
         rememberMe: false
       }
+    }
+  },
+  created () {
+    if (this.isLoggedIn) {
+      this.$store.dispatch('pushRoute', { name: 'Home' })
+    }
+  },
+  computed: {
+    isLoggedIn () {
+      return !!this.$store.state.session.user
     }
   },
   methods: {

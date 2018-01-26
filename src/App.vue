@@ -14,15 +14,19 @@
 
     <el-container v-if="isSessionReady">
       <el-header style="text-align: right; font-size: 12px">
-        <el-dropdown>
-          <i class="el-icon-setting" style="margin-right: 15px"></i>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>查看</el-dropdown-item>
-            <el-dropdown-item>新增</el-dropdown-item>
-            <el-dropdown-item>删除</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-        <span>王小虎</span>
+        <div class="user-drop">
+          <el-dropdown trigger="click" @command="userDropdownHandler">
+            <div class="cursor-pointer">
+              <span>{{user.name}}</span>
+              <i class="el-icon-arrow-down el-icon--right"></i>
+            </div>
+
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="logout">Log out</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+
+        </div>
       </el-header>
 
       <el-main class="app">
@@ -35,6 +39,8 @@
 </template>
 
 <script>
+import 'vue-awesome/icons/user-circle-o'
+
 export default {
   name: 'app',
   created () {
@@ -45,6 +51,9 @@ export default {
   computed: {
     isLoading () {
       return this.$store.state.isLoading
+    },
+    user () {
+      return this.$store.state.session.user
     },
     isLoggedIn () {
       return !!this.$store.state.session.user
@@ -61,6 +70,14 @@ export default {
         if (this.spinner) {
           this.spinner.close()
         }
+      }
+    }
+  },
+  methods: {
+    userDropdownHandler (item) {
+      if (item === 'logout') {
+        this.$store.dispatch('session/reset')
+        this.$store.dispatch('pushRoute', { name: 'Login' })
       }
     }
   }
@@ -169,6 +186,9 @@ input::-webkit-inner-spin-button {
 
 
 /* START Util Class */
+.cursor-pointer {
+  cursor: pointer;
+}
 p.btn-group {
   display: inline-block;
 }
@@ -204,6 +224,13 @@ p.btn-group {
 
 
 /* START Layout */
+
+.el-header {
+  .user-drop {
+    padding-top: 30px;
+  }
+}
+
 a {
   color: #20a0ff;
   text-decoration: none;
