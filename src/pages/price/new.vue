@@ -70,7 +70,7 @@ export default {
     submit () {
       this.isCreatingPrice = true
 
-      freshcom.createPrice(this.priceDraft).then(response => {
+      freshcom.createPrice(this.productId, this.priceDraft).then(response => {
         this.$message({
           showClose: true,
           message: `Price created successfully.`,

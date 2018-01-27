@@ -478,15 +478,15 @@ export default {
   //
   // Price
   //
-  listPrice (id, params = {}, options = {}) {
-    return this.http.get('/prices', { params: params }).then(response => {
+  listPrice (productId, params = {}, options = {}) {
+    return this.http.get(`/products/${productId}/prices`, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
 
-  createPrice (fields, params = {}, options = {}) {
+  createPrice (productId, fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
-    return this.http.post('/prices', payload, { params: params }).then(response => {
+    return this.http.post(`/products/${productId}/prices`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
