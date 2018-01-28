@@ -88,6 +88,16 @@ export default {
     }).catch(this._processHttpError)
   },
 
+  //
+  // MARK: Password
+  //
+  createPassword (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post(`/passwords`, payload, { params: params }).then(response => {
+      return {}
+    }).catch(this._processHttpError)
+  },
+
   // MARK: User
 
   retrieveUser (params = {}, options = {}) {
