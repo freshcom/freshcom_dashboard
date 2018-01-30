@@ -98,8 +98,29 @@ export default {
     }).catch(this._processHttpError)
   },
 
-  // MARK: User
+  //
+  // MARK: Email Confirmation
+  //
+  createEmailConfirmation (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post(`/email_confirmations`, payload, { params: params }).then(response => {
+      return {}
+    }).catch(this._processHttpError)
+  },
 
+  //
+  // MARK: Email Confirmation Token
+  //
+  createEmailConfirmationToken (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post(`/email_confirmation_tokens`, payload, { params: params }).then(response => {
+      return {}
+    }).catch(this._processHttpError)
+  },
+
+  //
+  // MARK: User
+  //
   retrieveUser (params = {}, options = {}) {
     return this.http.get('/user', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
