@@ -80,7 +80,7 @@ export default {
       this.isLoading = true
 
       freshcom.retrieveDepositable(this.id, {
-        include: 'avatar,externalFileCollections'
+        include: 'avatar,fileCollections'
       }).then(response => {
         this.depositable = response.data
         this.depositableDraft = _.cloneDeep(response.data)

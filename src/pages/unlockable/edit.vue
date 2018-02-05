@@ -78,7 +78,7 @@ export default {
       this.isLoading = true
 
       freshcom.retrieveUnlockable(this.id, {
-        include: 'avatar,externalFileCollections'
+        include: 'avatar,fileCollections'
       }).then(response => {
         this.unlockable = response.data
         this.unlockableDraft = _.cloneDeep(response.data)

@@ -2,10 +2,10 @@
 <div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="/file_collections" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">
+      <el-menu-item :route="{ name: 'ListFile' }" index="/files">
         Files
       </el-menu-item>
-      <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="/file_collections">
+      <el-menu-item :route="{ name: 'ListFileCollection' }" index="/file_collections">
         Collections
       </el-menu-item>
     </el-menu>
@@ -150,11 +150,11 @@ import 'vue-awesome/icons/folder'
 import freshcom from '@/freshcom-sdk'
 
 import PageMixin from '@/mixins/page'
-import ExternalFileCollection from '@/models/external-file-collection'
+import FileCollection from '@/models/external-file-collection'
 import ConfirmButton from '@/components/confirm-button'
 
 export default {
-  name: 'ShowExternalFileCollection',
+  name: 'ShowFileCollection',
   mixins: [PageMixin],
   components: {
     ConfirmButton
@@ -162,7 +162,7 @@ export default {
   props: ['id'],
   data () {
     return {
-      efc: ExternalFileCollection.objectWithDefaults(),
+      efc: FileCollection.objectWithDefaults(),
       isLoading: false
     }
   },
@@ -173,7 +173,7 @@ export default {
     loadEfc () {
       this.isLoading = true
 
-      freshcom.retrieveExternalFileCollection(this.id, {
+      freshcom.retrieveFileCollection(this.id, {
         include: 'files'
       }).then(response => {
         this.efc = response.data
@@ -184,10 +184,10 @@ export default {
       })
     },
     editEfc () {
-      this.$store.dispatch('pushRoute', { name: 'EditExternalFileCollection', params: { id: this.efc.id } })
+      this.$store.dispatch('pushRoute', { name: 'EditFileCollection', params: { id: this.efc.id } })
     },
     deleteEfc () {
-      freshcom.deleteExternalFileCollection(this.efc.id).then(() => {
+      freshcom.deleteFileCollection(this.efc.id).then(() => {
         this.$message({
           showClose: true,
           message: `File collection deleted successfully.`,
@@ -198,7 +198,7 @@ export default {
       })
     },
     back () {
-      this.$store.dispatch('pushRoute', { name: 'ListExternalFileCollection' })
+      this.$store.dispatch('pushRoute', { name: 'ListFileCollection' })
     }
   }
 }

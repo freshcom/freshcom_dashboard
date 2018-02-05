@@ -2,10 +2,10 @@
 <div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="/file_collections" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">
+      <el-menu-item :route="{ name: 'ListFile' }" index="/files">
         Files
       </el-menu-item>
-      <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="/file_collections">
+      <el-menu-item :route="{ name: 'ListFileCollection' }" index="/file_collections">
         Collections
       </el-menu-item>
     </el-menu>
@@ -55,21 +55,21 @@ import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
 import PageMixin from '@/mixins/page'
-import ExternalFileCollectionForm from '@/components/external-file-collection-form'
-import ExternalFileCollection from '@/models/external-file-collection'
+import FileCollectionForm from '@/components/external-file-collection-form'
+import FileCollection from '@/models/external-file-collection'
 
 export default {
-  name: 'EditExternalFileCollection',
+  name: 'EditFileCollection',
   mixins: [PageMixin],
   components: {
-    ExternalFileCollectionForm
+    FileCollectionForm
   },
   props: ['id'],
   data () {
     return {
       isLoading: false,
-      efc: ExternalFileCollection.objectWithDefaults(),
-      efcDraft: ExternalFileCollection.objectWithDefaults(),
+      efc: FileCollection.objectWithDefaults(),
+      efcDraft: FileCollection.objectWithDefaults(),
 
       isUpadingEfc: false,
       errors: {}
@@ -82,7 +82,7 @@ export default {
     loadEfc () {
       this.isLoading = true
 
-      freshcom.retrieveExternalFileCollection(this.id, {
+      freshcom.retrieveFileCollection(this.id, {
         include: 'files'
       }).then(response => {
         this.efc = response.data
@@ -96,7 +96,7 @@ export default {
     submit () {
       this.isUpdatingEfc = true
 
-      freshcom.updateExternalFileCollection(
+      freshcom.updateFileCollection(
         this.efcDraft.id,
         this.efcDraft
       ).then(efc => {
@@ -116,7 +116,7 @@ export default {
     },
 
     back () {
-      this.$store.dispatch('pushRoute', { name: 'ShowExternalFileCollection', params: { id: this.efc.id } })
+      this.$store.dispatch('pushRoute', { name: 'ShowFileCollection', params: { id: this.efc.id } })
     }
   }
 }

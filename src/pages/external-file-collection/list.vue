@@ -2,14 +2,14 @@
 <div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="/file_collections" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">
+      <el-menu-item :route="{ name: 'ListFile' }" index="/files">
         Files
       </el-menu-item>
-      <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="/file_collections">
+      <el-menu-item :route="{ name: 'ListFileCollection' }" index="/file_collections">
         Collections
       </el-menu-item>
     </el-menu>
-    <locale-selector @change="searchExternalFileCollection()" class="pull-right"></locale-selector>
+    <locale-selector @change="searchFileCollection()" class="pull-right"></locale-selector>
   </div>
 
   <div>
@@ -27,7 +27,7 @@
           </el-input>
         </div>
 
-        <el-button @click="newExternalFileCollection()" plain size="small" class="pull-right">
+        <el-button @click="newFileCollection()" plain size="small" class="pull-right">
           <icon name="plus" scale="0.7" class="v-middle"></icon> New
         </el-button>
       </div>
@@ -36,7 +36,7 @@
         <p v-if="noSearchResult" class="search-notice text-center">
           There is no result that matches "{{searchKeyword}}"
         </p>
-        <el-table v-if="hasSearchResult" @row-click="viewExternalFileCollection" :data="externalFileCollections" class="full">
+        <el-table v-if="hasSearchResult" @row-click="viewFileCollection" :data="fileCollections" class="full">
           <el-table-column prop="name" label="Name" width="200"></el-table-column>
           <el-table-column prop="label" label="Label" width="200"></el-table-column>
           <el-table-column prop="id" label="ID"></el-table-column>
@@ -63,7 +63,7 @@ import Pagination from '@/components/pagination'
 import { idLastPart } from '@/helpers/filters'
 
 export default {
-  name: 'ListExternalFileCollection',
+  name: 'ListFileCollection',
   mixins: [PageMixin],
   components: {
     Pagination
@@ -83,7 +83,7 @@ export default {
   },
   data () {
     return {
-      externalFileCollections: [],
+      fileCollections: [],
       isLoading: false,
       allCount: 0,
       totalCount: 0,
@@ -92,7 +92,7 @@ export default {
     }
   },
   created () {
-    this.searchExternalFileCollection()
+    this.searchFileCollection()
   },
   computed: {
     noSearchResult () {
@@ -107,16 +107,16 @@ export default {
   },
   watch: {
     isViewingTestData () {
-      this.searchExternalFileCollection()
+      this.searchFileCollection()
     },
     searchKeyword (newKeyword) {
-      this.searchExternalFileCollection()
+      this.searchFileCollection()
     },
     page (newPage, oldPage) {
       if (_.isEqual(newPage, oldPage)) {
         return
       }
-      this.searchExternalFileCollection()
+      this.searchFileCollection()
     }
   },
   methods: {
@@ -125,14 +125,14 @@ export default {
       this.$router.replace({ name: this.$store.state.route.name, query: q })
     }, 300),
 
-    searchExternalFileCollection () {
+    searchFileCollection () {
       this.isLoading = true
 
-      freshcom.listExternalFileCollection({
+      freshcom.listFileCollection({
         search: this.searchKeyword,
         page: this.page
       }).then(response => {
-        this.externalFileCollections = response.data
+        this.fileCollections = response.data
         this.allCount = response.meta.allCount
         this.totalCount = response.meta.totalCount
 
@@ -142,12 +142,12 @@ export default {
       })
     },
 
-    viewExternalFileCollection (efc) {
-      this.$store.dispatch('pushRoute', { name: 'ShowExternalFileCollection', params: { id: efc.id, callbackPath: this.currentRoutePath } })
+    viewFileCollection (efc) {
+      this.$store.dispatch('pushRoute', { name: 'ShowFileCollection', params: { id: efc.id, callbackPath: this.currentRoutePath } })
     },
 
-    newExternalFileCollection () {
-      this.$store.dispatch('pushRoute', { name: 'NewExternalFileCollection' })
+    newFileCollection () {
+      this.$store.dispatch('pushRoute', { name: 'NewFileCollection' })
     }
   }
 }

@@ -2,10 +2,10 @@
 <div class="page-warpper">
   <div>
     <el-menu :router="true" default-active="/file_collections" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">
+      <el-menu-item :route="{ name: 'ListFile' }" index="/files">
         Files
       </el-menu-item>
-      <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="/file_collections">
+      <el-menu-item :route="{ name: 'ListFileCollection' }" index="/file_collections">
         Collections
       </el-menu-item>
     </el-menu>
@@ -54,19 +54,19 @@
 import freshcom from '@/freshcom-sdk'
 
 import PageMixin from '@/mixins/page'
-import ExternalFileCollection from '@/models/external-file-collection'
-import ExternalFileCollectionForm from '@/components/external-file-collection-form'
+import FileCollection from '@/models/external-file-collection'
+import FileCollectionForm from '@/components/external-file-collection-form'
 
 export default {
-  name: 'NewExternalFileCollection',
+  name: 'NewFileCollection',
   mixins: [PageMixin],
   components: {
-    ExternalFileCollectionForm
+    FileCollectionForm
   },
   props: ['ownerId', 'ownerType'],
   data () {
     return {
-      efcDraft: ExternalFileCollection.objectWithDefaults(),
+      efcDraft: FileCollection.objectWithDefaults(),
       isCreatingEfc: false,
       errors: {}
     }
@@ -80,7 +80,7 @@ export default {
     submit () {
       this.isCreatingEfc = true
 
-      freshcom.createExternalFileCollection(this.efcDraft).then(response => {
+      freshcom.createFileCollection(this.efcDraft).then(response => {
         this.$message({
           showClose: true,
           message: `File collection created successfully.`,
@@ -97,7 +97,7 @@ export default {
     },
 
     back () {
-      this.$store.dispatch('pushRoute', { name: 'ListExternalFileCollection' })
+      this.$store.dispatch('pushRoute', { name: 'ListFileCollection' })
     }
   }
 }

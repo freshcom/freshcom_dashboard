@@ -2,7 +2,7 @@ export default {
   objectWithDefaults () {
     return {
       id: undefined,
-      type: 'ExternalFile',
+      type: 'File',
 
       name: '',
       contentType: ''

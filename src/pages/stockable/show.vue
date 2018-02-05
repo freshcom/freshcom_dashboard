@@ -88,7 +88,7 @@
           <h3>File Collections</h3>
 
           <span class="block-title-actions pull-right">
-            <router-link :to="{ name: 'NewExternalFileCollection', query: { stockableId: stockable.id, callbackPath: currentRoutePath } }">
+            <router-link :to="{ name: 'NewFileCollection', query: { stockableId: stockable.id, callbackPath: currentRoutePath } }">
               <icon name="plus" scale="0.8" class="v-middle"></icon>
               <span>Add</span>
             </router-link>
@@ -97,10 +97,10 @@
 
         <div class="block">
           <div class="block-body full">
-            <el-table :data="stockable.externalFileCollections" stripe class="block-table" :show-header="false">
+            <el-table :data="stockable.fileCollections" stripe class="block-table" :show-header="false">
               <el-table-column width="500">
                 <template slot-scope="scope">
-                  <router-link :to="{ name: 'ShowExternalFileCollection', params: { id: scope.row.id } }">
+                  <router-link :to="{ name: 'ShowFileCollection', params: { id: scope.row.id } }">
                     <span>{{scope.row.name}}</span>
                     <span v-if="scope.row.name"> - </span>
                     <span>{{scope.row.label}}</span>
@@ -117,7 +117,7 @@
               <el-table-column>
                 <template slot-scope="scope">
                   <p class="text-right actions">
-                    <router-link :to="{ name: 'EditExternalFileCollection', params: { id: scope.row.id }}">
+                    <router-link :to="{ name: 'EditFileCollection', params: { id: scope.row.id }}">
                       <icon name="pencil" scale="0.8" class="v-middle"></icon>
                       <span class="v-middle">Edit</span>
                     </router-link>
@@ -218,7 +218,7 @@ export default {
       this.isLoading = true
 
       freshcom.retrieveStockable(this.id, {
-        include: 'avatar,externalFileCollections'
+        include: 'avatar,fileCollections'
       }).then(response => {
         this.stockable = response.data
         this.isLoading = false

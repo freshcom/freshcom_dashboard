@@ -95,7 +95,7 @@
           </el-menu-item>
         </el-submenu>
 
-        <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">
+        <el-menu-item :route="{ name: 'ListFile' }" index="/files">
           <icon name="folder" scale="0.8"></icon>
           <span>File Storage</span>
         </el-menu-item>
@@ -110,11 +110,11 @@
             <icon name="folder" scale="0.8"></icon>
             <span>File Storage</span>
           </template>
-          <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="/file_collections">
+          <el-menu-item :route="{ name: 'ListFileCollection' }" index="/file_collections">
             <icon name="folder-open" scale="0.8"></icon>
             <span>File Collections</span>
           </el-menu-item>
-          <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">
+          <el-menu-item :route="{ name: 'ListFile' }" index="/files">
             <icon name="file" scale="0.8"></icon>
             <span>Files</span>
           </el-menu-item>

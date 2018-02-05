@@ -77,7 +77,7 @@ export default {
       this.isLoading = true
 
       freshcom.retrieveStockable(this.id, {
-        include: 'avatar,externalFileCollections'
+        include: 'avatar,fileCollections'
       }).then(response => {
         this.stockable = response.data
         this.stockableDraft = _.cloneDeep(response.data)

@@ -12,7 +12,7 @@
     <flexbox :gutter="0" class="h-fvp">
       <flexbox-item class="h-fvp vux-1px-r">
         <group title="File Sets">
-          <cell v-for="fileSet in fileSets" :key="fileSet.label" :title="$t(`models.externalFileSet.label.${fileSet.label}`)" :class="{ active: isFileSetSelected(fileSet) }" @click.native="selectFileSet(fileSet)" is-link></cell>
+          <cell v-for="fileSet in fileSets" :key="fileSet.label" :title="$t(`models.fFileSet.label.${fileSet.label}`)" :class="{ active: isFileSetSelected(fileSet) }" @click.native="selectFileSet(fileSet)" is-link></cell>
         </group>
       </flexbox-item>
       <flexbox-item :span="8" class="h-fvp scroll-y">
@@ -33,11 +33,11 @@
                     <li class="weui-uploader__file weui-uploader__file_status" style="background-image:url(https://static.vux.li/uploader_bg.png)">
                         <div class="weui-uploader__file-content">50%</div>
                     </li>
-                    <li v-for="externalFile in pendingExternalFiles" :key="externalFile.id" class="weui-uploader__file weui-uploader__file_status" style="background-image:url(https://static.vux.li/uploader_bg.png)">
-                        <div class="weui-uploader__file-content">{{externalFile.percentage}}%</div>
+                    <li v-for="fFile in pendingFiles" :key="fFile.id" class="weui-uploader__file weui-uploader__file_status" style="background-image:url(https://static.vux.li/uploader_bg.png)">
+                        <div class="weui-uploader__file-content">{{fFile.percentage}}%</div>
                     </li>
-                    <li v-for="externalFile in uploadedExternalFiles" :key="externalFile.id" class="weui-uploader__file">
-                      <img :src="externalFile.presignedUrl" style="height: 79px; width: 79px;">
+                    <li v-for="fFile in uploadedFiles" :key="fFile.id" class="weui-uploader__file">
+                      <img :src="fFile.presignedUrl" style="height: 79px; width: 79px;">
                     </li>
                 </ul>
                 <div class="weui-uploader__input-box">
@@ -77,11 +77,11 @@ export default {
     }
   },
   computed: {
-    pendingExternalFiles() {
-      return this.$store.state.pendingExternalFiles
+    pendingFiles() {
+      return this.$store.state.pendingFiles
     },
-    uploadedExternalFiles() {
-      return this.$store.state.uploadedExternalFiles
+    uploadedFiles() {
+      return this.$store.state.uploadedFiles
     }
   },
   watch: {
@@ -89,24 +89,24 @@ export default {
       this.fileSets = v
       this.selectedFileSet = this.value[0]
     },
-    uploadedExternalFiles(collection) {
-      // If there is still externalFile being uploaded we wait until
+    uploadedFiles(collection) {
+      // If there is still fFile being uploaded we wait until
       // all is finished
-      if (this.pendingExternalFiles.length > 0) {
+      if (this.pendingFiles.length > 0) {
         return
       }
 
       let uploadedByFileSets = {}
-      _.forEach(collection, (externalFile) => {
-        let fileSet = externalFile.fileSet
+      _.forEach(collection, (fFile) => {
+        let fileSet = fFile.fileSet
         uploadedByFileSets[fileSet.label] = uploadedByFileSets[fileSet.label] || []
-        uploadedByFileSets[fileSet.label].push(externalFile)
+        uploadedByFileSets[fileSet.label].push(fFile)
       })
 
-      this.$store.dispatch('popUploadedExternalFile', collection)
-      _.forEach(uploadedByFileSets, (externalFiles, fileSet) => {
-        this.$store.dispatch('createExternalFileSet', fileSet).then(fileSet => {
-          return this.$store.dispatch('addFileToExternalFileSet', externalFiles)
+      this.$store.dispatch('popUploadedFile', collection)
+      _.forEach(uploadedByFileSets, (fFiles, fileSet) => {
+        this.$store.dispatch('createFileSet', fileSet).then(fileSet => {
+          return this.$store.dispatch('addFileToFileSet', fFiles)
         })
       })
     }
@@ -123,12 +123,12 @@ export default {
     },
     pushPendingImage(e) {
       let files = e.target.files || []
-      let externalFileCollection = _.map(files, (file) => {
-        return { type: 'ExternalFile', name: file.name, sizeBytes: file.size, contentType: file.type, file: file, fileSet: this.selectedFileSet }
+      let fileCollection = _.map(files, (file) => {
+        return { type: 'File', name: file.name, sizeBytes: file.size, contentType: file.type, file: file, fileSet: this.selectedFileSet }
       })
 
-      if (!_.isEmpty(externalFileCollection)) {
-        this.$store.dispatch('pushPendingExternalFile', externalFileCollection)
+      if (!_.isEmpty(fileCollection)) {
+        this.$store.dispatch('pushPendingFile', fileCollection)
       }
     }
   }

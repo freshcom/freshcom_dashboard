@@ -655,38 +655,38 @@ export default {
   },
 
   //
-  // ExternalFile
+  // File
   //
-  listExternalFile (params = {}, options = {}) {
-    return this.http.get('/external_files', { params: params }).then(response => {
+  listFile (params = {}, options = {}) {
+    return this.http.get('/files', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
 
-  createExternalFile (fields, params = {}, options = {}) {
+  createFile (fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
-    return this.http.post('/external_files', payload, { params: params }).then(response => {
+    return this.http.post('/files', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
 
-  retrieveExternalFile (id, params = {}, options = {}) {
-    return this.http.get(`/external_files/${id}`, { params: params }).then(response => {
+  retrieveFile (id, params = {}, options = {}) {
+    return this.http.get(`/files/${id}`, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
 
-  updateExternalFile (id, fields, params = {}, options = {}) {
+  updateFile (id, fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
-    return this.http.patch(`/external_files/${id}`, payload, { params: params }).then(response => {
+    return this.http.patch(`/files/${id}`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
 
-  uploadExternalFile (fields, params = {}, options = {}) {
+  uploadFile (fields, params = {}, options = {}) {
     let file = fields.file
-    return this.createExternalFile(fields, params, options).then(response => {
-      let externalFile = response.data
+    return this.createFile(fields, params, options).then(response => {
+      let fFile = response.data
 
       if (options.created) {
         options.created(response)
@@ -697,22 +697,22 @@ export default {
           let percentage = Math.round((progressEvent.loaded * 100) / progressEvent.total)
 
           if (options.progress) {
-            options.progress(percentage, externalFile)
+            options.progress(percentage, fFile)
           }
         },
-        headers: { 'Content-Type': externalFile.contentType }
+        headers: { 'Content-Type': fFile.contentType }
       }
 
-      return axios.put(externalFile.url, file, config).then(() => { return response })
+      return axios.put(fFile.url, file, config).then(() => { return response })
     }).then(response => {
-      let externalFile = response.data
-      externalFile.status = 'uploaded'
-      return this.updateExternalFile(externalFile.id, externalFile, params, options)
+      let fFile = response.data
+      fFile.status = 'uploaded'
+      return this.updateFile(fFile.id, fFile, params, options)
     }).catch(this._processHttpError)
   },
 
-  deleteExternalFile (id, params = {}, options = {}) {
-    return this.http.delete(`/external_files/${id}`, { params: params }).then(response => {
+  deleteFile (id, params = {}, options = {}) {
+    return this.http.delete(`/files/${id}`, { params: params }).then(response => {
       if (response.data) {
         return SimpleJAS.deserialize(response.data)
       }
@@ -720,36 +720,36 @@ export default {
   },
 
   //
-  // ExternalFileCollection
+  // FileCollection
   //
-  listExternalFileCollection (params = {}, options = {}) {
-    return this.http.get('/external_file_collections', { params: params }).then(response => {
+  listFileCollection (params = {}, options = {}) {
+    return this.http.get('/file_collections', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
 
-  createExternalFileCollection (fields, params = {}, options = {}) {
+  createFileCollection (fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
-    return this.http.post('/external_file_collections', payload, { params: params }).then(response => {
+    return this.http.post('/file_collections', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
 
-  retrieveExternalFileCollection (id, params = {}, options = {}) {
-    return this.http.get(`/external_file_collections/${id}`, { params: params }).then(response => {
+  retrieveFileCollection (id, params = {}, options = {}) {
+    return this.http.get(`/file_collections/${id}`, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
 
-  updateExternalFileCollection (id, fields, params = {}, options = {}) {
+  updateFileCollection (id, fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
-    return this.http.patch(`/external_file_collections/${id}`, payload, { params: params }).then(response => {
+    return this.http.patch(`/file_collections/${id}`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
 
-  deleteExternalFileCollection (id, params = {}, options = {}) {
-    return this.http.delete(`/external_file_collections/${id}`, { params: params }).then(response => {
+  deleteFileCollection (id, params = {}, options = {}) {
+    return this.http.delete(`/file_collections/${id}`, { params: params }).then(response => {
       if (response.data) {
         return SimpleJAS.deserialize(response.data)
       }

@@ -66,13 +66,13 @@ import NewNotificationTriggerPage from '@/pages/notification-trigger/new'
 import ShowNotificationTriggerPage from '@/pages/notification-trigger/show'
 
 // File Storage
-import NewExternalFileCollectionPage from '@/pages/external-file-collection/new'
-import EditExternalFileCollectionPage from '@/pages/external-file-collection/edit'
-import ShowExternalFileCollectionPage from '@/pages/external-file-collection/show'
-import ListExternalFileCollectionPage from '@/pages/external-file-collection/list'
+import NewFileCollectionPage from '@/pages/external-file-collection/new'
+import EditFileCollectionPage from '@/pages/external-file-collection/edit'
+import ShowFileCollectionPage from '@/pages/external-file-collection/show'
+import ListFileCollectionPage from '@/pages/external-file-collection/list'
 
-import ListExternalFilePage from '@/pages/external-file/list'
-import ShowExternalFilePage from '@/pages/external-file/show'
+import ListFilePage from '@/pages/external-file/list'
+import ShowFilePage from '@/pages/external-file/show'
 
 import ShowBalanceSettingsPage from '@/pages/balance/settings'
 import APIHomePage from '@/pages/api/home'
@@ -213,8 +213,8 @@ const router = new Router({
     },
     {
       path: '/file_collections',
-      name: 'ListExternalFileCollection',
-      component: ListExternalFileCollectionPage,
+      name: 'ListFileCollection',
+      component: ListFileCollectionPage,
       props (route) {
         let page = extractPagination(route)
         return {
@@ -225,8 +225,8 @@ const router = new Router({
     },
     {
       path: '/file_collections/new',
-      name: 'NewExternalFileCollection',
-      component: NewExternalFileCollectionPage,
+      name: 'NewFileCollection',
+      component: NewFileCollectionPage,
       props (route) {
         let queryString = route.fullPath.split('?')[1]
         let query = qs.parse(queryString)
@@ -236,24 +236,24 @@ const router = new Router({
     },
     {
       path: '/file_collections/:id',
-      name: 'ShowExternalFileCollection',
-      component: ShowExternalFileCollectionPage,
+      name: 'ShowFileCollection',
+      component: ShowFileCollectionPage,
       props (route) {
         return { id: route.params.id }
       }
     },
     {
       path: '/file_collections/:id/edit',
-      name: 'EditExternalFileCollection',
-      component: EditExternalFileCollectionPage,
+      name: 'EditFileCollection',
+      component: EditFileCollectionPage,
       props (route) {
         return { id: route.params.id }
       }
     },
     {
       path: '/files',
-      name: 'ListExternalFile',
-      component: ListExternalFilePage,
+      name: 'ListFile',
+      component: ListFilePage,
       props (route) {
         let page = extractPagination(route)
         return {
@@ -264,8 +264,8 @@ const router = new Router({
     },
     {
       path: '/files/:id',
-      name: 'ShowExternalFile',
-      component: ShowExternalFilePage,
+      name: 'ShowFile',
+      component: ShowFilePage,
       props (route) {
         return { id: route.params.id }
       }

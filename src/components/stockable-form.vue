@@ -125,9 +125,9 @@ export default {
     }, 300),
     uploadAvatar (e) {
       let file = e.file
-      let externalFile = { type: 'ExternalFile', name: file.name, sizeBytes: file.size, contentType: file.type, file: file }
+      let fFile = { type: 'File', name: file.name, sizeBytes: file.size, contentType: file.type, file: file }
 
-      freshcom.uploadExternalFile(externalFile, {}, {
+      freshcom.uploadFile(fFile, {}, {
         created: (response) => {
           this.formModel.avatar = _.merge({}, response.data, { percentage: 0 })
           this.isUploadingAvatar = true
@@ -136,8 +136,8 @@ export default {
           this.formModel.avatar.percentage = percentage
         }, 300)
       }).then(response => {
-        let externalFile = response.data
-        this.formModel.avatar = externalFile
+        let fFile = response.data
+        this.formModel.avatar = fFile
         this.updateValue()
         this.isUploadingAvatar = false
       }).catch(() => {

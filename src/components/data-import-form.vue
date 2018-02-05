@@ -6,7 +6,7 @@
 
   <el-upload
     class="text-center"
-    :http-request="uploadExternalFile"
+    :http-request="uploadFile"
     drag
     action="https://jsonplaceholder.typicode.com/posts/"
     multiple>
@@ -23,7 +23,7 @@ import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 import translateErrors from '@/helpers/translate-errors'
 
-import ExternalFile from '@/models/external-file'
+import FFile from '@/models/external-file'
 
 export default {
   name: 'DataImportForm',
@@ -31,7 +31,7 @@ export default {
   data () {
     return {
       formModel: _.cloneDeep(this.value),
-      targetFile: ExternalFile.objectWithDefaults()
+      targetFile: FFile.objectWithDefaults()
     }
   },
   computed: {
@@ -49,12 +49,12 @@ export default {
       this.$emit('input', this.formModel)
     }, 300),
 
-    uploadExternalFile (e) {
-      this.targetFile = ExternalFile.objectWithDefaults()
+    uploadFile (e) {
+      this.targetFile = FFile.objectWithDefaults()
 
       let file = e.file
-      let externalFile = { type: 'ExternalFile', name: file.name, sizeBytes: file.size, contentType: file.type, file: file }
-      freshcom.uploadExternalFile(externalFile, {}, {
+      let fFile = { type: 'File', name: file.name, sizeBytes: file.size, contentType: file.type, file: file }
+      freshcom.uploadFile(fFile, {}, {
         created: (response) => {
           this.targetFile = _.merge({}, response.data, {
             status: 'uploading',

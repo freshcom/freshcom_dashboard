@@ -24,9 +24,9 @@
     <div class="block">
       <div class="block-body">
         <el-upload
-          :http-request="uploadExternalFile"
+          :http-request="uploadFile"
           :file-list="fileList"
-          :on-remove="deleteExternalFile"
+          :on-remove="deleteFile"
           action=""
           multiple
           >
@@ -48,7 +48,7 @@ import 'vue-awesome/icons/plus'
 import translateErrors from '@/helpers/translate-errors'
 
 export default {
-  name: 'ExternalFileCollectionForm',
+  name: 'FileCollectionForm',
   props: ['value', 'errors'],
   data () {
     return {
@@ -60,7 +60,7 @@ export default {
   },
   computed: {
     errorMsgs () {
-      return translateErrors(this.errors, 'externalFileCollection')
+      return translateErrors(this.errors, 'fileCollection')
     },
     fileList () {
       return _.concat(this.uploadingFiles, this.toFileList(this.formModel.files))
@@ -82,16 +82,16 @@ export default {
       }, [])
     },
 
-    uploadExternalFile (e) {
+    uploadFile (e) {
       let file = e.file
-      let externalFile = { type: 'ExternalFile', name: file.name, sizeBytes: file.size, contentType: file.type, file: file }
+      let fFile = { type: 'File', name: file.name, sizeBytes: file.size, contentType: file.type, file: file }
 
-      freshcom.uploadExternalFile(externalFile, {}, {
+      freshcom.uploadFile(fFile, {}, {
         created: (response) => {
-          let externalFile = response.data
+          let fFile = response.data
           let f = {
-            id: externalFile.id,
-            name: externalFile.name,
+            id: fFile.id,
+            name: fFile.name,
             status: 'uploading',
             percentage: 0
           }
@@ -111,7 +111,7 @@ export default {
       })
     },
 
-    deleteExternalFile (targetEf) {
+    deleteFile (targetEf) {
       this.formModel.files = _.reject(this.formModel.files, (ef) => { return ef.id === targetEf.id })
       this.updateValue()
     }

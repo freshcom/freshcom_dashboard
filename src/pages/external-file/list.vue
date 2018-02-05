@@ -2,14 +2,14 @@
 <div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="/files" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListExternalFile' }" index="/files">
+      <el-menu-item :route="{ name: 'ListFile' }" index="/files">
         Files
       </el-menu-item>
-      <el-menu-item :route="{ name: 'ListExternalFileCollection' }" index="/file_collections">
+      <el-menu-item :route="{ name: 'ListFileCollection' }" index="/file_collections">
         Collections
       </el-menu-item>
     </el-menu>
-    <locale-selector @change="searchExternalFile()" class="pull-right"></locale-selector>
+    <locale-selector @change="searchFile()" class="pull-right"></locale-selector>
   </div>
 
   <div>
@@ -30,7 +30,7 @@
         <p v-if="noSearchResult" class="search-notice text-center">
           There is no result that matches "{{searchKeyword}}"
         </p>
-        <el-table v-if="hasSearchResult" @row-click="viewExternalFile" :data="externalFiles" class="full">
+        <el-table v-if="hasSearchResult" @row-click="viewFile" :data="fFiles" class="full">
           <el-table-column prop="name" label="Name" width="300"></el-table-column>
           <el-table-column prop="contentType" label="Content Type" width="150"></el-table-column>
           <el-table-column prop="id" label="ID"></el-table-column>
@@ -57,7 +57,7 @@ import Pagination from '@/components/pagination'
 import { idLastPart } from '@/helpers/filters'
 
 export default {
-  name: 'ListExternalFile',
+  name: 'ListFile',
   mixins: [PageMixin],
   components: {
     Pagination
@@ -77,7 +77,7 @@ export default {
   },
   data () {
     return {
-      externalFiles: [],
+      fFiles: [],
       isLoading: false,
       allCount: 0,
       totalCount: 0,
@@ -86,7 +86,7 @@ export default {
     }
   },
   created () {
-    this.searchExternalFile()
+    this.searchFile()
   },
   computed: {
     noSearchResult () {
@@ -101,16 +101,16 @@ export default {
   },
   watch: {
     isViewingTestData () {
-      this.searchExternalFile()
+      this.searchFile()
     },
     searchKeyword (newKeyword) {
-      this.searchExternalFile()
+      this.searchFile()
     },
     page (newPage, oldPage) {
       if (_.isEqual(newPage, oldPage)) {
         return
       }
-      this.searchExternalFile()
+      this.searchFile()
     }
   },
   methods: {
@@ -119,14 +119,14 @@ export default {
       this.$router.replace({ name: this.$store.state.route.name, query: q })
     }, 300),
 
-    searchExternalFile () {
+    searchFile () {
       this.isLoading = true
 
-      freshcom.listExternalFile({
+      freshcom.listFile({
         search: this.searchKeyword,
         page: this.page
       }).then(response => {
-        this.externalFiles = response.data
+        this.fFiles = response.data
         this.allCount = response.meta.allCount
         this.totalCount = response.meta.totalCount
 
@@ -136,8 +136,8 @@ export default {
       })
     },
 
-    viewExternalFile (externalFile) {
-      this.$store.dispatch('pushRoute', { name: 'ShowExternalFile', params: { id: externalFile.id, callbackPath: this.currentRoutePath } })
+    viewFile (fFile) {
+      this.$store.dispatch('pushRoute', { name: 'ShowFile', params: { id: fFile.id, callbackPath: this.currentRoutePath } })
     }
   }
 }
