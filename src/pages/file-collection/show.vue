@@ -150,7 +150,7 @@ import 'vue-awesome/icons/folder'
 import freshcom from '@/freshcom-sdk'
 
 import PageMixin from '@/mixins/page'
-import FileCollection from '@/models/external-file-collection'
+import FileCollection from '@/models/file-collection'
 import ConfirmButton from '@/components/confirm-button'
 
 export default {

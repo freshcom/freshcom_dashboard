@@ -114,7 +114,7 @@ import 'vue-awesome/icons/file'
 import freshcom from '@/freshcom-sdk'
 
 import PageMixin from '@/mixins/page'
-import FFile from '@/models/external-file'
+import FFile from '@/models/file'
 import ConfirmButton from '@/components/confirm-button'
 
 export default {

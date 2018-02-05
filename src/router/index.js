@@ -66,13 +66,13 @@ import NewNotificationTriggerPage from '@/pages/notification-trigger/new'
 import ShowNotificationTriggerPage from '@/pages/notification-trigger/show'
 
 // File Storage
-import NewFileCollectionPage from '@/pages/external-file-collection/new'
-import EditFileCollectionPage from '@/pages/external-file-collection/edit'
-import ShowFileCollectionPage from '@/pages/external-file-collection/show'
-import ListFileCollectionPage from '@/pages/external-file-collection/list'
+import NewFileCollectionPage from '@/pages/file-collection/new'
+import EditFileCollectionPage from '@/pages/file-collection/edit'
+import ShowFileCollectionPage from '@/pages/file-collection/show'
+import ListFileCollectionPage from '@/pages/file-collection/list'
 
-import ListFilePage from '@/pages/external-file/list'
-import ShowFilePage from '@/pages/external-file/show'
+import ListFilePage from '@/pages/file/list'
+import ShowFilePage from '@/pages/file/show'
 
 import ShowBalanceSettingsPage from '@/pages/balance/settings'
 import APIHomePage from '@/pages/api/home'

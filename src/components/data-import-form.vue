@@ -23,7 +23,7 @@ import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 import translateErrors from '@/helpers/translate-errors'
 
-import FFile from '@/models/external-file'
+import FFile from '@/models/file'
 
 export default {
   name: 'DataImportForm',

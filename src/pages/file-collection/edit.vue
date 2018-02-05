@@ -1,5 +1,5 @@
 <template>
-<div class="page-warpper">
+<div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="/file_collections" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListFile' }" index="/files">
@@ -13,13 +13,13 @@
   </div>
 
   <div>
-    <el-card class="main-card">
+    <el-card v-loading="isLoading" class="main-card">
       <div slot="header">
         <div v-if="isViewingTestData" class="test-data-banner">
           <div class="banner-content">TEST DATA</div>
         </div>
 
-        <span style="line-height: 36px;">Create a file collection</span>
+        <span style="line-height: 36px;">Edit File Collection</span>
 
         <div class="pull-right">
           <el-button @click="back()" plain size="small">
@@ -33,7 +33,7 @@
       </div>
 
       <div class="data">
-        <external-file-collection-form v-model="efcDraft" :errors="errors"></external-file-collection-form>
+        <file-collection-form v-model="efcDraft" :errors="errors"></file-collection-form>
       </div>
 
       <div class="footer">
@@ -41,7 +41,7 @@
           Cancel
         </el-button>
 
-        <el-button @click="submit()" type="primary" class="pull-right" size="small">
+        <el-button @click="submit()" size="small" type="primary" class="pull-right">
           Save
         </el-button>
       </div>
@@ -51,53 +51,72 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
 import PageMixin from '@/mixins/page'
-import FileCollection from '@/models/external-file-collection'
-import FileCollectionForm from '@/components/external-file-collection-form'
+import FileCollectionForm from '@/components/file-collection-form'
+import FileCollection from '@/models/file-collection'
 
 export default {
-  name: 'NewFileCollection',
+  name: 'EditFileCollection',
   mixins: [PageMixin],
   components: {
     FileCollectionForm
   },
-  props: ['ownerId', 'ownerType'],
+  props: ['id'],
   data () {
     return {
+      isLoading: false,
+      efc: FileCollection.objectWithDefaults(),
       efcDraft: FileCollection.objectWithDefaults(),
-      isCreatingEfc: false,
+
+      isUpadingEfc: false,
       errors: {}
     }
   },
   created () {
-    if (this.ownerId && this.ownerType) {
-      this.efcDraft.owner = { id: this.ownerId, type: this.ownerType }
-    }
+    this.loadEfc()
   },
   methods: {
-    submit () {
-      this.isCreatingEfc = true
+    loadEfc () {
+      this.isLoading = true
 
-      freshcom.createFileCollection(this.efcDraft).then(response => {
+      freshcom.retrieveFileCollection(this.id, {
+        include: 'files'
+      }).then(response => {
+        this.efc = response.data
+        this.efcDraft = _.cloneDeep(response.data)
+        this.isLoading = false
+      }).catch(response => {
+        this.isLoading = false
+        throw response
+      })
+    },
+    submit () {
+      this.isUpdatingEfc = true
+
+      freshcom.updateFileCollection(
+        this.efcDraft.id,
+        this.efcDraft
+      ).then(efc => {
         this.$message({
           showClose: true,
-          message: `File collection created successfully.`,
+          message: `File collection saved successfully.`,
           type: 'success'
         })
 
-        this.isCreatingEfc = false
+        this.isUpdatingEfc = false
         this.back()
       }).catch(response => {
         this.errors = response.errors
-        this.isCreatingEfc = false
+        this.isUpdatingEfc = false
         throw response
       })
     },
 
     back () {
-      this.$store.dispatch('pushRoute', { name: 'ListFileCollection' })
+      this.$store.dispatch('pushRoute', { name: 'ShowFileCollection', params: { id: this.efc.id } })
     }
   }
 }
