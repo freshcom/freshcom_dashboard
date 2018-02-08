@@ -3,12 +3,12 @@
 
   <el-form-item v-if="canSelectGateway" :error="errorMsgs.gateway" label="Gateway" required>
     <el-select @change="handleGatewayChange($event)" :value="formModel.gateway">
-      <el-option label="Online" value="online"></el-option>
-      <el-option label="Offline" value="offline"></el-option>
+      <el-option label="Freshcom" value="freshcom"></el-option>
+      <el-option label="Custom" value="custom"></el-option>
     </el-select>
   </el-form-item>
 
-  <el-form-item v-if="formModel.gateway === 'offline'" label="Method" :error="errorMsgs.method" required>
+  <el-form-item v-if="formModel.gateway === 'custom'" label="Method" :error="errorMsgs.method" required>
     <el-select @change="updateValue" v-model="formModel.method">
       <el-option label="Cash" value="cash"></el-option>
       <el-option label="Cheque" value="cheque"></el-option>
@@ -49,11 +49,11 @@ export default {
   },
   computed: {
     canSelectProcessor () {
-      return !this.formModel.id && this.formModel.gateway === 'online'
+      return !this.formModel.id && this.formModel.gateway === 'freshcom'
     },
 
     canSelectGateway () {
-      return !this.formModel.id && this.formModel.payment.gateway === 'online'
+      return !this.formModel.id && this.formModel.payment.gateway === 'freshcom'
     },
 
     errorMsgs () {
@@ -72,7 +72,7 @@ export default {
 
     handleGatewayChange (value) {
       this.formModel.gateway = value
-      if (value === 'offline') {
+      if (value === 'custom') {
         this.formModel.method = 'cash'
       }
       this.updateValue()

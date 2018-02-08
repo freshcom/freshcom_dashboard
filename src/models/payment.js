@@ -5,7 +5,7 @@ export default {
       type: 'Payment',
       status: 'pending',
 
-      gateway: 'online',
+      gateway: 'freshcom',
       processor: 'stripe',
       method: '',
       source: undefined,

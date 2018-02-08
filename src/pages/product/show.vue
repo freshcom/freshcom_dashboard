@@ -73,8 +73,8 @@
               <dt>Sort Index</dt>
               <dd>{{product.sortIndex}}</dd>
 
-              <dt>Source Quantity</dt>
-              <dd>{{product.sourceQuantity}}</dd>
+              <dt>Goods Quantity</dt>
+              <dd>{{product.goodsQuantity}}</dd>
 
               <dt>Maximum Public OQ</dt>
               <dd>{{product.maximumPublicOrderQuantity}}</dd>
@@ -326,6 +326,10 @@
             <dl>
               <dt v-if="product.avatar">Avatar</dt>
               <dd v-if="product.avatar"><a href="#">{{product.avatar.id}}</a></dd>
+            </dl>
+            <dl>
+              <dt v-if="product.goods">Goods</dt>
+              <dd v-if="product.goods"><a href="#">{{product.goods.id}}</a></dd>
             </dl>
             <dl>
               <dt v-if="product.parent">Parent</dt>

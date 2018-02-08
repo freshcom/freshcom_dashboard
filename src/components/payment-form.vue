@@ -10,8 +10,8 @@
     <el-col v-if="canSelectGateway" :span="6">
       <el-form-item label="Gateway" :error="errorMsgs.gateway" required>
         <el-select @change="updateValue" v-model="formModel.gateway">
-          <el-option label="Online" value="online"></el-option>
-          <el-option label="Offline" value="offline"></el-option>
+          <el-option label="Freshcom" value="freshcom"></el-option>
+          <el-option label="Custom" value="custom"></el-option>
         </el-select>
       </el-form-item>
     </el-col>
@@ -24,7 +24,7 @@
       </el-form-item>
     </el-col>
     <el-col :span="6">
-      <el-form-item v-if="formModel.gateway === 'offline' && formModel.status === 'paid'" label="Method" :error="errorMsgs.method" required>
+      <el-form-item v-if="formModel.gateway === 'custom' && formModel.status === 'paid'" label="Method" :error="errorMsgs.method" required>
         <el-select @change="updateValue" v-model="formModel.method">
           <el-option label="Credit" value="credit"></el-option>
           <el-option label="Debit" value="debit"></el-option>
@@ -101,7 +101,7 @@
       </el-col>
     </el-row>
 
-    <el-row v-if="formModel.gateway === 'online' && formModel.order && formModel.order.fulfillmentMethod === 'ship'">
+    <el-row v-if="formModel.gateway === 'freshcom' && formModel.order && formModel.order.fulfillmentMethod === 'ship'">
       <el-form-item label="Billing Address" :error="errorMsgs.status" required>
         <el-radio-group @change="updateValue" v-model="isBillingAndShippingAddressSame">
           <el-radio :label="false">Enter new address</el-radio>
@@ -195,7 +195,7 @@ export default {
     },
 
     canSelectStatus () {
-      return this.formModel.gateway === 'offline'
+      return this.formModel.gateway === 'custom'
     },
 
     canEnterCaptureAmount () {
@@ -203,15 +203,15 @@ export default {
     },
 
     canEnterCreditCard () {
-      return !this.formModel.id && this.formModel.gateway === 'online' && this.action === 'payNow'
+      return !this.formModel.id && this.formModel.gateway === 'freshcom' && this.action === 'payNow'
     },
 
     canSelectProcessor () {
-      return !this.formModel.id && this.formModel.gateway === 'online'
+      return !this.formModel.id && this.formModel.gateway === 'freshcom'
     },
 
     canSelectAction () {
-      return !this.formModel.id && this.formModel.gateway === 'online'
+      return !this.formModel.id && this.formModel.gateway === 'freshcom'
     },
 
     canSelectGateway () {

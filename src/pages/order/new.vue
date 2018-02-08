@@ -383,7 +383,7 @@ export default {
       this.isCreatingPayment = true
 
       let paymentCreated
-      if (this.paymentDraft.gateway === 'online' && this.paymentDraft.useCardFrom === 'newCard') {
+      if (this.paymentDraft.gateway === 'freshcom' && this.paymentDraft.useCardFrom === 'newCard') {
         paymentCreated = createStripeToken().then(data => {
           this.paymentDraft.source = data.token.id
           return freshcom.createPayment(this.paymentDraft)

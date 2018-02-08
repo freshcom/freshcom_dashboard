@@ -71,8 +71,8 @@ export default {
     },
     refund: {
       gateway: {
-        online: 'Online',
-        offline: 'Offline'
+        freshcom: 'Freshcom',
+        custom: 'Custom'
       }
     },
     depositable: {
@@ -100,8 +100,8 @@ export default {
         refunded: 'Refunded'
       },
       gateway: {
-        online: 'Online',
-        offline: 'Offline'
+        freshcom: 'Freshcom',
+        custom: 'Custom'
       }
     },
     customer: {

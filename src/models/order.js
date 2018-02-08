@@ -5,8 +5,7 @@ export default {
       type: 'Order',
 
       code: '',
-      firstName: 'test',
-      lastName: 'test',
+      name: '',
       email: 'test@example.com',
       status: 'cart',
 
