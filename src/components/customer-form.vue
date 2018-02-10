@@ -27,6 +27,10 @@
     <el-input v-model="formModel.email"></el-input>
   </el-form-item>
 
+  <el-form-item label="Username" :error="errorMsgs.username" :required="formModel.status === 'registered'">
+    <el-input v-model="formModel.username"></el-input>
+  </el-form-item>
+
   <el-form-item v-show="canInputPassword" :error="errorMsgs.password" label="Password" required>
     <el-input v-model="formModel.password" type="password"></el-input>
   </el-form-item>
