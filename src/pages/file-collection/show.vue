@@ -99,23 +99,11 @@
         <div class="block">
           <div class="block-body">
             <dl>
-              <dt v-if="efc.product">Product</dt>
-              <dd v-if="efc.product">
-                <router-link :to="{ name: 'ShowProduct', params: { id: efc.product.id }}">
-                  {{efc.product.id}}
+              <dt v-if="efc.owner">Owner</dt>
+              <dd v-if="efc.owner">
+                <router-link :to="{ name: `Show${efc.owner.type}`, params: { id: efc.owner.id }}">
+                  {{efc.owner.id}}
                 </router-link>
-              </dd>
-
-              <dt v-if="efc.stockable">Stockable</dt>
-              <dd v-if="efc.stockable">
-                <router-link :to="{ name: 'ShowStockable', params: { id: efc.stockable.id }}">
-                  {{efc.stockable.id}}
-                </router-link>
-              </dd>
-
-              <dt v-if="efc.unlockable">Unlockable</dt>
-              <dd v-if="efc.unlockable">
-                <a href="#">{{efc.unlockable.id}}</a>
               </dd>
             </dl>
           </div>

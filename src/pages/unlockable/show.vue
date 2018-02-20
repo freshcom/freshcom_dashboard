@@ -82,8 +82,6 @@
                 <template slot-scope="scope">
                   <router-link :to="{ name: 'ShowFileCollection', params: { id: scope.row.id } }">
                     <span>{{scope.row.name}}</span>
-                    <span v-if="scope.row.name"> - </span>
-                    <span>{{scope.row.label}}</span>
                   </router-link>
                 </template>
               </el-table-column>
