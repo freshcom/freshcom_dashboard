@@ -9,7 +9,7 @@ export default {
       to: '',
       replyTo: undefined,
       subject: '',
-      contentHtml: ''
+      bodyHtml: ''
     }
   }
 }

@@ -58,15 +58,42 @@ export default {
   fields: {
     orderLineItem: {
       fulfillmentStatus: {
-        returned: 'Returned'
+        pending: 'Pending',
+        fulfilled: 'Fulfilled',
+        returned: 'Returned',
+        discarded: 'Discarded'
       }
     },
-    fulfillmentLineItem: {
+    fulfillmentPackage: {
+      systemLabel: {
+        auto: 'Auto'
+      },
+      status: {
+        fulfilled: 'Fulfilled',
+        partially_returned: 'Partially Returned',
+        returned: 'Returned',
+        discarded: 'Discarded'
+      }
+    },
+    fulfillmentItem: {
       status: {
         fulfilled: 'Fulfilled',
         pending: 'Pending',
         returned: 'Returned',
         discarded: 'Discarded'
+      }
+    },
+    returnPackage: {
+      systemLabel: {
+        auto: 'Auto'
+      },
+      status: {
+        returned: 'Returned'
+      }
+    },
+    returnItem: {
+      status: {
+        returned: 'Returned'
       }
     },
     refund: {
@@ -134,7 +161,9 @@ export default {
       fulfillmentStatus: {
         pending: 'Pending',
         fulfilled: 'Fulfilled',
-        returned: 'Returned'
+        partially_returned: 'Partially Returned',
+        returned: 'Returned',
+        discarded: 'Discarded'
       }
     },
     product: {
@@ -153,7 +182,7 @@ export default {
       },
       nameSync: {
         disabled: 'Disabled',
-        syncWithSource: 'Sync with source'
+        syncWithGoods: 'Sync with goods'
       }
     },
     productCollection: {

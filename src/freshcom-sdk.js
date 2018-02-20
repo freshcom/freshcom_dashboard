@@ -757,20 +757,47 @@ export default {
   },
 
   //
-  // MARK: Fulfillment
+  // MARK: Fulfillment Package
   //
-  listFulfillment (params = {}, options = {}) {
-    return this.http.get('/fulfillments', { params: params }).then(response => {
+  listFulfillmentPackage (params = {}, options = {}) {
+    return this.http.get('/fulfillment_packages', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  deleteFulfillmentPackage (id, params = {}, options = {}) {
+    return this.http.delete(`/fulfillment_packages/${id}`, { params: params }).then(response => {
+      if (response.data) {
+        return SimpleJAS.deserialize(response.data)
+      }
+    }).catch(this._processHttpError)
+  },
+
+  //
+  // MARK: Fulfillment Item
+  //
+  updateFulfillmentItem (id, fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.patch(`/fulfillment_items/${id}`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
 
   //
-  // MARK: Fulfillment Line Item
+  // MARK: Return Package
   //
-  updateFulfillmentLineItem (id, fields, params = {}, options = {}) {
+  listReturnPackage (params = {}, options = {}) {
+    return this.http.get('/return_packages', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  //
+  // MARK: Return Item
+  //
+  createReturnItem (fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
-    return this.http.patch(`/fulfillment_line_items/${id}`, payload, { params: params }).then(response => {
+    return this.http.post('/return_items', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },

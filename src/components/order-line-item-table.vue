@@ -20,7 +20,7 @@
   <el-table-column label="Name" prop="name">
     <template slot-scope="scope">
       <span>{{scope.row.name}}</span>
-      <el-tag v-if="scope.row.fulfillmentStatus === 'returned'" size="mini" type="info" class="m-l-10">
+      <el-tag size="mini" type="info" class="m-l-10">
         {{$t(`fields.orderLineItem.fulfillmentStatus.${scope.row.fulfillmentStatus}`)}}
       </el-tag>
     </template>

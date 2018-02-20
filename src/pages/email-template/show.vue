@@ -59,7 +59,7 @@
           <div class="block">
             <div class="block-body full">
               <div class="content-preview">
-                <iframe :srcdoc="emailTemplate.contentHtml"></iframe>
+                <iframe :srcdoc="emailTemplate.bodyHtml"></iframe>
               </div>
             </div>
           </div>

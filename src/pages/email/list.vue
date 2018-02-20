@@ -30,10 +30,10 @@
           There is no result that matches "{{searchKeyword}}"
         </p>
         <el-table v-if="hasSearchResult" @row-click="viewEmail" :data="emails">
-          <el-table-column prop="recipientEmail" label="Recipient Email">
+          <el-table-column prop="to" label="Recipient Email">
             <template slot-scope="scope">
               <span>
-                {{scope.row.recipientEmail}}
+                {{scope.row.to}}
               </span>
             </template>
           </el-table-column>

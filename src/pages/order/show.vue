@@ -215,18 +215,11 @@
 
         <div class="block-title">
           <h3>Fulfillments</h3>
-
-          <span class="block-title-actions pull-right">
-            <a @click="openAddFulfillmentDialog()" href="javascript:;">
-              <icon name="plus" scale="0.8" class="v-middle"></icon>
-              <span>Add</span>
-            </a>
-          </span>
         </div>
         <div class="block">
           <div class="block-body full">
             <el-table
-              :data="fulfillments"
+              :data="fulfillmentPackages"
               :show-header="false"
               row-key="id"
               class="nested-block-table column-compact"
@@ -234,14 +227,14 @@
             >
               <el-table-column type="expand" width="30px">
                 <template slot-scope="props">
-                  <el-table :data="props.row.lineItems" :show-header="false" style="width: 100%">
+                  <el-table :data="props.row.items" :show-header="false" style="width: 100%">
                     <el-table-column width="30px"></el-table-column>
-                    <el-table-column width="400px" label="Name" prop="name">
+                    <el-table-column label="Name" prop="name">
                       <template slot-scope="scope">
                         <span>{{scope.row.name}}</span>
 
                         <el-tag size="mini" type="info" class="m-l-10">
-                          {{$t(`fields.fulfillmentLineItem.status.${scope.row.status}`)}}
+                          {{$t(`fields.fulfillmentItem.status.${scope.row.status}`)}}
                         </el-tag>
                       </template>
 
@@ -251,19 +244,24 @@
                         x {{scope.row.quantity}}
                       </template>
                     </el-table-column>
-                    <el-table-column>
+                    <el-table-column width="120px" label="Qty" prop="quantity">
+                      <template slot-scope="scope">
+                        <span v-if="scope.row.source">{{scope.row.source.type}}</span>
+                      </template>
+                    </el-table-column>
+                    <el-table-column width="140px">
                       <template slot-scope="scope">
                         <p class="text-right actions">
                           <confirm-button v-if="scope.row.status === 'pending'" size="mini">
-                            Mark Fulfilled
+                            Fulfill
                           </confirm-button>
 
-                          <confirm-button v-if="scope.row.status === 'fulfilled'" @confirmed="markFulfillmentLineItemReturned(scope.row)" confirm-button-text="Yes" size="mini">
-                            Mark Returned
+                          <confirm-button v-if="scope.row.status === 'fulfilled'" @confirmed="returnFulfillmentItem(scope.row)" confirm-button-text="Yes" size="mini">
+                            Return
                           </confirm-button>
 
-                          <confirm-button v-if="scope.row.status === 'fulfilled'" @confirmed="markFulfillmentLineItemDiscarded(scope.row)" confirm-button-text="Yes" size="mini">
-                            Mark Discarded
+                          <confirm-button v-if="scope.row.status === 'fulfilled'" @confirmed="discardFulfillmentItem(scope.row)" confirm-button-text="Yes" size="mini">
+                            Discard
                           </confirm-button>
 
                           <confirm-button v-if="scope.row.status === 'pending'" size="mini">
@@ -275,26 +273,98 @@
                   </el-table>
                 </template>
               </el-table-column>
-              <el-table-column label="Name" prop="name">
+              <el-table-column label="Name" prop="name" width="270px">
                 <template slot-scope="scope">
-                  <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }">
-                    <b>
-                      <span>
-                        {{scope.row.insertedAt | moment}}
-                      </span>
-                    </b>
-                  </router-link>
+                  <b>{{scope.row.insertedAt | moment}}</b>
+
+                  <el-tag size="mini" type="info" class="m-l-10">
+                    {{$t(`fields.fulfillmentPackage.status.${scope.row.status}`)}}
+                  </el-tag>
                 </template>
               </el-table-column>
-              <el-table-column width="120px" label="Qty" prop="quantity"></el-table-column>
-              <el-table-column width="100px" label="ST Amt." prop="subTotal" align="right"></el-table-column>
-              <el-table-column width="80px" label="Tax" prop="taxTotal" align="right"></el-table-column>
-              <el-table-column width="100px" label="GT Amt." prop="grandTotal" align="right"></el-table-column>
+              <el-table-column>
+                <template slot-scope="scope">
+                  <b class="m-l-10">
+                    {{$t(`fields.fulfillmentPackage.systemLabel.${scope.row.systemLabel}`)}}
+                  </b>
+                </template>
+              </el-table-column>
 
               <el-table-column width="120">
                 <template slot-scope="scope">
                   <p class="text-right actions">
-                    <confirm-button @confirmed="deleteFulfillment(scope.row.id)" size="mini">
+                    <confirm-button v-if="canDeleteFulfillmentPackage(scope.row)" @confirmed="deleteFulfillmentPackage(scope.row.id)" size="mini">
+                      Delete
+                    </confirm-button>
+                  </p>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+        </div>
+
+        <div class="block-title">
+          <h3>Returns</h3>
+        </div>
+        <div class="block">
+          <div class="block-body full">
+            <el-table
+              :data="returnPackages"
+              :show-header="false"
+              row-key="id"
+              class="nested-block-table column-compact"
+              style="width: 100%"
+            >
+              <el-table-column type="expand" width="30px">
+                <template slot-scope="props">
+                  <el-table :data="props.row.items" :show-header="false" style="width: 100%">
+                    <el-table-column width="30px"></el-table-column>
+                    <el-table-column label="Name" prop="name">
+                      <template slot-scope="scope">
+                        <span>{{scope.row.name}}</span>
+
+                        <el-tag size="mini" type="info" class="m-l-10">
+                          {{$t(`fields.returnItem.status.${scope.row.status}`)}}
+                        </el-tag>
+                      </template>
+
+                    </el-table-column>
+                    <el-table-column width="80px" label="Qty" prop="quantity">
+                      <template slot-scope="scope">
+                        x {{scope.row.quantity}}
+                      </template>
+                    </el-table-column>
+                    <el-table-column width="140px">
+                      <template slot-scope="scope">
+                        <p class="text-right actions">
+
+                        </p>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </template>
+              </el-table-column>
+              <el-table-column label="Name" prop="name" width="230px">
+                <template slot-scope="scope">
+                  <b>{{scope.row.insertedAt | moment}}</b>
+
+                  <el-tag size="mini" type="info" class="m-l-10">
+                    {{$t(`fields.returnPackage.status.${scope.row.status}`)}}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column>
+                <template slot-scope="scope">
+                  <b class="m-l-10">
+                    {{$t(`fields.returnPackage.systemLabel.${scope.row.systemLabel}`)}}
+                  </b>
+                </template>
+              </el-table-column>
+
+              <el-table-column width="120">
+                <template slot-scope="scope">
+                  <p class="text-right actions">
+                    <confirm-button v-if="canDeleteReturnPackage(scope.row)" @confirmed="deleteReturnPackage(scope.row.id)" size="mini">
                       Delete
                     </confirm-button>
                   </p>
@@ -313,7 +383,9 @@
           </div>
         </div>
 
-        <h3>Related Resources</h3>
+        <div class="block-title">
+          <h3>Related Resources</h3>
+        </div>
         <div class="block">
           <div class="block-body">
              <dl>
@@ -324,20 +396,6 @@
                   </router-link>
                 </dd>
               </dl>
-          </div>
-        </div>
-
-        <h3>Logs</h3>
-        <div class="block">
-          <div class="block-body">
-
-          </div>
-        </div>
-
-        <h3>Events</h3>
-        <div class="block">
-          <div class="block-body">
-
           </div>
         </div>
       </div>
@@ -439,7 +497,8 @@ export default {
       order: Order.objectWithDefaults(),
 
       payments: [],
-      fulfillments: [],
+      fulfillmentPackages: [],
+      returnPackages: [],
 
       lineItemDraftForAdd: OrderLineItem.objectWithDefaults(),
       isAddingLineItem: false,
@@ -490,7 +549,8 @@ export default {
       return Promise.all([
         this.loadOrder(),
         this.loadPayments(),
-        this.loadFulfillments()
+        this.loadFulfillmentPackages(),
+        this.loadReturnPackages()
       ])
     },
 
@@ -601,8 +661,9 @@ export default {
       })
     },
 
+    //
     // MARK: Payment
-
+    //
     loadPayments () {
       return freshcom.listPayment({
         filter: { targetId: this.id, targetType: 'Order' }
@@ -762,64 +823,93 @@ export default {
       })
     },
 
-    // MARK: Fulfillment
-
-    loadFulfillments () {
-      return freshcom.listFulfillment({
-        filter: { sourceId: this.id, sourceType: 'Order' },
-        include: 'lineItems'
+    //
+    // MARK: Fulfillment Package
+    //
+    loadFulfillmentPackages () {
+      return freshcom.listFulfillmentPackage({
+        filter: { orderId: this.id },
+        include: 'items'
       }).then(response => {
-        this.fulfillments = response.data
+        this.fulfillmentPackages = response.data
         return response
       })
     },
 
-    openAddFulfillmentDialog () {
-
+    canDeleteFulfillmentPackage (fulfillmentPackage) {
+      return _.includes(['pending', 'in_progress', 'discarded'], fulfillmentPackage.status)
     },
 
-    deleteFulfillment (id) {
-
+    deleteFulfillmentPackage (id) {
+      freshcom.deleteFulfillmentPackage(id).then(response => {
+        return Promise.all([
+          this.loadOrder(),
+          this.loadFulfillmentPackages()
+        ])
+      })
     },
 
-    markFulfillmentLineItemReturned (fli) {
-      let fliDraft = _.cloneDeep(fli)
-      fliDraft.status = 'returned'
+    returnFulfillmentItem (fulfillmentItem) {
+      let returnItemDraft = {
+        type: 'ReturnItem',
+        status: 'returned',
+        quantity: fulfillmentItem.quantity,
+        fulfillmentItem: fulfillmentItem
+      }
 
-      let fulfillment = _.find(this.fulfillments, { id: fli.fulfillment.id })
-      freshcom.updateFulfillmentLineItem(fli.id, fliDraft).then(response => {
-        let fli = response.data
-        let lineItem = _.find(fulfillment.lineItems, { id: fli.id })
-        lineItem.status = fli.status
-
-        return this.loadOrder()
+      freshcom.createReturnItem(returnItemDraft).then(response => {
+        return Promise.all([
+          this.loadOrder(),
+          this.loadFulfillmentPackages(),
+          this.loadReturnPackages()
+        ])
       }).then(() => {
         this.$message({
           showClose: true,
-          message: `Fulfillment line item marked as returned successfully.`,
+          message: `Return item created successfully.`,
           type: 'success'
         })
       })
     },
 
-    markFulfillmentLineItemDiscarded (fli) {
-      let fliDraft = _.cloneDeep(fli)
-      fliDraft.status = 'discarded'
+    discardFulfillmentItem (fulfillmentItem) {
+      let fulfillmentItemDraft = _.cloneDeep(fulfillmentItem)
+      fulfillmentItemDraft.status = 'discarded'
 
-      let fulfillment = _.find(this.fulfillments, { id: fli.fulfillment.id })
-      freshcom.updateFulfillmentLineItem(fli.id, fliDraft).then(response => {
-        let fli = response.data
-        let lineItem = _.find(fulfillment.lineItems, { id: fli.id })
-        lineItem.status = fli.status
+      let fpackage = _.find(this.fulfillmentPackages, { id: fulfillmentItem.package.id })
+      freshcom.updateFulfillmentItem(fulfillmentItem.id, fulfillmentItemDraft).then(response => {
+        let fulfillmentItem = response.data
+        let item = _.find(fpackage.items, { id: fulfillmentItem.id })
+        item.status = fulfillmentItem.status
 
-        return this.loadOrder()
+        return Promise.all([
+          this.loadOrder(),
+          this.loadFulfillmentPackages()
+        ])
       }).then(() => {
         this.$message({
           showClose: true,
-          message: `Fulfillment line item marked as discarded successfully.`,
+          message: `Fulfillment item discarded successfully.`,
           type: 'success'
         })
       })
+    },
+
+    //
+    // MARK: Return Package
+    //
+    loadReturnPackages () {
+      return freshcom.listReturnPackage({
+        filter: { orderId: this.id },
+        include: 'items'
+      }).then(response => {
+        this.returnPackages = response.data
+        return response
+      })
+    },
+
+    canDeleteReturnPackage (returnPackage) {
+      return _.includes(['pending', 'in_progress'], returnPackage.status)
     }
   }
 }

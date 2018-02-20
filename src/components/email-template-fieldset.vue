@@ -23,12 +23,12 @@
     <el-row>
       <el-col :span="24" class="content-input">
         <p class="text-center">Code</p>
-        <codemirror v-model="formModel.contentHtml" :options="cmOptions" @input="updateValue"></codemirror>
+        <codemirror v-model="formModel.bodyHtml" :options="cmOptions" @input="updateValue"></codemirror>
       </el-col>
 
       <el-col :span="24" class="content-preview">
         <p class="text-center">Preview</p>
-        <iframe :srcdoc="formModel.contentHtml"></iframe>
+        <iframe :srcdoc="formModel.bodyHtml"></iframe>
       </el-col>
     </el-row>
   </div>
