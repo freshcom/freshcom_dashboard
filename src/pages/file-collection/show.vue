@@ -55,7 +55,7 @@
           </div>
         </div>
 
-         <div class="block-title">
+        <div class="block-title">
           <h3>Files</h3>
         </div>
         <div class="block">
