@@ -61,6 +61,9 @@ import NewEmailTemplatePage from '@/pages/email-template/new'
 import ShowEmailTemplatePage from '@/pages/email-template/show'
 import EditEmailTemplatePage from '@/pages/email-template/edit'
 
+import ListSmsPage from '@/pages/sms/list'
+import ListSmsTemplatePage from '@/pages/sms-template/list'
+
 import ListNotificationTriggerPage from '@/pages/notification-trigger/list'
 import NewNotificationTriggerPage from '@/pages/notification-trigger/new'
 import ShowNotificationTriggerPage from '@/pages/notification-trigger/show'
@@ -547,6 +550,30 @@ const router = new Router({
       component: EditEmailTemplatePage,
       props (route) {
         return { id: route.params.id }
+      }
+    },
+    {
+      path: '/sms',
+      name: 'ListSms',
+      component: ListSmsPage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          page: page
+        }
+      }
+    },
+    {
+      path: '/sms-templates',
+      name: 'ListSmsTemplate',
+      component: ListSmsTemplatePage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          page: page
+        }
       }
     },
     {

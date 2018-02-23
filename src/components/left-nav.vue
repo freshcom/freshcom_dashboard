@@ -93,6 +93,10 @@
             <icon name="envelope" scale="0.8"></icon>
             <span>Emails</span>
           </el-menu-item>
+          <el-menu-item :route="{ name: 'ListSms' }" index="/emails">
+            <icon name="comment" scale="0.8"></icon>
+            <span>SMS</span>
+          </el-menu-item>
         </el-submenu>
 
         <el-menu-item :route="{ name: 'ListFile' }" index="/files">
@@ -157,6 +161,7 @@ import _ from 'lodash'
 import 'vue-awesome/icons/external-link'
 import 'vue-awesome/icons/send'
 import 'vue-awesome/icons/envelope'
+import 'vue-awesome/icons/comment'
 import 'vue-awesome/icons/home'
 import 'vue-awesome/icons/inbox'
 import 'vue-awesome/icons/shopping-bag'

@@ -56,7 +56,8 @@ export default {
   createToken (payload) {
     let config = {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Freshcom-OTP': payload.otp
       }
     }
     return this.http.post('/token', qs.stringify(payload), config).then(response => {
@@ -85,6 +86,16 @@ export default {
   retrieveAccount (params = {}, options = {}) {
     return this.http.get('/account', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  //
+  // MARK: Phone Verification Code
+  //
+  createPhoneVerificationCode (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post('/phone_verification_codes', payload, { params: params }).then(response => {
+      return {}
     }).catch(this._processHttpError)
   },
 
@@ -845,6 +856,31 @@ export default {
       if (response.data) {
         return SimpleJAS.deserialize(response.data)
       }
+    }).catch(this._processHttpError)
+  },
+
+  //
+  // MARK: SMS
+  //
+  listSms (params = {}, options = {}) {
+    return this.http.get('/sms', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  //
+  // MARK: SMS Template
+  //
+  listSmsTemplate (params = {}, options = {}) {
+    return this.http.get('/sms_templates', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  createSmsTemplate (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post('/sms_templates', payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
 
