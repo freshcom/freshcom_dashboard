@@ -884,6 +884,27 @@ export default {
     }).catch(this._processHttpError)
   },
 
+  retrieveSmsTemplate (id, params = {}, options = {}) {
+    return this.http.get(`/sms_templates/${id}`, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  updateSmsTemplate (id, fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.patch(`/sms_templates/${id}`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  deleteSmsTemplate (id, params = {}, options = {}) {
+    return this.http.delete(`/sms_templates/${id}`, { params: params }).then(response => {
+      if (response.data) {
+        return SimpleJAS.deserialize(response.data)
+      }
+    }).catch(this._processHttpError)
+  },
+
   //
   // MARK: Notification Trigger
   //

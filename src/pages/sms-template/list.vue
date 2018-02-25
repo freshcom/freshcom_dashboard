@@ -3,7 +3,7 @@
 
   <div>
     <el-menu :router="true" default-active="/sms-templates" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListSms' }" index="/smss">SMS</el-menu-item>
+      <el-menu-item :route="{ name: 'ListSms' }" index="/sms">SMS</el-menu-item>
       <el-menu-item :route="{ name: 'ListSmsTemplate' }" index="/sms-templates">Templates</el-menu-item>
     </el-menu>
     <locale-selector @change="searchSmsTemplate" class="pull-right"></locale-selector>
