@@ -54,13 +54,15 @@ export default {
   // MARK: Token
   //
   createToken (payload) {
-    let config = {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'X-Freshcom-OTP': payload.otp
-      }
+    let headers = {
+      'Content-Type': 'application/x-www-form-urlencoded'
     }
-    return this.http.post('/token', qs.stringify(payload), config).then(response => {
+
+    if (payload.otp) {
+      headers['X-Freshcom-OTP'] = payload.otp
+    }
+
+    return this.http.post('/token', qs.stringify(payload), { headers: headers }).then(response => {
       return response.data
     }).catch(error => {
       throw error.response.data
