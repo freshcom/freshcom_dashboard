@@ -22,6 +22,7 @@
             </div>
 
             <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="nuke">Nuke</el-dropdown-item>
               <el-dropdown-item command="logout">Log out</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -40,6 +41,7 @@
 
 <script>
 import 'vue-awesome/icons/user-circle-o'
+import freshcom from '@/freshcom-sdk'
 
 export default {
   name: 'app',
@@ -78,6 +80,10 @@ export default {
       if (item === 'logout') {
         this.$store.dispatch('session/reset')
         this.$store.dispatch('pushRoute', { name: 'Login' })
+      }
+
+      if (item === 'nuke') {
+        freshcom.createAccountReset({ type: 'AccountReset' })
       }
     }
   }

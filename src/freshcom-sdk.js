@@ -69,6 +69,15 @@ export default {
     })
   },
 
+  createAccountReset (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post('/account_resets', payload, { params: params }).then(response => {
+      if (response.data) {
+        return SimpleJAS.deserialize(response.data)
+      }
+    }).catch(this._processHttpError)
+  },
+
   //
   // MARK: Password Reset Token
   //
