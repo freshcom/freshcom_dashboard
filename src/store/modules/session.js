@@ -1,4 +1,5 @@
 import freshcom from '@/freshcom-sdk'
+import Cookies from 'js-cookie'
 
 const MT = {
   TOKEN_CHANGED: 'TOKEN_CHANGED',
@@ -15,17 +16,21 @@ const MT = {
 
 const FIFTY_MINUTES = 3000000
 
-function getObjectFromStorage (key) {
-  let rawData = localStorage.getItem(key)
+function getObjectFromStorage (key, defaultValue) {
+  let rawData = Cookies.get(key)
   if (!rawData) {
-    return
+    return defaultValue
   }
 
   return JSON.parse(rawData)
 }
 
 function setObjectToStorage (key, value) {
-  localStorage.setItem(key, JSON.stringify(value))
+  Cookies.set(key, JSON.stringify(value), { expires: 30 }) // expires in 7 days
+}
+
+function removeObjectFromStorage (key) {
+  Cookies.remove(key)
 }
 
 export default {
@@ -45,7 +50,6 @@ export default {
       // Retrive live token
       let liveToken = getObjectFromStorage('state.session.liveToken')
       if (!liveToken) {
-        console.warn('No token')
         return commit(MT.READY, true)
       }
       commit(MT.LIVE_TOKEN_CHANGED, liveToken)
@@ -58,7 +62,7 @@ export default {
         return Promise.all([dispatch('getAccount'), dispatch('getUser')])
       }).then(() => {
         // Retrieve mode
-        let mode = localStorage.getItem('state.session.mode')
+        let mode = getObjectFromStorage('state.session.mode')
         if (mode === 'test') {
           return dispatch('setMode', mode)
         }
@@ -90,9 +94,9 @@ export default {
     },
 
     reset ({ rootState, state, commit, dispatch }) {
-      localStorage.removeItem('state.session.liveToken')
-      localStorage.removeItem('state.session.testToken')
-      localStorage.removeItem('state.session.mode')
+      removeObjectFromStorage('state.session.liveToken')
+      removeObjectFromStorage('state.session.testToken')
+      removeObjectFromStorage('state.session.mode')
 
       commit(MT.LIVE_TOKEN_REFRESHER_STOPPED)
       commit(MT.TEST_TOKEN_REFRESHER_STOPPED)
@@ -244,7 +248,7 @@ export default {
       state.account = account
     },
     [MT.MODE_CHANGED] (state, mode) {
-      localStorage.setItem('state.session.mode', mode)
+      setObjectToStorage('state.session.mode', mode)
       state.mode = mode
     },
     [MT.READY] (state, ready) {

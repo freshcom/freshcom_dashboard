@@ -4,15 +4,16 @@
 
     <h1>Freshcom</h1>
 
-    <el-card class="box-card">
-      <div slot="header" class="clearfix text-center">
-        <span>Please sign in to continue</span>
+    <el-card>
+      <div slot="header" class="text-center">
+        Please sign in to continue
       </div>
 
-      <el-form :model="form" @submit.native.prevent="attemptLogin(form)" label-width="80px" size="small">
+      <el-form @submit.native.prevent="attemptLogin(form)" label-width="80px" size="small">
         <el-form-item label="Email">
           <el-input v-model="form.username"></el-input>
         </el-form-item>
+
         <el-form-item label="Password">
           <el-input v-model="form.password" type="password"></el-input>
         </el-form-item>

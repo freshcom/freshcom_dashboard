@@ -191,10 +191,18 @@ input::-webkit-inner-spin-button {
 
 
 
-/* START Util Class */
+//
+// MARK: Utils
+//
+.text-center {
+  text-align: center;
+}
+
+
 .cursor-pointer {
   cursor: pointer;
 }
+
 p.btn-group {
   display: inline-block;
 }
@@ -203,9 +211,6 @@ p.btn-group {
   vertical-align: middle;
 }
 
-.text-center {
-  text-align: center;
-}
 
 .text-right {
   text-align: right;
