@@ -170,6 +170,51 @@ input::-webkit-inner-spin-button {
   padding-right: 10px;
 }
 
+//
+// MARK: Filter
+//
+.el-popover.filter {
+  padding: 0px;
+
+  .header {
+    padding: 6px 12px;
+    background-color: #eef1f6;
+
+    .el-button {
+      font-size: 12px;
+      padding: 4px 8px;
+    }
+
+    p {
+      font-weight: 500;
+      margin: 0;
+    }
+  }
+
+  .condition {
+    &:first-child {
+      .field {
+        border: none;
+      }
+    }
+
+    .field {
+      padding: 5px 10px;
+      border-top: 1px solid #ebeef5;
+
+      .el-checkbox__label {
+        font-weight: 400;
+      }
+    }
+
+    .value {
+      padding: 10px;
+      background-color: #eef1f6;
+    }
+  }
+}
+
+
 
 //
 // MARK: Input

@@ -5,11 +5,45 @@
     </div>
 
     <div slot="card-header">
+      {{filter}}
       <el-row>
         <el-col :span="16">
-          <el-button plain size="small">
+          <el-popover :visible-arrow="false" ref="filter" placement="bottom-start" width="200" trigger="click" popper-class="filter">
+            <el-form>
+              <el-row class="header">
+                <el-col :span="8">
+                  <el-button size="mini" plain>Clear</el-button>
+                </el-col>
+                <el-col :span="8" class="text-center">
+                  <p>Filters</p>
+                </el-col>
+                <el-col :span="8" class="text-right">
+                  <el-button size="mini" type="primary">Done</el-button>
+                </el-col>
+              </el-row>
+              <div class="condition">
+                <div class="field">
+                  <el-checkbox :value="'status' in filter" @change="toggleFilterField($event, 'status')">Status</el-checkbox>
+                </div>
+                <div v-show="'status' in filter" class="value">
+                  <el-input size="mini"></el-input>
+                </div>
+              </div>
+              <div class="condition">
+                <div class="field">
+                  <el-checkbox :value="filter.label">Label</el-checkbox>
+                </div>
+                <div v-show="'status' in filter" class="value">
+                  <el-input size="mini"></el-input>
+                </div>
+              </div>
+            </el-form>
+          </el-popover>
+
+          <el-button v-popover:filter plain size="small">
             <icon name="filter" scale="0.7" class="v-middle"></icon> Filter
           </el-button>
+
 
           <div class="search">
             <el-input :value="searchKeyword" @input="updateSearchKeyword" size="small" placeholder="Search...">
@@ -141,6 +175,7 @@ export default {
       isCreatingDataImport: false,
       dataImportDraftForAdd: DataImport.objectWithDefaults(),
 
+      filter: {},
       errors: {}
     }
   },
@@ -173,6 +208,17 @@ export default {
     }
   },
   methods: {
+    toggleFilterField (isActive, field) {
+      if (isActive) {
+        let newFilter = _.clone(this.filter)
+        newFilter[field] = ''
+        this.filter = newFilter
+      } else {
+        let newFilter = _.clone(this.filter)
+        delete newFilter[field]
+        this.filter = newFilter
+      }
+    },
     updateSearchKeyword: _.debounce(function (newSearchKeyword) {
       // Remove page[number] from query to reset to the first page
       let q = _.merge({}, _.omit(this.$route.query, ['page[number]']), { search: newSearchKeyword })
