@@ -1,11 +1,11 @@
 <template>
 <div class="main-col">
-  <div>
+<!--   <div>
     <el-menu :router="true" default-active="/unlockables" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListUnlockable' }" index="/unlockables">Unlockables</el-menu-item>
     </el-menu>
     <locale-selector @change="searchUnlockable()" class="pull-right"></locale-selector>
-  </div>
+  </div> -->
 
   <div>
     <el-card class="main-card">
