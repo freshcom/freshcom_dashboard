@@ -12,62 +12,8 @@
       <left-nav></left-nav>
     </el-aside>
 
-    <el-container v-if="isSessionReady">
-      <el-header height="60px">
-        <div class="left-menu">
-          <a href="javascript:;" class="is-active">Unlockables</a>
-          <a href="javascript:;">Settings</a>
-        </div>
-        <div class="right-menu">
-          <locale-selector class="menu-item locale"></locale-selector>
-
-          <div class="menu-item">
-            <div class="icon-wrapper">
-              <icon name="book" scale="1.2"></icon>
-            </div>
-          </div>
-
-          <el-dropdown class="menu-item" trigger="click" @command="userDropdownHandler">
-            <div class="icon-wrapper">
-              <icon name="bell" scale="1.1"></icon>
-            </div>
-
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item :disabled="true" class="user-info" command="nuke">
-                <p class="name">{{user.name}}</p>
-                <p class="role">Administrator</p>
-              </el-dropdown-item>
-
-              <el-dropdown-item command="nuke">Nuke</el-dropdown-item>
-              <el-dropdown-item command="logout">Log out</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-
-          <el-dropdown class="menu-item" trigger="click" @command="userDropdownHandler">
-            <div class="icon-wrapper">
-              <!-- <span>{{user.name}}</span> -->
-              <!-- <i class="el-icon-arrow-down"></i> -->
-              <icon name="user-circle-o" scale="1.5"></icon>
-            </div>
-
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item :disabled="true" class="user-info">
-                <p class="name">{{user.name}}</p>
-                <p class="role">Administrator</p>
-              </el-dropdown-item>
-              <el-dropdown-item command="nuke" divided>Nuke</el-dropdown-item>
-              <el-dropdown-item command="logout">Log out</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-
-
-        </div>
-      </el-header>
-
-      <el-main>
-        <router-view></router-view>
-      </el-main>
-    </el-container>
+    <router-view v-if="isSessionReady">
+    </router-view>
   </el-container>
 
 </div>
@@ -127,84 +73,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.left-menu {
-  float: left;
-  display: flex;
-  align-items: flex-end;
-  height: 30px;
-
-  a {
-    &:first-child {
-      margin-left: 0px;
-    }
-
-    &:hover {
-      color: #409EFF;
-    }
-
-    &.is-active {
-      color: #409EFF;
-    }
-
-    color: #909399;
-    margin-left: 20px;
-    font-weight: 500;
-    font-size: 14px;
-  }
-}
-
-.user-info {
-  width: 120px;
-
-  .name {
-    margin: 0;
-    color: #606266;
-    font-size: 16px;
-    line-height: 24px;
-  }
-
-  .role {
-    margin: 0;
-    color: #606266;
-    line-height: 16px;
-    font-size: 12px;
-  }
-}
-
-.right-menu {
-  float: right;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  height: 30px;
-
-  .menu-item {
-    margin-right: 16px;
-
-    &:last-child {
-      margin-right: 0px;
-    }
-
-    &.locale {
-      margin-right: 24px;
-    }
-
-    .icon-wrapper {
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      height: 24px;
-    }
-  }
-}
-
-.el-header {
-  padding: 20px 20px 10px 10px;
-}
-
-.el-main {
-  padding: 0 20px 20px 5px;
-}
 </style>
 
 <style lang="scss">
@@ -303,6 +171,42 @@ input::-webkit-inner-spin-button {
 }
 
 
+//
+// MARK: Input
+//
+.el-input {
+  .prefix {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    width: 24px;
+  }
+}
+
+//
+// MARK: Top Nav
+//
+.content-container .left-menu {
+  a {
+    &:first-child {
+      margin-left: 0px;
+    }
+
+    &:hover {
+      color: #409EFF;
+    }
+
+    &.router-link-active {
+      color: #409EFF;
+    }
+
+    color: #909399;
+    margin-left: 20px;
+    font-weight: 500;
+    font-size: 14px;
+  }
+}
 
 //
 // MARK: Utils

@@ -12,7 +12,7 @@ import Icon from 'vue-awesome/components/Icon.vue'
 import i18n from '@/i18n'
 
 import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css'
+import '@/assets/element-theme.scss'
 
 import vueMoment from 'vue-moment'
 import money from 'v-money'

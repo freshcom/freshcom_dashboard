@@ -1,44 +1,44 @@
 <template>
-<div class="main-col">
-<!--   <div>
-    <el-menu :router="true" default-active="/unlockables" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListUnlockable' }" index="/unlockables">Unlockables</el-menu-item>
-    </el-menu>
-    <locale-selector @change="searchUnlockable()" class="pull-right"></locale-selector>
-  </div> -->
+  <content-container>
+    <div slot="header">
+      <router-link :to="{ name: 'ListUnlockable'}">Unlockables</router-link>
+    </div>
 
-  <div>
-    <el-card class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
+    <div slot="card-header">
+      <el-row>
+        <el-col :span="16">
+          <el-button plain size="small">
+            <icon name="filter" scale="0.7" class="v-middle"></icon> Filter
+          </el-button>
 
-        <el-row>
-          <el-col :span="18">
-            <el-button plain size="small">
-              <icon name="filter" scale="0.7" class="v-middle"></icon> Filter
-            </el-button>
-            <div class="search">
-              <el-input :value="searchKeyword" @input="updateSearchKeyword" size="small" placeholder="Search...">
-                <template slot="prepend"><icon name="search" scale="1" class="v-middle"></icon></template>
-              </el-input>
-            </div>
-          </el-col>
+          <div class="search">
+            <el-input :value="searchKeyword" @input="updateSearchKeyword" size="small" placeholder="Search...">
+              <div slot="prefix" class="prefix">
+                <icon name="search" scale="0.8"></icon>
+              </div>
+            </el-input>
+          </div>
+        </el-col>
 
-          <el-col :span="6">
-            <div class="text-right">
-              <el-button @click="openAddDataImportDialog()" plain size="small">
-                <icon name="plus" scale="0.7" class="v-middle"></icon> Import
-              </el-button>
+        <el-col :span="8">
+          <div class="text-right">
+            <el-button-group>
               <el-button @click="newUnlockable()" plain size="small" class="pull-right" >
                 <icon name="plus" scale="0.7" class="v-middle"></icon> New
               </el-button>
-            </div>
-          </el-col>
-        </el-row>
-      </div>
+              <el-button @click="openAddDataImportDialog()" plain size="small">
+                <icon name="sign-in" scale="0.7" class="v-middle"></icon> Import
+              </el-button>
+              <el-button @click="openAddDataImportDialog()" plain size="small">
+                <icon name="sign-out" scale="0.7" class="v-middle"></icon> Export
+              </el-button>
+            </el-button-group>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
 
+    <div slot="card-content">
       <div class="data full" v-loading="isLoading">
         <p v-if="noSearchResult" class="search-notice text-center">
           There is no result that matches "{{searchKeyword}}"
@@ -79,28 +79,30 @@
           <pagination :number="page.number" :size="page.size" :total="totalCount"></pagination>
         </div>
       </div>
-    </el-card>
-  </div>
+    </div>
 
-  <div class="launchable">
-    <el-dialog :show-close="false" :visible="isAddingDataImport" title="Import unlockable" width="750px">
-      <data-import-form v-model="dataImportDraftForAdd" :errors="errors"></data-import-form>
+    <div slot="launchable" class="launchable">
+      <el-dialog :show-close="false" :visible="isAddingDataImport" title="Import unlockable" width="750px">
+        <data-import-form v-model="dataImportDraftForAdd" :errors="errors"></data-import-form>
 
-      <div slot="footer" class="dialog-footer">
-        <el-button :disabled="isCreatingDataImport" @click="closeAddDataImportDialog()" plain size="small">Cancel</el-button>
-        <el-button :loading="isCreatingDataImport" @click="createDataImport()" type="primary" size="small">Save</el-button>
-      </div>
-    </el-dialog>
-  </div>
-</div>
+        <div slot="footer" class="dialog-footer">
+          <el-button :disabled="isCreatingDataImport" @click="closeAddDataImportDialog()" plain size="small">Cancel</el-button>
+          <el-button :loading="isCreatingDataImport" @click="createDataImport()" type="primary" size="small">Save</el-button>
+        </div>
+      </el-dialog>
+    </div>
+  </content-container>
 </template>
 
 <script>
 import 'vue-awesome/icons/search'
+import 'vue-awesome/icons/sign-in'
+import 'vue-awesome/icons/sign-out'
 
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
+import ContentContainer from '@/components/content-container'
 import PageMixin from '@/mixins/page'
 import Pagination from '@/components/pagination'
 import { idLastPart } from '@/helpers/filters'
@@ -111,6 +113,7 @@ export default {
   name: 'ListUnlockable',
   mixins: [PageMixin],
   components: {
+    ContentContainer,
     Pagination,
     DataImportForm
   },
