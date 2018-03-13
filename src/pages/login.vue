@@ -6,7 +6,7 @@
 
     <el-card class="box-card">
       <div slot="header" class="clearfix text-center">
-        <span>Please login to continue</span>
+        <span>Please sign in to continue</span>
       </div>
 
       <el-form :model="form" @submit.native.prevent="attemptLogin(form)" label-width="80px" size="small">
@@ -23,7 +23,7 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button :loading="isSubmitting" type="primary" native-type="submit" size="medium">Login to your account</el-button>
+          <el-button :loading="isSubmitting" type="primary" native-type="submit" size="medium">Sign in to your account</el-button>
         </el-form-item>
 
       </el-form>
