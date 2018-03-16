@@ -71,7 +71,24 @@
     <div slot="card-content">
       <div class="data full">
         <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
-          <el-table :data="unlockables" class="data-table">
+          <div slot="no-content">
+            <p><icon name="unlock-alt" scale="3"></icon></p>
+            <p>
+              <span>You haven't created any unlockable yet.</span>
+              <a href="javascript:;">Learn more &rarr;</a>
+            </p>
+
+            <router-link :to="{ name: 'NewUnlockable' }" class="el-button el-button--small is-plain">
+              <span class="with-icon">
+                <span class="icon-wrapper">
+                  <icon name="plus" scale="0.6"></icon>
+                </span>
+                <span>Create your first unlockable</span>
+              </span>
+            </router-link>
+          </div>
+
+          <el-table :data="unlockables" slot="content" class="data-table">
             <el-table-column prop="name" label="UNLOCKABLE">
               <template slot-scope="scope">
                 <router-link :to="{ name: 'ShowUnlockable', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }" class="primary">
@@ -138,6 +155,7 @@ import 'vue-awesome/icons/search'
 import 'vue-awesome/icons/sign-in'
 import 'vue-awesome/icons/sign-out'
 import 'vue-awesome/icons/share'
+import 'vue-awesome/icons/arrow-right'
 
 import freshcom from '@/freshcom-sdk'
 

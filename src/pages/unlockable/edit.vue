@@ -1,42 +1,41 @@
 <template>
+<content-container @locale-changed="loadUnlockable" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListUnlockable' }">Unlockables</router-link>
+  </div>
 
-  <content-container @locale-changed="loadUnlockable" :ready="isReady">
-    <div slot="header">
-      <router-link :to="{ name: 'ListUnlockable'}">Unlockables</router-link>
+  <div slot="card-header">
+    <h1>Edit unlockable</h1>
+
+    <div class="pull-right">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button @click="submit()" type="primary" size="small">
+        Save
+      </el-button>
+    </div>
+  </div>
+
+  <div slot="card-content">
+    <div class="data">
+      <el-form @submit.native.prevent="submit()" label-width="150px" size="small">
+        <unlockable-fieldset v-model="unlockableDraft" :errors="errors"></unlockable-fieldset>
+      </el-form>
     </div>
 
-    <div slot="card-header">
-      <h1>Edit unlockable</h1>
+    <div class="foot">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
 
-      <div class="pull-right">
-        <el-button @click="back()" plain size="small">
-          Cancel
-        </el-button>
-
-        <el-button @click="submit()" type="primary" size="small">
-          Save
-        </el-button>
-      </div>
+      <el-button :loading="isUpdating" @click="submit()" type="primary" size="small" class="pull-right">
+        Save
+      </el-button>
     </div>
-
-    <div slot="card-content">
-      <div class="data">
-        <el-form @submit.native.prevent="submit()" label-width="150px" size="small">
-          <unlockable-fieldset v-model="unlockableDraft" :errors="errors"></unlockable-fieldset>
-        </el-form>
-      </div>
-
-      <div class="foot">
-        <el-button @click="back()" plain size="small">
-          Cancel
-        </el-button>
-
-        <el-button :loading="isUpdating" @click="submit()" type="primary" size="small" class="pull-right">
-          Save
-        </el-button>
-      </div>
-    </div>
-  </content-container>
+  </div>
+</content-container>
 </template>
 
 <script>

@@ -2,13 +2,17 @@
 <div class="component-wrapper query-result" v-loading="isLoading">
   <div v-if="isLoading" class="spinner-holder"></div>
 
+  <div v-if="noContent" class="notice small">
+    <slot name="no-content"></slot>
+  </div>
+
   <div v-if="noQueryResult" class="notice">
     <p><icon name="search" scale="3"></icon></p>
-    <p style="font-weight: 500;">There aren't any results that match your query.</p>
+    <p>There aren't any results that match your query.</p>
   </div>
 
   <template v-if="hasQueryResult">
-    <slot></slot>
+    <slot name="content"></slot>
 
     <div class="footer">
       <span class="total">around {{totalCount}} results</span>
@@ -44,6 +48,9 @@ export default {
     }
   },
   computed: {
+    noContent () {
+      return !this.isLoading && this.allCount === 0
+    },
     noQueryResult () {
       return !this.isLoading && this.totalCount === 0 && this.allCount > 0
     },
@@ -62,11 +69,16 @@ export default {
 
 .query-result {
   .notice {
-    padding-top: 60px;
+    padding-top: 50px;
     color: #909399;
     padding-bottom: 100px;
     text-align: center;
     font-weight: 500;
+
+    &.small {
+      font-size: 14px;
+      font-weight: 400;
+    }
   }
 
   .footer {
