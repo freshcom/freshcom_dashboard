@@ -42,15 +42,16 @@
     </el-header>
 
     <el-main>
-      <el-card class="main-card">
-        <div slot="header">
+      <el-card v-loading="!ready" class="main-card">
+        <div v-if="ready" slot="header">
           <div v-if="isViewingTestData" class="test-data-banner">
             <div class="banner-content">TEST DATA</div>
           </div>
 
           <slot name="card-header"></slot>
         </div>
-        <slot name="card-content"></slot>
+        <slot v-if="ready" name="card-content"></slot>
+        <div v-if="!ready" class="spinner-holder"></div>
       </el-card>
     </el-main>
 
@@ -63,6 +64,12 @@ import freshcom from '@/freshcom-sdk'
 
 export default {
   name: 'ContentContainer',
+  props: {
+    ready: {
+      type: Boolean,
+      default: true
+    }
+  },
   computed: {
     user () {
       return this.$store.state.session.user
@@ -90,6 +97,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.spinner-holder {
+  min-height: 600px;
+}
+
 .el-dropdown-menu .user-info {
   width: 120px;
 

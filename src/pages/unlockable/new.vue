@@ -25,7 +25,7 @@
         </el-form>
       </div>
 
-      <div class="footer">
+      <div class="foot">
         <el-button @click="back()" plain size="small">
           Cancel
         </el-button>
@@ -43,12 +43,12 @@ import freshcom from '@/freshcom-sdk'
 
 import ContentContainer from '@/components/content-container'
 import UnlockableFieldset from '@/components/unlockable-fieldset'
-import NewPageMixin from '@/mixins/new-page'
+import PageMixin from '@/mixins/page'
 import Unlockable from '@/models/unlockable'
 
 export default {
   name: 'NewUnlockable',
-  mixins: [NewPageMixin],
+  mixins: [PageMixin],
   components: {
     ContentContainer,
     UnlockableFieldset

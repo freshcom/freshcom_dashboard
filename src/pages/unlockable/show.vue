@@ -1,42 +1,40 @@
 <template>
-<div class="main-col">
-  <div>
-    <el-menu :router="true" default-active="/unlockables" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListUnlockable' }" index="/unlockables">Unlockables</el-menu-item>
-    </el-menu>
-    <locale-selector @change="loadUnlockable()" class="pull-right"></locale-selector>
-  </div>
+  <content-container @locale-changed="loadUnlockable" :ready="isReady">
+    <div slot="header">
+      <router-link :to="{ name: 'ListUnlockable'}">Unlockables</router-link>
+    </div>
 
-  <div>
-    <el-card v-loading="isLoading" class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
+    <div slot="card-header">
+      <div class="brief">
+        <div class="avatar">
+          <img :src="avatarUrl">
         </div>
 
-        <div class="brief">
-          <div class="avatar">
-            <img :src="avatarUrl">
-          </div>
-
-          <div class="detail">
-            <p>Unlockable {{unlockable.code}}</p>
-            <h2>{{unlockable.name}}</h2>
-            <p class="id">{{unlockable.id}}</p>
-          </div>
-        </div>
-
-        <div class="header-actions">
-          <el-button @click="editUnlockable()" plain size="small">Edit</el-button>
+        <div class="detail">
+          <p>
+            <span>Unlockable</span>
+            <span>{{unlockable.code}}</span>
+          </p>
+          <h1>{{unlockable.name}}</h1>
+          <p class="id">{{unlockable.id}}</p>
         </div>
       </div>
 
+      <div class="brief-action-group">
+        <router-link :to="{ name: 'EditUnlockable', params: { id: this.unlockable.id } }" class="el-button el-button--small is-plain">
+          Edit
+        </router-link>
+      </div>
+    </div>
+
+    <div slot="card-content">
       <div class="data">
-        <div class="block-title">
-          <h3>Details</h3>
-        </div>
         <div class="block">
-          <div class="block-body">
+          <div class="header">
+            <h2>Detail</h2>
+          </div>
+
+          <div class="body">
             <dl>
               <dt>ID</dt>
               <dd>{{unlockable.id}}</dd>
@@ -64,21 +62,20 @@
           </div>
         </div>
 
-        <div class="block-title">
-          <h3>File Collections</h3>
-
-          <span class="block-title-actions pull-right">
-            <router-link :to="{ name: 'NewFileCollection', query: { ownerId: unlockable.id, ownerType: 'Unlockable', callbackPath: currentRoutePath } }">
-              <icon name="plus" scale="0.8" class="v-middle"></icon>
-              <span>Add</span>
-            </router-link>
-          </span>
-        </div>
-
         <div class="block">
-          <div class="block-body full">
-            <el-table :data="unlockable.fileCollections" stripe class="block-table" :show-header="false" style="width: 100%">
-              <el-table-column width="500">
+          <div class="header">
+            <h2>File Collections</h2>
+
+            <div class="action-group">
+              <router-link :to="{ name: 'NewFileCollection', query: { ownerId: unlockable.id, ownerType: 'Unlockable', callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
+                Add
+              </router-link>
+            </div>
+          </div>
+
+          <div class="body full">
+            <el-table :data="fileCollections" class="block-table" :show-header="false" style="width: 100%">
+              <el-table-column width="300">
                 <template slot-scope="scope">
                   <router-link :to="{ name: 'ShowFileCollection', params: { id: scope.row.id } }">
                     <span>{{scope.row.name}}</span>
@@ -94,84 +91,61 @@
 
               <el-table-column>
                 <template slot-scope="scope">
-                  <p class="text-right actions">
-                    <router-link :to="{ name: 'EditFileCollection', params: { id: scope.row.id }}">
-                      <span class="v-middle">Edit</span>
-                    </router-link>
+                  <p class="action-group">
+                    <el-button-group>
+                      <router-link :to="{ name: 'EditFileCollection', params: { id: scope.row.id }}" class="el-button el-button--mini is-plain">
+                        Edit
+                      </router-link>
+                      <confirm-button plain size="mini">Delete</confirm-button>
+                    </el-button-group>
                   </p>
                 </template>
               </el-table-column>
             </el-table>
-          </div>
 
-          <div class="block-footer text-center">
-            <a class="view-more" href="#">View More</a>
+            <div v-if="fileCollections.length >= 5" class="foot text-center">
+              <a class="view-more" href="#">View More</a>
+            </div>
           </div>
         </div>
 
-
-        <div class="block-title">
-          <h3>Custom Data</h3>
-        </div>
         <div class="block">
-          <div class="block-body">
+          <div class="header">
+            <h2>Custom Data</h2>
+          </div>
+          <div class="body">
             {{unlockable.customData}}
           </div>
         </div>
-
-        <h3>Related Resources</h3>
-        <div class="block">
-          <div class="block-body">
-
-          </div>
-        </div>
-
-        <h3>Logs</h3>
-        <div class="block">
-          <div class="block-body">
-
-          </div>
-        </div>
-
-        <h3>Events</h3>
-        <div class="block">
-          <div class="block-body">
-
-          </div>
-        </div>
       </div>
 
-      <div class="footer text-right">
+      <div class="foot text-right">
         <confirm-button @confirmed="deleteUnlockable()" plain size="small">Delete</confirm-button>
       </div>
-    </el-card>
-  </div>
-</div>
-
+    </div>
+  </content-container>
 </template>
 
 <script>
-import 'vue-awesome/icons/plus'
 import freshcom from '@/freshcom-sdk'
 
+import ContentContainer from '@/components/content-container'
 import PageMixin from '@/mixins/page'
 import Unlockable from '@/models/unlockable'
 import ConfirmButton from '@/components/confirm-button'
-import { idLastPart } from '@/helpers/filters'
 
 export default {
   name: 'ShowUnlockable',
   mixins: [PageMixin],
   components: {
+    ContentContainer,
     ConfirmButton
-  },
-  filters: {
-    idLastPart
   },
   props: ['id'],
   data () {
     return {
       unlockable: Unlockable.objectWithDefaults(),
+      isReady: false,
       isLoading: false
     }
   },
@@ -184,10 +158,13 @@ export default {
         return this.unlockable.avatar.url
       }
 
-      return 'http://placehold.it/80x80'
+      return 'https://placehold.it/80x80'
     },
-    currentRoutePath () {
-      return this.$store.state.route.fullPath
+
+    fileCollections () {
+      if (!this.unlockable.fileCollections) { return [] }
+
+      return this.unlockable.fileCollections
     }
   },
   methods: {
@@ -199,14 +176,11 @@ export default {
       }).then(response => {
         this.unlockable = response.data
         this.isLoading = false
+        this.isReady = true
       }).catch(errors => {
         this.isLoading = false
         throw errors
       })
-    },
-
-    editUnlockable () {
-      this.$store.dispatch('pushRoute', { name: 'EditUnlockable', params: { id: this.unlockable.id } })
     },
 
     deleteUnlockable () {
@@ -221,7 +195,7 @@ export default {
       })
     },
 
-    back () {
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ListUnlockable' })
     }
   }

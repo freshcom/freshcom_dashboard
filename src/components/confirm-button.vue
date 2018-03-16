@@ -1,22 +1,19 @@
 <template>
-
-<div class="confirm-button">
-  <el-popover
-    ref="warnDelete"
-    placement="left"
-    width="160"
-    v-model="isConfirmVisible">
-    <p>Are you sure?</p>
-    <div style="text-align: right; margin: 0">
-      <el-button @click="isConfirmVisible = false" plain size="mini">Cancel</el-button>
-      <el-button type="danger" size="mini" @click="confirmed">{{confirmButtonText}}</el-button>
-    </div>
-  </el-popover>
   <el-button :type="type" :size="size" :class="iconOnly ? 'icon' : ''" plain v-popover:warnDelete>
+    <el-popover
+      ref="warnDelete"
+      placement="left"
+      width="160"
+      v-model="isConfirmVisible">
+      <p>Are you sure?</p>
+      <div style="text-align: right; margin: 0">
+        <el-button @click="isConfirmVisible = false" plain size="mini">Cancel</el-button>
+        <el-button type="danger" size="mini" @click="confirmed">{{confirmButtonText}}</el-button>
+      </div>
+    </el-popover>
+
     <slot>Delete</slot>
   </el-button>
-</div>
-
 </template>
 
 <script>

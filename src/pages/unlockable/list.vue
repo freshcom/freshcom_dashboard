@@ -38,7 +38,7 @@
         <el-col :span="8">
           <div class="text-right">
             <el-button-group>
-              <router-link :to="{ name: 'NewUnlockable' }" class="el-button el-button--default el-button--small is-plain">
+              <router-link :to="{ name: 'NewUnlockable' }" class="el-button el-button--small is-plain">
                 <span class="with-icon">
                   <span class="icon-wrapper">
                     <icon name="plus" scale="0.6"></icon>
@@ -68,54 +68,56 @@
       </el-row>
     </div>
 
-    <div slot="card-content" class="data full">
-      <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
-        <el-table :data="unlockables" class="data-table">
-          <el-table-column prop="name" label="UNLOCKABLE">
-            <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowUnlockable', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }" class="primary">
-                <span v-if="scope.row.code">
-                  [{{scope.row.code}}]
-                </span>
+    <div slot="card-content">
+      <div class="data full">
+        <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
+          <el-table :data="unlockables" class="data-table">
+            <el-table-column prop="name" label="UNLOCKABLE">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowUnlockable', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }" class="primary">
+                  <span v-if="scope.row.code">
+                    [{{scope.row.code}}]
+                  </span>
 
-                <span>{{scope.row.name}}</span>
-              </router-link>
-            </template>
-          </el-table-column>
+                  <span>{{scope.row.name}}</span>
+                </router-link>
+              </template>
+            </el-table-column>
 
-          <el-table-column prop="status" label="STATUS" width="100">
-            <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowUnlockable', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
-                <el-tag v-if="scope.row.status == 'active'" :disable-transitions="true" size="mini">
-                  {{$t(`fields.unlockable.status.${scope.row.status}`)}}
-                </el-tag>
-                <el-tag v-else :disable-transitions="true" size="mini">
-                  {{$t(`fields.unlockable.status.${scope.row.status}`)}}
-                </el-tag>
-              </router-link>
-            </template>
-          </el-table-column>
+            <el-table-column prop="status" label="STATUS" width="100">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowUnlockable', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
+                  <el-tag v-if="scope.row.status == 'active'" :disable-transitions="true" size="mini">
+                    {{$t(`fields.unlockable.status.${scope.row.status}`)}}
+                  </el-tag>
+                  <el-tag v-else :disable-transitions="true" size="mini">
+                    {{$t(`fields.unlockable.status.${scope.row.status}`)}}
+                  </el-tag>
+                </router-link>
+              </template>
+            </el-table-column>
 
-          <el-table-column prop="id" label="ID" width="120">
-            <template slot-scope="scope">
-              <el-popover trigger="hover" placement="top">
-                <span>{{ scope.row.id }}</span>
-                <div slot="reference" class="name-wrapper">
-                  {{ scope.row.id | idLastPart }}
-                </div>
-              </el-popover>
-            </template>
-          </el-table-column>
+            <el-table-column prop="id" label="ID" width="120">
+              <template slot-scope="scope">
+                <el-popover trigger="hover" placement="top">
+                  <span>{{ scope.row.id }}</span>
+                  <div slot="reference" class="name-wrapper">
+                    {{ scope.row.id | idLastPart }}
+                  </div>
+                </el-popover>
+              </template>
+            </el-table-column>
 
-          <el-table-column prop="updatedAt" label="UPDATED" align="right" width="200">
-            <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowUnlockable', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
-                {{scope.row.updatedAt | moment}}
-              </router-link>
-            </template>
-          </el-table-column>
-        </el-table>
-      </query-result>
+            <el-table-column prop="updatedAt" label="UPDATED" align="right" width="200">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowUnlockable', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
+                  {{scope.row.updatedAt | moment}}
+                </router-link>
+              </template>
+            </el-table-column>
+          </el-table>
+        </query-result>
+      </div>
     </div>
 
     <div slot="launchable" class="launchable">

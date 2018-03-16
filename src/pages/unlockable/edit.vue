@@ -1,72 +1,74 @@
 <template>
-<div class="main-col">
-  <div>
-    <el-menu :router="true" default-active="unlockables" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListUnlockable' }" index="unlockables">Unlockables</el-menu-item>
-    </el-menu>
-    <locale-selector @change="loadUnlockable()" class="pull-right"></locale-selector>
-  </div>
 
-  <div>
-    <el-card class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
+  <content-container @locale-changed="loadUnlockable" :ready="isReady">
+    <div slot="header">
+      <router-link :to="{ name: 'ListUnlockable'}">Unlockables</router-link>
+    </div>
 
-        <span style="line-height: 36px;">Edit unlockable</span>
+    <div slot="card-header">
+      <h1>Edit unlockable</h1>
 
-        <div style="float: right;">
-          <el-button @click="back()" plain size="small">
-            Cancel
-          </el-button>
-
-          <el-button @click="submit()" type="primary" size="small">
-            Save
-          </el-button>
-        </div>
-      </div>
-
-      <div class="data">
-        <unlockable-form v-model="unlockableDraft" :errors="errors"></unlockable-form>
-      </div>
-
-      <div class="footer">
+      <div class="pull-right">
         <el-button @click="back()" plain size="small">
           Cancel
         </el-button>
 
-        <el-button @click="submit()" type="primary" size="small" class="pull-right">
+        <el-button @click="submit()" type="primary" size="small">
           Save
         </el-button>
       </div>
-    </el-card>
-  </div>
-</div>
+    </div>
+
+    <div slot="card-content">
+      <div class="data">
+        <el-form @submit.native.prevent="submit()" label-width="150px" size="small">
+          <unlockable-fieldset v-model="unlockableDraft" :errors="errors"></unlockable-fieldset>
+        </el-form>
+      </div>
+
+      <div class="foot">
+        <el-button @click="back()" plain size="small">
+          Cancel
+        </el-button>
+
+        <el-button :loading="isUpdating" @click="submit()" type="primary" size="small" class="pull-right">
+          Save
+        </el-button>
+      </div>
+    </div>
+  </content-container>
 </template>
 
 <script>
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
+import ContentContainer from '@/components/content-container'
 import PageMixin from '@/mixins/page'
 import Unlockable from '@/models/unlockable'
-import UnlockableForm from '@/components/unlockable-form'
+import UnlockableFieldset from '@/components/unlockable-fieldset'
 
 export default {
   name: 'EditUnlockable',
   mixins: [PageMixin],
   components: {
-    UnlockableForm
+    ContentContainer,
+    UnlockableFieldset
   },
-  props: ['id'],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  },
   data () {
     return {
       isLoading: false,
+      isReady: false,
       unlockable: Unlockable.objectWithDefaults(),
       unlockableDraft: Unlockable.objectWithDefaults(),
 
-      isUpdatingUnlockable: false,
+      isUpdating: false,
       errors: {}
     }
   },
@@ -84,6 +86,7 @@ export default {
         this.unlockableDraft = _.cloneDeep(response.data)
 
         this.isLoading = false
+        this.isReady = true
       }).catch(errors => {
         this.isLoading = false
         throw errors
@@ -91,7 +94,7 @@ export default {
     },
 
     submit () {
-      this.isUpdatingUnlockable = true
+      this.isUpdating = true
 
       freshcom.updateUnlockable(
         this.unlockableDraft.id,
@@ -103,11 +106,11 @@ export default {
           type: 'success'
         })
 
-        this.isUpdatingUnlockable = false
+        this.isUpdating = false
         this.back()
       }).catch(response => {
         this.errors = response.errors
-        this.isUpdatingUnlockable = false
+        this.isUpdating = false
         throw response
       })
     },
