@@ -33,11 +33,11 @@ export default {
   },
   methods: {
     setPageSize (size) {
-      let q = _.merge({}, this.$route.query, { 'page[size]': size })
+      let q = _.merge({}, this.$route.query, { page: { size: size } })
       this.$router.replace({ name: this.$route.name, query: q })
     },
     setPageNumber (number) {
-      let q = _.merge({}, this.$route.query, { 'page[number]': number })
+      let q = _.merge({}, this.$route.query, { page: { number: number } })
       this.$router.replace({ name: this.$route.name, query: q })
     }
   }

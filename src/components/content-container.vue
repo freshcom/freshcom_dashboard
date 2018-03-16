@@ -6,7 +6,7 @@
       </div>
 
       <div class="right-menu">
-        <locale-selector class="menu-item locale"></locale-selector>
+        <locale-selector class="menu-item locale" @change="localeChangeHandler()"></locale-selector>
 
         <div class="menu-item">
           <div class="icon-wrapper">
@@ -72,6 +72,9 @@ export default {
     }
   },
   methods: {
+    localeChangeHandler () {
+      this.$emit('locale-changed')
+    },
     userDropdownHandler (item) {
       if (item === 'logout') {
         this.$store.dispatch('session/reset')
@@ -87,14 +90,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.left-menu {
-  float: left;
-  display: flex;
-  align-items: flex-end;
-  height: 30px;
-}
-
-.user-info {
+.el-dropdown-menu .user-info {
   width: 120px;
 
   .name {
@@ -112,38 +108,97 @@ export default {
   }
 }
 
-.right-menu {
-  float: right;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  height: 30px;
+.content-container {
+  .left-menu {
+    float: left;
+    display: flex;
+    align-items: flex-end;
+    height: 30px;
+  }
 
-  .menu-item {
-    margin-right: 16px;
+  .right-menu {
+    float: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 30px;
 
-    &:last-child {
-      margin-right: 0px;
+    .menu-item {
+      margin-right: 16px;
+
+      &:last-child {
+        margin-right: 0px;
+      }
+
+      &.locale {
+        margin-right: 24px;
+      }
+
+      .icon-wrapper {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        height: 24px;
+      }
     }
+  }
 
-    &.locale {
-      margin-right: 24px;
-    }
+  .el-header {
+    padding: 20px 20px 10px 10px;
+  }
 
-    .icon-wrapper {
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      height: 24px;
+  .el-main {
+    padding: 0 20px 20px 5px;
+
+    .test-data-banner {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      border-top: 1px solid #f79a59;
+      text-align: center;
+
+      .banner-content {
+        line-height: 9px;
+        position: relative;
+        vertical-align: top;
+        display: inline-block;
+        font-size: 10px;
+        color: white;
+        font-weight: 500;
+        background-color: #f79a59;
+        padding: 0px 10px 1px 10px;
+        border: solid 1px #f79a59;
+        border-bottom-right-radius: 5px;
+        border-bottom-left-radius: 5px;
+      }
     }
   }
 }
 
-.el-header {
-  padding: 20px 20px 10px 10px;
-}
+</style>
 
-.el-main {
-  padding: 0 20px 20px 5px;
+<style lang="scss">
+// We have to use global here because that actual a tag
+// is in the slot
+.content-container .el-header .left-menu {
+  a {
+    &:first-child {
+      margin-left: 0px;
+    }
+
+    &:hover {
+      color: #409EFF;
+    }
+
+    &.router-link-active {
+      color: #409EFF;
+    }
+
+    color: #909399;
+    margin-left: 20px;
+    font-weight: 500;
+    font-size: 14px;
+  }
 }
 </style>

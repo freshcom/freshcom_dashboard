@@ -1,57 +1,38 @@
 <template>
-  <content-container>
+  <content-container @locale-changed="listUnlockable">
     <div slot="header">
       <router-link :to="{ name: 'ListUnlockable'}">Unlockables</router-link>
     </div>
 
     <div slot="card-header">
-      {{filter}}
       <el-row>
         <el-col :span="16">
-          <el-popover :visible-arrow="false" ref="filter" placement="bottom-start" width="200" trigger="click" popper-class="filter">
-            <el-form>
-              <el-row class="header">
-                <el-col :span="8">
-                  <el-button size="mini" plain>Clear</el-button>
-                </el-col>
-                <el-col :span="8" class="text-center">
-                  <p>Filters</p>
-                </el-col>
-                <el-col :span="8" class="text-right">
-                  <el-button size="mini" type="primary">Done</el-button>
-                </el-col>
-              </el-row>
-              <div class="condition">
-                <div class="field">
-                  <el-checkbox :value="'status' in filter" @change="toggleFilterField($event, 'status')">Status</el-checkbox>
-                </div>
-                <div v-show="'status' in filter" class="value">
-                  <el-input size="mini"></el-input>
+          <filter-button :current="filterObject" :draft="filterObjectDraft" @cancel="resetFilter" @clear="clearFilter">
+            <filter-condition v-model="filterObjectDraft" filter-key="status" default="active">
+              <span slot="key">Status</span>
+              <div slot="value">
+                <select v-model="filterObjectDraft.status">
+                  <option v-for="status in ['active', 'draft']" :value="status">is {{status}}</option>
+                </select>
+              </div>
+            </filter-condition>
+
+            <filter-condition v-model="filterObjectDraft" filter-key="label" default="">
+              <span slot="key">Label</span>
+              <div slot="value">
+                <select value="$eq">
+                  <option value="$eq">is equal to</option>
+                </select>
+
+                <div style="vertical-align: middle;" class="m-t-5">
+                  <icon name="share" class="fa-flip-vertical" scale="0.8"></icon>
+                  <input v-model="filterObjectDraft.label" type="text"></input>
                 </div>
               </div>
-              <div class="condition">
-                <div class="field">
-                  <el-checkbox :value="filter.label">Label</el-checkbox>
-                </div>
-                <div v-show="'status' in filter" class="value">
-                  <el-input size="mini"></el-input>
-                </div>
-              </div>
-            </el-form>
-          </el-popover>
+            </filter-condition>
+          </filter-button>
 
-          <el-button v-popover:filter plain size="small">
-            <icon name="filter" scale="0.7" class="v-middle"></icon> Filter
-          </el-button>
-
-
-          <div class="search">
-            <el-input :value="searchKeyword" @input="updateSearchKeyword" size="small" placeholder="Search...">
-              <div slot="prefix" class="prefix">
-                <icon name="search" scale="0.8"></icon>
-              </div>
-            </el-input>
-          </div>
+          <search-input :value="searchKeyword"></search-input>
         </el-col>
 
         <el-col :span="8">
@@ -72,25 +53,34 @@
       </el-row>
     </div>
 
-    <div slot="card-content">
-      <div class="data full" v-loading="isLoading">
-        <p v-if="noSearchResult" class="search-notice text-center">
-          There is no result that matches "{{searchKeyword}}"
-        </p>
-        <el-table v-if="hasSearchResult" @row-click="viewUnlockable" :data="unlockables" class="full">
-          <el-table-column prop="name" label="Unlockable">
+    <div slot="card-content" class="data full">
+      <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
+        <el-table :data="unlockables" class="data-table">
+          <el-table-column prop="name" label="UNLOCKABLE">
             <template slot-scope="scope">
-              <span v-if="scope.row.code">
-                [{{scope.row.code}}]
-              </span>
-              <span>{{scope.row.name}}</span>
+              <router-link :to="{ name: 'ShowUnlockable', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }" class="primary">
+                <span v-if="scope.row.code">
+                  [{{scope.row.code}}]
+                </span>
+
+                <span>{{scope.row.name}}</span>
+              </router-link>
             </template>
           </el-table-column>
-          <el-table-column prop="status" label="Status" width="100">
+
+          <el-table-column prop="status" label="STATUS" width="100">
             <template slot-scope="scope">
-              {{$t(`fields.unlockable.status.${scope.row.status}`)}}
+              <router-link :to="{ name: 'ShowUnlockable', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
+                <el-tag v-if="scope.row.status == 'active'" :disable-transitions="true" size="mini">
+                  {{$t(`fields.unlockable.status.${scope.row.status}`)}}
+                </el-tag>
+                <el-tag v-else :disable-transitions="true" size="mini">
+                  {{$t(`fields.unlockable.status.${scope.row.status}`)}}
+                </el-tag>
+              </router-link>
             </template>
           </el-table-column>
+
           <el-table-column prop="id" label="ID" width="120">
             <template slot-scope="scope">
               <el-popover trigger="hover" placement="top">
@@ -101,18 +91,16 @@
               </el-popover>
             </template>
           </el-table-column>
-          <el-table-column prop="updatedAt" label="" align="right" width="200">
+
+          <el-table-column prop="updatedAt" label="UPDATED" align="right" width="200">
             <template slot-scope="scope">
-              {{scope.row.updatedAt | moment}}
+              <router-link :to="{ name: 'ShowUnlockable', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
+                {{scope.row.updatedAt | moment}}
+              </router-link>
             </template>
           </el-table-column>
         </el-table>
-
-        <div v-if="hasSearchResult" class="footer">
-          <span class="total">around {{totalCount}} results</span>
-          <pagination :number="page.number" :size="page.size" :total="totalCount"></pagination>
-        </div>
-      </div>
+      </query-result>
     </div>
 
     <div slot="launchable" class="launchable">
@@ -132,37 +120,21 @@
 import 'vue-awesome/icons/search'
 import 'vue-awesome/icons/sign-in'
 import 'vue-awesome/icons/sign-out'
+import 'vue-awesome/icons/share'
 
-import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
-import ContentContainer from '@/components/content-container'
-import PageMixin from '@/mixins/page'
-import Pagination from '@/components/pagination'
-import { idLastPart } from '@/helpers/filters'
+import listPageMixinFactory from '@/mixins/list-page'
 import DataImportForm from '@/components/data-import-form'
 import DataImport from '@/models/data-import'
 
+let listPageMixin = listPageMixinFactory({ listMethodName: 'listUnlockable' })
+
 export default {
   name: 'ListUnlockable',
-  mixins: [PageMixin],
+  mixins: [listPageMixin],
   components: {
-    ContentContainer,
-    Pagination,
     DataImportForm
-  },
-  filters: {
-    idLastPart
-  },
-  props: {
-    searchKeyword: {
-      type: String,
-      default: ''
-    },
-    page: {
-      type: Object,
-      required: true
-    }
   },
   data () {
     return {
@@ -175,61 +147,20 @@ export default {
       isCreatingDataImport: false,
       dataImportDraftForAdd: DataImport.objectWithDefaults(),
 
-      filter: {},
       errors: {}
     }
   },
   created () {
-    this.searchUnlockable()
-  },
-  computed: {
-    noSearchResult () {
-      return !this.isLoading && this.totalCount === 0 && this.allCount > 0
-    },
-    hasSearchResult () {
-      return !this.isLoading && this.totalCount !== 0
-    },
-    currentRoutePath () {
-      return this.$store.state.route.fullPath
-    }
-  },
-  watch: {
-    isViewingTestData () {
-      this.searchUnlockable()
-    },
-    searchKeyword (newKeyword) {
-      this.searchUnlockable()
-    },
-    page (newPage, oldPage) {
-      if (_.isEqual(newPage, oldPage)) {
-        return
-      }
-      this.searchUnlockable()
-    }
+    this.listUnlockable()
   },
   methods: {
-    toggleFilterField (isActive, field) {
-      if (isActive) {
-        let newFilter = _.clone(this.filter)
-        newFilter[field] = ''
-        this.filter = newFilter
-      } else {
-        let newFilter = _.clone(this.filter)
-        delete newFilter[field]
-        this.filter = newFilter
-      }
-    },
-    updateSearchKeyword: _.debounce(function (newSearchKeyword) {
-      // Remove page[number] from query to reset to the first page
-      let q = _.merge({}, _.omit(this.$route.query, ['page[number]']), { search: newSearchKeyword })
-      this.$router.replace({ name: this.$store.state.route.name, query: q })
-    }, 300),
-    searchUnlockable () {
+    listUnlockable () {
       this.isLoading = true
 
       freshcom.listUnlockable({
         search: this.searchKeyword,
-        page: this.page
+        page: this.page,
+        filter: this.filterObject
       }).then(response => {
         this.unlockables = response.data
         this.allCount = response.meta.allCount
@@ -240,9 +171,11 @@ export default {
         this.isLoading = false
       })
     },
+
     viewUnlockable (depositable) {
       this.$store.dispatch('pushRoute', { name: 'ShowUnlockable', params: { id: depositable.id, callbackPath: this.currentRoutePath } })
     },
+
     newUnlockable () {
       this.$store.dispatch('pushRoute', { name: 'NewUnlockable' })
     },
@@ -282,18 +215,6 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-.main-card .footer {
-  text-align: right;
-  border-top: 0;
-}
+<style scoped lang="scss">
 
-.total {
-  float: left;
-  display: inline-block;
-  font-size: 13px;
-  min-width: 28px;
-  height: 28px;
-  line-height: 28px;
-}
 </style>

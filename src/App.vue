@@ -94,30 +94,6 @@ input::-webkit-inner-spin-button {
     margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
 
-.test-data-banner {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  border-top: 1px solid #f79a59;
-  text-align: center;
-
-  .banner-content {
-    line-height: 9px;
-    position: relative;
-    vertical-align: top;
-    display: inline-block;
-    font-size: 10px;
-    color: white;
-    font-weight: 500;
-    background-color: #f79a59;
-    padding: 0px 10px 1px 10px;
-    border: solid 1px #f79a59;
-    border-bottom-right-radius: 5px;
-    border-bottom-left-radius: 5px;
-  }
-}
-
 .wrapper {
   min-width: 1024px;
   display: flex;
@@ -171,52 +147,6 @@ input::-webkit-inner-spin-button {
 }
 
 //
-// MARK: Filter
-//
-.el-popover.filter {
-  padding: 0px;
-
-  .header {
-    padding: 6px 12px;
-    background-color: #eef1f6;
-
-    .el-button {
-      font-size: 12px;
-      padding: 4px 8px;
-    }
-
-    p {
-      font-weight: 500;
-      margin: 0;
-    }
-  }
-
-  .condition {
-    &:first-child {
-      .field {
-        border: none;
-      }
-    }
-
-    .field {
-      padding: 5px 10px;
-      border-top: 1px solid #ebeef5;
-
-      .el-checkbox__label {
-        font-weight: 400;
-      }
-    }
-
-    .value {
-      padding: 10px;
-      background-color: #eef1f6;
-    }
-  }
-}
-
-
-
-//
 // MARK: Input
 //
 .el-input {
@@ -230,26 +160,38 @@ input::-webkit-inner-spin-button {
 }
 
 //
-// MARK: Top Nav
+// MARK: Data Table
 //
-.content-container .left-menu {
+
+.el-table.data-table {
+  th {
+    background-color: #f5f7fa;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  .el-table__header th:first-child > div, .el-table__body tr td:first-child > div {
+    padding-left: 20px;
+  }
+
+  .el-table__header th:last-child > div, .el-table__body tr td:last-child > div {
+    padding-right: 20px
+  }
+
+  td {
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+
   a {
-    &:first-child {
-      margin-left: 0px;
-    }
+    display: block;
+    padding: 8px 0px;
+    color: inherit;
 
-    &:hover {
-      color: #409EFF;
+    &.primary {
+      color: #3297d3;
+      font-weight: 500;
     }
-
-    &.router-link-active {
-      color: #409EFF;
-    }
-
-    color: #909399;
-    margin-left: 20px;
-    font-weight: 500;
-    font-size: 14px;
   }
 }
 
@@ -512,10 +454,6 @@ a:hover {
   }
 }
 
-p.search-notice {
-  margin-top: 60px;
-}
-
 .el-button.icon {
   padding: 5px;
 }
@@ -524,15 +462,6 @@ p.search-notice {
   height: 800px;
 }
 /* END Layout */
-
-
-/* START Card Search */
-.search {
-  display: inline-block;
-  margin-left: 35px;
-  width: 400px;
-}
-/* END Card Search */
 
 /* START Utils */
 .m-l-10 {
@@ -557,6 +486,10 @@ p.search-notice {
 
 .m-t-10 {
   margin-top: 10px;
+}
+
+.m-t-5 {
+  margin-top: 5px;
 }
 
 .m-l-20 {
@@ -725,29 +658,29 @@ small {
     }
   }
 
-  .data.full .el-table {
-    th {
-      background-color: #f5f7fa;
-      padding-top: 5px;
-      padding-bottom: 5px;
-    }
+  // .data.full .el-table {
+  //   th {
+  //     background-color: #f5f7fa;
+  //     padding-top: 5px;
+  //     padding-bottom: 5px;
+  //   }
 
-    .el-table__header th:first-child > div, .el-table__body tr td:first-child > div {
-      padding-left: 20px;
-    }
+  //   .el-table__header th:first-child > div, .el-table__body tr td:first-child > div {
+  //     padding-left: 20px;
+  //   }
 
-    .el-table__header th:last-child > div, .el-table__body tr td:last-child > div {
-      padding-right: 20px
-    }
+  //   .el-table__header th:last-child > div, .el-table__body tr td:last-child > div {
+  //     padding-right: 20px
+  //   }
 
-    tbody tr {
-      cursor: pointer;
-    }
-  }
+  //   tbody tr {
+  //     cursor: pointer;
+  //   }
+  // }
 
-  .el-table.full.no-pointer tbody tr {
-    cursor: default;
-  }
+  // .el-table.full.no-pointer tbody tr {
+  //   cursor: default;
+  // }
 
   dl {
     margin: 0px;

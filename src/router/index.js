@@ -85,11 +85,11 @@ import APIHomePage from '@/pages/api/home'
 Vue.use(Router)
 
 function extractPagination (route) {
-  let queryString = route.fullPath.split('?')[1]
-  let query = qs.parse(queryString)
+  let query = route.query
 
   let pageNumber = 1
   let pageSize = DEFAULT_PAGE_SIZE
+
   if (query.page && query.page.number) {
     pageNumber = query.page.number
   }
@@ -102,6 +102,13 @@ function extractPagination (route) {
 
 const router = new Router({
   mode: 'history',
+  parseQuery (query) {
+    return qs.parse(query)
+  },
+  stringifyQuery (query) {
+    var result = qs.stringify(query, { arrayFormat: 'brackets' })
+    return result ? ('?' + result) : ''
+  },
   routes: [
     {
       path: '/',
@@ -431,8 +438,10 @@ const router = new Router({
       component: ListUnlockablePage,
       props (route) {
         let page = extractPagination(route)
+
         return {
           searchKeyword: route.query.search,
+          filterObject: route.query.filter,
           page: page
         }
       }
