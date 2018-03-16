@@ -451,10 +451,7 @@ const router = new Router({
       name: 'NewUnlockable',
       component: NewUnlockablePage,
       props (route) {
-        let queryString = route.fullPath.split('?')[1]
-        let query = qs.parse(queryString)
-
-        return { customerId: query.customerId, callbackPath: query.callbackPath }
+        return { callbackPath: route.query.callbackPath }
       }
     },
     {

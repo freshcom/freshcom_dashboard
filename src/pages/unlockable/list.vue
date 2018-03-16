@@ -143,11 +143,11 @@ import listPageMixinFactory from '@/mixins/list-page'
 import DataImportForm from '@/components/data-import-form'
 import DataImport from '@/models/data-import'
 
-let listPageMixin = listPageMixinFactory({ listMethodName: 'listUnlockable' })
+let ListPageMixin = listPageMixinFactory({ listMethodName: 'listUnlockable' })
 
 export default {
   name: 'ListUnlockable',
-  mixins: [listPageMixin],
+  mixins: [ListPageMixin],
   components: {
     DataImportForm
   },

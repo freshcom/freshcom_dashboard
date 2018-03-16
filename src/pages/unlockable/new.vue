@@ -1,34 +1,28 @@
 <template>
-<div class="main-col">
-  <div>
-    <el-menu :router="true" default-active="/unlockables" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListUnlockable' }" index="/unlockables">Unlockables</el-menu-item>
-    </el-menu>
-    <locale-selector class="pull-right"></locale-selector>
-  </div>
+  <content-container>
+    <div slot="header">
+      <router-link :to="{ name: 'ListUnlockable' }">Unlockables</router-link>
+    </div>
 
-  <div>
-    <el-card class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
+    <div slot="card-header">
+      <h1>Create an unlockable</h1>
 
-        <span style="line-height: 36px;">Create an unlockable</span>
+      <div class="pull-right">
+        <el-button @click="back()" plain size="small">
+          Cancel
+        </el-button>
 
-        <div class="pull-right">
-          <el-button @click="back()" plain size="small">
-            Cancel
-          </el-button>
-
-          <el-button @click="submit()" type="primary" size="small">
-            Save
-          </el-button>
-        </div>
+        <el-button :loading="isCreating" @click="submit()" type="primary" size="small">
+          Save
+        </el-button>
       </div>
+    </div>
 
+    <div slot="card-content">
       <div class="data">
-        <unlockable-form v-model="unlockableDraft" :errors="errors"></unlockable-form>
+        <el-form @submit.native.prevent="submit()" label-width="150px" size="small">
+          <unlockable-fieldset v-model="unlockableDraft" :errors="errors"></unlockable-fieldset>
+        </el-form>
       </div>
 
       <div class="footer">
@@ -36,39 +30,39 @@
           Cancel
         </el-button>
 
-        <el-button @click="submit()" type="primary" size="small" class="pull-right">
+        <el-button :loading="isCreating" @click="submit()" type="primary" size="small" class="pull-right">
           Save
         </el-button>
       </div>
-    </el-card>
-  </div>
-</div>
+    </div>
+  </content-container>
 </template>
 
 <script>
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
+import ContentContainer from '@/components/content-container'
+import UnlockableFieldset from '@/components/unlockable-fieldset'
+import NewPageMixin from '@/mixins/new-page'
 import Unlockable from '@/models/unlockable'
-import UnlockableForm from '@/components/unlockable-form'
 
 export default {
   name: 'NewUnlockable',
-  mixins: [PageMixin],
+  mixins: [NewPageMixin],
   components: {
-    UnlockableForm
+    ContentContainer,
+    UnlockableFieldset
   },
   data () {
     return {
       unlockableDraft: Unlockable.objectWithDefaults(),
-      isCreatingUnlockable: false,
+      isCreating: false,
       errors: {}
     }
   },
   methods: {
     submit () {
-      this.isCreatingUnlockable = true
-
+      this.isCreating = true
       freshcom.createUnlockable(this.unlockableDraft).then(response => {
         this.$message({
           showClose: true,
@@ -76,15 +70,16 @@ export default {
           type: 'success'
         })
 
-        this.isCreatingUnlockable = false
+        this.isCreating = false
         this.back()
       }).catch(response => {
         this.errors = response.errors
-        this.isCreatingUnlockable = false
+        this.isCreating = false
         throw response
       })
     },
-    back () {
+
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ListUnlockable' })
     }
   }

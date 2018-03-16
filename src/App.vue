@@ -211,6 +211,42 @@ input::-webkit-inner-spin-button {
 }
 
 //
+// MARK: Main Card
+//
+.main-card {
+  .el-card__header {
+    padding: 20px;
+    position: relative;
+
+    h1 {
+      display: inline-block;
+      line-height: 32px;
+      margin: 0px;
+      font-weight: 400;
+      font-size: 16px;
+    }
+  }
+
+  .el-card__body {
+    padding: 0px;
+
+    .data {
+      min-height: 100px;
+      padding: 20px 20px 0px 20px;
+
+      &.full {
+        padding: 0;
+      }
+    }
+  }
+
+  .footer {
+    padding: 20px;
+    border-top: 1px solid #d1dbe5;
+  }
+}
+
+//
 // MARK: Utils
 //
 .text-center {
@@ -654,24 +690,6 @@ small {
     line-height: 80px;
   }
 
-  .el-card__header {
-    padding: 20px;
-    position: relative;
-  }
-
-  .el-card__body {
-    padding: 0px;
-
-    .data {
-      min-height: 100px;
-      padding: 20px 20px 0px 20px;
-
-      &.full {
-        padding: 0;
-      }
-    }
-  }
-
   // .data.full .el-table {
   //   th {
   //     background-color: #f5f7fa;
@@ -726,12 +744,6 @@ small {
       margin-left: 115px;
     }
   }
-
-  .footer {
-    padding: 20px;
-    border-top: 1px solid #d1dbe5;
-  }
-
 }
 /* END Main Card */
 
@@ -804,44 +816,6 @@ small {
       height: 100%;
       vertical-align: middle;
     }
-  }
-}
-
-.file-uploader {
-  text-align: center;
-
-  .el-upload {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    width: 150px;
-    height: 150px;
-  }
-
-  .el-upload:hover {
-    border-color: #20a0ff;
-  }
-
-  .file-uploader-icon {
-    color: #8c939d;
-    width: 20px;
-    height: 150px;
-    line-height: 150px;
-    text-align: center;
-  }
-
-  .file {
-    width: 150px;
-    height: 150px;
-    display: block;
-  }
-
-  .el-progress {
-    width: 150px;
-    display: inline-block;
-    text-align: center;
   }
 }
 
