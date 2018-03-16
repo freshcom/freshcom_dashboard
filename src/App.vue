@@ -147,6 +147,21 @@ input::-webkit-inner-spin-button {
 }
 
 //
+// MARK: Link as Button
+//
+.el-button {
+  .with-icon {
+    display: flex;
+    align-items: center;
+  }
+
+  .icon-wrapper {
+    display: flex;
+    margin-right: 3px;
+  }
+}
+
+//
 // MARK: Input
 //
 .el-input {
@@ -201,7 +216,6 @@ input::-webkit-inner-spin-button {
 .text-center {
   text-align: center;
 }
-
 
 .cursor-pointer {
   cursor: pointer;

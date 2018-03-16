@@ -38,14 +38,29 @@
         <el-col :span="8">
           <div class="text-right">
             <el-button-group>
-              <el-button @click="newUnlockable()" plain size="small" class="pull-right" >
-                <icon name="plus" scale="0.7" class="v-middle"></icon> New
+              <router-link :to="{ name: 'NewUnlockable' }" class="el-button el-button--default el-button--small is-plain">
+                <span class="with-icon">
+                  <span class="icon-wrapper">
+                    <icon name="plus" scale="0.6"></icon>
+                  </span>
+                  <span>New</span>
+                </span>
+              </router-link>
+              <el-button @click="openAddDataImportDialog()" plain size="small">
+                <span class="with-icon">
+                  <span class="icon-wrapper">
+                    <icon name="sign-in" scale="0.65"></icon>
+                  </span>
+                  <span>Import</span>
+                </span>
               </el-button>
               <el-button @click="openAddDataImportDialog()" plain size="small">
-                <icon name="sign-in" scale="0.7" class="v-middle"></icon> Import
-              </el-button>
-              <el-button @click="openAddDataImportDialog()" plain size="small">
-                <icon name="sign-out" scale="0.7" class="v-middle"></icon> Export
+                <span class="with-icon">
+                  <span class="icon-wrapper">
+                    <icon name="sign-out" scale="0.65"></icon>
+                  </span>
+                  <span>Export</span>
+                </span>
               </el-button>
             </el-button-group>
           </div>
@@ -170,10 +185,6 @@ export default {
       }).catch(errors => {
         this.isLoading = false
       })
-    },
-
-    viewUnlockable (depositable) {
-      this.$store.dispatch('pushRoute', { name: 'ShowUnlockable', params: { id: depositable.id, callbackPath: this.currentRoutePath } })
     },
 
     newUnlockable () {

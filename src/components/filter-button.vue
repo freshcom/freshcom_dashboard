@@ -21,10 +21,13 @@
   </el-popover>
 
   <el-button v-popover:filter plain size="small" class="cta">
-    <div class="text">
-      <icon name="filter" scale="0.7" class="v-middle"></icon>
+    <div class="text with-icon">
+      <span class="icon-wrapper">
+        <icon name="filter" scale="0.6"></icon>
+      </span>
       <span>Filter</span>
     </div>
+
     <div class="indicator" v-if="activeFilterCount > 0">
       <span class="active-filter-count">{{activeFilterCount}}</span>
     </div>
@@ -106,7 +109,6 @@ export default {
     padding: 3px 15px;
 
     .text {
-      display: inline-block;
       padding: 6px 0px;
     }
 
