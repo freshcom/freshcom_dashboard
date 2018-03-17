@@ -36,7 +36,7 @@
 import fieldsetMixinFactory from '@/mixins/fieldset'
 import AvatarInput from '@/components/avatar-input'
 
-let FieldsetMixin = fieldsetMixinFactory({ errorKey: 'unlockable' })
+let FieldsetMixin = fieldsetMixinFactory({ errorI18nKey: 'unlockable' })
 
 export default {
   name: 'UnlockableFieldset',

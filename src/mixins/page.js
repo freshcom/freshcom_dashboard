@@ -1,4 +1,9 @@
+import ContentContainer from '@/components/content-container'
+
 export default {
+  components: {
+    ContentContainer
+  },
   props: {
     callbackPath: {
       type: String

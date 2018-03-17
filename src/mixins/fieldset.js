@@ -19,7 +19,7 @@ export default function (opts = {}) {
     },
     computed: {
       errorMsgs () {
-        return translateErrors(this.errors, opts.errorKey)
+        return translateErrors(this.errors, opts.errorI18nKey)
       }
     },
     watch: {

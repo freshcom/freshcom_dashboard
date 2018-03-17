@@ -151,12 +151,6 @@
 </template>
 
 <script>
-import 'vue-awesome/icons/search'
-import 'vue-awesome/icons/sign-in'
-import 'vue-awesome/icons/sign-out'
-import 'vue-awesome/icons/share'
-import 'vue-awesome/icons/arrow-right'
-
 import freshcom from '@/freshcom-sdk'
 
 import listPageMixinFactory from '@/mixins/list-page'
@@ -194,8 +188,8 @@ export default {
 
       freshcom.listUnlockable({
         search: this.searchKeyword,
-        page: this.page,
-        filter: this.filterObject
+        filter: this.filterObject,
+        page: this.page
       }).then(response => {
         this.unlockables = response.data
         this.allCount = response.meta.allCount
@@ -205,10 +199,6 @@ export default {
       }).catch(errors => {
         this.isLoading = false
       })
-    },
-
-    newUnlockable () {
-      this.$store.dispatch('pushRoute', { name: 'NewUnlockable' })
     },
 
     openAddDataImportDialog () {

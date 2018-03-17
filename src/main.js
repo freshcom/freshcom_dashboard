@@ -21,6 +21,11 @@ import App from './app'
 import LeftNav from '@/components/left-nav'
 import LocaleSelector from '@/components/locale-selector'
 
+import 'vue-awesome/icons/sign-in'
+import 'vue-awesome/icons/sign-out'
+import 'vue-awesome/icons/share'
+import 'vue-awesome/icons/folder'
+
 // -- Sync Store & Router --
 sync(store, router)
 

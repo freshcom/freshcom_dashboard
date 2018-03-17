@@ -224,19 +224,21 @@ const router = new Router({
       }
     },
     {
-      path: '/file_collections',
+      path: '/file-collections',
       name: 'ListFileCollection',
       component: ListFileCollectionPage,
       props (route) {
         let page = extractPagination(route)
+
         return {
           searchKeyword: route.query.search,
+          filterObject: route.query.filter,
           page: page
         }
       }
     },
     {
-      path: '/file_collections/new',
+      path: '/file-collections/new',
       name: 'NewFileCollection',
       component: NewFileCollectionPage,
       props (route) {
@@ -247,7 +249,7 @@ const router = new Router({
       }
     },
     {
-      path: '/file_collections/:id',
+      path: '/file-collections/:id',
       name: 'ShowFileCollection',
       component: ShowFileCollectionPage,
       props (route) {
@@ -255,7 +257,7 @@ const router = new Router({
       }
     },
     {
-      path: '/file_collections/:id/edit',
+      path: '/file-collections/:id/edit',
       name: 'EditFileCollection',
       component: EditFileCollectionPage,
       props (route) {

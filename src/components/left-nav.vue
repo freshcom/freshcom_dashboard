@@ -99,7 +99,7 @@
           </el-menu-item>
         </el-submenu>
 
-        <el-menu-item :route="{ name: 'ListFile' }" index="/files">
+        <el-menu-item :route="{ name: 'ListFileCollection' }" index="/file-collections">
           <icon name="folder" scale="0.8"></icon>
           <span>File Storage</span>
         </el-menu-item>
@@ -177,7 +177,6 @@ import 'vue-awesome/icons/terminal'
 import 'vue-awesome/icons/bank'
 import 'vue-awesome/icons/id-card'
 import 'vue-awesome/icons/folder-open'
-import 'vue-awesome/icons/folder'
 import 'vue-awesome/icons/diamond'
 
 import 'vue-awesome/icons/cog'
@@ -212,7 +211,7 @@ export default {
       let routePath = this.currentRoutePath
       if (routePath.startsWith('/stockables')) { return '/stockables' }
       if (routePath.startsWith('/unlockables')) { return '/unlockables' }
-      if (routePath.startsWith('/file')) { return '/files' }
+      if (routePath.startsWith('/file')) { return '/file-collections' }
 
       if (routePath.startsWith('/products')) { return '/products' }
       if (routePath.startsWith('/prices')) { return '/products' }

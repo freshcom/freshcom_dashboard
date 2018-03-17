@@ -1,181 +1,217 @@
 <template>
-<div class="page-wrapper">
-  <div>
-    <el-menu :router="true" default-active="/file_collections" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListFile' }" index="/files">
-        Files
-      </el-menu-item>
-      <el-menu-item :route="{ name: 'ListFileCollection' }" index="/file_collections">
-        Collections
-      </el-menu-item>
-    </el-menu>
-    <locale-selector class="pull-right"></locale-selector>
+<content-container @locale-changed="loadFileCollection" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListFileCollection' }">File Collections</router-link>
+    <router-link :to="{ name: 'ListFile' }">Files</router-link>
   </div>
 
-  <div>
-    <el-card v-loading="isLoading" class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
-
-        <div class="brief">
-          <div class="avatar">
-            <icon name="folder" class="avatar-icon"></icon>
-          </div>
-
-          <div class="detail">
-            <p>{{efc.code}}</p>
-            <h2>{{efc.name}}</h2>
-            <p class="id">{{efc.id}}</p>
-          </div>
-        </div>
-
-        <div class="header-actions">
-          <el-button @click="editEfc()" plain size="small">Edit</el-button>
-        </div>
+  <div slot="card-header">
+    <div class="brief">
+      <div class="avatar">
+        <icon name="folder" class="avatar-icon"></icon>
       </div>
 
-      <div class="data">
-        <div class="block-title">
-          <h3>Details</h3>
-        </div>
-        <div class="block">
-          <div class="block-body">
-            <dl>
-              <dt>ID</dt>
-              <dd>{{efc.id}}</dd>
-
-              <dt>Name</dt>
-              <dd>{{efc.name}}</dd>
-
-              <dt>Label</dt>
-              <dd>{{efc.label}}</dd>
-            </dl>
-          </div>
-        </div>
-
-        <div class="block-title">
-          <h3>Files</h3>
-        </div>
-        <div class="block">
-          <div class="block-body full">
-            <el-table :data="efc.files" class="block-table" :show-header="false" style="width: 100%">
-              <el-table-column>
-                <template slot-scope="scope">
-                  {{scope.row.name}}
-                </template>
-              </el-table-column>
-
-              <el-table-column width="150">
-                <template slot-scope="scope">
-                  <span>{{scope.row.contentType}}</span>
-                </template>
-              </el-table-column>
-
-              <el-table-column width="120">
-                <template slot-scope="scope">
-                  <span>{{scope.row.sizeBytes}} Bytes</span>
-                </template>
-              </el-table-column>
-
-              <el-table-column width="200">
-                <template slot-scope="scope">
-                  <span>{{scope.row.updatedAt | moment}}</span>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-        </div>
-
-        <h3>Custom Data</h3>
-        <div class="block">
-          <div class="block-body">
-
-          </div>
-        </div>
-
-        <h3>Related Resources</h3>
-        <div class="block">
-          <div class="block-body">
-            <dl>
-              <dt v-if="efc.owner">Owner</dt>
-              <dd v-if="efc.owner">
-                <router-link :to="{ name: `Show${efc.owner.type}`, params: { id: efc.owner.id }}">
-                  {{efc.owner.id}}
-                </router-link>
-              </dd>
-            </dl>
-          </div>
-        </div>
-
-        <h3>Logs</h3>
-        <div class="block">
-          <div class="block-body">
-
-          </div>
-        </div>
-
-        <h3>Events</h3>
-        <div class="block">
-          <div class="block-body">
-
-          </div>
-        </div>
+      <div class="detail">
+        <p>
+          <span>File Collection</span>
+          <span>{{fileCollection.code}}</span>
+        </p>
+        <h1>{{fileCollection.name}}</h1>
+        <p class="id">{{fileCollection.id}}</p>
       </div>
+    </div>
 
-      <div class="footer text-right">
-        <confirm-button @confirmed="deleteEfc()" size="small">Delete</confirm-button>
-      </div>
-    </el-card>
+    <div class="brief-action-group">
+      <router-link :to="{ name: 'EditFileCollection', params: { id: this.fileCollection.id } }" class="el-button el-button--small is-plain">
+        Edit
+      </router-link>
+    </div>
   </div>
-</div>
 
+  <div slot="card-content">
+    <div class="data">
+      <div class="block">
+        <div class="header">
+          <h2>Detail</h2>
+        </div>
+
+        <div class="body">
+          <dl>
+            <dt>ID</dt>
+            <dd>{{fileCollection.id}}</dd>
+
+            <dt>Name</dt>
+            <dd>{{fileCollection.name}}</dd>
+
+            <dt>Label</dt>
+            <dd>{{fileCollection.label}}</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Files</h2>
+
+          <div class="action-group">
+            <el-button @click.native="addFile()" plain size="mini">
+              Add
+            </el-button>
+          </div>
+        </div>
+
+        <div class="body full">
+          <el-table :data="fileCollection.files" class="block-table" :show-header="false">
+            <el-table-column>
+              <template slot-scope="scope">
+                {{scope.row.name}}
+              </template>
+            </el-table-column>
+
+            <el-table-column width="150">
+              <template slot-scope="scope">
+                <span>{{scope.row.contentType}}</span>
+              </template>
+            </el-table-column>
+
+            <el-table-column width="120">
+              <template slot-scope="scope">
+                <span>{{scope.row.sizeBytes}} Bytes</span>
+              </template>
+            </el-table-column>
+
+            <el-table-column width="200">
+              <template slot-scope="scope">
+                <span>{{scope.row.updatedAt | moment}}</span>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Custom Data</h2>
+        </div>
+        <div class="body">
+          {{fileCollection.customData}}
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Related Resources</h2>
+        </div>
+        <div class="body">
+          <dl>
+            <dt v-if="fileCollection.owner">Owner</dt>
+            <dd v-if="fileCollection.owner">
+              <router-link :to="{ name: `Show${fileCollection.owner.type}`, params: { id: fileCollection.owner.id }}">
+                {{fileCollection.owner.id}} ({{fileCollection.owner.type}})
+              </router-link>
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot text-right">
+      <confirm-button @confirmed="deleteFileCollection()" plain size="small">Delete</confirm-button>
+    </div>
+
+    <div class="launchable">
+      <el-dialog :show-close="false" :visible="isAddingFile" title="Add file" width="600px">
+        <p class="text-center">
+          <el-button @click.native="addMembership()" size="small" type="primary">Add from existing file</el-button>
+        </p>
+
+        <div class="divider-text">
+          <span class="text">Or</span>
+        </div>
+
+        <p class="text-center">
+          <router-link :to="{ name: 'NewFile', params: { collectionId: this.fileCollection.id } }" class="el-button el-button--small el-button--primary">
+            Create a new file
+          </router-link>
+        </p>
+
+        <div slot="footer">
+          <el-button :disabled="isCreatingMembership" @click="cancelAddFile()" plain size="small">Cancel</el-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog :show-close="false" :visible="isAddingMembership" title="Add existing file to collection" width="600px">
+        <el-form @submit.native.prevent="createMembership()" label-width="150px" size="small">
+          <file-collection-membership-fieldset v-model="membership" :errors="errors"></file-collection-membership-fieldset>
+        </el-form>
+
+        <div slot="footer">
+          <el-button :disabled="isCreatingMembership" @click="cancelAddMembership()" plain size="small">Cancel</el-button>
+          <el-button :loading="isCreatingMembership" @click="createMembership()" type="primary" size="small">Save</el-button>
+        </div>
+      </el-dialog>
+    </div>
+  </div>
+</content-container>
 </template>
 
 <script>
-import 'vue-awesome/icons/folder'
 import freshcom from '@/freshcom-sdk'
 
 import PageMixin from '@/mixins/page'
 import FileCollection from '@/models/file-collection'
 import ConfirmButton from '@/components/confirm-button'
+import FileCollectionMembershipFieldset from '@/components/file-collection-membership-fieldset'
 
 export default {
   name: 'ShowFileCollection',
   mixins: [PageMixin],
   components: {
-    ConfirmButton
+    ConfirmButton,
+    FileCollectionMembershipFieldset
   },
-  props: ['id'],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  },
   data () {
     return {
-      efc: FileCollection.objectWithDefaults(),
-      isLoading: false
+      fileCollection: FileCollection.objectWithDefaults(),
+      isLoading: false,
+      isReady: false,
+
+      isAddingFile: false,
+
+      isAddingMembership: false,
+      isCreatingMembership: false,
+      membership: { type: 'FileCollectionMembership', code: '', sortIndex: 0 },
+
+      errors: {}
     }
   },
   created () {
-    this.loadEfc()
+    this.loadFileCollection()
   },
   methods: {
-    loadEfc () {
+    loadFileCollection () {
       this.isLoading = true
 
       freshcom.retrieveFileCollection(this.id, {
         include: 'files'
       }).then(response => {
-        this.efc = response.data
+        this.fileCollection = response.data
         this.isLoading = false
+        this.isReady = true
       }).catch(errors => {
         this.isLoading = false
         throw errors
       })
     },
-    editEfc () {
-      this.$store.dispatch('pushRoute', { name: 'EditFileCollection', params: { id: this.efc.id } })
-    },
-    deleteEfc () {
-      freshcom.deleteFileCollection(this.efc.id).then(() => {
+
+    deleteFileCollection () {
+      freshcom.deleteFileCollection(this.fileCollection.id).then(() => {
         this.$message({
           showClose: true,
           message: `File collection deleted successfully.`,
@@ -185,8 +221,30 @@ export default {
         this.back()
       })
     },
-    back () {
+
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ListFileCollection' })
+    },
+
+    addFile () {
+      this.isAddingFile = true
+    },
+
+    cancelAddFile () {
+      this.isAddingFile = false
+    },
+
+    addMembership () {
+      this.isAddingFile = false
+      this.isAddingMembership = true
+    },
+
+    cancelAddMembership () {
+      this.isAddingMembership = false
+    },
+
+    createMembership () {
+
     }
   }
 }

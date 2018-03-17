@@ -56,6 +56,12 @@ export default {
     }
   },
   fields: {
+    fileCollection: {
+      status: {
+        active: 'Active',
+        draft: 'Draft'
+      }
+    },
     orderLineItem: {
       fulfillmentStatus: {
         pending: 'Pending',

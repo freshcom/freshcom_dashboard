@@ -60,6 +60,7 @@ export default {
       this.selectedOption = this.recordToOption(newValue).value
     },
     selectedOption (newValue) {
+      console.log(newValue)
       let record = _.find(this.records, { id: newValue })
       this.$emit('input', record)
     }
