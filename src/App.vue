@@ -335,7 +335,7 @@ input::-webkit-inner-spin-button {
   align-items: center;
 
   &.medium .resource {
-    width: 300px;
+    width: 298px;
   }
 
   .resource {
@@ -373,7 +373,7 @@ input::-webkit-inner-spin-button {
 //
 .data {
   min-height: 100px;
-  padding: 20px 20px 0px 20px;
+  padding: 0px 20px;
 
   &.full {
     padding: 0;
@@ -415,6 +415,12 @@ input::-webkit-inner-spin-button {
 // MARK: Block
 //
 .block {
+  margin-bottom: 20px;
+
+  &:first-child {
+    margin-top: 20px;
+  }
+
   .header {
     h2 {
       display: inline-block;
@@ -438,7 +444,6 @@ input::-webkit-inner-spin-button {
   .body {
     border: 1px solid #eaeefb;
     border-radius: 4px;
-    margin-bottom: 20px;
     overflow: hidden;
     padding: 20px;
     clear: both;
@@ -831,11 +836,21 @@ a:hover {
 }
 
 .el-dialog__body {
-  padding: 20px;
+  padding: 0px 15px;
+
+  p {
+    line-height: 20px;
+  }
 }
 
 .el-dialog__header {
+  padding: 15px;
   border-bottom: 1px solid #eaeefb;
+}
+
+.el-dialog__footer {
+  padding: 15px;
+  border-top: 1px solid #eaeefb;
 }
 
 .el-pagination {

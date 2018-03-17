@@ -21,9 +21,13 @@
 
   <div slot="card-content">
     <div class="data">
-      <el-form @submit.native.prevent="submit()" label-width="150px" size="small">
-        <file-collection-fieldset v-model="fileCollectionDraft" :errors="errors"></file-collection-fieldset>
-      </el-form>
+      <el-row>
+        <el-col :span="14" :offset="5">
+          <el-form @submit.native.prevent="submit()" label-width="60px" size="small">
+            <file-collection-fieldset v-model="fileCollectionDraft" :errors="errors"></file-collection-fieldset>
+          </el-form>
+        </el-col>
+      </el-row>
     </div>
 
     <div class="foot">
@@ -107,7 +111,7 @@ export default {
       })
     },
 
-    back () {
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ShowFileCollection', params: { id: this.fileCollection.id } })
     }
   }

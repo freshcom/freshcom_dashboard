@@ -1,53 +1,46 @@
 <template>
-<div class="page-warpper">
-  <div>
-    <el-menu :router="true" default-active="/file_collections" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListFile' }" index="/files">
-        Files
-      </el-menu-item>
-      <el-menu-item :route="{ name: 'ListFileCollection' }" index="/file_collections">
-        Collections
-      </el-menu-item>
-    </el-menu>
-    <locale-selector class="pull-right"></locale-selector>
+<content-container>
+  <div slot="header">
+    <router-link :to="{ name: 'ListFileCollection' }">File Collections</router-link>
+    <router-link :to="{ name: 'ListFile' }">Files</router-link>
   </div>
 
-  <div>
-    <el-card class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
+  <div slot="card-header">
+    <h1>Create a file collection</h1>
 
-        <span style="line-height: 36px;">Create a file collection</span>
+    <div class="pull-right">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
 
-        <div class="pull-right">
-          <el-button @click="back()" plain size="small">
-            Cancel
-          </el-button>
-
-          <el-button @click="submit()" type="primary" size="small">
-            Save
-          </el-button>
-        </div>
-      </div>
-
-      <div class="data">
-        <file-collection-form v-model="efcDraft" :errors="errors"></file-collection-form>
-      </div>
-
-      <div class="footer">
-        <el-button @click="back()" plain size="small">
-          Cancel
-        </el-button>
-
-        <el-button @click="submit()" type="primary" class="pull-right" size="small">
-          Save
-        </el-button>
-      </div>
-    </el-card>
+      <el-button :loading="isCreating" @click="submit()" type="primary" size="small">
+        Save
+      </el-button>
+    </div>
   </div>
-</div>
+
+  <div slot="card-content">
+    <div class="data">
+      <el-row>
+        <el-col :span="14" :offset="5">
+          <el-form @submit.native.prevent="submit()" label-width="60px" size="small">
+            <file-collection-fieldset v-model="fileCollectionDraft" :errors="errors"></file-collection-fieldset>
+          </el-form>
+        </el-col>
+      </el-row>
+    </div>
+
+    <div class="foot">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isCreating" @click="submit()" type="primary" size="small" class="pull-right">
+        Save
+      </el-button>
+    </div>
+  </div>
+</content-container>
 </template>
 
 <script>
@@ -55,48 +48,52 @@ import freshcom from '@/freshcom-sdk'
 
 import PageMixin from '@/mixins/page'
 import FileCollection from '@/models/file-collection'
-import FileCollectionForm from '@/components/file-collection-form'
+import FileCollectionFieldset from '@/components/file-collection-fieldset'
 
 export default {
   name: 'NewFileCollection',
   mixins: [PageMixin],
   components: {
-    FileCollectionForm
+    FileCollectionFieldset
   },
-  props: ['ownerId', 'ownerType'],
+  props: {
+    owner: {
+      type: Object
+    }
+  },
   data () {
     return {
-      efcDraft: FileCollection.objectWithDefaults(),
-      isCreatingEfc: false,
+      fileCollectionDraft: FileCollection.objectWithDefaults(),
+      isCreating: false,
       errors: {}
     }
   },
   created () {
-    if (this.ownerId && this.ownerType) {
-      this.efcDraft.owner = { id: this.ownerId, type: this.ownerType }
+    if (this.owner) {
+      this.fileCollectionDraft.owner = this.owner
     }
   },
   methods: {
     submit () {
-      this.isCreatingEfc = true
+      this.isCreating = true
 
-      freshcom.createFileCollection(this.efcDraft).then(response => {
+      freshcom.createFileCollection(this.fileCollectionDraft).then(response => {
         this.$message({
           showClose: true,
           message: `File collection created successfully.`,
           type: 'success'
         })
 
-        this.isCreatingEfc = false
+        this.isCreating = false
         this.back()
       }).catch(response => {
         this.errors = response.errors
-        this.isCreatingEfc = false
+        this.isCreating = false
         throw response
       })
     },
 
-    back () {
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ListFileCollection' })
     }
   }

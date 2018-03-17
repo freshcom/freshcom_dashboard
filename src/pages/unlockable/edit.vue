@@ -20,9 +20,13 @@
 
   <div slot="card-content">
     <div class="data">
-      <el-form @submit.native.prevent="submit()" label-width="150px" size="small">
-        <unlockable-fieldset v-model="unlockableDraft" :errors="errors"></unlockable-fieldset>
-      </el-form>
+      <el-row>
+        <el-col :span="14" :offset="5">
+          <el-form @submit.native.prevent="submit()" label-width="100px" size="small">
+            <unlockable-fieldset v-model="unlockableDraft" :errors="errors"></unlockable-fieldset>
+          </el-form>
+        </el-col>
+      </el-row>
     </div>
 
     <div class="foot">

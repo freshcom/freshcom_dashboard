@@ -67,7 +67,7 @@
           <h2>File Collections</h2>
 
           <div class="action-group">
-            <router-link :to="{ name: 'NewFileCollection', query: { ownerId: unlockable.id, ownerType: 'Unlockable', callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
+            <router-link :to="{ name: 'NewFileCollection', query: { owner: { id: this.unlockable.id, type: 'Unlockable', name: this.unlockable.name }, callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
               Add
             </router-link>
           </div>
@@ -77,7 +77,7 @@
           <el-table :data="fileCollections" class="data-table block-table" :show-header="false">
             <el-table-column width="300">
               <template slot-scope="scope">
-                <router-link :to="{ name: 'ShowFileCollection', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }">
+                <router-link :to="{ name: 'ShowFileCollection', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }" class="primary">
                   <span>{{scope.row.name}}</span>
                 </router-link>
               </template>
@@ -85,7 +85,9 @@
 
             <el-table-column width="100">
               <template slot-scope="scope">
-                <span>{{scope.row.fileCount}} files</span>
+                <router-link :to="{ name: 'ShowFileCollection', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }">
+                  <span>{{scope.row.fileCount}} files</span>
+                </router-link>
               </template>
             </el-table-column>
 
@@ -93,10 +95,10 @@
               <template slot-scope="scope">
                 <p class="action-group">
                   <el-button-group>
-                    <router-link :to="{ name: 'EditFileCollection', params: { id: scope.row.id }}" class="el-button el-button--mini is-plain">
+                    <router-link :to="{ name: 'EditFileCollection', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
                       Edit
                     </router-link>
-                    <confirm-button plain size="mini">Delete</confirm-button>
+                    <el-button plain size="mini">Delete</el-button>
                   </el-button-group>
                 </p>
               </template>
@@ -120,7 +122,29 @@
     </div>
 
     <div class="foot text-right">
-      <confirm-button @confirmed="deleteUnlockable()" plain size="small">Delete</confirm-button>
+      <el-button @click.native="attemptDeleteUnlockable()" plain size="small">Delete</el-button>
+    </div>
+
+    <div class="launchable">
+      <el-dialog :show-close="false" :visible="isConfirmingDeleteUnlockable" title="Delete unlockable" width="500px">
+        <p>
+          Are you sure you want to delete this unlockable? If you delete this unlockable,
+          all of the following related resources if any will also be deleted:
+
+          <ul>
+            <li>All unlocks that are associated with this unlockable</li>
+            <li>All products that contain this unlockable</li>
+            <li>All file collections that are owned by this unlockable and all files inside those collection</li>
+          </ul>
+
+          <b>This action cannot be undone.</b>
+        </p>
+
+        <div slot="footer">
+          <el-button :disabled="isDeletingUnlockable" @click="cancelDeleteUnlockable()" plain size="small">Cancel</el-button>
+          <el-button :loading="isDeletingUnlockable" @click="deleteUnlockable()" type="danger" size="small">Delete</el-button>
+        </div>
+      </el-dialog>
     </div>
   </div>
 </content-container>
@@ -130,7 +154,6 @@
 import freshcom from '@/freshcom-sdk'
 
 import Unlockable from '@/models/unlockable'
-import ConfirmButton from '@/components/confirm-button'
 
 import resourcePageMixinFactory from '@/mixins/resource-page'
 let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadUnlockable' })
@@ -138,9 +161,6 @@ let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadUnlockab
 export default {
   name: 'ShowUnlockable',
   mixins: [ResourcePageMixin],
-  components: {
-    ConfirmButton
-  },
   props: {
     id: {
       type: String,
@@ -150,7 +170,10 @@ export default {
   data () {
     return {
       unlockable: Unlockable.objectWithDefaults(),
-      isLoading: false
+      isLoading: false,
+
+      isConfirmingDeleteUnlockable: false,
+      isDeletingUnlockable: false
     }
   },
   computed: {
@@ -183,8 +206,23 @@ export default {
       })
     },
 
+    defaultBack () {
+      this.$store.dispatch('pushRoute', { name: 'ListUnlockable' })
+    },
+
+    attemptDeleteUnlockable () {
+      this.isConfirmingDeleteUnlockable = true
+    },
+
+    cancelDeleteUnlockable () {
+      this.isConfirmingDeleteUnlockable = false
+    },
+
     deleteUnlockable () {
+      this.isDeletingUnlockable = true
+
       freshcom.deleteUnlockable(this.unlockable.id).then(() => {
+        this.isDeletingUnlockable = false
         this.$message({
           showClose: true,
           message: `Unlockable deleted successfully.`,
@@ -192,11 +230,9 @@ export default {
         })
 
         this.back()
+      }).catch(() => {
+        this.isDeletingUnlockable = false
       })
-    },
-
-    defaultBack () {
-      this.$store.dispatch('pushRoute', { name: 'ListUnlockable' })
     }
   }
 }

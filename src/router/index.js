@@ -242,10 +242,7 @@ const router = new Router({
       name: 'NewFileCollection',
       component: NewFileCollectionPage,
       props (route) {
-        let queryString = route.fullPath.split('?')[1]
-        let query = qs.parse(queryString)
-
-        return { ownerId: query.ownerId, ownerType: query.ownerType, callbackPath: query.callbackPath }
+        return { owner: route.query.owner, callbackPath: route.query.callbackPath }
       }
     },
     {
@@ -261,7 +258,7 @@ const router = new Router({
       name: 'EditFileCollection',
       component: EditFileCollectionPage,
       props (route) {
-        return { id: route.params.id }
+        return { id: route.params.id, callbackPath: route.query.callbackPath }
       }
     },
     {
