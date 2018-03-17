@@ -12,8 +12,8 @@
 
 <script>
 import FileSelect from '@/components/file-select'
-import fieldsetMixinFactory from '@/mixins/fieldset'
 
+import fieldsetMixinFactory from '@/mixins/fieldset'
 let FieldsetMixin = fieldsetMixinFactory({ errorI18nKey: 'fileCollectionMembership' })
 
 export default {

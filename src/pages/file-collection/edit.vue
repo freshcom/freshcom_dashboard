@@ -1,122 +1,114 @@
 <template>
-<div class="page-wrapper">
-  <div>
-    <el-menu :router="true" default-active="/file_collections" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListFile' }" index="/files">
-        Files
-      </el-menu-item>
-      <el-menu-item :route="{ name: 'ListFileCollection' }" index="/file_collections">
-        Collections
-      </el-menu-item>
-    </el-menu>
-    <locale-selector class="pull-right"></locale-selector>
+<content-container @locale-changed="reload" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListFileCollection' }">File Collections</router-link>
+    <router-link :to="{ name: 'ListFile' }">Files</router-link>
   </div>
 
-  <div>
-    <el-card v-loading="isLoading" class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
+  <div slot="card-header">
+    <h1>Edit file collection</h1>
 
-        <span style="line-height: 36px;">Edit File Collection</span>
+    <div class="pull-right">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
 
-        <div class="pull-right">
-          <el-button @click="back()" plain size="small">
-            Cancel
-          </el-button>
-
-          <el-button @click="submit()" type="primary" size="small">
-            Save
-          </el-button>
-        </div>
-      </div>
-
-      <div class="data">
-        <file-collection-form v-model="efcDraft" :errors="errors"></file-collection-form>
-      </div>
-
-      <div class="footer">
-        <el-button @click="back()" plain size="small">
-          Cancel
-        </el-button>
-
-        <el-button @click="submit()" size="small" type="primary" class="pull-right">
-          Save
-        </el-button>
-      </div>
-    </el-card>
+      <el-button :loading="isUpdating" @click="submit()" type="primary" size="small">
+        Save
+      </el-button>
+    </div>
   </div>
-</div>
+
+  <div slot="card-content">
+    <div class="data">
+      <el-form @submit.native.prevent="submit()" label-width="150px" size="small">
+        <file-collection-fieldset v-model="fileCollectionDraft" :errors="errors"></file-collection-fieldset>
+      </el-form>
+    </div>
+
+    <div class="foot">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isUpdating" @click="submit()" type="primary" size="small" class="pull-right">
+        Save
+      </el-button>
+    </div>
+  </div>
+</content-container>
 </template>
 
 <script>
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
-import FileCollectionForm from '@/components/file-collection-form'
+import FileCollectionFieldset from '@/components/file-collection-fieldset'
 import FileCollection from '@/models/file-collection'
+
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadFileCollection' })
 
 export default {
   name: 'EditFileCollection',
-  mixins: [PageMixin],
+  mixins: [ResourcePageMixin],
   components: {
-    FileCollectionForm
+    FileCollectionFieldset
   },
-  props: ['id'],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  },
   data () {
     return {
       isLoading: false,
-      efc: FileCollection.objectWithDefaults(),
-      efcDraft: FileCollection.objectWithDefaults(),
+      fileCollection: FileCollection.objectWithDefaults(),
+      fileCollectionDraft: FileCollection.objectWithDefaults(),
 
-      isUpadingEfc: false,
+      isUpdating: false,
       errors: {}
     }
   },
-  created () {
-    this.loadEfc()
-  },
   methods: {
-    loadEfc () {
+    loadFileCollection () {
       this.isLoading = true
 
-      freshcom.retrieveFileCollection(this.id, {
-        include: 'files'
-      }).then(response => {
-        this.efc = response.data
-        this.efcDraft = _.cloneDeep(response.data)
+      return freshcom.retrieveFileCollection(this.id).then(response => {
+        this.fileCollection = response.data
+        this.fileCollectionDraft = _.cloneDeep(response.data)
         this.isLoading = false
       }).catch(response => {
         this.isLoading = false
         throw response
       })
     },
+
     submit () {
-      this.isUpdatingEfc = true
+      this.isUpdating = true
 
       freshcom.updateFileCollection(
-        this.efcDraft.id,
-        this.efcDraft
-      ).then(efc => {
+        this.fileCollectionDraft.id,
+        this.fileCollectionDraft
+      ).then(fileCollection => {
         this.$message({
           showClose: true,
           message: `File collection saved successfully.`,
           type: 'success'
         })
 
-        this.isUpdatingEfc = false
+        this.isUpdating = false
         this.back()
       }).catch(response => {
         this.errors = response.errors
-        this.isUpdatingEfc = false
+        this.isUpdating = false
         throw response
       })
     },
 
     back () {
-      this.$store.dispatch('pushRoute', { name: 'ShowFileCollection', params: { id: this.efc.id } })
+      this.$store.dispatch('pushRoute', { name: 'ShowFileCollection', params: { id: this.fileCollection.id } })
     }
   }
 }
