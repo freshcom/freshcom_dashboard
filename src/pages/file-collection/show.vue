@@ -124,7 +124,7 @@
             <dt v-if="fileCollection.owner">Owner</dt>
             <dd v-if="fileCollection.owner">
               <router-link :to="{ name: `Show${fileCollection.owner.type}`, params: { id: fileCollection.owner.id }}">
-                {{fileCollection.owner.id}} ({{fileCollection.owner.type}})
+                {{fileCollection.owner.type}} - {{fileCollection.owner.id}}
               </router-link>
             </dd>
           </dl>
