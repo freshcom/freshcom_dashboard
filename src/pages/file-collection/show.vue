@@ -148,7 +148,7 @@
 
         <p class="text-center">
           <router-link :to="{ name: 'NewFile', params: { collectionId: this.fileCollection.id } }" class="el-button el-button--small el-button--primary">
-            Create a new file
+            Upload new files
           </router-link>
         </p>
 
