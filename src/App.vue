@@ -202,6 +202,9 @@ input::-webkit-inner-spin-button {
     display: block;
     padding: 8px 0px;
     color: inherit;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     &.primary {
       color: #3297d3;
@@ -463,7 +466,7 @@ input::-webkit-inner-spin-button {
 //
 // MARK: Block Table
 //
-.el-table.block-table {
+.el-table.data-table.block-table {
   border: 0;
   width: 100%;
 
@@ -485,8 +488,8 @@ input::-webkit-inner-spin-button {
     }
 
     tr td {
-      padding-top: 8px;
-      padding-bottom: 8px;
+      padding-top: 0px;
+      padding-bottom: 0px;
     }
 
     p {

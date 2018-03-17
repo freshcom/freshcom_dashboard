@@ -61,28 +61,41 @@
         </div>
 
         <div class="body full">
-          <el-table :data="fileCollection.files" class="block-table" :show-header="false">
+          <el-table :data="fileCollection.files" class="data-table block-table" :show-header="false">
             <el-table-column>
               <template slot-scope="scope">
-                {{scope.row.name}}
+                <router-link :to="{ name: 'ShowFile', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }" class="primary">
+                  <span>{{scope.row.name}}</span>
+                </router-link>
               </template>
             </el-table-column>
 
             <el-table-column width="150">
               <template slot-scope="scope">
-                <span>{{scope.row.contentType}}</span>
-              </template>
-            </el-table-column>
-
-            <el-table-column width="120">
-              <template slot-scope="scope">
-                <span>{{scope.row.sizeBytes}} Bytes</span>
+                <router-link :to="{ name: 'ShowFile', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }">
+                  <span>{{scope.row.contentType}}</span>
+                </router-link>
               </template>
             </el-table-column>
 
             <el-table-column width="200">
               <template slot-scope="scope">
-                <span>{{scope.row.updatedAt | moment}}</span>
+                <router-link :to="{ name: 'ShowFile', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }">
+                  <span>{{scope.row.updatedAt | moment}}</span>
+                </router-link>
+              </template>
+            </el-table-column>
+
+            <el-table-column>
+              <template slot-scope="scope">
+                <p class="action-group">
+                  <el-button-group>
+                    <router-link :to="{ name: 'EditFileCollection', params: { id: scope.row.id }}" class="el-button el-button--mini is-plain">
+                      Edit
+                    </router-link>
+                    <confirm-button plain size="mini">Delete</confirm-button>
+                  </el-button-group>
+                </p>
               </template>
             </el-table-column>
           </el-table>
@@ -240,11 +253,27 @@ export default {
     },
 
     cancelAddMembership () {
+      this.membership = { type: 'FileCollectionMembership', code: '', sortIndex: 0 }
       this.isAddingMembership = false
     },
 
     createMembership () {
+      this.isCreatingMembership = true
 
+      return freshcom.createFileCollectionMembership(this.fileCollection.id, this.membership).then(() => {
+        return this.loadFileCollection()
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: `File added successfully.`,
+          type: 'success'
+        })
+
+        this.isCreatingMembership = false
+        this.cancelAddMembership()
+      }).catch(() => {
+        this.isCreatingMembership = false
+      })
     }
   }
 }

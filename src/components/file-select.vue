@@ -48,7 +48,7 @@ export default {
   data () {
     return {
       isEditing: _.isEmpty(this.value),
-      draft: _.cloneDeep(this.value)
+      draft: {}
     }
   },
   watch: {

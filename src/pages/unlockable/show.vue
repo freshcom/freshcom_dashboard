@@ -77,7 +77,7 @@
           <el-table :data="fileCollections" class="block-table" :show-header="false">
             <el-table-column width="300">
               <template slot-scope="scope">
-                <router-link :to="{ name: 'ShowFileCollection', params: { id: scope.row.id } }">
+                <router-link :to="{ name: 'ShowFileCollection', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }">
                   <span>{{scope.row.name}}</span>
                 </router-link>
               </template>

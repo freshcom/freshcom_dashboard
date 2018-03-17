@@ -779,6 +779,16 @@ export default {
   },
 
   //
+  // MARK: File Collection Membership
+  //
+  createFileCollectionMembership (collectionId, fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post(`/file_collections/${collectionId}/memberships`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  //
   // MARK: Fulfillment Package
   //
   listFulfillmentPackage (params = {}, options = {}) {
