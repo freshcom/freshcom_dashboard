@@ -98,7 +98,7 @@
                     <router-link :to="{ name: 'EditFileCollection', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
                       Edit
                     </router-link>
-                    <el-button plain size="mini">Delete</el-button>
+                    <el-button @click.native="attemptDeleteFileCollection(scope.row)" plain size="mini">Delete</el-button>
                   </el-button-group>
                 </p>
               </template>
@@ -145,6 +145,8 @@
           <el-button :loading="isDeletingUnlockable" @click="deleteUnlockable()" type="danger" size="small">Delete</el-button>
         </div>
       </el-dialog>
+
+      <file-collection-delete-dialog v-model="isConfirmingDeleteFileCollection" :target="fileCollectionForDelete"></file-collection-delete-dialog>
     </div>
   </div>
 </content-container>
@@ -154,6 +156,7 @@
 import freshcom from '@/freshcom-sdk'
 
 import Unlockable from '@/models/unlockable'
+import FileCollectionDeleteDialog from '@/components/file-collection-delete-dialog'
 
 import resourcePageMixinFactory from '@/mixins/resource-page'
 let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadUnlockable' })
@@ -161,6 +164,9 @@ let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadUnlockab
 export default {
   name: 'ShowUnlockable',
   mixins: [ResourcePageMixin],
+  components: {
+    FileCollectionDeleteDialog
+  },
   props: {
     id: {
       type: String,
@@ -171,6 +177,9 @@ export default {
     return {
       unlockable: Unlockable.objectWithDefaults(),
       isLoading: false,
+
+      isConfirmingDeleteFileCollection: false,
+      fileCollectionForDelete: {},
 
       isConfirmingDeleteUnlockable: false,
       isDeletingUnlockable: false
@@ -208,6 +217,11 @@ export default {
 
     defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ListUnlockable' })
+    },
+
+    attemptDeleteFileCollection (fileCollection) {
+      this.isConfirmingDeleteFileCollection = true
+      this.fileCollectionForDelete = fileCollection
     },
 
     attemptDeleteUnlockable () {

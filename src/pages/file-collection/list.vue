@@ -25,9 +25,37 @@
                 <option value="$eq">is equal to</option>
               </select>
 
-              <div style="vertical-align: middle;" class="m-t-5">
+              <div class="m-t-5">
                 <icon name="share" class="fa-flip-vertical" scale="0.8"></icon>
                 <input v-model="filterObjectDraft.label" type="text"></input>
+              </div>
+            </div>
+          </filter-condition>
+
+          <filter-condition v-model="filterObjectDraft" filter-key="ownerType" default="">
+            <span slot="key">Owner Type</span>
+            <div slot="value">
+              <select value="$eq">
+                <option value="$eq">is equal to</option>
+              </select>
+
+              <div class="m-t-5">
+                <icon name="share" class="fa-flip-vertical" scale="0.8"></icon>
+                <input v-model="filterObjectDraft.ownerType" type="text"></input>
+              </div>
+            </div>
+          </filter-condition>
+
+          <filter-condition v-model="filterObjectDraft" filter-key="ownerId" default="">
+            <span slot="key">Owner ID</span>
+            <div slot="value">
+              <select value="$eq">
+                <option value="$eq">is equal to</option>
+              </select>
+
+              <div class="m-t-5">
+                <icon name="share" class="fa-flip-vertical" scale="0.8"></icon>
+                <input v-model="filterObjectDraft.ownerId" type="text"></input>
               </div>
             </div>
           </filter-condition>

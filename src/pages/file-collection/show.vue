@@ -168,7 +168,7 @@
         </div>
       </el-dialog>
 
-      <el-dialog :show-close="false" :visible="isEditingMembership" title="Editing file membership" width="600px">
+      <el-dialog :show-close="false" :visible="isEditingMembership" title="Edit file membership" width="600px">
         <el-form @submit.native.prevent="updateMembership()" label-width="150px" size="small">
           <file-collection-membership-fieldset v-model="membershipForEdit" :errors="errors"></file-collection-membership-fieldset>
         </el-form>
