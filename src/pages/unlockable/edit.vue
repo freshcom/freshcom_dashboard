@@ -1,5 +1,5 @@
 <template>
-<content-container @locale-changed="loadUnlockable" :ready="isReady">
+<content-container @locale-changed="reload" :ready="isReady">
   <div slot="header">
     <router-link :to="{ name: 'ListUnlockable' }">Unlockables</router-link>
   </div>
@@ -43,13 +43,15 @@ import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
 import ContentContainer from '@/components/content-container'
-import PageMixin from '@/mixins/page'
 import Unlockable from '@/models/unlockable'
 import UnlockableFieldset from '@/components/unlockable-fieldset'
 
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadUnlockable' })
+
 export default {
   name: 'EditUnlockable',
-  mixins: [PageMixin],
+  mixins: [ResourcePageMixin],
   components: {
     ContentContainer,
     UnlockableFieldset
@@ -63,7 +65,6 @@ export default {
   data () {
     return {
       isLoading: false,
-      isReady: false,
       unlockable: Unlockable.objectWithDefaults(),
       unlockableDraft: Unlockable.objectWithDefaults(),
 
@@ -71,21 +72,17 @@ export default {
       errors: {}
     }
   },
-  created () {
-    this.loadUnlockable()
-  },
   methods: {
     loadUnlockable () {
       this.isLoading = true
 
-      freshcom.retrieveUnlockable(this.id, {
-        include: 'avatar,fileCollections'
+      return freshcom.retrieveUnlockable(this.id, {
+        include: 'avatar'
       }).then(response => {
         this.unlockable = response.data
         this.unlockableDraft = _.cloneDeep(response.data)
 
         this.isLoading = false
-        this.isReady = true
       }).catch(errors => {
         this.isLoading = false
         throw errors

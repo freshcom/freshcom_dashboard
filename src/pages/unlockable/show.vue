@@ -1,5 +1,5 @@
 <template>
-<content-container @locale-changed="loadUnlockable" :ready="isReady">
+<content-container @locale-changed="reload" :ready="isReady">
   <div slot="header">
     <router-link :to="{ name: 'ListUnlockable'}">Unlockables</router-link>
   </div>
@@ -74,7 +74,7 @@
         </div>
 
         <div class="body full">
-          <el-table :data="fileCollections" class="block-table" :show-header="false">
+          <el-table :data="fileCollections" class="data-table block-table" :show-header="false">
             <el-table-column width="300">
               <template slot-scope="scope">
                 <router-link :to="{ name: 'ShowFileCollection', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }">
@@ -129,13 +129,15 @@
 <script>
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
 import Unlockable from '@/models/unlockable'
 import ConfirmButton from '@/components/confirm-button'
 
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadUnlockable' })
+
 export default {
   name: 'ShowUnlockable',
-  mixins: [PageMixin],
+  mixins: [ResourcePageMixin],
   components: {
     ConfirmButton
   },
@@ -148,12 +150,8 @@ export default {
   data () {
     return {
       unlockable: Unlockable.objectWithDefaults(),
-      isReady: false,
       isLoading: false
     }
-  },
-  created () {
-    this.loadUnlockable()
   },
   computed: {
     avatarUrl () {
@@ -174,12 +172,11 @@ export default {
     loadUnlockable () {
       this.isLoading = true
 
-      freshcom.retrieveUnlockable(this.id, {
+      return freshcom.retrieveUnlockable(this.id, {
         include: 'avatar,fileCollections'
       }).then(response => {
         this.unlockable = response.data
         this.isLoading = false
-        this.isReady = true
       }).catch(errors => {
         this.isLoading = false
         throw errors

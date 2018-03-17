@@ -153,10 +153,10 @@
 <script>
 import freshcom from '@/freshcom-sdk'
 
-import listPageMixinFactory from '@/mixins/list-page'
 import DataImportForm from '@/components/data-import-form'
 import DataImport from '@/models/data-import'
 
+import listPageMixinFactory from '@/mixins/list-page'
 let ListPageMixin = listPageMixinFactory({ listMethodName: 'listUnlockable' })
 
 export default {

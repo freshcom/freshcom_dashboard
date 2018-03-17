@@ -126,8 +126,8 @@
 
 <script>
 import freshcom from '@/freshcom-sdk'
-import listPageMixinFactory from '@/mixins/list-page'
 
+import listPageMixinFactory from '@/mixins/list-page'
 let ListPageMixin = listPageMixinFactory({ listMethodName: 'listFileCollection' })
 
 export default {

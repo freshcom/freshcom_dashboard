@@ -1,5 +1,5 @@
 <template>
-<content-container @locale-changed="loadFileCollection" :ready="isReady">
+<content-container @locale-changed="reload" :ready="isReady">
   <div slot="header">
     <router-link :to="{ name: 'ListFileCollection' }">File Collections</router-link>
     <router-link :to="{ name: 'ListFile' }">Files</router-link>
@@ -201,14 +201,16 @@
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
 import FileCollection from '@/models/file-collection'
 import ConfirmButton from '@/components/confirm-button'
 import FileCollectionMembershipFieldset from '@/components/file-collection-membership-fieldset'
 
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadFileCollection' })
+
 export default {
   name: 'ShowFileCollection',
-  mixins: [PageMixin],
+  mixins: [ResourcePageMixin],
   components: {
     ConfirmButton,
     FileCollectionMembershipFieldset
@@ -223,7 +225,6 @@ export default {
     return {
       fileCollection: FileCollection.objectWithDefaults(),
       isLoading: false,
-      isReady: false,
 
       isAddingFile: false,
 
@@ -242,9 +243,6 @@ export default {
       errors: {}
     }
   },
-  created () {
-    this.loadFileCollection()
-  },
   computed: {
     memberships () {
       if (this.fileCollection && this.fileCollection.memberships) {
@@ -258,12 +256,11 @@ export default {
     loadFileCollection () {
       this.isLoading = true
 
-      freshcom.retrieveFileCollection(this.id, {
+      return freshcom.retrieveFileCollection(this.id, {
         include: 'memberships.file'
       }).then(response => {
         this.fileCollection = response.data
         this.isLoading = false
-        this.isReady = true
       }).catch(errors => {
         this.isLoading = false
         throw errors
