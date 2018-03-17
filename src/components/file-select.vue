@@ -20,7 +20,7 @@
         <p class="secondary">{{value.id}}</p>
       </div>
 
-      <div class="action-group">
+      <div v-if="!disabled" class="action-group">
         <el-button @click.native="edit()" plain size="mini">Edit</el-button>
       </div>
     </div>
@@ -43,6 +43,10 @@ export default {
       default: function () {
         return {}
       }
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   data () {

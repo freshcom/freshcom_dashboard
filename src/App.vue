@@ -177,7 +177,6 @@ input::-webkit-inner-spin-button {
 //
 // MARK: Data Table
 //
-
 .el-table.data-table {
   th {
     background-color: #f5f7fa;

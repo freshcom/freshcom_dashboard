@@ -788,6 +788,21 @@ export default {
     }).catch(this._processHttpError)
   },
 
+  updateFileCollectionMembership (id, fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.patch(`/file_collection_memberships/${id}`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  deleteFileCollectionMembership (id, params = {}, options = {}) {
+    return this.http.delete(`/file_collection_memberships/${id}`, { params: params }).then(response => {
+      if (response.data) {
+        return SimpleJAS.deserialize(response.data)
+      }
+    }).catch(this._processHttpError)
+  },
+
   //
   // MARK: Fulfillment Package
   //

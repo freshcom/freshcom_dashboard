@@ -1,7 +1,7 @@
 <template>
   <div class="component-wrapper file-collection-membership-fieldset">
-    <el-form-item label="File" :error="errorMsgs.file">
-      <file-select v-model="formModel.file" @input="updateValue"></file-select>
+    <el-form-item label="File" :error="errorMsgs.file" required>
+      <file-select v-model="formModel.file" :disabled="!!formModel.id" @input="updateValue"></file-select>
     </el-form-item>
 
     <el-form-item label="Sort Index" :error="errorMsgs.sortIndex" required>

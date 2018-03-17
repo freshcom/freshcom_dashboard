@@ -51,7 +51,7 @@
 
       <div class="block">
         <div class="header">
-          <h2>Files</h2>
+          <h2>Files <small>({{fileCollection.fileCount}})</small></h2>
 
           <div class="action-group">
             <el-button @click.native="addFile()" plain size="mini">
@@ -61,27 +61,27 @@
         </div>
 
         <div class="body full">
-          <el-table :data="fileCollection.files" class="data-table block-table" :show-header="false">
+          <el-table :data="memberships" class="data-table block-table" :show-header="false">
             <el-table-column>
               <template slot-scope="scope">
-                <router-link :to="{ name: 'ShowFile', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }" class="primary">
-                  <span>{{scope.row.name}}</span>
+                <router-link :to="{ name: 'ShowFile', params: { id: scope.row.file.id }, query: { callbackPath: currentRoutePath } }" class="primary">
+                  <span>{{scope.row.file.name}}</span>
                 </router-link>
               </template>
             </el-table-column>
 
             <el-table-column width="150">
               <template slot-scope="scope">
-                <router-link :to="{ name: 'ShowFile', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }">
-                  <span>{{scope.row.contentType}}</span>
+                <router-link :to="{ name: 'ShowFile', params: { id: scope.row.file.id }, query: { callbackPath: currentRoutePath } }">
+                  <span>{{scope.row.file.contentType}}</span>
                 </router-link>
               </template>
             </el-table-column>
 
             <el-table-column width="200">
               <template slot-scope="scope">
-                <router-link :to="{ name: 'ShowFile', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }">
-                  <span>{{scope.row.updatedAt | moment}}</span>
+                <router-link :to="{ name: 'ShowFile', params: { id: scope.row.file.id }, query: { callbackPath: currentRoutePath } }">
+                  <span>{{scope.row.file.updatedAt | moment}}</span>
                 </router-link>
               </template>
             </el-table-column>
@@ -90,15 +90,19 @@
               <template slot-scope="scope">
                 <p class="action-group">
                   <el-button-group>
-                    <router-link :to="{ name: 'EditFileCollection', params: { id: scope.row.id }}" class="el-button el-button--mini is-plain">
+                    <el-button @click.native="editMembership(scope.row)" plain size="mini">
                       Edit
-                    </router-link>
-                    <confirm-button plain size="mini">Delete</confirm-button>
+                    </el-button>
+                    <el-button @click.native="attemptDeleteMembership(scope.row)" plain size="mini">Remove</el-button>
                   </el-button-group>
                 </p>
               </template>
             </el-table-column>
           </el-table>
+
+          <div v-if="memberships.length >= 5" class="foot text-center">
+            <a class="view-more" href="#">View More</a>
+          </div>
         </div>
       </div>
 
@@ -155,12 +159,37 @@
 
       <el-dialog :show-close="false" :visible="isAddingMembership" title="Add existing file to collection" width="600px">
         <el-form @submit.native.prevent="createMembership()" label-width="150px" size="small">
-          <file-collection-membership-fieldset v-model="membership" :errors="errors"></file-collection-membership-fieldset>
+          <file-collection-membership-fieldset v-model="membershipForAdd" :errors="errors"></file-collection-membership-fieldset>
         </el-form>
 
         <div slot="footer">
           <el-button :disabled="isCreatingMembership" @click="cancelAddMembership()" plain size="small">Cancel</el-button>
           <el-button :loading="isCreatingMembership" @click="createMembership()" type="primary" size="small">Save</el-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog :show-close="false" :visible="isEditingMembership" title="Editing file membership" width="600px">
+        <el-form @submit.native.prevent="updateMembership()" label-width="150px" size="small">
+          <file-collection-membership-fieldset v-model="membershipForEdit" :errors="errors"></file-collection-membership-fieldset>
+        </el-form>
+
+        <div slot="footer">
+          <el-button :disabled="isUpdatingMembership" @click="cancelEditMembership()" plain size="small">Cancel</el-button>
+          <el-button :loading="isUpdatingMembership" @click="updateMembership()" type="primary" size="small">Save</el-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog :show-close="false" :visible="isConfirmingDeleteMembership" title="Remove file from collection" width="600px">
+        <p>
+          Are you sure you want to remove this file from the collection?
+          By default the file itself will not be deleted. If you also want
+          to delete the file click on &quot;Remove and delete file&quot;
+        </p>
+
+        <div slot="footer">
+          <el-button :disabled="isDeletingMembership" @click="cancelDeleteMembership()" plain size="small">Cancel</el-button>
+          <el-button :loading="isDeletingMembership" @click="deleteFile()" type="danger" size="small">Remove and delete file</el-button>
+          <el-button :loading="isDeletingMembership" @click="deleteMembership()" type="danger" size="small">Remove</el-button>
         </div>
       </el-dialog>
     </div>
@@ -169,6 +198,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
 import PageMixin from '@/mixins/page'
@@ -199,7 +229,15 @@ export default {
 
       isAddingMembership: false,
       isCreatingMembership: false,
-      membership: { type: 'FileCollectionMembership', code: '', sortIndex: 0 },
+      membershipForAdd: { type: 'FileCollectionMembership', code: '', sortIndex: 0 },
+
+      isEditingMembership: false,
+      isUpdatingMembership: false,
+      membershipForEdit: {},
+
+      isDeletingMembership: false,
+      isConfirmingDeleteMembership: false,
+      membershipForDelete: {},
 
       errors: {}
     }
@@ -207,12 +245,21 @@ export default {
   created () {
     this.loadFileCollection()
   },
+  computed: {
+    memberships () {
+      if (this.fileCollection && this.fileCollection.memberships) {
+        return this.fileCollection.memberships
+      }
+
+      return []
+    }
+  },
   methods: {
     loadFileCollection () {
       this.isLoading = true
 
       freshcom.retrieveFileCollection(this.id, {
-        include: 'files'
+        include: 'memberships.file'
       }).then(response => {
         this.fileCollection = response.data
         this.isLoading = false
@@ -253,14 +300,14 @@ export default {
     },
 
     cancelAddMembership () {
-      this.membership = { type: 'FileCollectionMembership', code: '', sortIndex: 0 }
+      this.membershipForAdd = { type: 'FileCollectionMembership', code: '', sortIndex: 0 }
       this.isAddingMembership = false
     },
 
     createMembership () {
       this.isCreatingMembership = true
 
-      return freshcom.createFileCollectionMembership(this.fileCollection.id, this.membership).then(() => {
+      return freshcom.createFileCollectionMembership(this.fileCollection.id, this.membershipForAdd).then(() => {
         return this.loadFileCollection()
       }).then(() => {
         this.$message({
@@ -271,8 +318,88 @@ export default {
 
         this.isCreatingMembership = false
         this.cancelAddMembership()
-      }).catch(() => {
+      }).catch(response => {
+        this.errors = response.errors
         this.isCreatingMembership = false
+      })
+    },
+
+    editMembership (membership) {
+      this.isEditingMembership = true
+      this.membershipForEdit = _.cloneDeep(membership)
+    },
+
+    cancelEditMembership () {
+      this.isEditingMembership = false
+    },
+
+    updateMembership () {
+      this.isUpdatingMembership = true
+
+      return freshcom.updateFileCollectionMembership(this.membershipForEdit.id, this.membershipForEdit).then(() => {
+        return this.loadFileCollection()
+      }).then(() => {
+        this.cancelEditMembership()
+        this.isUpdatingMembership = false
+        this.membershipForEdit = {}
+
+        this.$message({
+          showClose: true,
+          message: `File membership updated successfully.`,
+          type: 'success'
+        })
+      }).catch(response => {
+        this.errors = response.errors
+        this.isUpdatingMembership = false
+      })
+    },
+
+    attemptDeleteMembership (membership) {
+      this.isConfirmingDeleteMembership = true
+      this.membershipForDelete = membership
+    },
+
+    cancelDeleteMembership () {
+      this.isConfirmingDeleteMembership = false
+    },
+
+    deleteMembership () {
+      this.isDeletingMembership = true
+
+      return freshcom.deleteFileCollectionMembership(this.membershipForDelete.id).then(() => {
+        return this.loadFileCollection()
+      }).then(() => {
+        this.cancelDeleteMembership()
+        this.isDeletingMembership = false
+        this.membershipForDelete = {}
+
+        this.$message({
+          showClose: true,
+          message: `File removed from collection successfully.`,
+          type: 'success'
+        })
+      }).catch(() => {
+        this.isDeletingMembership = false
+      })
+    },
+
+    deleteFile () {
+      this.isDeletingMembership = true
+
+      return freshcom.deleteFile(this.membershipForDelete.file.id).then(() => {
+        return this.loadFileCollection()
+      }).then(() => {
+        this.cancelDeleteMembership()
+        this.isDeletingMembership = false
+        this.membershipForDelete = {}
+
+        this.$message({
+          showClose: true,
+          message: `File deleted successfully.`,
+          type: 'success'
+        })
+      }).catch(() => {
+        this.isDeletingMembership = false
       })
     }
   }
