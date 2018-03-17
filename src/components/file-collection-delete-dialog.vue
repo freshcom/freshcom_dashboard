@@ -55,7 +55,8 @@ export default {
           type: 'success'
         })
 
-        this.back()
+        this.cancelDeleteCollection()
+        this.$emit('deleted')
       }).catch(() => {
         this.isDeleting = false
       })

@@ -146,7 +146,11 @@
         </div>
       </el-dialog>
 
-      <file-collection-delete-dialog v-model="isConfirmingDeleteFileCollection" :target="fileCollectionForDelete"></file-collection-delete-dialog>
+      <file-collection-delete-dialog
+        v-model="isConfirmingDeleteFileCollection"
+        :target="fileCollectionForDelete"
+        @deleted="loadUnlockable()"
+      ></file-collection-delete-dialog>
     </div>
   </div>
 </content-container>
