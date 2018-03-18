@@ -19,6 +19,20 @@
     <div class="data">
       <el-row>
         <el-col :span="14" :offset="5">
+          <el-form label-width="90px" size="small">
+            <el-form-item v-if="collection.id" label="Collection">
+              <div class="resource-block medium">
+                <div class="resource">
+                  <p class="primary">
+                    <span>File Collection</span>
+                    <span v-if="collection.name">: {{collection.name}}</span>
+                  </p>
+                  <p class="secondary">{{collection.id}}</p>
+                </div>
+              </div>
+            </el-form-item>
+          </el-form>
+
           <el-upload
             :http-request="uploadFile"
             :file-list="fileList"
@@ -56,8 +70,11 @@ export default {
   name: 'NewFile',
   mixins: [PageMixin],
   props: {
-    collectionId: {
-      type: String
+    collection: {
+      type: Object,
+      default () {
+        return {}
+      }
     }
   },
   data () {
@@ -146,6 +163,21 @@ export default {
           targetFileObject.percentage = percentage
           targetFileObject.status = 'uploading'
         }, 300)
+      }).then(response => {
+        // Create the membership if given collection
+        if (this.collection.id) {
+          let membership = {
+            type: 'FileCollectionMembership',
+            sortIndex: 0,
+            collection: { id: this.collection.id, type: 'FileCollelction' },
+            file: { id: response.data.id, type: 'File' }
+          }
+          return freshcom.createFileCollectionMembership(this.collection.id, membership).then(() => {
+            return response
+          })
+        }
+
+        return response
       }).then(response => {
         let fileObject = _.find(this.fileList, { id: response.data.id })
         fileObject.status = 'uploaded'

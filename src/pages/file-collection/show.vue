@@ -147,7 +147,7 @@
         </div>
 
         <p class="text-center">
-          <router-link :to="{ name: 'NewFile', params: { collectionId: this.fileCollection.id } }" class="el-button el-button--small el-button--primary">
+          <router-link :to="{ name: 'NewFile', query: { callbackPath: currentRoutePath, collection: { id: fileCollection.id, name: fileCollection.name, code: fileCollection.code } } }" class="el-button el-button--small el-button--primary">
             Upload new files
           </router-link>
         </p>

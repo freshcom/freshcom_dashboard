@@ -228,6 +228,9 @@ input::-webkit-inner-spin-button {
       margin: 0px;
       font-weight: 400;
       font-size: 16px;
+      width: 450px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .brief-action-group {

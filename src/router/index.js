@@ -280,7 +280,10 @@ const router = new Router({
       name: 'NewFile',
       component: NewFilePage,
       props (route) {
-        return { collectionId: route.params.collectionId }
+        return {
+          collection: route.query.collection,
+          callbackPath: route.query.callbackPath
+        }
       }
     },
     {
