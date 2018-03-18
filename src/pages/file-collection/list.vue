@@ -131,7 +131,7 @@
             <template slot-scope="scope">
               <el-popover trigger="hover" placement="top">
                 <span>{{ scope.row.id }}</span>
-                <div slot="reference" class="name-wrapper">
+                <div slot="reference">
                   {{ scope.row.id | idLastPart }}
                 </div>
               </el-popover>
