@@ -419,7 +419,7 @@ export default {
       this.isConfirmingDeleteCollection = false
     },
 
-    deleteCollection (opts = { }) {
+    deleteCollection () {
       this.isDeletingCollection = true
 
       freshcom.deleteFileCollection(this.fileCollection.id).then(() => {

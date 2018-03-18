@@ -78,6 +78,7 @@ import ListFileCollectionPage from '@/pages/file-collection/list'
 
 import ListFilePage from '@/pages/file/list'
 import ShowFilePage from '@/pages/file/show'
+import NewFilePage from '@/pages/file/new'
 
 import ShowBalanceSettingsPage from '@/pages/balance/settings'
 import APIHomePage from '@/pages/api/home'
@@ -272,6 +273,14 @@ const router = new Router({
           filterObject: route.query.filter,
           page: page
         }
+      }
+    },
+    {
+      path: '/files/new',
+      name: 'NewFile',
+      component: NewFilePage,
+      props (route) {
+        return { collectionId: route.params.collectionId }
       }
     },
     {

@@ -1,144 +1,141 @@
 <template>
-<div class="page-wrapper">
-  <div>
-    <el-menu :router="true" default-active="/files" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListFile' }" index="/files">
-        Files
-      </el-menu-item>
-      <el-menu-item :route="{ name: 'ListFileCollection' }" index="/file_collections">
-        Collections
-      </el-menu-item>
-    </el-menu>
-    <locale-selector class="pull-right"></locale-selector>
+<content-container @locale-changed="reload" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListFileCollection' }">File Collections</router-link>
+    <router-link :to="{ name: 'ListFile' }">Files</router-link>
   </div>
 
-  <div>
-    <el-card v-loading="isLoading" class="main-card">
-        <div slot="header">
-          <div v-if="isViewingTestData" class="test-data-banner">
-            <div class="banner-content">TEST DATA</div>
-          </div>
+  <div slot="card-header">
+    <div class="brief">
+      <div class="avatar">
+        <img v-if="isImage(file)" :src="file.url">
+        <icon v-else name="file" class="avatar-icon"></icon>
+      </div>
 
-          <div class="brief">
-            <div class="avatar">
-              <img v-if="isImage(fFile)" :src="fFile.url">
-              <icon v-else name="file" class="avatar-icon"></icon>
-            </div>
+      <div class="detail">
+        <p>
+          <span>File</span>
+          <span>{{file.code}}</span>
+        </p>
+        <h1>{{file.name}}</h1>
+        <p class="id">{{file.id}}</p>
+      </div>
+    </div>
 
-            <div class="detail">
-              <p>{{fFile.code}}</p>
-              <h2>{{fFile.name}}</h2>
-              <p class="id">{{fFile.id}}</p>
-            </div>
-          </div>
-        </div>
-
-
-        <div class="data">
-          <div class="block-title">
-            <h3>Details</h3>
-          </div>
-          <div class="block">
-            <div class="block-body">
-              <dl>
-                <dt>ID</dt>
-                <dd>{{fFile.id}}</dd>
-
-                <dt>Status</dt>
-                <dd>{{fFile.status}}</dd>
-
-                <dt>Name</dt>
-                <dd>{{fFile.name}}</dd>
-
-                <dt>Content Type</dt>
-                <dd>{{fFile.contentType}}</dd>
-
-                <dt>Size</dt>
-                <dd>{{fFile.sizeBytes}} bytes</dd>
-
-                <dt>Public Readable</dt>
-                <dd>{{fFile.publicReadable}}</dd>
-
-                <dt>Version Name</dt>
-                <dd>{{fFile.versionName}}</dd>
-
-                <dt>Version Label</dt>
-                <dd>{{fFile.versionLabel}}</dd>
-
-                <dt>URL</dt>
-                <dd><a :href="fFile.url" target="_blank">Click to open</a></dd>
-              </dl>
-            </div>
-          </div>
-
-          <h3>Custom Data</h3>
-          <div class="block">
-            <div class="block-body">
-
-            </div>
-          </div>
-
-          <h3>Related Resources</h3>
-          <div class="block">
-            <div class="block-body">
-
-            </div>
-          </div>
-
-          <h3>Logs</h3>
-          <div class="block">
-            <div class="block-body">
-
-            </div>
-          </div>
-
-          <h3>Events</h3>
-          <div class="block">
-            <div class="block-body">
-
-            </div>
-          </div>
-        </div>
-
-        <div class="footer text-right">
-          <confirm-button @confirmed="deleteFile()" size="small">Delete</confirm-button>
-        </div>
-    </el-card>
+    <div class="brief-action-group">
+      <router-link :to="{ name: 'EditFile', params: { id: this.file.id } }" class="el-button el-button--small is-plain">
+        Edit
+      </router-link>
+    </div>
   </div>
-</div>
 
+  <div slot="card-content">
+    <div class="data">
+      <div class="block">
+        <div class="header">
+          <h2>Detail</h2>
+        </div>
+
+        <div class="body">
+          <dl>
+            <dt>ID</dt>
+            <dd>{{file.id}}</dd>
+
+            <dt>Status</dt>
+            <dd>{{file.status}}</dd>
+
+            <dt>Name</dt>
+            <dd>{{file.name}}</dd>
+
+            <dt>Content Type</dt>
+            <dd>{{file.contentType}}</dd>
+
+            <dt>Size</dt>
+            <dd>{{file.sizeBytes}} bytes</dd>
+
+            <dt>Public Readable</dt>
+            <dd>{{file.publicReadable}}</dd>
+
+            <dt>Version Name</dt>
+            <dd>{{file.versionName}}</dd>
+
+            <dt>Version Label</dt>
+            <dd>{{file.versionLabel}}</dd>
+
+            <dt>URL</dt>
+            <dd><a :href="file.url" target="_blank">Click to open</a></dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Custom Data</h2>
+        </div>
+        <div class="body">
+          {{file.customData}}
+        </div>
+      </div>
+    </div>
+
+    <div class="foot text-right">
+      <el-button @click.native="attemptDeleteFile()" plain size="small">Delete</el-button>
+    </div>
+
+    <div class="launchable">
+      <el-dialog :show-close="false" :visible="isConfirmingDeleteFile" title="Delete file" width="500px">
+        <p>
+          Are you sure you want to delete this file?
+
+          <br/><br/>
+          <b>This action cannot be undone.</b>
+        </p>
+
+        <div slot="footer">
+          <el-button :disabled="isDeletingFile" @click="cancelDeleteFile()" plain size="small">Cancel</el-button>
+          <el-button :loading="isDeletingFile" @click="deleteFile()" type="danger" size="small">Delete</el-button>
+        </div>
+      </el-dialog>
+    </div>
+  </div>
+</content-container>
 </template>
 
 <script>
 import 'vue-awesome/icons/file'
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
 import FFile from '@/models/file'
-import ConfirmButton from '@/components/confirm-button'
+
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadFile' })
 
 export default {
   name: 'ShowFile',
-  mixins: [PageMixin],
-  components: {
-    ConfirmButton
+  mixins: [ResourcePageMixin],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
   },
-  props: ['id'],
   data () {
     return {
-      fFile: FFile.objectWithDefaults(),
+      file: FFile.objectWithDefaults(),
       isLoading: false,
+
+      isConfirmingDeleteFile: false,
+      isDeletingFile: false,
 
       errors: {}
     }
   },
-  created () {
-    this.loadFile()
-  },
   methods: {
     loadFile () {
-      freshcom.retrieveFile(this.id).then(response => {
-        this.fFile = response.data
+      this.isLoading = true
+
+      return freshcom.retrieveFile(this.id).then(response => {
+        this.file = response.data
         this.isLoading = false
       }).catch(errors => {
         this.isLoading = false
@@ -146,12 +143,23 @@ export default {
       })
     },
 
-    isImage (fFile) {
-      return fFile.contentType.startsWith('image/')
+    isImage (file) {
+      return file.contentType.startsWith('image/')
+    },
+
+    attemptDeleteFile () {
+      this.isConfirmingDeleteFile = true
+    },
+
+    cancelDeleteFile () {
+      this.isConfirmingDeleteFile = false
     },
 
     deleteFile () {
-      freshcom.deleteFile(this.fFile.id).then(() => {
+      this.isDeletingFile = true
+
+      freshcom.deleteFile(this.file.id).then(() => {
+        this.isDeletingFile = false
         this.$message({
           showClose: true,
           message: `File deleted successfully.`,
@@ -159,10 +167,12 @@ export default {
         })
 
         this.back()
+      }).catch(() => {
+        this.isDeletingFile = false
       })
     },
 
-    back () {
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ListFile' })
     }
   }

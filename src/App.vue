@@ -309,6 +309,13 @@ input::-webkit-inner-spin-button {
 }
 
 //
+// MARK: Message Box
+//
+.el-message-box.top {
+  margin-top: -50vh;
+}
+
+//
 // MARK: Resource Editor
 //
 .resource-editor {

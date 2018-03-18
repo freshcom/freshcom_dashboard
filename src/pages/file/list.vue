@@ -49,7 +49,7 @@
                 <span class="icon-wrapper">
                   <icon name="plus" scale="0.6"></icon>
                 </span>
-                <span>New</span>
+                <span>Upload</span>
               </span>
             </router-link>
           </el-button-group>
@@ -125,6 +125,8 @@
 </template>
 
 <script>
+import 'vue-awesome/icons/plus'
+
 import freshcom from '@/freshcom-sdk'
 
 import listPageMixinFactory from '@/mixins/list-page'
