@@ -20,7 +20,7 @@
             <span>Orders</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListCustomer' }" index="/customers">
-            <icon name="users" scale="0.8"></icon>
+            <icon name="user" scale="1"></icon>
             <span>Customers</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
@@ -165,7 +165,6 @@ import 'vue-awesome/icons/comment'
 import 'vue-awesome/icons/home'
 import 'vue-awesome/icons/inbox'
 import 'vue-awesome/icons/shopping-bag'
-import 'vue-awesome/icons/users'
 import 'vue-awesome/icons/cubes'
 import 'vue-awesome/icons/unlock-alt'
 import 'vue-awesome/icons/file'

@@ -121,6 +121,7 @@ export default {
     },
     unlockable: {
       status: {
+        draft: 'Draft',
         active: 'Active'
       }
     },

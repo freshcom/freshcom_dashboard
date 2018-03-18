@@ -494,8 +494,10 @@ const router = new Router({
       component: ListCustomerPage,
       props (route) {
         let page = extractPagination(route)
+
         return {
           searchKeyword: route.query.search,
+          filterObject: route.query.filter,
           page: page
         }
       }

@@ -120,7 +120,7 @@
                 <el-tag v-if="scope.row.status == 'active'" :disable-transitions="true" size="mini">
                   {{$t(`fields.fileCollection.status.${scope.row.status}`)}}
                 </el-tag>
-                <el-tag v-else :disable-transitions="true" size="mini">
+                <el-tag v-else :disable-transitions="true" type="info" size="mini">
                   {{$t(`fields.fileCollection.status.${scope.row.status}`)}}
                 </el-tag>
               </router-link>
