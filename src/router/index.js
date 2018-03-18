@@ -291,7 +291,10 @@ const router = new Router({
       name: 'ShowFile',
       component: ShowFilePage,
       props (route) {
-        return { id: route.params.id }
+        return {
+          id: route.params.id,
+          callbackPath: route.query.callbackPath
+        }
       }
     },
     {
