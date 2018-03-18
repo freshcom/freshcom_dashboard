@@ -106,7 +106,7 @@
           </el-table>
 
           <div v-if="fileCollections.length >= 5" class="foot text-center">
-            <a class="view-more" href="#">View More</a>
+            <router-link :to="{ name: 'ListFileCollection', query: { filter: { ownerType: 'Unlockable', ownerId: unlockable.id } } }" class="view-more">View More</router-link>
           </div>
         </div>
       </div>
