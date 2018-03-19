@@ -2,7 +2,7 @@
   <div>
     <el-form-item label="Amount" :error="errorMsgs.amount" required>
       <div class="el-input el-input--small">
-        <input v-model.lazy="amount" v-money="{ precision: 0, prefix: '' }" @input="amountInputHandler" autocomplete="off" type="text" rows="2" validateevent="true" class="el-input__inner amount">
+        <input :value="formModel.amount" v-money="{ precision: 0, prefix: '' }" @input="amountInputHandler" autocomplete="off" type="text" rows="2" validateevent="true" class="el-input__inner amount">
       </div>
     </el-form-item>
 
@@ -16,44 +16,21 @@
     </el-form-item>
 
     <el-form-item label="Caption" :error="errorMsgs.caption">
-      <el-input v-model="formModel.caption"></el-input>
+      <el-input v-model="formModel.caption" @input="updateValue"></el-input>
     </el-form-item>
   </div>
 </template>
 
 <script>
-import _ from 'lodash'
-
-import translateErrors from '@/helpers/translate-errors'
+import fieldsetMixinFactory from '@/mixins/fieldset'
+let FieldsetMixin = fieldsetMixinFactory({ errorI18nKey: 'fileCollectionMembership' })
 
 export default {
   name: 'PointTransactionFieldset',
-  props: ['value', 'errors'],
-  data () {
-    return {
-      amount: this.value.amount,
-      formModel: _.cloneDeep(this.value)
-    }
-  },
-  computed: {
-    errorMsgs () {
-      return translateErrors(this.errors, 'pointTransaction')
-    }
-  },
-  watch: {
-    value (v) {
-      this.formModel = _.cloneDeep(v)
-      this.amount = this.formModel.amount
-    }
-  },
+  mixins: [FieldsetMixin],
   methods: {
-    updateValue: _.debounce(function () {
-      this.$emit('input', this.formModel)
-    }, 300),
-
-    amountInputHandler () {
-      let value = Number(this.amount.replace(/[^0-9.-]/g, ''))
-      this.formModel.amount = value
+    amountInputHandler (e) {
+      this.formModel.amount = Number(e.target.value.replace(/[^0-9.-]/g, ''))
       this.updateValue()
     }
   }

@@ -257,7 +257,7 @@
           <h2>Point Transactions</h2>
 
           <div class="action-group">
-            <el-button @click="openAddPointTransactionDialog()" class="el-button el-button--mini is-plain">
+            <el-button @click="addPointTransaction()" class="el-button el-button--mini is-plain">
               Add
             </el-button>
           </div>
@@ -292,7 +292,7 @@
               <template slot-scope="scope">
                 <p v-if="scope.row.amount === 0" class="action-group">
                   <el-button-group>
-                    <el-button @click="deletePointTransaction(scope.row)" plain size="mini">
+                    <el-button @click="deletePointTransaction(scope.row.id)" plain size="mini">
                       Delete
                     </el-button>
                   </el-button-group>
@@ -436,6 +436,17 @@
         <div slot="footer">
           <el-button :disabled="isCreatingUnlock" @click="cancelAddUnlock()" plain size="small">Cancel</el-button>
           <el-button :loading="isCreatingUnlock" @click="createUnlock()" type="primary" size="small">Save</el-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog :show-close="false" :visible="isAddingPointTransaction" title="Add point transaction" width="600px">
+        <el-form @submit.native.prevent="createPointTransaction()" label-width="150px" size="small">
+          <point-transaction-fieldset v-model="pointTransactionForAdd" :errors="errors"></point-transaction-fieldset>
+        </el-form>
+
+        <div slot="footer">
+          <el-button :disabled="isCreatingPointTransaction" @click="cancelAddPointTransaction()" plain size="small">Cancel</el-button>
+          <el-button :loading="isCreatingPointTransaction" @click="createPointTransaction()" type="primary" size="small">Save</el-button>
         </div>
       </el-dialog>
     </div>
@@ -673,7 +684,7 @@
           <h3>Point Transactions</h3>
 
           <span class="block-title-actions pull-right">
-            <a @click="openAddPointTransactionDialog()" href="javascript:;">
+            <a @click="addPointTransaction()" href="javascript:;">
               <icon name="plus" scale="0.8" class="v-middle"></icon>
               <span>Add</span>
             </a>
@@ -824,12 +835,12 @@
 
     <el-dialog :show-close="false" :visible="isAddingPointTransaction" title="Add Point Transaction" width="600px">
       <el-form label-width="150px" size="small" @submit.native.prevent="createPointTransaction()">
-        <point-transaction-fieldset v-model="pointTransactionDraftForAdd" :errors="errors"></point-transaction-fieldset>
+        <point-transaction-fieldset v-model="pointTransactionForAdd" :errors="errors"></point-transaction-fieldset>
         <button class="hidden" type="submit"></button>
       </el-form>
 
       <div slot="footer" class="dialog-footer">
-        <el-button :disabled="isCreatingPointTransaction" @click="closeAddPointTransactionDialog()" plain size="small">Cancel</el-button>
+        <el-button :disabled="isCreatingPointTransaction" @click="cancelAddPointTransaction()" plain size="small">Cancel</el-button>
         <el-button :loading="isCreatingPointTransaction" @click="createPointTransaction()" type="primary" size="small">Save</el-button>
       </div>
     </el-dialog>
@@ -917,7 +928,7 @@ export default {
 
       isAddingPointTransaction: false,
       isCreatingPointTransaction: false,
-      pointTransactionDraftForAdd: PointTransaction.objectWithDefaults(),
+      pointTransactionForAdd: PointTransaction.objectWithDefaults(),
 
       errors: {}
     }
@@ -956,8 +967,9 @@ export default {
       ])
     },
 
+    //
     // MARK: Customer
-
+    //
     loadCustomer () {
       return freshcom.retrieveCustomer(this.id, {
         include: 'point_account,fileCollections'
@@ -978,8 +990,9 @@ export default {
       })
     },
 
+    //
     // MARK: Order
-
+    //
     loadOrders () {
       freshcom.listOrder({
         filter: { customerId: this.id },
@@ -989,8 +1002,9 @@ export default {
       })
     },
 
+    //
     // MARK: Card
-
+    //
     loadCards () {
       return freshcom.listCard({
         filter: { ownerId: this.id, ownerType: 'Customer' }
@@ -1057,8 +1071,9 @@ export default {
       })
     },
 
+    //
     // MARK: Unlock
-
+    //
     loadUnlocks () {
       freshcom.listUnlock({
         filter: { customerId: this.id },
@@ -1115,27 +1130,27 @@ export default {
       })
     },
 
+    //
     // MARK: Point Transaction
-
+    //
     loadPointTransactions () {
       freshcom.listPointTransaction(this.customer.pointAccount.id).then(response => {
         this.pointTransactions = response.data
       })
     },
 
-    openAddPointTransactionDialog () {
-      this.pointTransactionDraftForAdd = PointTransaction.objectWithDefaults()
+    addPointTransaction () {
+      this.pointTransactionForAdd = PointTransaction.objectWithDefaults()
       this.isAddingPointTransaction = true
     },
 
-    closeAddPointTransactionDialog () {
+    cancelAddPointTransaction () {
       this.isAddingPointTransaction = false
-      this.isCreatingPointTransaction = false
     },
 
     createPointTransaction () {
       this.isCreatingPointTransaction = true
-      return freshcom.createPointTransaction(this.customer.pointAccount.id, this.pointTransactionDraftForAdd).then(() => {
+      return freshcom.createPointTransaction(this.customer.pointAccount.id, this.pointTransactionForAdd).then(() => {
         return Promise.all([this.loadPointTransactions(), this.loadCustomer()])
       }).then(() => {
         this.$message({
@@ -1144,7 +1159,8 @@ export default {
           type: 'success'
         })
 
-        this.closeAddPointTransactionDialog()
+        this.isCreatingPointTransaction = false
+        this.cancelAddPointTransaction()
       }).catch(response => {
         this.errors = response.errors
         this.isCreatingPointTransaction = false
