@@ -91,14 +91,22 @@
               </template>
             </el-table-column>
 
-            <el-table-column>
+            <el-table-column align="right">
+              <template slot-scope="scope">
+                {{scope.row.insertedAt | moment}}
+              </template>
+            </el-table-column>
+
+            <el-table-column width="130">
               <template slot-scope="scope">
                 <p class="action-group">
                   <el-button-group>
                     <router-link :to="{ name: 'EditFileCollection', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
                       Edit
                     </router-link>
-                    <el-button @click.native="attemptDeleteFileCollection(scope.row)" plain size="mini">Delete</el-button>
+                    <el-button @click="attemptDeleteFileCollection(scope.row)" plain size="mini">
+                      Delete
+                    </el-button>
                   </el-button-group>
                 </p>
               </template>
@@ -122,7 +130,7 @@
     </div>
 
     <div class="foot text-right">
-      <el-button @click.native="attemptDeleteUnlockable()" plain size="small">Delete</el-button>
+      <el-button @click="attemptDeleteUnlockable()" plain size="small">Delete</el-button>
     </div>
 
     <div class="launchable">

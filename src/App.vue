@@ -209,6 +209,15 @@ input::-webkit-inner-spin-button {
       color: #3297d3;
       font-weight: 500;
     }
+
+    &.with-icon {
+      display: flex;
+      align-items: center;
+
+      .icon-wrapper {
+        display: inline-flex;
+      }
+    }
   }
 }
 

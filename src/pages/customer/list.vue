@@ -104,7 +104,7 @@
           <el-table-column prop="status" label="STATUS" width="100">
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowCustomer', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
-                <el-tag v-if="scope.row.status == 'registered'" :disable-transitions="true" size="mini">
+                <el-tag v-if="scope.row.status === 'registered'" :disable-transitions="true" size="mini">
                   {{$t(`fields.customer.status.${scope.row.status}`)}}
                 </el-tag>
                 <el-tag v-else :disable-transitions="true" type="info" size="mini">

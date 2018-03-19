@@ -1,5 +1,448 @@
 <template>
-<div class="page-wrapper">
+<content-container @locale-changed="reload" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListCustomer' }">Customers</router-link>
+  </div>
+
+  <div slot="card-header">
+    <div class="brief">
+      <div class="avatar">
+        <icon name="user" class="avatar-icon"></icon>
+      </div>
+
+      <div class="detail">
+        <p>
+          <span>Customer</span>
+          <span>{{customer.code}}</span>
+        </p>
+        <h1>{{customer.name}}</h1>
+        <p class="id">{{customer.id}}</p>
+      </div>
+    </div>
+
+    <div class="brief-action-group">
+      <router-link :to="{ name: 'EditCustomer', params: { id: this.customer.id } }" class="el-button el-button--small is-plain">
+        Edit
+      </router-link>
+    </div>
+  </div>
+
+  <div slot="card-content">
+    <div class="data">
+      <div class="block">
+        <div class="header">
+          <h2>Detail</h2>
+        </div>
+
+        <div class="body">
+          <dl>
+            <dt>ID</dt>
+            <dd>{{customer.id}}</dd>
+
+            <template v-if="customer.code">
+              <dt>Code</dt>
+              <dd>{{customer.code}}</dd>
+            </template>
+
+            <dt>Status</dt>
+            <dd>{{$t(`fields.customer.status.${customer.status}`)}}</dd>
+
+            <dt>Name</dt>
+            <dd>{{customer.name}}</dd>
+
+            <dt>Email</dt>
+            <dd>{{customer.email}}</dd>
+
+            <template v-if="customer.phoneNumber">
+              <dt>Phone</dt>
+              <dd>{{customer.phoneNumber}}</dd>
+            </template>
+
+            <template v-if="customer.label">
+              <dt>Label</dt>
+              <dd>{{customer.label}}</dd>
+            </template>
+
+            <template v-if="customer.pointAccount">
+              <dt>Point Balance</dt>
+              <dd>{{customer.pointAccount.balance}}</dd>
+            </template>
+          </dl>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Orders</h2>
+
+          <div class="action-group">
+            <router-link :to="{ name: 'NewOrder', query: { customer: { id: this.customer.id, name: this.customer.name }, callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
+              Add
+            </router-link>
+          </div>
+        </div>
+
+        <div class="body full">
+          <el-table :data="orders" class="data-table block-table" :show-header="false">
+            <el-table-column width="100">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowOrder', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }" class="primary">
+                  <span v-if="scope.row.code">[{{scope.row.code}}]</span>
+                  <span>{{scope.row.grandTotalCents | dollar}}</span>
+                </router-link>
+              </template>
+            </el-table-column>
+
+            <el-table-column width="100">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowOrder', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }">
+                  <el-tag v-if="scope.row.status === 'opened'" size="mini" class="m-l-10">
+                    {{$t(`fields.order.status.${scope.row.status}`)}}
+                  </el-tag>
+                  <el-tag v-else size="mini" type="info" class="m-l-10">
+                    {{$t(`fields.order.status.${scope.row.status}`)}}
+                  </el-tag>
+                </router-link>
+              </template>
+            </el-table-column>
+
+            <el-table-column width="120">
+              <template slot-scope="scope">
+                {{scope.row.id | idLastPart}}
+              </template>
+            </el-table-column>
+
+            <el-table-column align="right">
+              <template slot-scope="scope">
+                {{scope.row.openedAt | moment}}
+              </template>
+            </el-table-column>
+
+            <el-table-column width="130">
+              <template slot-scope="scope">
+                <p class="action-group">
+                  <el-button-group>
+                    <router-link :to="{ name: 'EditOrder', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
+                      Edit
+                    </router-link>
+                  </el-button-group>
+                </p>
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <div v-if="orders.length >= 5" class="foot text-center">
+            <router-link :to="{ name: 'ListOrder', query: { filter: { customerId: customer.id } } }" class="view-more">View More</router-link>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Cards</h2>
+        </div>
+
+        <div class="body full">
+          <el-table :data="cards" class="data-table block-table" :show-header="false">
+            <el-table-column width="120">
+              <template slot-scope="scope">
+                <a href="javascript:;" class="primary with-icon">
+                  <span>
+                    **** {{scope.row.lastFourDigit}}
+                  </span>
+
+                  <span v-if="scope.row.brand === 'Visa'" class="m-l-10 icon-wrapper">
+                    <icon name="cc-visa" scale="1.5"></icon>
+                  </span>
+                  <span v-if="scope.row.brand === 'MasterCard'" class="m-l-10 icon-wrapper">
+                    <icon name="cc-mastercard" scale="1.5"></icon>
+                  </span>
+                </a>
+              </template>
+            </el-table-column>
+
+            <el-table-column width="100">
+              <template slot-scope="scope">
+                {{scope.row.expMonth}} / {{scope.row.expYear}}
+              </template>
+            </el-table-column>
+
+            <el-table-column width="100">
+              <template slot-scope="scope">
+                <el-tag v-if="scope.row.primary" size="mini">
+                  Primary
+                </el-tag>
+              </template>
+            </el-table-column>
+
+            <el-table-column width="120">
+              <template slot-scope="scope">
+                {{scope.row.id | idLastPart}}
+              </template>
+            </el-table-column>
+
+            <el-table-column align="right">
+              <template slot-scope="scope">
+                {{scope.row.insertedAt | moment}}
+              </template>
+            </el-table-column>
+
+            <el-table-column width="130">
+              <template slot-scope="scope">
+                <p class="action-group">
+                  <el-button-group>
+                    <el-button @click="editCard(scope.row)" plain size="mini">
+                      Edit
+                    </el-button>
+                    <el-button @click="attemptDeleteCard(scope.row)" plain size="mini">
+                      Delete
+                    </el-button>
+                  </el-button-group>
+                </p>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Unlocks</h2>
+
+          <div class="action-group">
+            <el-button @click="addUnlock()" class="el-button el-button--mini is-plain">
+              Add
+            </el-button>
+          </div>
+        </div>
+
+        <div class="body full">
+          <el-table :data="unlocks" class="data-table block-table" :show-header="false">
+            <el-table-column width="200">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowUnlockable', params: { id: scope.row.unlockable.id }, query: { callbackPath: currentRoutePath } }" class="primary">
+                  <span v-if="scope.row.unlockable.code">[{{scope.row.unlockable.code}}]</span>
+                  <span>{{scope.row.unlockable.name}}</span>
+                </router-link>
+              </template>
+            </el-table-column>
+
+            <el-table-column align="right">
+              <template slot-scope="scope">
+                {{scope.row.insertedAt | moment}}
+              </template>
+            </el-table-column>
+
+            <el-table-column width="130">
+              <template slot-scope="scope">
+                <p class="action-group">
+                  <el-button-group>
+                    <confirm-button @confirmed="deleteUnlock(scope.row.id)" plain size="mini">
+                      Delete
+                    </confirm-button>
+                  </el-button-group>
+                </p>
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <div v-if="orders.length >= 5" class="foot text-center">
+            <router-link :to="{ name: 'ListUnlockable', query: { filter: { unlockedBy: customer.id } } }" class="view-more">View More</router-link>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Point Transactions</h2>
+
+          <div class="action-group">
+            <el-button @click="openAddPointTransactionDialog()" class="el-button el-button--mini is-plain">
+              Add
+            </el-button>
+          </div>
+        </div>
+
+        <div class="body full">
+          <el-table :data="pointTransactions" class="data-table block-table" :show-header="false">
+            <el-table-column width="120">
+              <template slot-scope="scope">
+                <a href="javascript:;" class="primary">
+                  <span v-if="scope.row.amount >= 0">+</span>
+                  <span v-else="scope.row.amount >= 0">-</span>
+                  <span>{{scope.row.amount}}</span>
+                </a>
+              </template>
+            </el-table-column>
+
+            <el-table-column align="right" width="120">
+              <template slot-scope="scope">
+                <span>=</span>
+                <span>{{scope.row.balanceAfterCommit}}</span>
+              </template>
+            </el-table-column>
+
+            <el-table-column align="right">
+              <template slot-scope="scope">
+                {{scope.row.insertedAt | moment}}
+              </template>
+            </el-table-column>
+
+            <el-table-column width="130">
+              <template slot-scope="scope">
+                <p v-if="scope.row.amount === 0" class="action-group">
+                  <el-button-group>
+                    <el-button @click="deletePointTransaction(scope.row)" plain size="mini">
+                      Delete
+                    </el-button>
+                  </el-button-group>
+                </p>
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <div v-if="orders.length >= 5" class="foot text-center">
+            <router-link :to="{ name: 'ListPointTransaction', query: { filter: { accountId: customer.pointAccount.id } } }" class="view-more">View More</router-link>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>File Collections</h2>
+
+          <div class="action-group">
+            <router-link :to="{ name: 'NewFileCollection', query: { owner: { id: this.customer.id, type: 'Customer', name: this.customer.name }, callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
+              Add
+            </router-link>
+          </div>
+        </div>
+
+        <div class="body full">
+          <el-table :data="fileCollections" class="data-table block-table" :show-header="false">
+            <el-table-column width="300">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowFileCollection', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }" class="primary">
+                  <span>{{scope.row.name}}</span>
+                </router-link>
+              </template>
+            </el-table-column>
+
+            <el-table-column width="100">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowFileCollection', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }">
+                  <span>{{scope.row.fileCount}} files</span>
+                </router-link>
+              </template>
+            </el-table-column>
+
+            <el-table-column align="right">
+              <template slot-scope="scope">
+                {{scope.row.insertedAt | moment}}
+              </template>
+            </el-table-column>
+
+            <el-table-column width="130">
+              <template slot-scope="scope">
+                <p class="action-group">
+                  <el-button-group>
+                    <router-link :to="{ name: 'EditFileCollection', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
+                      Edit
+                    </router-link>
+                    <el-button @click="attemptDeleteFileCollection(scope.row)" plain size="mini">
+                      Delete
+                    </el-button>
+                  </el-button-group>
+                </p>
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <div v-if="fileCollections.length >= 5" class="foot text-center">
+            <router-link :to="{ name: 'ListFileCollection', query: { filter: { ownerType: 'Customer', ownerId: customer.id } } }" class="view-more">View More</router-link>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Custom Data</h2>
+        </div>
+        <div class="body">
+          {{customer.customData}}
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Related Resource</h2>
+        </div>
+        <div class="body">
+          <dl>
+            <dt v-if="customer.enroller">Enroller</dt>
+            <dd v-if="customer.enroller">
+              <router-link :to="{ name: 'ShowCustomer', params: { id: customer.enroller.id } }">
+                {{customer.enroller.id}}
+              </router-link>
+            </dd>
+
+            <dt v-if="customer.sponsor">Sponsor</dt>
+            <dd v-if="customer.sponsor">
+              <router-link :to="{ name: 'ShowCustomer', params: { id: customer.sponsor.id } }">
+                {{customer.sponsor.id}}
+              </router-link>
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot text-right">
+      <el-button @click="attemptDeleteCustomer()" plain size="small">
+        Delete
+      </el-button>
+    </div>
+
+    <div class="launchable">
+      <el-dialog :show-close="false" :visible="isEditingCard" title="Edit card" width="600px">
+        <el-form @submit.native.prevent="updateCard()" label-width="150px" size="small">
+          <card-fieldset v-model="cardForEdit" :errors="errors"></card-fieldset>
+        </el-form>
+
+        <div slot="footer">
+          <el-button :disabled="isUpdatingCard" @click="cancelEditCard()" plain size="small">Cancel</el-button>
+          <el-button :loading="isUpdatingCard" @click="updateCard()" type="primary" size="small">Save</el-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog :show-close="false" :visible="isConfirmingDeleteCard" title="Delete card" width="500px">
+        <p>
+          Are you sure you want to delete this card?
+          <br/></br>
+          <b>This action cannot be undone.</b>
+        </p>
+
+        <div slot="footer">
+          <el-button :disabled="isDeletingCard" @click="cancelDeleteCard()" plain size="small">Cancel</el-button>
+          <el-button :loading="isDeletingCard" @click="deleteCard()" type="danger" size="small">Delete</el-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog :show-close="false" :visible="isAddingUnlock" title="Add unlock" width="600px">
+        <el-form @submit.native.prevent="createUnlock()" label-width="150px" size="small">
+          <unlock-fieldset v-model="unlockForAdd" :errors="errors"></unlock-fieldset>
+        </el-form>
+
+        <div slot="footer">
+          <el-button :disabled="isCreatingUnlock" @click="cancelAddUnlock()" plain size="small">Cancel</el-button>
+          <el-button :loading="isCreatingUnlock" @click="createUnlock()" type="primary" size="small">Save</el-button>
+        </div>
+      </el-dialog>
+    </div>
+  </div>
+</content-container>
+
+<!-- <div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="/customers" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListCustomer' }" index="/customers">Customers</el-menu-item>
@@ -162,7 +605,7 @@
               <el-table-column align="right" width="200">
                 <template slot-scope="scope">
                   <p class="text-right actions">
-                    <el-button @click="openEditCardDialog(scope.row)" plain size="mini">
+                    <el-button @click="editCard(scope.row)" plain size="mini">
                       Edit
                     </el-button>
 
@@ -184,7 +627,7 @@
           <h3>Unlocks</h3>
 
           <span class="block-title-actions pull-right">
-            <a @click="openAddUnlockDialog()" href="javascript:;">
+            <a @click="addUnlock()" href="javascript:;">
               <icon name="plus" scale="0.8" class="v-middle"></icon>
               <span>Add</span>
             </a>
@@ -371,7 +814,7 @@
   </div>
   <div class="launchable">
     <el-dialog :show-close="false" :visible="isEditingCard" title="Edit Card" width="600px">
-      <card-form v-model="cardDraftForEdit" :errors="errors"></card-form>
+      <card-form v-model="cardForEdit" :errors="errors"></card-form>
 
       <div slot="footer" class="dialog-footer">
         <el-button :disabled="isUpdatingCard" @click="closeEditCardDialog()" plain size="small">Cancel</el-button>
@@ -393,47 +836,56 @@
 
     <el-dialog :show-close="false" :visible="isAddingUnlock" title="Add Unlock" width="600px">
       <el-form label-width="150px" size="small" @submit.native.prevent="createUnlock()">
-        <unlock-fieldset v-model="unlockDraftForAdd" :errors="errors"></unlock-fieldset>
+        <unlock-fieldset v-model="unlockForAdd" :errors="errors"></unlock-fieldset>
         <button class="hidden" type="submit"></button>
       </el-form>
 
       <div slot="footer" class="dialog-footer">
-        <el-button :disabled="isCreatingUnlock" @click="closeAddUnlockDialog()" plain size="small">Cancel</el-button>
+        <el-button :disabled="isCreatingUnlock" @click="cancelAddUnlock()" plain size="small">Cancel</el-button>
         <el-button :loading="isCreatingUnlock" @click="createUnlock()" type="primary" size="small">Save</el-button>
       </div>
     </el-dialog>
   </div>
-</div>
+</div> -->
 
 </template>
 
 <script>
-import 'vue-awesome/icons/plus'
+import 'vue-awesome/icons/cc-visa'
+import 'vue-awesome/icons/cc-mastercard'
+
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
-import Customer from '@/models/customer'
-import Card from '@/models/card'
-import Unlock from '@/models/unlock'
-import PointTransaction from '@/models/point-transaction'
 import ConfirmButton from '@/components/confirm-button'
-import CardForm from '@/components/card-form'
+import Customer from '@/models/customer'
+import PointTransaction from '@/models/point-transaction'
+import CardFieldset from '@/components/card-fieldset'
 import UnlockFieldset from '@/components/unlock-fieldset'
 import PointTransactionFieldset from '@/components/point-transaction-fieldset'
 import { dollar, idLastPart } from '@/helpers/filters'
 
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadResources' })
+
 export default {
   name: 'ShowCustomer',
-  props: ['id'],
+  mixins: [ResourcePageMixin],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  },
   components: {
     ConfirmButton,
-    CardForm,
+    CardFieldset,
     UnlockFieldset,
     PointTransactionFieldset
   },
   filters: {
-    dollar,
-    idLastPart
+    idLastPart,
+    dollar
   },
   data () {
     return {
@@ -444,9 +896,11 @@ export default {
 
       isLoadingCards: false,
       cards: [],
-      cardDraftForEdit: Card.objectWithDefaults(),
+      cardForEdit: {},
       isEditingCard: false,
       isUpdatingCard: false,
+      isConfirmingDeleteCard: false,
+      isDeletingCard: false,
 
       isLoadingOrders: false,
       orders: [],
@@ -456,7 +910,7 @@ export default {
 
       isAddingUnlock: false,
       isCreatingUnlock: false,
-      unlockDraftForAdd: Unlock.objectWithDefaults(),
+      unlockForAdd: {},
 
       isLoadingPointTransaction: false,
       pointTransactions: [],
@@ -480,22 +934,14 @@ export default {
     })
   },
   computed: {
-    avatarUrl () {
-      if (this.customer.avatar) {
-        return this.customer.avatar.url
-      }
+    fileCollections () {
+      if (!this.customer.fileCollections) { return [] }
 
-      return 'http://placehold.it/80x80'
-    },
-    currentRoutePath () {
-      return this.$store.state.route.fullPath
-    },
-    isViewingTestData () {
-      return this.$store.state.session.mode === 'test'
+      return this.customer.fileCollections
     }
   },
   methods: {
-    back () {
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ListCustomer' })
     },
 
@@ -514,14 +960,10 @@ export default {
 
     loadCustomer () {
       return freshcom.retrieveCustomer(this.id, {
-        include: 'point_account'
+        include: 'point_account,fileCollections'
       }).then(response => {
         this.customer = response.data
       })
-    },
-
-    editCustomer () {
-      this.$store.dispatch('pushRoute', { name: 'EditCustomer', params: { id: this.customer.id } })
     },
 
     deleteCustomer () {
@@ -557,23 +999,20 @@ export default {
       })
     },
 
-    openEditCardDialog (card) {
-      let cardDraft = _.cloneDeep(card)
-
-      this.cardDraftForEdit = cardDraft
+    editCard (card) {
+      this.cardForEdit = _.cloneDeep(card)
       this.errors = {}
       this.isEditingCard = true
     },
 
-    closeEditCardDialog () {
+    cancelEditCard () {
       this.isEditingCard = false
-      this.isUpdatingCard = false
     },
 
     updateCard () {
       this.isUpdatingCard = true
 
-      freshcom.updateCard(this.cardDraftForEdit.id, this.cardDraftForEdit).then(() => {
+      freshcom.updateCard(this.cardForEdit.id, this.cardForEdit).then(() => {
         return this.loadCards()
       }).then(() => {
         this.$message({
@@ -582,7 +1021,8 @@ export default {
           type: 'success'
         })
 
-        this.closeEditCardDialog()
+        this.isUpdatingCard = false
+        this.cancelEditCard()
       }).catch(response => {
         this.errors = response.errors
         this.isUpdatingCard = false
@@ -590,15 +1030,30 @@ export default {
       })
     },
 
-    deleteCard (card) {
-      freshcom.deleteCard(card.id).then(() => {
+    attemptDeleteCard (card) {
+      this.cardForDelete = card
+      this.isConfirmingDeleteCard = true
+    },
+
+    cancelDeleteCard () {
+      this.isConfirmingDeleteCard = false
+    },
+
+    deleteCard () {
+      this.isDeletingCard = true
+      freshcom.deleteCard(this.cardForDelete.id).then(() => {
         return this.loadCards()
       }).then(() => {
+        this.cancelDeleteCard()
+        this.isDeletingCard = false
+
         this.$message({
           showClose: true,
           message: `Card deleted successfully.`,
           type: 'success'
         })
+      }).catch(() => {
+        this.isDeletingCard = false
       })
     },
 
@@ -614,20 +1069,23 @@ export default {
       })
     },
 
-    openAddUnlockDialog () {
-      this.unlockDraftForAdd = Unlock.objectWithDefaults()
-      this.unlockDraftForAdd.customer = this.customer
+    addUnlock () {
+      this.unlockForAdd = {
+        type: 'Unlock',
+        sortIndex: 0,
+        customer: this.customer
+      }
       this.isAddingUnlock = true
     },
 
-    closeAddUnlockDialog () {
+    cancelAddUnlock () {
       this.isAddingUnlock = false
-      this.isCreatingUnlock = false
     },
 
     createUnlock () {
       this.isCreatingUnlock = true
-      return freshcom.createUnlock(this.unlockDraftForAdd).then(() => {
+
+      return freshcom.createUnlock(this.unlockForAdd).then(() => {
         return this.loadUnlocks()
       }).then(() => {
         this.$message({
@@ -636,7 +1094,8 @@ export default {
           type: 'success'
         })
 
-        this.closeAddUnlockDialog()
+        this.isCreatingUnlock = false
+        this.cancelAddUnlock()
       }).catch(response => {
         this.errors = response.errors
         this.isCreatingUnlock = false
@@ -703,6 +1162,10 @@ export default {
           type: 'success'
         })
       })
+    },
+
+    attemptDeleteCustomer () {
+
     }
   }
 }

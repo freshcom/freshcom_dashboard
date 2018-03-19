@@ -11,7 +11,7 @@
       </remote-select>
 
       <div v-if="hasExistingValue" class="action-group">
-        <el-button @click.native="cancelEdit()" plain size="mini">Cancel</el-button>
+        <el-button @click="cancelEdit()" plain size="mini">Cancel</el-button>
       </div>
     </div>
     <div v-show="!isEditing" class="resource-block medium">
@@ -21,7 +21,7 @@
       </div>
 
       <div v-if="!disabled" class="action-group">
-        <el-button @click.native="edit()" plain size="mini">Edit</el-button>
+        <el-button @click="edit()" plain size="mini">Edit</el-button>
       </div>
     </div>
   </div>

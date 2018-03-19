@@ -79,7 +79,7 @@
     </div>
 
     <div class="foot text-right">
-      <el-button @click.native="attemptDeleteFile()" plain size="small">Delete</el-button>
+      <el-button @click="attemptDeleteFile()" plain size="small">Delete</el-button>
     </div>
 
     <div class="launchable">

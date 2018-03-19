@@ -54,7 +54,7 @@
           <h2>Files <small>({{fileCollection.fileCount}})</small></h2>
 
           <div class="action-group">
-            <el-button @click.native="addFile()" plain size="mini">
+            <el-button @click="addFile()" plain size="mini">
               Add
             </el-button>
           </div>
@@ -62,7 +62,7 @@
 
         <div class="body full">
           <el-table :data="memberships" class="data-table block-table" :show-header="false">
-            <el-table-column>
+            <el-table-column width="240">
               <template slot-scope="scope">
                 <router-link :to="{ name: 'ShowFile', params: { id: scope.row.file.id }, query: { callbackPath: currentRoutePath } }" class="primary">
                   <span>{{scope.row.file.name}}</span>
@@ -70,7 +70,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column width="150">
+            <el-table-column width="120">
               <template slot-scope="scope">
                 <router-link :to="{ name: 'ShowFile', params: { id: scope.row.file.id }, query: { callbackPath: currentRoutePath } }">
                   <span>{{scope.row.file.contentType}}</span>
@@ -78,7 +78,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column width="200">
+            <el-table-column align="right">
               <template slot-scope="scope">
                 <router-link :to="{ name: 'ShowFile', params: { id: scope.row.file.id }, query: { callbackPath: currentRoutePath } }">
                   <span>{{scope.row.file.updatedAt | moment}}</span>
@@ -86,14 +86,16 @@
               </template>
             </el-table-column>
 
-            <el-table-column>
+            <el-table-column width="130">
               <template slot-scope="scope">
                 <p class="action-group">
                   <el-button-group>
-                    <el-button @click.native="editMembership(scope.row)" plain size="mini">
+                    <el-button @click="editMembership(scope.row)" plain size="mini">
                       Edit
                     </el-button>
-                    <el-button @click.native="attemptDeleteMembership(scope.row)" plain size="mini">Remove</el-button>
+                    <el-button @click="attemptDeleteMembership(scope.row)" plain size="mini">
+                      Remove
+                    </el-button>
                   </el-button-group>
                 </p>
               </template>
@@ -133,13 +135,13 @@
     </div>
 
     <div class="foot text-right">
-      <el-button @click.native="attemptDeleteCollection()" plain size="small">Delete</el-button>
+      <el-button @click="attemptDeleteCollection()" plain size="small">Delete</el-button>
     </div>
 
     <div class="launchable">
       <el-dialog :show-close="false" :visible="isAddingFile" title="Add file" width="600px">
         <p class="text-center">
-          <el-button @click.native="addMembership()" size="small" type="primary">Add from existing file</el-button>
+          <el-button @click="addMembership()" size="small" type="primary">Add from existing file</el-button>
         </p>
 
         <div class="divider-text">
@@ -303,12 +305,15 @@ export default {
     },
 
     addMembership () {
+      this.membershipForAdd = {
+        type: 'FileCollectionMembership',
+        sortIndex: 0
+      }
       this.isAddingFile = false
       this.isAddingMembership = true
     },
 
     cancelAddMembership () {
-      this.membershipForAdd = { type: 'FileCollectionMembership', code: '', sortIndex: 0 }
       this.isAddingMembership = false
     },
 
@@ -329,6 +334,7 @@ export default {
       }).catch(response => {
         this.errors = response.errors
         this.isCreatingMembership = false
+        throw response
       })
     },
 
@@ -363,8 +369,8 @@ export default {
     },
 
     attemptDeleteMembership (membership) {
-      this.isConfirmingDeleteMembership = true
       this.membershipForDelete = membership
+      this.isConfirmingDeleteMembership = true
     },
 
     cancelDeleteMembership () {
