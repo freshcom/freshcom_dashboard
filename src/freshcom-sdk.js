@@ -113,29 +113,29 @@ export default {
   //
   // MARK: Password
   //
-  createPassword (fields, params = {}, options = {}) {
+  updatePassword (fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
-    return this.http.post(`/passwords`, payload, { params: params }).then(response => {
+    return this.http.patch(`/password`, payload, { params: params }).then(response => {
       return {}
     }).catch(this._processHttpError)
   },
 
   //
-  // MARK: Email Confirmation
+  // MARK: Email Verification
   //
-  createEmailConfirmation (fields, params = {}, options = {}) {
+  createEmailVerification (fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
-    return this.http.post(`/email_confirmations`, payload, { params: params }).then(response => {
+    return this.http.post(`/email_verifications`, payload, { params: params }).then(response => {
       return {}
     }).catch(this._processHttpError)
   },
 
   //
-  // MARK: Email Confirmation Token
+  // MARK: Email Verification Token
   //
-  createEmailConfirmationToken (fields, params = {}, options = {}) {
+  createEmailVerificationToken (fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
-    return this.http.post(`/email_confirmation_tokens`, payload, { params: params }).then(response => {
+    return this.http.post(`/email_verification_tokens`, payload, { params: params }).then(response => {
       return {}
     }).catch(this._processHttpError)
   },
@@ -151,7 +151,6 @@ export default {
 
   updateCurrentUser (fields = {}, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
-    console.log(payload)
     return this.http.patch('/user', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
