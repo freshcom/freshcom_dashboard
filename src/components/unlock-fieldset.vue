@@ -1,13 +1,13 @@
 <template>
-  <div>
-    <el-form-item label="Unlockable" :error="errorMsgs.unlockable" required>
-      <unlockable-select v-model="formModel.unlockable" :disabled="!!formModel.id" @input="updateValue"></unlockable-select>
-    </el-form-item>
+<div class="component-wrapper unlock-fieldset">
+  <el-form-item label="Unlockable" :error="errorMsgs.unlockable" required>
+    <unlockable-select v-model="formModel.unlockable" :disabled="!!formModel.id" @input="updateValue"></unlockable-select>
+  </el-form-item>
 
-    <el-form-item label="Sort Index" :error="errorMsgs.sortIndex" required>
-      <el-input-number @change="updateValue" v-model="formModel.sortIndex" :min="0" :step="1000"></el-input-number>
-    </el-form-item>
-  </div>
+  <el-form-item label="Sort Index" :error="errorMsgs.sortIndex" required>
+    <el-input-number @change="updateValue" v-model="formModel.sortIndex" :min="0" :step="1000"></el-input-number>
+  </el-form-item>
+</div>
 </template>
 
 <script>

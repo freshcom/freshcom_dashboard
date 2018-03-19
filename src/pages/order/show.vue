@@ -1,5 +1,178 @@
 <template>
-<div class="page-wrapper">
+<content-container @locale-changed="reload" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListOrder' }">Orders</router-link>
+  </div>
+
+  <div slot="card-header">
+    <div class="brief">
+      <div class="avatar">
+        <icon name="inbox" class="avatar-icon"></icon>
+      </div>
+
+      <div class="detail">
+        <p>
+          <span>Order</span>
+          <span>{{order.code}}</span>
+        </p>
+        <h1>{{order.name}}</h1>
+        <p class="id">{{order.id}}</p>
+      </div>
+    </div>
+
+    <div class="brief-action-group">
+      <router-link :to="{ name: 'EditOrder', params: { id: this.order.id } }" class="el-button el-button--small is-plain">
+        Edit
+      </router-link>
+    </div>
+  </div>
+
+  <div slot="card-content">
+    <div class="data">
+      <div class="block">
+        <div class="header">
+          <h2>Detail</h2>
+        </div>
+
+        <div class="body">
+          <dl>
+            <dt>ID</dt>
+            <dd>{{order.id}}</dd>
+
+            <template v-if="order.code">
+              <dt>Code</dt>
+              <dd>{{order.code}}</dd>
+            </template>
+
+            <dt>Status</dt>
+            <dd>
+              {{$t(`fields.order.status.${order.status}`)}}
+            </dd>
+
+            <dt>Payment Status</dt>
+            <dd>
+              {{$t(`fields.order.paymentStatus.${order.paymentStatus}`)}}
+            </dd>
+
+            <dt>Name</dt>
+            <dd>{{order.name}}</dd>
+
+            <dt>Email</dt>
+            <dd>{{order.email}}</dd>
+
+            <template v-if="order.phoneNumber">
+              <dt>Phone</dt>
+              <dd>{{order.phoneNumber}}</dd>
+            </template>
+
+            <template v-if="order.label">
+              <dt>Phone</dt>
+              <dd>{{order.label}}</dd>
+            </template>
+
+            <hr>
+
+            <dt>Fulfillment Method</dt>
+            <dd>{{$t(`fields.order.fulfillmentMethod.${order.fulfillmentMethod}`)}}</dd>
+
+            <dt>Fulfillment Status</dt>
+            <dd>{{$t(`fields.order.fulfillmentStatus.${order.fulfillmentStatus}`)}}</dd>
+
+            <template v-if="order.fulfillmentMethod === 'ship'">
+              <dt>Delivery Address</dt>
+              <dd>
+                {{order.deliveryAddressLineOne}}
+                <template v-if="order.deliveryAddressLineTwo">
+                  <br>
+                  {{order.deliveryAddressLineTwo}}
+                </template>
+                <br>
+                {{order.deliveryAddressCity}}, {{order.deliveryAddressProvince}}, {{order.deliveryAddressCountryCode}}
+                <br>
+                {{order.deliveryAddressPostalCode}}
+              </dd>
+            </template>
+
+            <hr>
+
+            <template v-if="order.SubTotalCents != order.grandTotalCents">
+              <dt>Sub Total</dt>
+              <dd>
+                <span v-if="order.isEstimate">~</span>
+                {{order.subTotalCents | dollar}}
+              </dd>
+            </template>
+
+            <template v-if="order.taxOneCents > 0">
+              <dt>Tax 1</dt>
+              <dd>{{order.taxOneCents | dollar}}</dd>
+            </template>
+
+            <template v-if="order.taxTwoCents > 0">
+              <dt>Tax 2</dt>
+              <dd>{{order.taxTwoCents | dollar}}</dd>
+            </template>
+
+            <template v-if="order.taxThreeCents > 0">
+              <dt>Tax 3</dt>
+              <dd>{{order.taxThreeCents | dollar}}</dd>
+            </template>
+
+            <dt>Grand Total</dt>
+            <dd>
+              <span v-if="order.isEstimate">~</span>
+              {{order.grandTotalCents | dollar}}
+            </dd>
+
+            <dt v-if="order.authorizationTotalCents != order.grandTotalCents">Authorization Total</dt>
+            <dd v-if="order.authorizationTotalCents != order.grandTotalCents">{{order.authorizationTotalCents | dollar}}</dd>
+
+            <dt>Opened At</dt>
+            <dd>{{order.openedAt | moment}}</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Line Items</h2>
+
+          <div class="action-group">
+            <el-button @click="addLineItem()" size="mini" plain>
+              Add
+            </el-button>
+          </div>
+        </div>
+
+        <div class="body full">
+          <order-line-item-table :records="order.rootLineItems" @delete="deleteLineItem" @edit="openEditLineItemDialog($event)">
+          </order-line-item-table>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot text-right">
+      <el-button @click="attemptDeleteOrder()" plain size="small">
+        Delete
+      </el-button>
+    </div>
+
+    <div class="launchable">
+      <el-dialog :show-close="false" :visible="isAddingLineItem" title="Add line item" width="750px">
+        <el-form @submit.native.prevent="createLineItem()" label-position="top" size="small">
+          <order-line-item-fieldset v-model="lineItemForAdd" :errors="errors"></order-line-item-fieldset>
+        </el-form>
+
+        <div slot="footer">
+          <el-button :disabled="isCreatingLineItem" @click="cancelAddLineItem()" plain size="small">Cancel</el-button>
+          <el-button :loading="isCreatingLineItem" @click="createLineItem()" type="primary" size="small">Save</el-button>
+        </div>
+      </el-dialog>
+    </div>
+  </div>
+</content-container>
+
+<!-- <div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="/orders" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">Orders</el-menu-item>
@@ -408,7 +581,7 @@
 
   <div class="launchable">
     <el-dialog :show-close="false" :visible="isAddingLineItem" title="Add Line Item" width="750px">
-      <order-line-item-form v-model="lineItemDraftForAdd"></order-line-item-form>
+      <order-line-item-form v-model="lineItemForAdd"></order-line-item-form>
 
       <div slot="footer" class="dialog-footer">
         <el-button :disabled="isCreatingLineItem" @click="closeAddLineItemDialog()" plain size="small">Cancel</el-button>
@@ -452,12 +625,11 @@
       </div>
     </el-dialog>
   </div>
-</div>
+</div> -->
 
 </template>
 
 <script>
-import 'vue-awesome/icons/plus'
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
@@ -466,30 +638,37 @@ import OrderLineItem from '@/models/order-line-item'
 import Payment from '@/models/payment'
 import Refund from '@/models/refund'
 
-import OrderLineItemForm from '@/components/order-line-item-form'
+import OrderLineItemFieldset from '@/components/order-line-item-form'
 import PaymentForm from '@/components/payment-form'
 import RefundForm from '@/components/refund-form'
 
-import PageMixin from '@/mixins/page'
 import ConfirmButton from '@/components/confirm-button'
 import OrderLineItemTable from '@/components/order-line-item-table'
 import { dollar } from '@/helpers/filters'
 import { createToken as createStripeToken } from 'vue-stripe-elements-plus'
 
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadResources' })
+
 export default {
   name: 'ShowOrder',
-  mixins: [PageMixin],
+  mixins: [ResourcePageMixin],
   components: {
     RefundForm,
     PaymentForm,
-    OrderLineItemForm,
+    OrderLineItemFieldset,
     ConfirmButton,
     OrderLineItemTable
   },
   filters: {
     dollar
   },
-  props: ['id', 'callbackPath'],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  },
   data () {
     return {
       isLoading: false,
@@ -500,7 +679,7 @@ export default {
       fulfillmentPackages: [],
       returnPackages: [],
 
-      lineItemDraftForAdd: OrderLineItem.objectWithDefaults(),
+      lineItemForAdd: OrderLineItem.objectWithDefaults(),
       isAddingLineItem: false,
       isCreatingLineItem: false,
 
@@ -526,22 +705,8 @@ export default {
       errors: {}
     }
   },
-  created () {
-    this.isLoading = true
-
-    this.loadResources().then(() => {
-      this.isLoading = false
-      this.isReady = true
-    }).catch(response => {
-      this.isLoading = false
-      throw response
-    })
-  },
   methods: {
-    back () {
-      if (this.callbackPath) {
-        return this.$store.dispatch('pushRoute', { path: this.callbackPath })
-      }
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ListOrder' })
     },
 
@@ -554,8 +719,9 @@ export default {
       ])
     },
 
+    //
     // MARK: Order
-
+    //
     loadOrder () {
       return freshcom.retrieveOrder(this.id, {
         include: 'rootLineItems.children'
@@ -563,6 +729,10 @@ export default {
         this.order = response.data
         return response
       })
+    },
+
+    attemptDeleteOrder () {
+
     },
 
     deleteOrder () {
@@ -577,21 +747,16 @@ export default {
       })
     },
 
-    editOrder () {
-      this.$router.push({ name: 'EditOrder', params: { id: this.order.id }, query: { callbackPath: this.currentRoutePath } })
-    },
-
     // MARK: Line Item
 
-    openAddLineItemDialog () {
-      let lineItem = OrderLineItem.objectWithDefaults()
-      lineItem.order = this.order
-
-      this.lineItemDraftForAdd = lineItem
+    addLineItem () {
+      this.lineItemForAdd = OrderLineItem.objectWithDefaults()
+      this.lineItemForAdd.order = this.order
+      this.errors = {}
       this.isAddingLineItem = true
     },
 
-    closeAddLineItemDialog () {
+    cancelAddLineItem () {
       this.isAddingLineItem = false
       this.isCreatingLineItem = false
     },
@@ -599,7 +764,7 @@ export default {
     createLineItem () {
       this.isCreatingLineItem = true
 
-      freshcom.createOrderLineItem(this.id, this.lineItemDraftForAdd).then(() => {
+      freshcom.createOrderLineItem(this.id, this.lineItemForAdd).then(() => {
         return this.loadOrder()
       }).then(response => {
         this.$message({
@@ -608,7 +773,7 @@ export default {
           type: 'success'
         })
 
-        this.closeAddLineItemDialog()
+        this.cancelAddLineItem()
       }).catch(response => {
         this.errors = response.errors
         this.isCreatingLineItem = false

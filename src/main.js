@@ -27,6 +27,7 @@ import 'vue-awesome/icons/share' // Filter
 import 'vue-awesome/icons/folder' // File Collection
 import 'vue-awesome/icons/user' // Customer
 import 'vue-awesome/icons/plus'
+import 'vue-awesome/icons/inbox' // Order
 
 // -- Sync Store & Router --
 sync(store, router)
