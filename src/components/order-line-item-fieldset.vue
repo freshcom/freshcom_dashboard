@@ -11,8 +11,8 @@
 
   <el-row class="m-b-20">
     <el-col :span="9" class="p-r-10">
-      <el-form-item label="Product" :error="errorMsgs.product" required>
-        <product-select v-model="formModel.product" :disabled="!canSelectProduct" @input="productChangeHandler" size="small"></product-select>
+      <el-form-item v-if="canSelectProduct" :error="errorMsgs.product" label="Product" required>
+        <product-select v-model="formModel.product" @input="productChangeHandler" size="small"></product-select>
       </el-form-item>
 
 <!--       <el-form-item label="Product" class="full">
