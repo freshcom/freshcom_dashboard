@@ -1,5 +1,47 @@
 <template>
-<div class="page-wrapper">
+<content-container @locale-changed="reload" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListCustomer' }">Customers</router-link>
+  </div>
+
+  <div slot="card-header">
+    <h1>Edit customer</h1>
+
+    <div class="pull-right">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button @click="submit()" type="primary" size="small">
+        Save
+      </el-button>
+    </div>
+  </div>
+
+  <div slot="card-content">
+    <div class="data">
+      <el-row>
+        <el-col :span="14" :offset="5">
+          <el-form @submit.native.prevent="submit()" label-width="100px" size="small">
+            <customer-fieldset v-model="customerDraft" :errors="errors"></customer-fieldset>
+          </el-form>
+        </el-col>
+      </el-row>
+    </div>
+
+    <div class="foot">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isUpdating" @click="submit()" type="primary" size="small" class="pull-right">
+        Save
+      </el-button>
+    </div>
+  </div>
+</content-container>
+
+<!-- <div class="page-wrapper">
 
   <div>
     <el-menu :router="true" default-active="/customers" mode="horizontal" class="secondary-nav">
@@ -43,42 +85,46 @@
     </el-card>
   </div>
 
-</div>
+</div> -->
 </template>
 
 <script>
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
 import Customer from '@/models/customer'
-import CustomerForm from '@/components/customer-form'
+import CustomerFieldset from '@/components/customer-fieldset'
+
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadCustomer' })
 
 export default {
   name: 'EditCustomer',
-  mixins: [PageMixin],
+  mixins: [ResourcePageMixin],
   components: {
-    CustomerForm
+    CustomerFieldset
   },
-  props: ['id'],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  },
   data () {
     return {
       isLoading: false,
       customer: Customer.objectWithDefaults(),
       customerDraft: Customer.objectWithDefaults(),
 
-      isUpdatingCustomer: false,
+      isUpdating: false,
       errors: {}
     }
-  },
-  created () {
-    this.loadCustomer()
   },
   methods: {
     loadCustomer () {
       this.isLoading = true
 
-      freshcom.retrieveCustomer(this.id).then(response => {
+      return freshcom.retrieveCustomer(this.id).then(response => {
         this.customer = response.data
         this.customerDraft = _.cloneDeep(response.data)
 
@@ -92,7 +138,7 @@ export default {
     },
 
     submit () {
-      this.isUpdatingCustomer = true
+      this.isUpdating = true
 
       freshcom.updateCustomer(this.customerDraft.id, this.customerDraft).then(() => {
         this.$message({
@@ -101,17 +147,17 @@ export default {
           type: 'success'
         })
 
-        this.isUpdatingCustomer = false
+        this.isUpdating = false
         this.back()
       }).catch(response => {
         this.errors = response.errors
-        this.isUpdatingCustomer = false
+        this.isUpdating = false
 
         throw response
       })
     },
 
-    back () {
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ShowCustomer', params: { id: this.customer.id } })
     }
   }

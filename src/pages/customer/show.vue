@@ -246,7 +246,7 @@
             </el-table-column>
           </el-table>
 
-          <div v-if="orders.length >= 5" class="foot text-center">
+          <div v-if="unlocks.length >= 5" class="foot text-center">
             <router-link :to="{ name: 'ListUnlockable', query: { filter: { unlockedBy: customer.id } } }" class="view-more">View More</router-link>
           </div>
         </div>
@@ -301,7 +301,7 @@
             </el-table-column>
           </el-table>
 
-          <div v-if="orders.length >= 5" class="foot text-center">
+          <div v-if="pointTransactions.length >= 5" class="foot text-center">
             <router-link :to="{ name: 'ListPointTransaction', query: { filter: { accountId: customer.pointAccount.id } } }" class="view-more">View More</router-link>
           </div>
         </div>
@@ -1090,6 +1090,7 @@ export default {
         sortIndex: 0,
         customer: this.customer
       }
+      this.errors = {}
       this.isAddingUnlock = true
     },
 
@@ -1141,6 +1142,7 @@ export default {
 
     addPointTransaction () {
       this.pointTransactionForAdd = PointTransaction.objectWithDefaults()
+      this.errors = {}
       this.isAddingPointTransaction = true
     },
 

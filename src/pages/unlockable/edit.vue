@@ -46,7 +46,6 @@
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
-import ContentContainer from '@/components/content-container'
 import Unlockable from '@/models/unlockable'
 import UnlockableFieldset from '@/components/unlockable-fieldset'
 
@@ -57,7 +56,6 @@ export default {
   name: 'EditUnlockable',
   mixins: [ResourcePageMixin],
   components: {
-    ContentContainer,
     UnlockableFieldset
   },
   props: {
@@ -115,7 +113,7 @@ export default {
       })
     },
 
-    back () {
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ShowUnlockable', params: { id: this.unlockable.id } })
     }
   }
