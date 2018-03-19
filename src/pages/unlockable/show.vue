@@ -127,6 +127,29 @@
           {{unlockable.customData}}
         </div>
       </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Related Resources</h2>
+        </div>
+        <div class="body">
+          <dl>
+            <dt v-if="unlockable.avatar">Avatar</dt>
+            <dd v-if="unlockable.avatar">
+              <router-link :to="{ name: 'ShowFile', params: { id: unlockable.avatar.id }}">
+               {{unlockable.avatar.id}}
+              </router-link>
+            </dd>
+
+            <dt v-if="unlockable.file">File</dt>
+            <dd v-if="unlockable.file">
+              <router-link :to="{ name: 'ShowFile', params: { id: unlockable.file.id }}">
+               {{unlockable.file.id}}
+              </router-link>
+            </dd>
+          </dl>
+        </div>
+      </div>
     </div>
 
     <div class="foot text-right">
@@ -143,6 +166,8 @@
             <li>All unlocks that are associated with this unlockable</li>
             <li>All products that contain this unlockable</li>
             <li>All file collections that are owned by this unlockable and all files inside those collection</li>
+            <li>File that is the avatar of this unlockable</li>
+            <li>Any file associated with this unlockable</li>
           </ul>
 
           <b>This action cannot be undone.</b>

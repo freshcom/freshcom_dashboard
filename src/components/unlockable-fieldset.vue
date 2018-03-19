@@ -29,11 +29,16 @@
   <el-form-item label="Description">
     <el-input v-model="formModel.description" @input="updateValue()" type="textarea"></el-input>
   </el-form-item>
+
+  <el-form-item label="File">
+    <file-input v-model="formModel.file" @input="updateValue()"></file-input>
+  </el-form-item>
 </div>
 </template>
 
 <script>
 import AvatarInput from '@/components/avatar-input'
+import FileInput from '@/components/file-input'
 
 import fieldsetMixinFactory from '@/mixins/fieldset'
 let FieldsetMixin = fieldsetMixinFactory({ errorI18nKey: 'unlockable' })
@@ -42,7 +47,8 @@ export default {
   name: 'UnlockableFieldset',
   mixins: [FieldsetMixin],
   components: {
-    AvatarInput
+    AvatarInput,
+    FileInput
   }
 }
 </script>

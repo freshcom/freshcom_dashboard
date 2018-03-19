@@ -1,13 +1,13 @@
 <template>
-  <div class="component-wrapper avatar-input">
-    <el-upload :http-request="uploadAvatar" action="" :show-file-list="false" class="uploader">
-      <img v-if="avatarUrl" :src="avatarUrl" class="preview">
-      <div v-else class="uploader-icon-wrapper">
-        <i class="el-icon-plus"></i>
-      </div>
-    </el-upload>
-    <el-progress v-if="isUploading" :show-text="false" :percentage="avatar.percentage"></el-progress>
-  </div>
+<div class="component-wrapper avatar-input">
+  <el-upload :http-request="uploadAvatar" action="" :show-file-list="false" class="uploader">
+    <img v-if="avatarUrl" :src="avatarUrl" class="preview">
+    <div v-else class="uploader-icon-wrapper">
+      <i class="el-icon-plus"></i>
+    </div>
+  </el-upload>
+  <el-progress v-if="isUploading" :show-text="false" :percentage="avatar.percentage"></el-progress>
+</div>
 </template>
 
 <script>
