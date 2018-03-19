@@ -1,91 +1,127 @@
 <template>
-  <el-autocomplete
-    v-model="inputModel"
-    :fetch-suggestions="queryProduct"
-    placeholder="Search for product..."
-    :disabled="!!selectedOption"
-    @select="setSelectedProduct"
-    class="product-select"
-  >
+  <div class="component-wrapper product-select">
+    <div v-show="isEditing" class="resource-editor">
+      <remote-select
+        :value="draft"
+        :search-method="searchProduct"
+        :record-to-option="productToOption"
+        :class="[size]"
+        @change="productChangeHandler($event)"
+        placeholder="Search..."
+      >
+      </remote-select>
 
-  <el-button v-if="selectedOption" slot="append" @click="clear()">
-    <icon name="times" scale="0.8" class="v-middle"></icon>
-  </el-button>
+      <div v-if="hasExistingValue" :class="[size]" class="action-group">
+        <el-button @click="cancelEdit()" plain size="mini">Cancel</el-button>
+      </div>
+    </div>
+    <div v-show="!isEditing" :class="[size]" class="resource-block">
+      <div class="resource">
+        <p class="primary">
+          <span v-if="value.code">[{{value.code}}]</span>
+          <span>{{value.name}}</span>
+        </p>
+        <p v-if="size !== 'small'" class="secondary">{{value.id}}</p>
+      </div>
 
-  </el-autocomplete>
+      <div v-if="!disabled" class="action-group">
+        <el-button @click="edit()" plain size="mini">Edit</el-button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
 import _ from 'lodash'
-import JSONAPI from '@/jsonapi'
-import ProductAPI from '@/api/product'
+import freshcom from '@/freshcom-sdk'
+import RemoteSelect from '@/components/remote-select'
 
 export default {
   name: 'ProductSelect',
+  components: {
+    RemoteSelect
+  },
   props: {
-    filter: {
+    value: {
       type: Object,
       default: function () {
         return {}
       }
     },
-    include: String,
-    value: Object
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    size: {
+      type: String,
+      default: 'medium'
+    }
   },
   data () {
     return {
-      inputModel: '',
-      selectedOption: undefined,
-      options: [],
-      records: []
+      isEditing: _.isEmpty(this.value),
+      draft: {}
     }
   },
   watch: {
-    value (newValue) {
-      this.selectedOption = this._productToOption(newValue).value
-      if (!this.selectedOption) {
-        this.inputModel = ''
+    value (v) {
+      if (_.isEmpty(v)) {
+        this.isEditing = true
+      } else {
+        this.isEditing = false
       }
     }
   },
+  computed: {
+    hasExistingValue () {
+      return !_.isEmpty(this.value)
+    }
+  },
   methods: {
-    queryProduct (searchKeyword, callback) {
-      ProductAPI.queryRecord({ search: searchKeyword, filter: this.filter, include: this.include }).then(response => {
-        let apiPayload = response.data
-        this.records = JSONAPI.deserialize(apiPayload.data, apiPayload.included)
-        this.options = _.map(this.records, this._productToOption)
+    edit () {
+      this.isEditing = true
+    },
 
-        callback(this.options)
+    cancelEdit () {
+      this.isEditing = false
+    },
+
+    searchProduct (keyword) {
+      return freshcom.listProduct({
+        search: keyword
+      }).then(response => {
+        return response.data
       })
     },
-    setSelectedProduct (selectedOption) {
-      let product = _.find(this.records, { id: selectedOption.id })
+
+    productChangeHandler (product) {
       this.$emit('input', product)
+      this.draft = {}
     },
-    clear () {
-      this.selectedOption = undefined
-      this.inputModel = ''
-      this.$emit('input', undefined)
-    },
-    _productToOption (record) {
-      if (!record) {
+
+    productToOption (product) {
+      if (!product) {
         return { value: undefined }
       }
 
       let info = ''
-      if (record.code) {
-        info += `[${record.code}] `
+      if (product.code) {
+        info += `[${product.code}] `
       }
-      info += record.name + ' :: ' + record.status
-      return { value: info, id: record.id }
+      info += product.name + ' :: ' + product.status
+      return { value: product.id, label: info }
     }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
-.product-select .el-input.is-disabled .el-input__inner {
-  color: #000;
+<style lang="scss" scoped>
+.el-select.small {
+  max-width: 180px;
+}
+
+.action-group.small {
+  margin-left: 0px;
 }
 </style>

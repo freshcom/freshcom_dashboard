@@ -2,7 +2,7 @@
 <div class="component-wrapper order-line-item-fieldset">
   <el-row v-if="canSelectType" class="m-b-20">
     <el-form-item label="Type" class="type">
-      <el-radio-group @change="reset()" v-model="type">
+      <el-radio-group v-model="type" @change="reset()">
         <el-radio-button label="Product"></el-radio-button>
         <el-radio-button label="Custom"></el-radio-button>
       </el-radio-group>
@@ -10,18 +10,22 @@
   </el-row>
 
   <el-row class="m-b-20">
-    <el-col v-if="canSelectProduct" :span="9" class="p-r-10">
-      <el-form-item label="Product" class="full">
+    <el-col :span="9" class="p-r-10">
+      <el-form-item label="Product" :error="errorMsgs.product" required>
+        <product-select v-model="formModel.product" :disabled="!canSelectProduct" @input="productChangeHandler" size="small"></product-select>
+      </el-form-item>
+
+<!--       <el-form-item label="Product" class="full">
         <remote-select
           :search-method="searchProducts"
           :value="selectedProduct"
-          @change="handleProductChange($event)"
+          @change="productChangeHandler($event)"
           no-data-text="No matching product"
           placeholder="Type to start searching..."
           class="product-select"
         >
         </remote-select>
-      </el-form-item>
+      </el-form-item> -->
     </el-col>
 
     <el-col :span="9" class="p-l-10">
@@ -193,15 +197,18 @@ import translateErrors from '@/helpers/translate-errors'
 import { dollar, chargeDollar } from '@/helpers/filters'
 import Price from '@/models/price'
 import OrderLineItem from '@/models/order-line-item'
-import RemoteSelect from '@/components/remote-select'
+import ProductSelect from '@/components/product-select'
 
 import MoneyInput from '@/components/money-input'
 
+import fieldsetMixinFactory from '@/mixins/fieldset'
+let FieldsetMixin = fieldsetMixinFactory({ errorI18nKey: 'fileCollectionMembership' })
+
 export default {
-  name: 'OrderLineItemForm',
-  props: ['value', 'errors', 'isVisible'],
+  name: 'OrderLineItemFieldset',
+  mixins: [FieldsetMixin],
   components: {
-    RemoteSelect,
+    ProductSelect,
     MoneyInput
   },
   filters: {
@@ -216,9 +223,7 @@ export default {
       selectedProduct: null,
       isLoadingProducts: false,
 
-      productVariants: [],
-
-      formModel: _.cloneDeep(this.value)
+      productVariants: []
     }
   },
   created () {
@@ -301,20 +306,15 @@ export default {
     }
   },
   methods: {
-    updateValue: _.debounce(function (formModel) {
-      formModel = formModel || this.formModel
-      this.$emit('input', formModel)
-    }, 300),
-
-    searchProducts (keyword) {
-      return freshcom.listProduct({
-        search: keyword,
-        filter: { status: ['active', 'internal'] },
-        include: 'prices,defaultPrice'
-      }).then(response => {
-        return response.data
-      })
-    },
+    // searchProducts (keyword) {
+    //   return freshcom.listProduct({
+    //     search: keyword,
+    //     filter: { status: ['active', 'internal'] },
+    //     include: 'prices,defaultPrice'
+    //   }).then(response => {
+    //     return response.data
+    //   })
+    // },
 
     reset () {
       this.formModel = OrderLineItem.objectWithDefaults()
@@ -360,7 +360,7 @@ export default {
       this.updateValue(OrderLineItem.balanceByProduct(this.formModel))
     },
 
-    handleProductChange (product) {
+    productChangeHandler (product) {
       if (!product) {
         return this.reset()
       }

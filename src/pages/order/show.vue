@@ -638,7 +638,7 @@ import OrderLineItem from '@/models/order-line-item'
 import Payment from '@/models/payment'
 import Refund from '@/models/refund'
 
-import OrderLineItemFieldset from '@/components/order-line-item-form'
+import OrderLineItemFieldset from '@/components/order-line-item-fieldset'
 import PaymentForm from '@/components/payment-form'
 import RefundForm from '@/components/refund-form'
 

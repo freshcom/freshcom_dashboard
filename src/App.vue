@@ -357,6 +357,11 @@ input::-webkit-inner-spin-button {
     width: 298px;
   }
 
+  &.small {
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+
   .resource {
     display: inline-block;
 
@@ -379,6 +384,7 @@ input::-webkit-inner-spin-button {
   .action-group {
     margin-left: 15px;
     display: inline-block;
+    line-height: 31px;
 
     .el-button.el-button--mini {
       font-size: 11px;
