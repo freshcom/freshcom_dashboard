@@ -145,8 +145,72 @@
         </div>
 
         <div class="body full">
-          <order-line-item-table :records="order.rootLineItems" @delete="deleteLineItem" @edit="openEditLineItemDialog($event)">
+          <order-line-item-table :records="order.rootLineItems" @delete="deleteLineItem" @edit="eidtLineItem($event)">
           </order-line-item-table>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Payments</h2>
+
+          <div class="action-group">
+            <el-button @click="addPayment()" size="mini" plain>
+              Add
+            </el-button>
+          </div>
+        </div>
+
+        <div class="body full">
+          <el-table :data="payments" class="data-table block-table" :show-header="false">
+            <el-table-column width="100">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }" class="primary">
+                  <span>{{scope.row.amountCents | dollar}}</span>
+                </router-link>
+              </template>
+            </el-table-column>
+
+            <el-table-column width="100">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }">
+                  <el-tag v-if="scope.row.status === 'pending'" size="mini" type="warning" class="m-l-10">
+                    {{$t(`fields.payment.status.${scope.row.status}`)}}
+                  </el-tag>
+                  <el-tag v-else size="mini" type="info" class="m-l-10">
+                    {{$t(`fields.payment.status.${scope.row.status}`)}}
+                  </el-tag>
+                </router-link>
+              </template>
+            </el-table-column>
+
+            <el-table-column align="right">
+              <template slot-scope="scope">
+                {{scope.row.insertedAt | moment}}
+              </template>
+            </el-table-column>
+
+            <el-table-column width="130">
+              <template slot-scope="scope">
+                <p class="action-group">
+                  <el-button-group>
+                    <el-button v-if="canEditPayment(scope.row)" @click="editPayment(scope.row)" plain size="mini">
+                      Edit
+                    </el-button>
+                    <el-button v-if="scope.row.status === 'authorized'" @click="editPayment(scope.row)" plain size="mini">
+                      Capture
+                    </el-button>
+                    <el-button v-if="canRefundPayment(scope.row)" @click="addRefund(scope.row)" plain size="mini">
+                      Refund
+                    </el-button>
+                    <confirm-button v-if="scope.row.status === 'pending'" @confirmed="deletePayment(scope.row.id)" size="mini">
+                      Delete
+                    </confirm-button>
+                  </el-button-group>
+                </p>
+              </template>
+            </el-table-column>
+          </el-table>
         </div>
       </div>
     </div>
@@ -166,6 +230,50 @@
         <div slot="footer">
           <el-button :disabled="isCreatingLineItem" @click="cancelAddLineItem()" plain size="small">Cancel</el-button>
           <el-button :loading="isCreatingLineItem" @click="createLineItem()" type="primary" size="small">Save</el-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog :show-close="false" :visible="isEditingLineItem" title="Edit line item" width="750px">
+        <el-form @submit.native.prevent="updateLineItem()" label-position="top" size="small">
+          <order-line-item-fieldset v-model="lineItemForEdit" :errors="errors"></order-line-item-fieldset>
+        </el-form>
+
+        <div slot="footer">
+          <el-button :disabled="isUpdatingLineItem" @click="cancelEditLineItem()" plain size="small">Cancel</el-button>
+          <el-button :loading="isUpdatingLineItem" @click="updateLineItem()" type="primary" size="small">Save</el-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog :show-close="false" :visible="isAddingPayment" title="Add payment" width="750px">
+        <el-form @submit.native.prevent="createPayment()" label-position="top" size="small">
+          <payment-fieldset v-model="paymentForAdd" :errors="errors"></payment-fieldset>
+        </el-form>
+
+        <div slot="footer">
+          <el-button :disabled="isCreatingPayment" @click="cancelAddPayment()" plain size="small">Cancel</el-button>
+          <el-button :loading="isCreatingPayment" @click="createPayment()" type="primary" size="small">Save</el-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog :show-close="false" :visible="isEditingPayment" title="Edit payment" width="750px">
+        <el-form @submit.native.prevent="updatePayment()" label-position="top" size="small">
+          <payment-fieldset v-model="paymentForEdit" :errors="errors"></payment-fieldset>
+        </el-form>
+
+        <div slot="footer">
+          <el-button :disabled="isUpdatingPayment" @click="cancelEditPayment()" plain size="small">Cancel</el-button>
+          <el-button :loading="isUpdatingPayment" @click="updatePayment()" type="primary" size="small">Save</el-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog :show-close="false" :visible="isAddingRefund" title="Add refund" width="500px">
+        <el-form @submit.native.prevent="createRefund()" label-position="top" size="small">
+          <refund-fieldset v-model="refundForAdd" :errors="errors"></refund-fieldset>
+        </el-form>
+
+        <div slot="footer">
+          <el-button :disabled="isCreatingRefund" @click="cancelAddRefund()" plain size="small">Cancel</el-button>
+          <el-button :loading="isCreatingRefund" @click="createRefund()" type="primary" size="small">Save</el-button>
         </div>
       </el-dialog>
     </div>
@@ -318,7 +426,7 @@
         </div>
         <div class="block">
           <div class="block-body full">
-            <order-line-item-table @delete="deleteLineItem" @edit="openEditLineItemDialog($event)" :records="order.rootLineItems">
+            <order-line-item-table @delete="deleteLineItem" @edit="eidtLineItem($event)" :records="order.rootLineItems">
             </order-line-item-table>
           </div>
         </div>
@@ -329,7 +437,7 @@
           </h3>
 
           <span class="block-title-actions pull-right">
-            <a @click="openAddPaymentDialog()" href="javascript:;">
+            <a @click="addPayment()" href="javascript:;">
               <icon name="plus" scale="0.8" class="v-middle"></icon>
               <span>Add</span>
             </a>
@@ -372,7 +480,7 @@
                       Capture
                     </el-button>
 
-                    <el-button v-if="canRefundPayment(scope.row)" @click="openAddRefundDialog(scope.row)" plain size="mini">
+                    <el-button v-if="canRefundPayment(scope.row)" @click="addRefund(scope.row)" plain size="mini">
                       Refund
                     </el-button>
 
@@ -590,25 +698,25 @@
     </el-dialog>
 
     <el-dialog :show-close="false" :visible="isEditingLineItem" title="Edit Line Item" width="750px">
-      <order-line-item-form v-model="lineItemDraftForEdit"></order-line-item-form>
+      <order-line-item-form v-model="lineItemForEdit"></order-line-item-form>
 
       <div slot="footer" class="dialog-footer">
-        <el-button :disabled="isUpdatingLineItem" @click="closeEditLineItemDialog()" plain size="small">Cancel</el-button>
+        <el-button :disabled="isUpdatingLineItem" @click="cancelEditLineItem()" plain size="small">Cancel</el-button>
         <el-button :loading="isUpdatingLineItem" @click="updateLineItem()" type="primary" size="small">Save</el-button>
       </div>
     </el-dialog>
 
     <el-dialog :show-close="false" :visible="isAddingPayment" title="Add Payment" width="750px">
-      <payment-form v-model="paymentDraftForAdd"></payment-form>
+      <payment-form v-model="paymentForAdd"></payment-form>
 
       <div slot="footer" class="dialog-footer">
-        <el-button :disabled="isCreatingPayment" @click="closeAddPaymentDialog()" plain size="small">Cancel</el-button>
+        <el-button :disabled="isCreatingPayment" @click="cancelAddPayment()" plain size="small">Cancel</el-button>
         <el-button :loading="isCreatingPayment" @click="createPayment()" type="primary" size="small">Save</el-button>
       </div>
     </el-dialog>
 
     <el-dialog :show-close="false" :visible="isEditingPayment" title="Edit Payment" width="600px">
-      <payment-form v-model="paymentDraftForEdit" :errors="errors"></payment-form>
+      <payment-form v-model="paymentForEdit" :errors="errors"></payment-form>
 
       <div slot="footer" class="dialog-footer">
         <el-button :disabled="isUpdatingPayment" @click="closeEditPaymentDialog()" plain size="small">Cancel</el-button>
@@ -617,11 +725,11 @@
     </el-dialog>
 
     <el-dialog :show-close="false" :visible="isAddingRefund" title="Refund Payment" width="500px">
-      <refund-form v-model="refundDraftForAdd" :errors="errors"></refund-form>
+      <refund-form v-model="refundForAdd" :errors="errors"></refund-form>
 
       <div slot="footer" class="dialog-footer">
-        <el-button :disabled="isCreatingRefund" @click="closeAddRefundDialog()" plain size="small">Cancel</el-button>
-        <el-button :loading="isCreatingRefund" @click="createRefund()" type="primary" size="small">Refund {{refundDraftForAdd.amountCents | dollar}}</el-button>
+        <el-button :disabled="isCreatingRefund" @click="cancelAddRefund()" plain size="small">Cancel</el-button>
+        <el-button :loading="isCreatingRefund" @click="createRefund()" type="primary" size="small">Refund {{refundForAdd.amountCents | dollar}}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -639,8 +747,8 @@ import Payment from '@/models/payment'
 import Refund from '@/models/refund'
 
 import OrderLineItemFieldset from '@/components/order-line-item-fieldset'
-import PaymentForm from '@/components/payment-form'
-import RefundForm from '@/components/refund-form'
+import PaymentFieldset from '@/components/payment-fieldset'
+import RefundFieldset from '@/components/refund-fieldset'
 
 import ConfirmButton from '@/components/confirm-button'
 import OrderLineItemTable from '@/components/order-line-item-table'
@@ -654,8 +762,8 @@ export default {
   name: 'ShowOrder',
   mixins: [ResourcePageMixin],
   components: {
-    RefundForm,
-    PaymentForm,
+    RefundFieldset,
+    PaymentFieldset,
     OrderLineItemFieldset,
     ConfirmButton,
     OrderLineItemTable
@@ -684,20 +792,18 @@ export default {
       isCreatingLineItem: false,
 
       lineItemForEdit: OrderLineItem.objectWithDefaults(),
-      lineItemDraftForEdit: OrderLineItem.objectWithDefaults(),
       isEditingLineItem: false,
       isUpdatingLineItem: false,
 
       paymentForEdit: Payment.objectWithDefaults(),
-      paymentDraftForEdit: Payment.objectWithDefaults(),
       isEditingPayment: false,
       isUpdatingPayment: false,
 
-      paymentDraftForAdd: Payment.objectWithDefaults(),
+      paymentForAdd: Payment.objectWithDefaults(),
       isAddingPayment: false,
       isCreatingPayment: false,
 
-      refundDraftForAdd: Refund.objectWithDefaults(),
+      refundForAdd: Refund.objectWithDefaults(),
       isAddingRefund: false,
       isCreatingRefund: false,
 
@@ -781,23 +887,21 @@ export default {
       })
     },
 
-    openEditLineItemDialog (lineItemId) {
+    eidtLineItem (lineItemId) {
       let lineItem = _.find(this.order.rootLineItems, { id: lineItemId })
-      this.lineItemForEdit = lineItem
-      this.lineItemDraftForEdit = _.cloneDeep(lineItem)
-
+      this.lineItemForEdit = _.cloneDeep(lineItem)
+      this.errors = {}
       this.isEditingLineItem = true
     },
 
-    closeEditLineItemDialog () {
+    cancelEditLineItem () {
       this.isEditingLineItem = false
-      this.isUpdatingLineItem = false
     },
 
     updateLineItem () {
       this.isUpdatingLineItem = true
 
-      freshcom.updateOrderLineItem(this.lineItemDraftForEdit.id, this.lineItemDraftForEdit).then(() => {
+      freshcom.updateOrderLineItem(this.lineItemForEdit.id, this.lineItemForEdit).then(() => {
         return this.loadOrder()
       }).then(response => {
         this.$message({
@@ -806,7 +910,8 @@ export default {
           type: 'success'
         })
 
-        this.closeEditLineItemDialog()
+        this.isUpdatingLineItem = false
+        this.cancelEditLineItem()
       }).catch(response => {
         this.errors = response.errors
         this.isUpdatingLineItem = false
@@ -846,32 +951,31 @@ export default {
       return payment.status === 'partially_refunded' || payment.status === 'paid'
     },
 
-    openAddPaymentDialog () {
+    addPayment () {
       let paymentDraft = Payment.objectWithDefaults()
 
       paymentDraft.target = this.order
       paymentDraft.owner = this.order.customer
 
-      this.paymentDraftForAdd = paymentDraft
+      this.paymentForAdd = paymentDraft
       this.isAddingPayment = true
     },
 
-    closeAddPaymentDialog () {
+    cancelAddPayment () {
       this.isAddingPayment = false
-      this.isCreatingPayment = false
     },
 
     createPayment () {
       this.isCreatingPayment = true
 
       let paymentCreated
-      if (this.paymentDraftForAdd.gateway === 'freshcom') {
+      if (this.paymentForAdd.gateway === 'freshcom' && !this.paymentForAdd.source) {
         paymentCreated = createStripeToken().then(data => {
-          this.paymentDraftForAdd.source = data.token.id
-          return freshcom.createPayment(this.paymentDraftForAdd)
+          this.paymentForAdd.source = data.token.id
+          return freshcom.createPayment(this.paymentForAdd)
         })
       } else {
-        paymentCreated = freshcom.createPayment(this.paymentDraftForAdd)
+        paymentCreated = freshcom.createPayment(this.paymentForAdd)
       }
 
       paymentCreated.then(() => {
@@ -886,7 +990,8 @@ export default {
           type: 'success'
         })
 
-        this.closeAddPaymentDialog()
+        this.isCreatingPayment = false
+        this.cancelAddPayment()
       }).catch(response => {
         this.errors = response.errors
         this.isCreatingPayment = false
@@ -894,7 +999,7 @@ export default {
       })
     },
 
-    openAddRefundDialog (payment) {
+    addRefund (payment) {
       let refundDraft = Refund.objectWithDefaults()
 
       refundDraft.payment = payment
@@ -904,20 +1009,19 @@ export default {
       refundDraft.owner = payment.owner
       refundDraft.target = payment.target
 
-      this.refundDraftForAdd = refundDraft
+      this.refundForAdd = refundDraft
       this.errors = {}
       this.isAddingRefund = true
     },
 
-    closeAddRefundDialog () {
+    cancelAddRefund () {
       this.isAddingRefund = false
-      this.isCreatingRefund = false
     },
 
     createRefund () {
       this.isCreatingRefund = true
 
-      freshcom.createRefund(this.refundDraftForAdd.payment.id, this.refundDraftForAdd).then(() => {
+      freshcom.createRefund(this.refundForAdd.payment.id, this.refundForAdd).then(() => {
         return Promise.all([
           this.loadOrder(),
           this.loadPayments()
@@ -929,7 +1033,8 @@ export default {
           type: 'success'
         })
 
-        this.closeAddRefundDialog()
+        this.isCreatingRefund = false
+        this.cancelAddRefund()
       }).catch(response => {
         this.errors = response.errors
         this.isCreatingRefund = false
@@ -937,23 +1042,22 @@ export default {
       })
     },
 
-    openEditPaymentDialog (payment) {
+    editPayment (payment) {
       let paymentDraft = _.cloneDeep(payment)
 
-      this.paymentDraftForEdit = paymentDraft
+      this.paymentForEdit = paymentDraft
       this.errors = {}
       this.isEditingPayment = true
     },
 
-    closeEditPaymentDialog () {
+    cancelEditPayment () {
       this.isEditingPayment = false
-      this.isUpdatingPayment = false
     },
 
     updatePayment () {
       this.isUpdatingPayment = true
 
-      freshcom.updatePayment(this.paymentDraftForEdit.id, this.paymentDraftForEdit).then(() => {
+      freshcom.updatePayment(this.paymentForEdit.id, this.paymentForEdit).then(() => {
         return Promise.all([
           this.loadOrder(),
           this.loadPayments()
@@ -965,7 +1069,8 @@ export default {
           type: 'success'
         })
 
-        this.closeEditPaymentDialog()
+        this.isUpdatingPayment = false
+        this.cancelEditPayment()
       }).catch(response => {
         this.errors = response.errors
         this.isUpdatingPayment = false

@@ -1,6 +1,6 @@
 <template>
 <div class="component-wrapper order-line-item-fieldset">
-  <el-row v-if="canSelectType" class="m-b-20">
+  <el-row v-if="canSelectType" class="m-b-20 m-t-20">
     <el-form-item label="Type" class="type">
       <el-radio-group v-model="type" @change="reset()">
         <el-radio-button label="Product"></el-radio-button>
@@ -12,20 +12,14 @@
   <el-row class="m-b-20">
     <el-col :span="9" class="p-r-10">
       <el-form-item v-if="canSelectProduct" :error="errorMsgs.product" label="Product" required>
-        <product-select v-model="formModel.product" @input="productChangeHandler" size="small"></product-select>
+        <product-select
+          v-model="formModel.product"
+          :filter="{ status: ['active', 'internal'] }"
+          @input="productChangeHandler"
+          include="prices,defaultPrice"
+          size="small">
+        </product-select>
       </el-form-item>
-
-<!--       <el-form-item label="Product" class="full">
-        <remote-select
-          :search-method="searchProducts"
-          :value="selectedProduct"
-          @change="productChangeHandler($event)"
-          no-data-text="No matching product"
-          placeholder="Type to start searching..."
-          class="product-select"
-        >
-        </remote-select>
-      </el-form-item> -->
     </el-col>
 
     <el-col :span="9" class="p-l-10">
@@ -137,7 +131,7 @@
     </el-form-item>
   </el-row>
 
-  <el-row>
+  <el-row class="m-b-20">
     <el-form-item label="Sub Total Amt." class="sub-total-left">
       <money-input
         :value="formModel.subTotalCents"
@@ -306,16 +300,6 @@ export default {
     }
   },
   methods: {
-    // searchProducts (keyword) {
-    //   return freshcom.listProduct({
-    //     search: keyword,
-    //     filter: { status: ['active', 'internal'] },
-    //     include: 'prices,defaultPrice'
-    //   }).then(response => {
-    //     return response.data
-    //   })
-    // },
-
     reset () {
       this.formModel = OrderLineItem.objectWithDefaults()
       this.products = []
@@ -374,7 +358,6 @@ export default {
           this.productVariants = variants
           this.formModel.product = _.find(variants, { primary: true })
 
-          console.log(variants)
           this.updateValue(OrderLineItem.balanceByProduct(this.formModel))
         })
       } else {

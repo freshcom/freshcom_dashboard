@@ -28,8 +28,9 @@ export default function (opts = {}) {
       }
     },
     methods: {
-      updateValue: _.debounce(function () {
-        this.$emit('input', this.formModel)
+      updateValue: _.debounce(function (formModel) {
+        formModel = formModel || this.formModel
+        this.$emit('input', formModel)
       }, 300)
     }
   }

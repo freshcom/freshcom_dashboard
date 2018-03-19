@@ -7,7 +7,7 @@
     </el-form-item>
 
     <el-form-item label="Reason" :error="errorMsgs.reasonLabel">
-      <el-select @change="updateValue" v-model="formModel.reasonLabel" placeholder="Please select a reason">
+      <el-select @change="updateValue()" v-model="formModel.reasonLabel" placeholder="Please select a reason">
         <el-option label="Mannual Deposit" value="mannual_deposit"></el-option>
         <el-option label="Used" value="used"></el-option>
         <el-option label="Gift" value="gift"></el-option>
@@ -16,7 +16,7 @@
     </el-form-item>
 
     <el-form-item label="Caption" :error="errorMsgs.caption">
-      <el-input v-model="formModel.caption" @input="updateValue"></el-input>
+      <el-input v-model="formModel.caption" @input="updateValue()"></el-input>
     </el-form-item>
   </div>
 </template>

@@ -1,11 +1,11 @@
 <template>
   <div class="component-wrapper file-collection-membership-fieldset">
     <el-form-item label="File" :error="errorMsgs.file" required>
-      <file-select v-model="formModel.file" :disabled="!!formModel.id" @input="updateValue"></file-select>
+      <file-select v-model="formModel.file" :disabled="!!formModel.id" @input="updateValue()"></file-select>
     </el-form-item>
 
     <el-form-item label="Sort Index" :error="errorMsgs.sortIndex" required>
-      <el-input-number v-model="formModel.sortIndex" :min="0" :step="1000" @change="updateValue"></el-input-number>
+      <el-input-number v-model="formModel.sortIndex" :min="0" :step="1000" @change="updateValue()"></el-input-number>
     </el-form-item>
   </div>
 </template>

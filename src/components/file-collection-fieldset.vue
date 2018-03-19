@@ -13,11 +13,11 @@
   </el-form-item>
 
   <el-form-item :error="errorMsgs.name"  label="Name" required>
-    <el-input v-model="formModel.name" @input="updateValue"></el-input>
+    <el-input v-model="formModel.name" @input="updateValue()"></el-input>
   </el-form-item>
 
   <el-form-item :error="errorMsgs.label" label="Label">
-    <el-input v-model="formModel.label" @input="updateValue"></el-input>
+    <el-input v-model="formModel.label" @input="updateValue()"></el-input>
   </el-form-item>
 </div>
 </template>

@@ -14,7 +14,7 @@
 import UnlockableSelect from '@/components/unlockable-select'
 
 import fieldsetMixinFactory from '@/mixins/fieldset'
-let FieldsetMixin = fieldsetMixinFactory({ errorI18nKey: 'fileCollectionMembership' })
+let FieldsetMixin = fieldsetMixinFactory({ errorI18nKey: 'unlock' })
 
 export default {
   name: 'UnlockFieldset',

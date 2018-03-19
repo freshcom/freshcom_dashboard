@@ -7,6 +7,7 @@
         :record-to-option="productToOption"
         :class="[size]"
         @change="productChangeHandler($event)"
+        no-data-text="No matching product..."
         placeholder="Search..."
       >
       </remote-select>
@@ -55,6 +56,16 @@ export default {
     size: {
       type: String,
       default: 'medium'
+    },
+    include: {
+      type: String,
+      default: ''
+    },
+    filter: {
+      type: Object,
+      default () {
+        return {}
+      }
     }
   },
   data () {
@@ -88,7 +99,9 @@ export default {
 
     searchProduct (keyword) {
       return freshcom.listProduct({
-        search: keyword
+        search: keyword,
+        filter: this.filter,
+        include: this.include
       }).then(response => {
         return response.data
       })
