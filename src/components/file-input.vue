@@ -7,7 +7,7 @@
     :on-remove="deleteFile"
     action=""
   >
-    <el-button size="small" plain>Click to upload</el-button>
+    <el-button size="small" plain>{{text}}</el-button>
   </el-upload>
 </div>
 </template>
@@ -24,6 +24,10 @@ export default {
       default () {
         return {}
       }
+    },
+    text: {
+      type: String,
+      default: 'Click to upload'
     }
   },
   data () {
@@ -91,6 +95,7 @@ export default {
 
     deleteFile (fileObject) {
       freshcom.deleteFile(fileObject.id)
+      this.$emit('input', {})
     },
 
     uploadFile (e) {

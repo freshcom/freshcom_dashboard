@@ -1,7 +1,7 @@
 <template>
 <content-container @locale-changed="listUnlockable">
   <div slot="header">
-    <router-link :to="{ name: 'ListUnlockable'}">Unlockables</router-link>
+    <router-link :to="{ name: 'ListUnlockable' }">Unlockables</router-link>
   </div>
 
   <div slot="card-header">
