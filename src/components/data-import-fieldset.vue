@@ -9,7 +9,7 @@
   </el-form-item>
 
   <el-form-item label="Type">
-    <el-radio v-for="type in dataTypes" v-model="formModel.dataType" :label="type" @input="updateValue()" border>{{type}}</el-radio>
+    <el-radio v-for="type in dataTypes" v-model="formModel.dataType" :key="type" :label="type" @input="updateValue()" border>{{type}}</el-radio>
   </el-form-item>
 </div>
 </template>
