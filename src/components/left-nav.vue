@@ -16,7 +16,7 @@
             <span>Storefront</span>
           </template>
           <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">
-            <icon name="inbox" scale="1"></icon>
+            <icon name="file-text" scale="1"></icon>
             <span>Orders</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListCustomer' }" index="/customers">

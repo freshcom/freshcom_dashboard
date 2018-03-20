@@ -7,7 +7,7 @@
   <div slot="card-header">
     <div class="brief">
       <div class="avatar">
-        <icon name="inbox" class="avatar-icon"></icon>
+        <icon name="file-text" class="avatar-icon"></icon>
       </div>
 
       <div class="detail">
@@ -213,6 +213,204 @@
           </el-table>
         </div>
       </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Fulfillments</h2>
+        </div>
+
+        <div class="body full">
+          <el-table :data="fulfillmentPackages" class="data-table block-table column-compact" :show-header="false">
+            <el-table-column type="expand" width="30px">
+              <template slot-scope="props">
+                <el-table :data="props.row.items" :show-header="false" class="data-table block-table">
+                  <el-table-column width="50px"></el-table-column>
+
+                  <el-table-column width="300px">
+                    <template slot-scope="scope">
+                      <a href="javascript:;" class="primary">
+                        <span>{{scope.row.name}}</span>
+
+                        <el-tag size="mini" type="info" class="m-l-10">
+                          {{$t(`fields.fulfillmentItem.status.${scope.row.status}`)}}
+                        </el-tag>
+                      </a>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column width="80px">
+                    <template slot-scope="scope">
+                      x {{scope.row.quantity}}
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column>
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.source">{{scope.row.source.type}}</span>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column width="140px">
+                    <template slot-scope="scope">
+                      <p class="action-group">
+                        <el-button-group>
+                          <confirm-button v-if="scope.row.status === 'pending'" size="mini">
+                            Fulfill
+                          </confirm-button>
+
+                          <confirm-button v-if="scope.row.status === 'fulfilled'" @confirmed="returnFulfillmentItem(scope.row)" confirm-button-text="Yes" size="mini">
+                            Return
+                          </confirm-button>
+
+                          <confirm-button v-if="scope.row.status === 'fulfilled'" @confirmed="discardFulfillmentItem(scope.row)" confirm-button-text="Yes" size="mini">
+                            Discard
+                          </confirm-button>
+
+                          <confirm-button v-if="scope.row.status === 'pending'" size="mini">
+                            Delete
+                          </confirm-button>
+                        </el-button-group>
+                      </p>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </template>
+            </el-table-column>
+
+            <el-table-column width="300px">
+              <template slot-scope="scope">
+                <a href="javascript:;" class="primary">
+                  <b>{{scope.row.insertedAt | moment}}</b>
+
+                  <el-tag size="mini" type="info" class="m-l-10">
+                    {{$t(`fields.fulfillmentPackage.status.${scope.row.status}`)}}
+                  </el-tag>
+                </a>
+              </template>
+            </el-table-column>
+
+            <el-table-column>
+              <template slot-scope="scope">
+                <b class="m-l-10">
+                  {{$t(`fields.fulfillmentPackage.systemLabel.${scope.row.systemLabel}`)}}
+                </b>
+              </template>
+            </el-table-column>
+
+            <el-table-column width="130">
+              <template slot-scope="scope">
+                <p class="action-group">
+                  <el-button-group>
+                    <confirm-button v-if="canDeleteFulfillmentPackage(scope.row)" @confirmed="deleteFulfillmentPackage(scope.row.id)" size="mini">
+                      Delete
+                    </confirm-button>
+                  </el-button-group>
+                </p>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Returns</h2>
+        </div>
+
+        <div class="body full">
+          <el-table :data="returnPackages" class="data-table block-table column-compact" :show-header="false">
+            <el-table-column type="expand" width="30px">
+              <template slot-scope="props">
+                <el-table :data="props.row.items" :show-header="false" class="data-table block-table">
+                  <el-table-column width="50px"></el-table-column>
+
+                  <el-table-column width="300px">
+                    <template slot-scope="scope">
+                      <a href="javascript:;" class="primary">
+                        <span>{{scope.row.name}}</span>
+
+                        <el-tag size="mini" type="info" class="m-l-10">
+                          {{$t(`fields.returnItem.status.${scope.row.status}`)}}
+                        </el-tag>
+                      </a>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column width="80px">
+                    <template slot-scope="scope">
+                      x {{scope.row.quantity}}
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column>
+                    <template slot-scope="scope">
+                      <p class="action-group">
+                      </p>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </template>
+            </el-table-column>
+
+            <el-table-column width="300px">
+              <template slot-scope="scope">
+                <a href="javascript:;" class="primary">
+                  <b>{{scope.row.insertedAt | moment}}</b>
+
+                  <el-tag size="mini" type="info" class="m-l-10">
+                    {{$t(`fields.returnPackage.status.${scope.row.status}`)}}
+                  </el-tag>
+                </a>
+              </template>
+            </el-table-column>
+
+            <el-table-column>
+              <template slot-scope="scope">
+                <b class="m-l-10">
+                  {{$t(`fields.returnPackage.systemLabel.${scope.row.systemLabel}`)}}
+                </b>
+              </template>
+            </el-table-column>
+
+            <el-table-column width="130">
+              <template slot-scope="scope">
+                <p class="action-group">
+                  <el-button-group>
+                    <confirm-button v-if="canDeleteReturnPackage(scope.row)" @confirmed="deleteReturnPackage(scope.row.id)" size="mini">
+                      Delete
+                    </confirm-button>
+                  </el-button-group>
+                </p>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Custom Data</h2>
+        </div>
+        <div class="body">
+          {{order.customData}}
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Related Resources</h2>
+        </div>
+        <div class="body">
+          <dl>
+            <dt v-if="order.customer">Customer</dt>
+            <dd v-if="order.customer">
+              <router-link :to="{ name: 'ShowCustomer', params: { id: order.customer.id }}">
+               {{order.customer.id}}
+              </router-link>
+            </dd>
+          </dl>
+        </div>
+      </div>
     </div>
 
     <div class="foot text-right">
@@ -279,462 +477,6 @@
     </div>
   </div>
 </content-container>
-
-<!-- <div class="page-wrapper">
-  <div>
-    <el-menu :router="true" default-active="/orders" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">Orders</el-menu-item>
-      <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">Payments</el-menu-item>
-    </el-menu>
-    <locale-selector @change="loadOrder" class="pull-right"></locale-selector>
-  </div>
-
-  <div v-loading="isLoading" element-loading-background="transparent" class="card-wrapper">
-    <el-card v-if="isReady" class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
-
-        <div class="brief no-avatar">
-          <div class="detail">
-            <p>Order {{order.code}}</p>
-            <h2 v-if="order.firstName">{{order.firstName}} {{order.lastName}}</h2>
-            <h2 v-else>{{order.name}}</h2>
-            <p class="id">{{order.id}}</p>
-          </div>
-        </div>
-
-        <div class="header-actions">
-          <el-button @click="editOrder()" plain size="small">Edit</el-button>
-        </div>
-      </div>
-
-      <div class="data">
-        <div class="block-title">
-          <h3>Details</h3>
-        </div>
-        <div class="block">
-          <div class="block-body">
-            <dl>
-              <dt>ID</dt>
-              <dd>{{order.id}}</dd>
-
-              <template v-if="order.code">
-                <dt>Code</dt>
-                <dd>{{order.code}}</dd>
-              </template>
-
-              <dt>Status</dt>
-              <dd>
-                {{$t(`fields.order.status.${order.status}`)}}
-              </dd>
-
-              <dt>Payment Status</dt>
-              <dd>
-                {{$t(`fields.order.paymentStatus.${order.paymentStatus}`)}}
-              </dd>
-
-              <dt>Name</dt>
-              <dd>{{order.name}}</dd>
-
-              <dt>Email</dt>
-              <dd>{{order.email}}</dd>
-
-              <template v-if="order.phoneNumber">
-                <dt>Phone</dt>
-                <dd>{{order.phoneNumber}}</dd>
-              </template>
-
-              <template v-if="order.label">
-                <dt>Phone</dt>
-                <dd>{{order.label}}</dd>
-              </template>
-
-              <hr>
-
-              <dt>Fulfillment Method</dt>
-              <dd>{{$t(`fields.order.fulfillmentMethod.${order.fulfillmentMethod}`)}}</dd>
-
-              <dt>Fulfillment Status</dt>
-              <dd>{{$t(`fields.order.fulfillmentStatus.${order.fulfillmentStatus}`)}}</dd>
-
-              <template v-if="order.fulfillmentMethod === 'ship'">
-                <dt>Delivery Address</dt>
-                <dd>
-                  {{order.deliveryAddressLineOne}}
-                  <template v-if="order.deliveryAddressLineTwo">
-                    <br>
-                    {{order.deliveryAddressLineTwo}}
-                  </template>
-                  <br>
-                  {{order.deliveryAddressCity}}, {{order.deliveryAddressProvince}}, {{order.deliveryAddressCountryCode}}
-                  <br>
-                  {{order.deliveryAddressPostalCode}}
-                </dd>
-              </template>
-
-              <hr>
-
-              <template v-if="order.SubTotalCents != order.grandTotalCents">
-                <dt>Sub Total</dt>
-                <dd>
-                  <span v-if="order.isEstimate">~</span>
-                  {{order.subTotalCents | dollar}}
-                </dd>
-              </template>
-
-              <template v-if="order.taxOneCents > 0">
-                <dt>Tax 1</dt>
-                <dd>{{order.taxOneCents | dollar}}</dd>
-              </template>
-
-              <template v-if="order.taxTwoCents > 0">
-                <dt>Tax 2</dt>
-                <dd>{{order.taxTwoCents | dollar}}</dd>
-              </template>
-
-              <template v-if="order.taxThreeCents > 0">
-                <dt>Tax 3</dt>
-                <dd>{{order.taxThreeCents | dollar}}</dd>
-              </template>
-
-              <dt>Grand Total</dt>
-              <dd>
-                <span v-if="order.isEstimate">~</span>
-                {{order.grandTotalCents | dollar}}
-              </dd>
-
-              <dt v-if="order.authorizationTotalCents != order.grandTotalCents">Authorization Total</dt>
-              <dd v-if="order.authorizationTotalCents != order.grandTotalCents">{{order.authorizationTotalCents | dollar}}</dd>
-
-              <dt>Opened At</dt>
-              <dd>{{order.openedAt | moment}}</dd>
-            </dl>
-          </div>
-        </div>
-
-        <div class="block-title">
-          <h3>Line Items</h3>
-
-          <span class="block-title-actions pull-right">
-            <a @click="openAddLineItemDialog()" href="javascript:;">
-              <icon name="plus" scale="0.8" class="v-middle"></icon>
-              <span>Add</span>
-            </a>
-          </span>
-        </div>
-        <div class="block">
-          <div class="block-body full">
-            <order-line-item-table @delete="deleteLineItem" @edit="eidtLineItem($event)" :records="order.rootLineItems">
-            </order-line-item-table>
-          </div>
-        </div>
-
-        <div class="block-title">
-          <h3>
-            Payments
-          </h3>
-
-          <span class="block-title-actions pull-right">
-            <a @click="addPayment()" href="javascript:;">
-              <icon name="plus" scale="0.8" class="v-middle"></icon>
-              <span>Add</span>
-            </a>
-          </span>
-        </div>
-
-        <div class="block">
-          <div class="block-body full">
-            <el-table :data="payments" class="block-table" :show-header="false" style="width: 100%">
-              <el-table-column>
-                <template slot-scope="scope">
-                  <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }">
-                    <b>
-                      <span>
-                        {{scope.row.amountCents | dollar}}
-                      </span>
-                    </b>
-                  </router-link>
-
-                  <el-tag size="mini" type="info" class="m-l-10">
-                    {{$t(`fields.payment.status.${scope.row.status}`)}}
-                  </el-tag>
-                </template>
-              </el-table-column>
-
-              <el-table-column width="200">
-                <template slot-scope="scope">
-                  <span>{{scope.row.insertedAt | moment}}</span>
-                </template>
-              </el-table-column>
-
-              <el-table-column width="200">
-                <template slot-scope="scope">
-                  <p class="text-right actions">
-                    <el-button v-if="canEditPayment(scope.row)" @click="openEditPaymentDialog(scope.row)" plain size="mini">
-                      Edit
-                    </el-button>
-
-                    <el-button v-if="scope.row.status === 'authorized'" @click="openEditPaymentDialog(scope.row)" plain size="mini">
-                      Capture
-                    </el-button>
-
-                    <el-button v-if="canRefundPayment(scope.row)" @click="addRefund(scope.row)" plain size="mini">
-                      Refund
-                    </el-button>
-
-                    <confirm-button v-if="scope.row.status === 'pending'" @confirmed="deletePayment(scope.row.id)" size="mini">
-                      Delete
-                    </confirm-button>
-                  </p>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-        </div>
-
-        <div class="block-title">
-          <h3>Fulfillments</h3>
-        </div>
-        <div class="block">
-          <div class="block-body full">
-            <el-table
-              :data="fulfillmentPackages"
-              :show-header="false"
-              row-key="id"
-              class="nested-block-table column-compact"
-              style="width: 100%"
-            >
-              <el-table-column type="expand" width="30px">
-                <template slot-scope="props">
-                  <el-table :data="props.row.items" :show-header="false" style="width: 100%">
-                    <el-table-column width="30px"></el-table-column>
-                    <el-table-column label="Name" prop="name">
-                      <template slot-scope="scope">
-                        <span>{{scope.row.name}}</span>
-
-                        <el-tag size="mini" type="info" class="m-l-10">
-                          {{$t(`fields.fulfillmentItem.status.${scope.row.status}`)}}
-                        </el-tag>
-                      </template>
-
-                    </el-table-column>
-                    <el-table-column width="80px" label="Qty" prop="quantity">
-                      <template slot-scope="scope">
-                        x {{scope.row.quantity}}
-                      </template>
-                    </el-table-column>
-                    <el-table-column width="120px" label="Qty" prop="quantity">
-                      <template slot-scope="scope">
-                        <span v-if="scope.row.source">{{scope.row.source.type}}</span>
-                      </template>
-                    </el-table-column>
-                    <el-table-column width="140px">
-                      <template slot-scope="scope">
-                        <p class="text-right actions">
-                          <confirm-button v-if="scope.row.status === 'pending'" size="mini">
-                            Fulfill
-                          </confirm-button>
-
-                          <confirm-button v-if="scope.row.status === 'fulfilled'" @confirmed="returnFulfillmentItem(scope.row)" confirm-button-text="Yes" size="mini">
-                            Return
-                          </confirm-button>
-
-                          <confirm-button v-if="scope.row.status === 'fulfilled'" @confirmed="discardFulfillmentItem(scope.row)" confirm-button-text="Yes" size="mini">
-                            Discard
-                          </confirm-button>
-
-                          <confirm-button v-if="scope.row.status === 'pending'" size="mini">
-                            Delete
-                          </confirm-button>
-                        </p>
-                      </template>
-                    </el-table-column>
-                  </el-table>
-                </template>
-              </el-table-column>
-              <el-table-column label="Name" prop="name" width="270px">
-                <template slot-scope="scope">
-                  <b>{{scope.row.insertedAt | moment}}</b>
-
-                  <el-tag size="mini" type="info" class="m-l-10">
-                    {{$t(`fields.fulfillmentPackage.status.${scope.row.status}`)}}
-                  </el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column>
-                <template slot-scope="scope">
-                  <b class="m-l-10">
-                    {{$t(`fields.fulfillmentPackage.systemLabel.${scope.row.systemLabel}`)}}
-                  </b>
-                </template>
-              </el-table-column>
-
-              <el-table-column width="120">
-                <template slot-scope="scope">
-                  <p class="text-right actions">
-                    <confirm-button v-if="canDeleteFulfillmentPackage(scope.row)" @confirmed="deleteFulfillmentPackage(scope.row.id)" size="mini">
-                      Delete
-                    </confirm-button>
-                  </p>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-        </div>
-
-        <div class="block-title">
-          <h3>Returns</h3>
-        </div>
-        <div class="block">
-          <div class="block-body full">
-            <el-table
-              :data="returnPackages"
-              :show-header="false"
-              row-key="id"
-              class="nested-block-table column-compact"
-              style="width: 100%"
-            >
-              <el-table-column type="expand" width="30px">
-                <template slot-scope="props">
-                  <el-table :data="props.row.items" :show-header="false" style="width: 100%">
-                    <el-table-column width="30px"></el-table-column>
-                    <el-table-column label="Name" prop="name">
-                      <template slot-scope="scope">
-                        <span>{{scope.row.name}}</span>
-
-                        <el-tag size="mini" type="info" class="m-l-10">
-                          {{$t(`fields.returnItem.status.${scope.row.status}`)}}
-                        </el-tag>
-                      </template>
-
-                    </el-table-column>
-                    <el-table-column width="80px" label="Qty" prop="quantity">
-                      <template slot-scope="scope">
-                        x {{scope.row.quantity}}
-                      </template>
-                    </el-table-column>
-                    <el-table-column width="140px">
-                      <template slot-scope="scope">
-                        <p class="text-right actions">
-
-                        </p>
-                      </template>
-                    </el-table-column>
-                  </el-table>
-                </template>
-              </el-table-column>
-              <el-table-column label="Name" prop="name" width="230px">
-                <template slot-scope="scope">
-                  <b>{{scope.row.insertedAt | moment}}</b>
-
-                  <el-tag size="mini" type="info" class="m-l-10">
-                    {{$t(`fields.returnPackage.status.${scope.row.status}`)}}
-                  </el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column>
-                <template slot-scope="scope">
-                  <b class="m-l-10">
-                    {{$t(`fields.returnPackage.systemLabel.${scope.row.systemLabel}`)}}
-                  </b>
-                </template>
-              </el-table-column>
-
-              <el-table-column width="120">
-                <template slot-scope="scope">
-                  <p class="text-right actions">
-                    <confirm-button v-if="canDeleteReturnPackage(scope.row)" @confirmed="deleteReturnPackage(scope.row.id)" size="mini">
-                      Delete
-                    </confirm-button>
-                  </p>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-        </div>
-
-        <div class="block-title">
-          <h3>Custom Data</h3>
-        </div>
-        <div class="block">
-          <div class="block-body">
-            {{order.customData}}
-          </div>
-        </div>
-
-        <div class="block-title">
-          <h3>Related Resources</h3>
-        </div>
-        <div class="block">
-          <div class="block-body">
-             <dl>
-                <dt v-if="order.customer">Customer</dt>
-                <dd v-if="order.customer">
-                  <router-link :to="{ name: 'ShowCustomer', params: { id: order.customer.id }}">
-                    {{order.customer.id}}
-                  </router-link>
-                </dd>
-              </dl>
-          </div>
-        </div>
-      </div>
-
-      <div class="footer text-right">
-        <confirm-button @confirmed="deleteOrder()" size="small">Delete</confirm-button>
-      </div>
-    </el-card>
-  </div>
-
-  <div class="launchable">
-    <el-dialog :show-close="false" :visible="isAddingLineItem" title="Add Line Item" width="750px">
-      <order-line-item-form v-model="lineItemForAdd"></order-line-item-form>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button :disabled="isCreatingLineItem" @click="closeAddLineItemDialog()" plain size="small">Cancel</el-button>
-        <el-button :loading="isCreatingLineItem" @click="createLineItem()" type="primary" size="small">Save</el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog :show-close="false" :visible="isEditingLineItem" title="Edit Line Item" width="750px">
-      <order-line-item-form v-model="lineItemForEdit"></order-line-item-form>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button :disabled="isUpdatingLineItem" @click="cancelEditLineItem()" plain size="small">Cancel</el-button>
-        <el-button :loading="isUpdatingLineItem" @click="updateLineItem()" type="primary" size="small">Save</el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog :show-close="false" :visible="isAddingPayment" title="Add Payment" width="750px">
-      <payment-form v-model="paymentForAdd"></payment-form>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button :disabled="isCreatingPayment" @click="cancelAddPayment()" plain size="small">Cancel</el-button>
-        <el-button :loading="isCreatingPayment" @click="createPayment()" type="primary" size="small">Save</el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog :show-close="false" :visible="isEditingPayment" title="Edit Payment" width="600px">
-      <payment-form v-model="paymentForEdit" :errors="errors"></payment-form>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button :disabled="isUpdatingPayment" @click="closeEditPaymentDialog()" plain size="small">Cancel</el-button>
-        <el-button :loading="isUpdatingPayment" @click="updatePayment()" type="primary" size="small">Save</el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog :show-close="false" :visible="isAddingRefund" title="Refund Payment" width="500px">
-      <refund-form v-model="refundForAdd" :errors="errors"></refund-form>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button :disabled="isCreatingRefund" @click="cancelAddRefund()" plain size="small">Cancel</el-button>
-        <el-button :loading="isCreatingRefund" @click="createRefund()" type="primary" size="small">Refund {{refundForAdd.amountCents | dollar}}</el-button>
-      </div>
-    </el-dialog>
-  </div>
-</div> -->
-
 </template>
 
 <script>
@@ -838,7 +580,7 @@ export default {
     },
 
     attemptDeleteOrder () {
-
+      // TODO:
     },
 
     deleteOrder () {
@@ -853,8 +595,9 @@ export default {
       })
     },
 
+    //
     // MARK: Line Item
-
+    //
     addLineItem () {
       this.lineItemForAdd = OrderLineItem.objectWithDefaults()
       this.lineItemForAdd.order = this.order

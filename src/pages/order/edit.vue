@@ -1,5 +1,47 @@
 <template>
-<div class="page-wrapper">
+<content-container @locale-changed="reload" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListOrder'}">Orders</router-link>
+  </div>
+
+  <div slot="card-header">
+    <h1>Edit order</h1>
+
+    <div class="pull-right">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button @click="submit()" type="primary" size="small">
+        Save
+      </el-button>
+    </div>
+  </div>
+
+  <div slot="card-content">
+    <div class="data">
+      <el-row>
+        <el-col :span="14" :offset="5">
+          <el-form @submit.native.prevent="submit()" label-width="140px" size="small">
+            <order-fieldset v-model="orderDraft" :errors="errors"></order-fieldset>
+          </el-form>
+        </el-col>
+      </el-row>
+    </div>
+
+    <div class="foot">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isUpdating" @click="submit()" type="primary" size="small" class="pull-right">
+        Save
+      </el-button>
+    </div>
+  </div>
+</content-container>
+
+<!-- <div class="page-wrapper">
 
   <div>
     <el-menu :router="true" default-active="/orders" mode="horizontal" class="secondary-nav">
@@ -21,7 +63,7 @@
             Cancel
           </el-button>
 
-          <el-button :loading="isUpdatingOrder" @click="submit()" type="primary" size="small">
+          <el-button :loading="isUpdating" @click="submit()" type="primary" size="small">
             Save
           </el-button>
         </div>
@@ -36,50 +78,54 @@
           Cancel
         </el-button>
 
-        <el-button :loading="isUpdatingOrder" @click="submit()" type="primary" size="small" class="pull-right">
+        <el-button :loading="isUpdating" @click="submit()" type="primary" size="small" class="pull-right">
           Save
         </el-button>
       </div>
     </el-card>
   </div>
 
-</div>
+</div> -->
 </template>
 
 <script>
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
 import Order from '@/models/order'
-import OrderForm from '@/components/order-form'
+import OrderFieldset from '@/components/order-fieldset'
+
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadOrder' })
 
 export default {
   name: 'EditOrder',
-  mixins: [PageMixin],
+  mixins: [ResourcePageMixin],
   components: {
-    OrderForm
+    OrderFieldset
   },
-  props: ['id'],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  },
   data () {
     return {
       isLoading: false,
       order: Order.objectWithDefaults(),
       orderDraft: Order.objectWithDefaults(),
 
-      isUpdatingOrder: false,
+      isUpdating: false,
 
       errors: {}
     }
-  },
-  created () {
-    this.loadOrder()
   },
   methods: {
     loadOrder () {
       this.isLoading = true
 
-      freshcom.retrieveOrder(this.id, {
+      return freshcom.retrieveOrder(this.id, {
         include: 'customer'
       }).then(response => {
         this.order = response.data
@@ -93,7 +139,7 @@ export default {
     },
 
     submit () {
-      this.isUpdatingOrder = true
+      this.isUpdating = true
 
       freshcom.updateOrder(this.orderDraft.id, this.orderDraft).then(() => {
         this.$message({
@@ -102,19 +148,15 @@ export default {
           type: 'success'
         })
 
-        this.isUpdatingOrder = false
+        this.isUpdating = false
         this.back()
       }).catch(response => {
         this.errors = response.errors
-        this.isUpdatingOrder = false
+        this.isUpdating = false
       })
     },
 
-    back () {
-      if (this.callbackPath) {
-        return this.$store.dispatch('pushRoute', { path: this.callbackPath })
-      }
-
+    defaultBack () {
       return this.$store.dispatch('pushRoute', { name: 'ShowOrder', params: { id: this.order.id } })
     }
   }

@@ -1,87 +1,118 @@
 <template>
-  <el-autocomplete
-    v-model="inputModel"
-    :fetch-suggestions="queryCustomer"
-    placeholder="Search for Customer..."
-    :disabled="!!selectedOption"
-    @select="setSelectedCustomer"
-  >
+  <div class="component-wrapper customer-select">
+    <div v-show="isEditing" class="resource-editor">
+      <remote-select
+        :value="draft"
+        :search-method="searchCustomer"
+        :record-to-option="customerToOption"
+        @change="customerChangeHandler($event)"
+        placeholder="Search..."
+      >
+      </remote-select>
 
-    <el-button v-if="selectedOption" slot="append" @click="clear()">
-      <icon name="times" scale="0.8" class="v-middle"></icon>
-    </el-button>
-  </el-autocomplete>
+      <div v-if="hasExistingValue" class="action-group">
+        <el-button @click="cancelEdit()" plain size="mini">Cancel</el-button>
+      </div>
+    </div>
+    <div v-show="!isEditing" class="resource-block medium">
+      <div class="resource">
+        <p class="primary">
+          <span v-if="value.code">[{{value.code}}]</span>
+          <span>{{value.name}}</span>
+        </p>
+        <p class="secondary">{{value.id}}</p>
+      </div>
 
+      <div v-if="!disabled" class="action-group">
+        <el-button @click="edit()" plain size="mini">Edit</el-button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
 import _ from 'lodash'
-import JSONAPI from '@/jsonapi'
-import CustomerAPI from '@/api/customer'
-import Customer from '@/models/customer'
+import freshcom from '@/freshcom-sdk'
+import RemoteSelect from '@/components/remote-select'
 
 export default {
   name: 'CustomerSelect',
+  components: {
+    RemoteSelect
+  },
   props: {
-    filter: {
+    value: {
       type: Object,
       default: function () {
         return {}
       }
     },
-    value: Object
+    disabled: {
+      type: Boolean,
+      default: false
+    }
   },
   data () {
     return {
-      inputModel: '',
-      selectedOption: undefined,
-      options: [],
-      records: []
+      isEditing: _.isEmpty(this.value),
+      draft: {}
     }
   },
   watch: {
-    value (newValue) {
-      this.selectedOption = this._customerToOption(newValue).value
+    value (v) {
+      if (_.isEmpty(v)) {
+        this.isEditing = true
+      } else {
+        this.isEditing = false
+      }
+    }
+  },
+  computed: {
+    hasExistingValue () {
+      return !_.isEmpty(this.value)
     }
   },
   methods: {
-    queryCustomer (searchKeyword, callback) {
-      CustomerAPI.queryRecord({ search: searchKeyword, filter: this.filter }).then(response => {
-        let apiPayload = response.data
-        this.records = JSONAPI.deserialize(apiPayload.data)
-        this.options = _.map(this.records, this._customerToOption)
+    edit () {
+      this.isEditing = true
+    },
 
-        callback(this.options)
+    cancelEdit () {
+      this.isEditing = false
+    },
+
+    searchCustomer (keyword) {
+      return freshcom.listCustomer({
+        search: keyword
+      }).then(response => {
+        return response.data
       })
     },
-    setSelectedCustomer (selectedOption) {
-      let customer = _.find(this.records, { id: selectedOption.id })
+
+    customerChangeHandler (customer) {
       this.$emit('input', customer)
+      this.draft = {}
     },
-    clear () {
-      this.selectedOption = undefined
-      this.inputModel = ''
-      this.$emit('input', undefined)
-    },
-    _customerToOption (record) {
-      if (!record) {
+
+    customerToOption (customer) {
+      if (!customer) {
         return { value: undefined }
       }
 
       let info = ''
-      if (record.code) {
-        info += `[${record.code}] `
+      if (customer.code) {
+        info += `[${customer.code}] `
       }
-
-      info += Customer.fullName(record)
-      info += ' :: ' + record.status
-      return { value: info, id: record.id }
+      info += customer.name + ' :: ' + customer.status
+      return { value: customer.id, label: info }
     }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-
+<style lang="scss" scoped>
+.editor {
+  display: inline-block;
+}
 </style>
