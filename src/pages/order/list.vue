@@ -194,6 +194,7 @@ export default {
 
       freshcom.listOrder({
         search: this.searchKeyword,
+        filter: this.filterObject,
         page: this.page
       }).then(response => {
         this.orders = response.data
