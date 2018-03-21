@@ -68,8 +68,7 @@ export default {
         }
       }).then(() => {
         commit(MT.READY, true)
-      }).catch(error => {
-        console.log(error)
+      }).catch(() => {
         dispatch('reset')
       })
     },
@@ -132,8 +131,6 @@ export default {
       return freshcom.createToken({
         refresh_token: state.liveToken.refresh_token, grant_type: 'refresh_token'
       }).then(liveToken => {
-        console.log('Refreshed live token')
-
         setObjectToStorage('state.session.liveToken', liveToken)
         commit(MT.LIVE_TOKEN_CHANGED, liveToken)
 
@@ -216,6 +213,7 @@ export default {
 
       if (token) {
         freshcom.setAccessToken(token.access_token)
+        freshcom.setRefreshToken(token.refresh_token)
       } else {
         freshcom.setAccessToken(undefined)
       }

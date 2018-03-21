@@ -16,8 +16,9 @@ let axiosInstance = axios.create({
   }
 })
 
-export default {
+const sdk = {
   http: axiosInstance,
+  refreshToken: undefined,
 
   _processHttpError (error) {
     let response
@@ -39,6 +40,10 @@ export default {
 
   setLocale (locale) {
     this.http.defaults.params['locale'] = locale
+  },
+
+  setRefreshToken (refreshToken) {
+    this.refreshToken = refreshToken
   },
 
   setAccessToken (accessToken) {
@@ -970,3 +975,27 @@ export default {
     }).catch(this._processHttpError)
   }
 }
+
+axiosInstance.interceptors.response.use(undefined, function (error) {
+  let config = error.config
+
+  let response
+  if (error && error.response) {
+    response = error.response
+  }
+
+  if (response && response.status === 401 && !config.retried) {
+    config.retried = true
+
+    return sdk.createToken({
+      refresh_token: sdk.refreshToken, grant_type: 'refresh_token'
+    }).then(token => {
+      config.headers['Authorization'] = `Bearer ${token.access_token}`
+      return axiosInstance(config)
+    })
+  }
+
+  throw error
+})
+
+export default sdk
