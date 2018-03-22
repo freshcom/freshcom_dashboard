@@ -159,7 +159,7 @@ import freshcom from '@/freshcom-sdk'
 
 import MoneyInput from '@/components/money-input'
 import { Card } from 'vue-stripe-elements-plus'
-import { STRIPE_PUBLISHABLE_KEY } from '@/env'
+import { STRIPE_LIVE_PUBLISHABLE_KEY, STRIPE_TEST_PUBLISHABLE_KEY } from '@/env'
 
 import fieldsetMixinFactory from '@/mixins/fieldset'
 let FieldsetMixin = fieldsetMixinFactory({ errorI18nKey: 'payment' })
@@ -180,11 +180,22 @@ export default {
       stripeOptions: {
         // see https://stripe.com/docs/stripe.js#element-options for details
       },
-      stripePk: STRIPE_PUBLISHABLE_KEY,
       isBillingAndShippingAddressSame: false
     }
   },
   computed: {
+    stripePk () {
+      if (this.isTestMode) {
+        return STRIPE_TEST_PUBLISHABLE_KEY
+      } else {
+        return STRIPE_LIVE_PUBLISHABLE_KEY
+      }
+    },
+
+    isTestMode () {
+      return this.$store.state.session.mode === 'test'
+    },
+
     canSelectCards () {
       return this.cards.length > 0
     },

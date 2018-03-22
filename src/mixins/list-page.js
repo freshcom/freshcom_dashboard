@@ -43,6 +43,15 @@ export default function (opts = {}) {
         filterObjectDraft: _.cloneDeep(this.filterObject)
       }
     },
+    computed: {
+      isViewingTestData () {
+        return this.$store.state.session.mode === 'test'
+      },
+
+      currentRoutePath () {
+        return this.$store.state.route.fullPath
+      }
+    },
     watch: {
       isViewingTestData () {
         this[opts.listMethodName]()
@@ -66,17 +75,6 @@ export default function (opts = {}) {
         this[opts.listMethodName]()
       }
     },
-
-    computed: {
-      isViewingTestData () {
-        return this.$store.state.session.mode === 'test'
-      },
-
-      currentRoutePath () {
-        return this.$store.state.route.fullPath
-      }
-    },
-
     methods: {
       clearFilter () {
         this.filterObjectDraft = {}

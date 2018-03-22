@@ -1,5 +1,34 @@
 <template>
-<div class="page-wrapper">
+<content-container :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'APIHome' }">API</router-link>
+  </div>
+
+  <div slot="card-content">
+    <div class="data">
+      <div class="block">
+        <div class="header">
+          <h2>Detail</h2>
+        </div>
+
+        <div class="body">
+          <dl>
+            <dt>Account ID</dt>
+            <dd v-if="isViewingTestData">{{account.testAccountId}}</dd>
+            <dd v-else="isViewingTestData">{{account.id}}</dd>
+
+            <dl>
+              <dt>Publishable Refresh Token</dt>
+              <dd>{{refreshToken.prefixedId}}</dd>
+            </dl>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+</content-container>
+
+<!-- <div class="page-wrapper">
 
   <div>
     <el-menu :router="true" default-active="/api" mode="horizontal" class="secondary-nav">
@@ -37,28 +66,31 @@
     </el-card>
   </div>
 
-</div>
+</div> -->
 </template>
 
 <script>
-import PageMixin from '@/mixins/page'
 import freshcom from '@/freshcom-sdk'
+
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadRefreshToken' })
 
 export default {
   name: 'APIHome',
-  mixins: [PageMixin],
+  mixins: [ResourcePageMixin],
   data () {
     return {
       isLoading: false,
       refreshToken: {}
     }
   },
-  created () {
-    this.loadRefreshToken()
-  },
   computed: {
     account () {
       return this.$store.state.session.account
+    },
+
+    isViewingTestData () {
+      return this.$store.state.session.mode === 'test'
     }
   },
   watch: {
@@ -69,7 +101,7 @@ export default {
   methods: {
     loadRefreshToken () {
       this.isLoading = true
-      freshcom.retrieveRefreshToken().then(response => {
+      return freshcom.retrieveRefreshToken().then(response => {
         this.refreshToken = response.data
         this.isLoading = false
       }).catch(errors => {
@@ -83,7 +115,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.main-card dl dt {
+dl dt {
   width: 200px;
 }
 </style>
