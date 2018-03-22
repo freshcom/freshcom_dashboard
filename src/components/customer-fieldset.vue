@@ -15,27 +15,27 @@
   </el-form-item>
 
   <el-form-item label="Name" :error="errorMsgs.name">
-    <el-input v-model="formModel.name" @change="updateValue()"></el-input>
+    <el-input v-model="formModel.name" @input="updateValue()"></el-input>
   </el-form-item>
 
   <el-form-item label="Email" :error="errorMsgs.email" :required="formModel.status === 'registered'">
-    <el-input v-model="formModel.email" @change="updateValue()"></el-input>
+    <el-input v-model="formModel.email" @input="updateValue()"></el-input>
   </el-form-item>
 
   <el-form-item label="Username" :error="errorMsgs.username" :required="formModel.status === 'registered'">
-    <el-input v-model="formModel.username" @change="updateValue()"></el-input>
+    <el-input v-model="formModel.username" @input="updateValue()"></el-input>
   </el-form-item>
 
   <el-form-item v-show="canInputPassword" :error="errorMsgs.password" label="Password" required>
-    <el-input v-model="formModel.password" @change="updateValue()" type="password"></el-input>
+    <el-input v-model="formModel.password" @input="updateValue()" type="password"></el-input>
   </el-form-item>
 
   <el-form-item label="Phone" :error="errorMsgs.phoneNumber">
-    <el-input v-model="formModel.phoneNumber" @change="updateValue()"></el-input>
+    <el-input v-model="formModel.phoneNumber" @input="updateValue()"></el-input>
   </el-form-item>
 
   <el-form-item label="Label" :error="errorMsgs.label">
-    <el-input v-model="formModel.label" @change="updateValue()"></el-input>
+    <el-input v-model="formModel.label" @input="updateValue()"></el-input>
   </el-form-item>
 </div>
 </template>
