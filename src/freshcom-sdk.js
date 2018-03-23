@@ -726,7 +726,10 @@ const sdk = {
             options.progress(percentage, fFile)
           }
         },
-        headers: { 'Content-Type': fFile.contentType }
+        headers: {
+          'Content-Type': fFile.contentType,
+          'Cache-Control': 'max-age=0, s-maxage=2592000' // Allow cdn to cache for 30 days
+        }
       }
 
       return axios.put(fFile.url, file, config).then(() => { return response })
