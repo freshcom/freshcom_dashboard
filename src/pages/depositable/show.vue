@@ -1,192 +1,167 @@
 <template>
-<div class="page-wrapper">
-  <div>
-    <el-menu :router="true" default-active="/depositables" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListDepositable' }" index="/depositables">Depositables</el-menu-item>
-    </el-menu>
-    <locale-selector @change="loadDepositable()" class="pull-right"></locale-selector>
+<content-container @locale-changed="reload" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListDepositable'}">Depositables</router-link>
   </div>
 
-  <div>
-    <el-card v-loading="isLoading" class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
-
-        <div class="brief">
-          <div class="avatar">
-            <img :src="avatarUrl">
-          </div>
-
-          <div class="detail">
-            <p>Depositable {{depositable.code}}</p>
-            <h2>{{depositable.firstName}} {{depositable.lastName}}</h2>
-            <p class="id">{{depositable.id}}</p>
-          </div>
-        </div>
-
-        <div class="header-actions">
-          <el-button v-if="depositable.status === 'registered'" @click="editDepositable()" plain size="small">Reset Password</el-button>
-          <el-button @click="editDepositable()" plain size="small">Edit</el-button>
-        </div>
+  <div slot="card-header">
+    <div class="brief">
+      <div class="avatar">
+        <img :src="avatarUrl">
       </div>
 
-      <div class="data">
-        <div class="block-title">
-          <h3>Details</h3>
-        </div>
-        <div class="block">
-          <div class="block-body">
-            <dl>
-              <dt>ID</dt>
-              <dd>{{depositable.id}}</dd>
+      <div class="detail">
+        <p>
+          <span>Depositable</span>
+          <span>{{depositable.code}}</span>
+        </p>
+        <h1>{{depositable.name}}</h1>
+        <p class="id">{{depositable.id}}</p>
+      </div>
+    </div>
 
+    <div class="brief-action-group">
+      <router-link :to="{ name: 'EditDepositable', params: { id: this.depositable.id } }" class="el-button el-button--small is-plain">
+        Edit
+      </router-link>
+    </div>
+  </div>
+
+  <div slot="card-content">
+    <div class="data">
+      <div class="block">
+        <div class="header">
+          <h2>Detail</h2>
+        </div>
+
+        <div class="body">
+          <dl>
+            <dt>ID</dt>
+            <dd>{{depositable.id}}</dd>
+
+            <template v-if="depositable.code">
               <dt>Code</dt>
               <dd>{{depositable.code}}</dd>
+            </template>
 
-              <dt>Status</dt>
-              <dd>{{depositable.status}}</dd>
+            <dt>Status</dt>
+            <dd>{{depositable.status}}</dd>
 
-              <dt>Name</dt>
-              <dd>{{depositable.name}}</dd>
+            <dt>Name</dt>
+            <dd>{{depositable.name}}</dd>
 
-              <dt>Print Name</dt>
-              <dd>{{depositable.printName}}</dd>
+            <dt>Print Name</dt>
+            <dd>{{depositable.printName}}</dd>
 
-              <dt>Amount</dt>
-              <dd>{{depositable.amount}}</dd>
+            <dt>Amount</dt>
+            <dd>{{depositable.amount}}</dd>
 
-              <dt>Caption</dt>
-              <dd>{{depositable.caption}}</dd>
+            <dt>Caption</dt>
+            <dd>{{depositable.caption}}</dd>
 
-              <dt>Description</dt>
-              <dd>{{depositable.description}}</dd>
-            </dl>
-          </div>
-        </div>
-
-        <div class="block-title">
-          <h3>File Collections</h3>
-
-          <span class="block-title-actions pull-right">
-            <router-link :to="{ name: 'NewFileCollection', query: { ownerId: depositable.id, ownerType: 'Depositable', callbackPath: currentRoutePath } }">
-              <icon name="plus" scale="0.8" class="v-middle"></icon>
-              <span>Add</span>
-            </router-link>
-          </span>
-        </div>
-
-        <div class="block">
-          <div class="block-body full">
-            <el-table :data="depositable.fileCollections" stripe class="block-table" :show-header="false" style="width: 100%">
-              <el-table-column width="500">
-                <template slot-scope="scope">
-                  <router-link :to="{ name: 'ShowFileCollection', params: { id: scope.row.id } }">
-                    <span>{{scope.row.name}}</span>
-                    <span v-if="scope.row.name"> - </span>
-                    <span>{{scope.row.label}}</span>
-                  </router-link>
-                </template>
-              </el-table-column>
-
-              <el-table-column width="100">
-                <template slot-scope="scope">
-                  <span>{{scope.row.fileCount}} files</span>
-                </template>
-              </el-table-column>
-
-              <el-table-column>
-                <template slot-scope="scope">
-                  <p class="text-right actions">
-                    <router-link :to="{ name: 'EditFileCollection', params: { id: scope.row.id }}">
-                      <icon name="pencil" scale="0.8" class="v-middle"></icon>
-                      <span class="v-middle">Edit</span>
-                    </router-link>
-                  </p>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-
-          <div class="block-footer text-center">
-            <a class="view-more" href="#">View More</a>
-          </div>
-        </div>
-
-        <div class="block-title">
-          <h3>Custom Data</h3>
-        </div>
-        <div class="block">
-          <div class="block-body">
-            {{depositable.customData}}
-          </div>
-        </div>
-
-        <h3>Related Resources</h3>
-        <div class="block">
-          <div class="block-body">
-            <dl>
-              <dt v-if="depositable.enroller">Enroller</dt>
-              <dd v-if="depositable.enroller">
-                <a href="#">{{depositable.enroller.id}}</a>
-              </dd>
-
-              <dt v-if="depositable.sponsor">Sponsor</dt>
-              <dd v-if="depositable.sponsor">
-                <a href="#">{{depositable.sponsor.id}}</a>
-              </dd>
-            </dl>
-          </div>
-        </div>
-
-        <h3>Logs</h3>
-        <div class="block">
-          <div class="block-body">
-
-          </div>
-        </div>
-
-        <h3>Events</h3>
-        <div class="block">
-          <div class="block-body">
-
-          </div>
+            <dt>Description</dt>
+            <dd>{{depositable.description}}</dd>
+          </dl>
         </div>
       </div>
 
-      <div class="footer text-right">
-        <confirm-button @confirmed="deleteDepositable()" plain size="small">Delete</confirm-button>
+      <file-collection-block
+        :owner="depositable"
+        :records="fileCollections"
+        @deleted="loadDepositable()"
+      >
+      </file-collection-block>
+
+      <div class="block">
+        <div class="header">
+          <h2>Custom Data</h2>
+        </div>
+        <div class="body">
+          {{depositable.customData}}
+        </div>
       </div>
-    </el-card>
+
+      <div class="block">
+        <div class="header">
+          <h2>Related Resources</h2>
+        </div>
+        <div class="body">
+          <dl>
+            <dt v-if="depositable.avatar">Avatar</dt>
+            <dd v-if="depositable.avatar">
+              <router-link :to="{ name: 'ShowFile', params: { id: depositable.avatar.id }}">
+               {{depositable.avatar.id}}
+              </router-link>
+            </dd>
+
+            <dt v-if="depositable.file">File</dt>
+            <dd v-if="depositable.file">
+              <router-link :to="{ name: 'ShowFile', params: { id: depositable.file.id }}">
+               {{depositable.file.id}}
+              </router-link>
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot text-right">
+      <el-button @click="attemptDeleteDepositable()" plain size="small">Delete</el-button>
+    </div>
+
+    <div class="launchable">
+      <el-dialog :show-close="false" :visible="isConfirmingDeleteDepositable" title="Delete depositable" width="500px">
+        <p>
+          Are you sure you want to delete this depositable? If you delete this depositable,
+          all of the following related resources if any will also be deleted:
+
+          <ul>
+            <li>All products that contain this depositable</li>
+            <li>All file collections that are owned by this depositable and all files inside those collection</li>
+            <li>File that is the avatar of this depositable</li>
+          </ul>
+
+          <b>This action cannot be undone.</b>
+        </p>
+
+        <div slot="footer">
+          <el-button :disabled="isDeletingDepositable" @click="cancelDeleteDepositable()" plain size="small">Cancel</el-button>
+          <el-button :loading="isDeletingDepositable" @click="deleteDepositable()" type="danger" size="small">Delete</el-button>
+        </div>
+      </el-dialog>
+    </div>
   </div>
-</div>
-
+</content-container>
 </template>
 
 <script>
-import 'vue-awesome/icons/plus'
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
 import Depositable from '@/models/depositable'
-import ConfirmButton from '@/components/confirm-button'
-import { idLastPart } from '@/helpers/filters'
+import FileCollectionBlock from '@/components/file-collection-block'
+
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadDepositable' })
 
 export default {
   name: 'ShowDepositable',
-  mixins: [PageMixin],
+  mixins: [ResourcePageMixin],
   components: {
-    ConfirmButton
+    FileCollectionBlock
   },
-  filters: {
-    idLastPart
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
   },
-  props: ['id'],
   data () {
     return {
       depositable: Depositable.objectWithDefaults(),
-      isLoading: false
+      isLoading: false,
+
+      isConfirmingDeleteDepositable: false,
+      isDeletingDepositable: false
     }
   },
   created () {
@@ -198,17 +173,20 @@ export default {
         return this.depositable.avatar.url
       }
 
-      return 'http://placehold.it/80x80'
+      return 'https://placehold.it/80x80'
     },
-    currentRoutePath () {
-      return this.$store.state.route.fullPath
+
+    fileCollections () {
+      if (!this.depositable.fileCollections) { return [] }
+
+      return this.depositable.fileCollections
     }
   },
   methods: {
     loadDepositable () {
       this.isLoading = true
 
-      freshcom.retrieveDepositable(this.id, {
+      return freshcom.retrieveDepositable(this.id, {
         include: 'avatar,fileCollections'
       }).then(response => {
         this.depositable = response.data
@@ -219,12 +197,19 @@ export default {
       })
     },
 
-    editDepositable () {
-      this.$store.dispatch('pushRoute', { name: 'EditDepositable', params: { id: this.depositable.id } })
+    attemptDeleteDepositable () {
+      this.isConfirmingDeleteDepositable = true
+    },
+
+    cancelDeleteDepositable () {
+      this.isConfirmingDeleteDepositable = false
     },
 
     deleteDepositable () {
+      this.isDeletingDepositable = true
+
       freshcom.deleteDepositable(this.depositable.id).then(() => {
+        this.isDeletingDepositable = false
         this.$message({
           showClose: true,
           message: `Depositable deleted successfully.`,
@@ -232,10 +217,12 @@ export default {
         })
 
         this.back()
+      }).catch(() => {
+        this.isDeletingDepositable = false
       })
     },
 
-    back () {
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ListDepositable' })
     }
   }

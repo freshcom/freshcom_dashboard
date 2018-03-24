@@ -62,62 +62,12 @@
         </div>
       </div>
 
-      <div class="block">
-        <div class="header">
-          <h2>File Collections</h2>
-
-          <div class="action-group">
-            <router-link :to="{ name: 'NewFileCollection', query: { owner: { id: this.unlockable.id, type: 'Unlockable', name: this.unlockable.name }, callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
-              Add
-            </router-link>
-          </div>
-        </div>
-
-        <div class="body full">
-          <el-table :data="fileCollections" class="data-table block-table" :show-header="false">
-            <el-table-column width="300">
-              <template slot-scope="scope">
-                <router-link :to="{ name: 'ShowFileCollection', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }" class="primary">
-                  <span>{{scope.row.name}}</span>
-                </router-link>
-              </template>
-            </el-table-column>
-
-            <el-table-column width="100">
-              <template slot-scope="scope">
-                <router-link :to="{ name: 'ShowFileCollection', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }">
-                  <span>{{scope.row.fileCount}} files</span>
-                </router-link>
-              </template>
-            </el-table-column>
-
-            <el-table-column align="right">
-              <template slot-scope="scope">
-                {{scope.row.insertedAt | moment}}
-              </template>
-            </el-table-column>
-
-            <el-table-column width="130">
-              <template slot-scope="scope">
-                <p class="action-group">
-                  <el-button-group>
-                    <router-link :to="{ name: 'EditFileCollection', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
-                      Edit
-                    </router-link>
-                    <el-button @click="attemptDeleteFileCollection(scope.row)" plain size="mini">
-                      Delete
-                    </el-button>
-                  </el-button-group>
-                </p>
-              </template>
-            </el-table-column>
-          </el-table>
-
-          <div v-if="fileCollections.length >= 5" class="foot text-center">
-            <router-link :to="{ name: 'ListFileCollection', query: { filter: { ownerType: 'Unlockable', ownerId: unlockable.id } } }" class="view-more">View More</router-link>
-          </div>
-        </div>
-      </div>
+      <file-collection-block
+        :owner="unlockable"
+        :records="fileCollections"
+        @deleted="loadUnlockable()"
+      >
+      </file-collection-block>
 
       <div class="block">
         <div class="header">
@@ -178,12 +128,6 @@
           <el-button :loading="isDeletingUnlockable" @click="deleteUnlockable()" type="danger" size="small">Delete</el-button>
         </div>
       </el-dialog>
-
-      <file-collection-delete-dialog
-        v-model="isConfirmingDeleteFileCollection"
-        :target="fileCollectionForDelete"
-        @deleted="loadUnlockable()"
-      ></file-collection-delete-dialog>
     </div>
   </div>
 </content-container>
@@ -193,7 +137,7 @@
 import freshcom from '@/freshcom-sdk'
 
 import Unlockable from '@/models/unlockable'
-import FileCollectionDeleteDialog from '@/components/file-collection-delete-dialog'
+import FileCollectionBlock from '@/components/file-collection-block'
 
 import resourcePageMixinFactory from '@/mixins/resource-page'
 let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadUnlockable' })
@@ -202,7 +146,7 @@ export default {
   name: 'ShowUnlockable',
   mixins: [ResourcePageMixin],
   components: {
-    FileCollectionDeleteDialog
+    FileCollectionBlock
   },
   props: {
     id: {
@@ -214,9 +158,6 @@ export default {
     return {
       unlockable: Unlockable.objectWithDefaults(),
       isLoading: false,
-
-      isConfirmingDeleteFileCollection: false,
-      fileCollectionForDelete: {},
 
       isConfirmingDeleteUnlockable: false,
       isDeletingUnlockable: false
@@ -252,10 +193,6 @@ export default {
       })
     },
 
-    defaultBack () {
-      this.$store.dispatch('pushRoute', { name: 'ListUnlockable' })
-    },
-
     attemptDeleteFileCollection (fileCollection) {
       this.isConfirmingDeleteFileCollection = true
       this.fileCollectionForDelete = fileCollection
@@ -284,6 +221,10 @@ export default {
       }).catch(() => {
         this.isDeletingUnlockable = false
       })
+    },
+
+    defaultBack () {
+      this.$store.dispatch('pushRoute', { name: 'ListUnlockable' })
     }
   }
 }
