@@ -1,85 +1,84 @@
 <template>
-<div class="page-wrapper">
-
-  <div>
-    <el-menu :router="true" default-active="/depositables" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListDepositable' }" index="/depositables">Depositables</el-menu-item>
-    </el-menu>
-    <locale-selector @change="loadDepositable()" class="pull-right"></locale-selector>
+<content-container @locale-changed="reload" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListDepositable' }">Depositables</router-link>
   </div>
 
-  <div>
-    <el-card class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
+  <div slot="card-header">
+    <h1>Edit depositable</h1>
 
-        <span style="line-height: 36px;">Edit depositable</span>
+    <div class="pull-right">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
 
-        <div style="float: right;">
-          <el-button @click="back()" plain size="small">
-            Cancel
-          </el-button>
-
-          <el-button @click="submit()" size="small" type="primary">
-            Save
-          </el-button>
-        </div>
-      </div>
-
-      <div class="data">
-        <depositable-form v-model="depositableDraft" :errors="errors"></depositable-form>
-      </div>
-
-      <div class="footer">
-        <el-button @click="back()" plain size="small">
-          Cancel
-        </el-button>
-
-        <el-button @click="submit()" type="primary" size="small" class="pull-right">
-          Save
-        </el-button>
-      </div>
-    </el-card>
+      <el-button :loading="isUpdating" @click="submit()" type="primary" size="small">
+        Save
+      </el-button>
+    </div>
   </div>
 
-</div>
+  <div slot="card-content">
+    <div class="data">
+      <el-row>
+        <el-col :span="14" :offset="5">
+          <el-form @submit.native.prevent="submit()" label-width="100px" size="small">
+            <depositable-fieldset v-model="depositableDraft" :errors="errors"></depositable-fieldset>
+          </el-form>
+        </el-col>
+      </el-row>
+    </div>
+
+    <div class="foot">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isUpdating" @click="submit()" type="primary" size="small" class="pull-right">
+        Save
+      </el-button>
+    </div>
+  </div>
+</content-container>
 </template>
 
 <script>
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
 import Depositable from '@/models/depositable'
-import DepositableForm from '@/components/depositable-form'
+import DepositableFieldset from '@/components/depositable-fieldset'
+
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadDepositable' })
 
 export default {
   name: 'EditDepositable',
-  mixins: [PageMixin],
+  mixins: [ResourcePageMixin],
   components: {
-    DepositableForm
+    DepositableFieldset
   },
-  props: ['id'],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  },
   data () {
     return {
       isLoading: false,
       depositable: Depositable.objectWithDefaults(),
       depositableDraft: Depositable.objectWithDefaults(),
 
-      isUpdatingDepositable: false,
+      isUpdating: false,
       errors: {}
     }
-  },
-  created () {
-    this.loadDepositable()
   },
   methods: {
     loadDepositable () {
       this.isLoading = true
 
-      freshcom.retrieveDepositable(this.id, {
+      return freshcom.retrieveDepositable(this.id, {
         include: 'avatar,fileCollections'
       }).then(response => {
         this.depositable = response.data
@@ -93,7 +92,7 @@ export default {
     },
 
     submit () {
-      this.isUpdatingDepositable = true
+      this.isUpdating = true
 
       freshcom.updateDepositable(
         this.depositableDraft.id,
@@ -105,16 +104,16 @@ export default {
           type: 'success'
         })
 
-        this.isUpdatingDepositable = false
+        this.isUpdating = false
         this.back()
       }).catch(response => {
         this.errors = response.data
-        this.isUpdatingDepositable = false
+        this.isUpdating = false
         throw response
       })
     },
 
-    back () {
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ShowDepositable', params: { id: this.depositable.id } })
     }
   }

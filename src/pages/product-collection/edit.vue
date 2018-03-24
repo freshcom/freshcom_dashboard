@@ -25,7 +25,7 @@
             Cancel
           </el-button>
 
-          <el-button @click="submit()" size="small" type="primary">
+          <el-button :loading="isUpdating" @click="submit()" size="small" type="primary">
             Save
           </el-button>
         </div>

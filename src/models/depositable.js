@@ -5,7 +5,8 @@ export default {
       type: 'Depositable',
       status: 'active',
       amount: 0,
-      avatar: null
+      avatar: null,
+      gateway: 'freshcom'
     }
   }
 }

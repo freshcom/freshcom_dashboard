@@ -1,5 +1,5 @@
 <template>
-<div class="component-wrapper unlockable-fieldset">
+<div class="component-wrapper depositable-fieldset">
   <avatar-input v-model="formModel.avatar" @input="updateValue()"></avatar-input>
 
   <el-form-item label="Code" :error="errorMsgs.code">
@@ -8,10 +8,20 @@
 
   <el-form-item label="Status" :error="errorMsgs.status" required>
     <el-select v-model="formModel.status" @change="updateValue()">
-      <el-option label="Draft" value="draft"></el-option>
       <el-option label="Active" value="active"></el-option>
       <el-option label="Disabled" value="disabled"></el-option>
     </el-select>
+  </el-form-item>
+
+  <el-form-item label="Gateway" :error="errorMsgs.gateway" required>
+    <el-select v-model="formModel.gateway" @change="updateValue()">
+      <el-option label="Freshcom" value="freshcom"></el-option>
+      <el-option label="Custom" value="custom"></el-option>
+    </el-select>
+  </el-form-item>
+
+  <el-form-item label="Amount" :error="errorMsgs.amount" required>
+    <el-input-number v-model="formModel.amount" :controls="false" :step="1" :min="1" @input="updateValue()"></el-input-number>
   </el-form-item>
 
   <el-form-item label="Name" :error="errorMsgs.name" required>
@@ -34,17 +44,15 @@
 
 <script>
 import AvatarInput from '@/components/avatar-input'
-import FileInput from '@/components/file-input'
 
 import fieldsetMixinFactory from '@/mixins/fieldset'
-let FieldsetMixin = fieldsetMixinFactory({ errorI18nKey: 'unlockable' })
+let FieldsetMixin = fieldsetMixinFactory({ errorI18nKey: 'depositable' })
 
 export default {
-  name: 'UnlockableFieldset',
+  name: 'DepositableFieldsest',
   mixins: [FieldsetMixin],
   components: {
-    AvatarInput,
-    FileInput
+    AvatarInput
   }
 }
 </script>

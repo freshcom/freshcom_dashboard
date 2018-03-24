@@ -1,5 +1,47 @@
 <template>
-<div class="page-wrapper">
+<content-container>
+  <div slot="header">
+    <router-link :to="{ name: 'ListDepositable' }">Depositables</router-link>
+  </div>
+
+  <div slot="card-header">
+    <h1>Create an depositable</h1>
+
+    <div class="pull-right">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isCreating" @click="submit()" type="primary" size="small">
+        Save
+      </el-button>
+    </div>
+  </div>
+
+  <div slot="card-content">
+    <div class="data">
+      <el-row>
+        <el-col :span="14" :offset="5">
+          <el-form @submit.native.prevent="submit()" label-width="100px" size="small">
+            <depositable-fieldset v-model="depositableDraft" :errors="errors"></depositable-fieldset>
+          </el-form>
+        </el-col>
+      </el-row>
+    </div>
+
+    <div class="foot">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isCreating" @click="submit()" type="primary" size="small" class="pull-right">
+        Save
+      </el-button>
+    </div>
+  </div>
+</content-container>
+
+<!-- <div class="page-wrapper">
 
   <div>
     <el-menu :router="true" default-active="/depositables" mode="horizontal" class="secondary-nav">
@@ -44,32 +86,33 @@
     </el-card>
   </div>
 
-</div>
+</div> -->
 </template>
 
 <script>
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
 import Depositable from '@/models/depositable'
-import DepositableForm from '@/components/depositable-form'
+import DepositableFieldset from '@/components/depositable-fieldset'
+
+import PageMixin from '@/mixins/page'
 
 export default {
   name: 'NewDepositable',
   mixins: [PageMixin],
   components: {
-    DepositableForm
+    DepositableFieldset
   },
   data () {
     return {
       depositableDraft: Depositable.objectWithDefaults(),
-      isCreatingDepositable: false,
+      isCreating: false,
       errors: {}
     }
   },
   methods: {
     submit () {
-      this.isCreatingDepositable = true
+      this.isCreating = true
 
       freshcom.createDepositable(this.depositableDraft).then(response => {
         this.$message({
@@ -78,15 +121,16 @@ export default {
           type: 'success'
         })
 
-        this.isCreatingDepositable = false
+        this.isCreating = false
         this.back()
       }).catch(response => {
         this.errors = response.errors
-        this.isCreatingDepositable = false
+        this.isCreating = false
         throw response
       })
     },
-    back () {
+
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ListDepositable' })
     }
   }
