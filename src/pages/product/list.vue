@@ -120,14 +120,15 @@
 
           <el-table-column prop="status" label="STATUS" width="100">
             <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
-                <el-tag v-if="scope.row.status === 'active'" :disable-transitions="true" size="mini">
-                  {{$t(`fields.product.status.${scope.row.status}`)}}
-                </el-tag>
-                <el-tag v-else :disable-transitions="true" type="info" size="mini">
-                  {{$t(`fields.product.status.${scope.row.status}`)}}
-                </el-tag>
-              </router-link>
+              <hover-button v-if="scope.row.status === 'active'" @click="deactivateProduct(scope.row)" type="primary" hover-type="info">
+                <span slot="normal">{{$t(`fields.product.status.${scope.row.status}`)}}</span>
+                <span slot="hover">Deactive</span>
+              </hover-button>
+
+              <hover-button v-else @click="activateProduct(scope.row)" type="info" hover-type="primary">
+                <span slot="normal">{{$t(`fields.product.status.${scope.row.status}`)}}</span>
+                <span slot="hover">Activate</span>
+              </hover-button>
             </template>
           </el-table-column>
 
@@ -147,19 +148,6 @@
               <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
                 {{scope.row.updatedAt | moment}}
               </router-link>
-            </template>
-          </el-table-column>
-
-          <el-table-column align="right" width="120">
-            <template slot-scope="scope">
-              <p class="action-group">
-                <el-button v-if="scope.row.status === 'draft'" @click="activateProduct(scope.row)" plain type="primary" size="mini">
-                  Activate
-                </el-button>
-                <el-button v-else @click="deactivateProduct(scope.row)" plain type="info" size="mini">
-                  Deactivate
-                </el-button>
-              </p>
             </template>
           </el-table-column>
         </el-table>
@@ -186,6 +174,7 @@
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
+import HoverButton from '@/components/hover-button'
 import DataImportFieldset from '@/components/data-import-fieldset'
 import DataImport from '@/models/data-import'
 
@@ -196,7 +185,8 @@ export default {
   name: 'ListProduct',
   mixins: [ListPageMixin],
   components: {
-    DataImportFieldset
+    DataImportFieldset,
+    HoverButton
   },
   data () {
     return {
