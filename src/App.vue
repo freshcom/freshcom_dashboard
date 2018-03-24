@@ -192,6 +192,29 @@ input::-webkit-inner-spin-button {
     padding-right: 20px
   }
 
+  .action-group {
+    text-align: right;
+
+    .el-button {
+      padding: 5px 10px;
+      font-size: 11px;
+    }
+
+    a {
+      margin-left: 10px;
+    }
+
+    svg {
+      line-height: 16px;
+      min-height: 16px;
+      height: 16px;
+    }
+  }
+
+  p {
+    margin: 0;
+  }
+
   td {
     padding-top: 0px;
     padding-bottom: 0px;
@@ -527,29 +550,6 @@ input::-webkit-inner-spin-button {
     tr td {
       padding-top: 0px;
       padding-bottom: 0px;
-    }
-
-    p {
-      margin: 0;
-    }
-
-    .action-group {
-      text-align: right;
-
-      .el-button {
-        padding: 5px 10px;
-        font-size: 11px;
-      }
-
-      a {
-        margin-left: 10px;
-      }
-
-      svg {
-        line-height: 16px;
-        min-height: 16px;
-        height: 16px;
-      }
     }
   }
 

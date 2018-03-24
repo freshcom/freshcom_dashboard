@@ -1,204 +1,182 @@
 <template>
-<div class="page-wrapper">
-  <div>
-    <el-menu :router="true" default-active="/product_collections" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
-        Products
-      </el-menu-item>
-      <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">
-        Collections
-      </el-menu-item>
-    </el-menu>
-    <locale-selector @change="searchProductCollection()" class="pull-right"></locale-selector>
+<content-container @locale-changed="reload" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListProduct' }">Products</router-link>
+    <router-link :to="{ name: 'ListProductCollection' }">Collections</router-link>
   </div>
 
-  <div>
-    <el-card v-loading="isLoading" class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
-        <div class="brief">
-          <div class="avatar">
-            <icon name="folder" class="avatar-icon"></icon>
-          </div>
+  <div slot="card-header">
+    <div class="brief">
+      <div class="avatar">
+        <img v-if="avatarUrl" :src="avatarUrl">
+        <icon v-else name="tags" class="avatar-icon"></icon>
+      </div>
 
-          <div class="detail">
-            <p>{{productCollection.code}}</p>
-            <h2>{{productCollection.name}}</h2>
-            <p class="id">{{productCollection.id}}</p>
-          </div>
+      <div class="detail">
+        <p>
+          <span>Product Collection</span>
+          <span>{{productCollection.code}}</span>
+        </p>
+        <h1>{{productCollection.name}}</h1>
+        <p class="id">{{productCollection.id}}</p>
+      </div>
+    </div>
+
+    <div class="brief-action-group">
+      <router-link :to="{ name: 'EditProductCollection', params: { id: productCollection.id } }" class="el-button el-button--small is-plain">
+        Edit
+      </router-link>
+    </div>
+  </div>
+
+  <div slot="card-content">
+    <div class="data">
+      <div class="block">
+        <div class="header">
+          <h2>Detail</h2>
         </div>
 
-        <div class="header-actions">
-          <el-button @click="editProductCollection()" plain size="small">Edit</el-button>
+        <div class="body">
+          <dl>
+            <dt>ID</dt>
+            <dd>{{productCollection.id}}</dd>
+
+            <dt>Name</dt>
+            <dd>{{productCollection.name}}</dd>
+
+            <dt>Label</dt>
+            <dd>{{productCollection.label}}</dd>
+          </dl>
         </div>
       </div>
 
-      <div class="data">
-        <div class="block-title">
-          <h3>Details</h3>
-        </div>
-        <div class="block">
-          <div class="block-body">
-            <dl>
-              <dt>ID</dt>
-              <dd>{{productCollection.id}}</dd>
+      <div class="block">
+        <div class="header">
+          <h2>Products <small>({{productCollection.productCount}})</small></h2>
 
-              <dt>Name</dt>
-              <dd>{{productCollection.name}}</dd>
-
-              <dt>Label</dt>
-              <dd>{{productCollection.label}}</dd>
-            </dl>
+          <div class="action-group">
+            <el-button @click="addProduct()" plain size="mini">
+              Add
+            </el-button>
           </div>
         </div>
 
-        <div class="block-title">
-          <h3>Products</h3>
+        <div class="body full">
+          <el-table :data="memberships" :show-header="false" class="data-table block-table">
+            <el-table-column label="Name" width="240">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.product.id }, query: { callbackPath: currentRoutePath } }" class="primary">
+                  <span>{{scope.row.product.name}}</span>
+                </router-link>
+              </template>
+            </el-table-column>
 
-          <span class="block-title-actions pull-right">
-            <el-button @click="openAddMembershipDialog()" plain size="mini">
-              Mark All Active
-            </el-button>
-
-            <el-button @click="openAddMembershipDialog()" plain size="mini">
-              Add Product
-            </el-button>
-          </span>
-        </div>
-        <div class="block">
-          <div class="block-body full">
-            <el-table :data="memberships" class="block-table" :show-header="false" style="width: 100%">
-              <el-table-column>
-                <template slot-scope="scope">
-                  <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.product.id } }">
-                    {{scope.row.product.name}}
-                  </router-link>
-                </template>
-              </el-table-column>
-
-              <el-table-column width="80">
-                <template slot-scope="scope">
-                  <el-tag size="mini" type="info">
+            <el-table-column label="Status" width="100">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.product.id }, query: { callbackPath: currentRoutePath } }">
+                  <el-tag v-if="scope.row.product.status === 'active'" :disable-transitions="true" size="mini">
                     {{$t(`fields.product.status.${scope.row.product.status}`)}}
                   </el-tag>
-                </template>
-              </el-table-column>
+                  <el-tag v-else :disable-transitions="true" type="info" size="mini">
+                    {{$t(`fields.product.status.${scope.row.product.status}`)}}
+                  </el-tag>
+                </router-link>
+              </template>
+            </el-table-column>
 
-              <el-table-column width="80">
-                <template slot-scope="scope">
-                  <span>{{scope.row.sortIndex}}</span>
-                </template>
-              </el-table-column>
+            <el-table-column label="Sort" width="80">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.product.id }, query: { callbackPath: currentRoutePath } }">
+                  {{scope.row.product.sortIndex}}
+                </router-link>
+              </template>
+            </el-table-column>
 
-              <el-table-column width="180">
-                <template slot-scope="scope">
+            <el-table-column label="Added" align="right">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.product.id }, query: { callbackPath: currentRoutePath } }">
                   <span>{{scope.row.insertedAt | moment}}</span>
-                </template>
-              </el-table-column>
+                </router-link>
+              </template>
+            </el-table-column>
 
-              <el-table-column width="220">
-                <template slot-scope="scope">
-                  <p class="text-right actions">
-                    <el-button @click="markProductActive(scope.row.product)" v-if="scope.row.product.status === 'draft'" plain size="mini">
-                      Mark Active
-                    </el-button>
-
-                    <el-button @click="openEditMembershipDialog(scope.row)" plain size="mini">
+            <el-table-column width="130">
+              <template slot-scope="scope">
+                <p class="action-group">
+                  <el-button-group>
+                    <el-button @click="editMembership(scope.row)" plain size="mini">
                       Edit
                     </el-button>
+                    <el-button @click="attemptDeleteMembership(scope.row)" plain size="mini">
+                      Remove
+                    </el-button>
+                  </el-button-group>
+                </p>
+              </template>
+            </el-table-column>
+          </el-table>
 
-                    <confirm-button @confirmed="deleteMembership(scope.row.id)" size="mini">
-                      Delete
-                    </confirm-button>
-                  </p>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-        </div>
-
-        <h3>Custom Data</h3>
-        <div class="block">
-          <div class="block-body">
-
-          </div>
-        </div>
-
-        <h3>Related Resources</h3>
-        <div class="block">
-          <div class="block-body">
-            <dl>
-              <dt v-if="productCollection.product">Product</dt>
-              <dd v-if="productCollection.product">
-                <router-link :to="{ name: 'ShowProduct', params: { id: productCollection.product.id }}">
-                  {{productCollection.product.id}}
-                </router-link>
-              </dd>
-            </dl>
-          </div>
-        </div>
-
-        <h3>Logs</h3>
-        <div class="block">
-          <div class="block-body">
-
-          </div>
-        </div>
-
-        <h3>Events</h3>
-        <div class="block">
-          <div class="block-body">
-
+          <div v-if="memberships.length >= 5" class="foot text-center">
+            <router-link :to="{ name: 'ListProduct', query: { filter: { collectionId: productCollection.id } }}" class="view-more">View More</router-link>
           </div>
         </div>
       </div>
 
-      <div class="footer text-right">
-        <confirm-button @confirmed="deleteEfc()" size="small">Delete</confirm-button>
+      <div class="block">
+        <div class="header">
+          <h2>Custom Data</h2>
+        </div>
+        <div class="body">
+          {{productCollection.customData}}
+        </div>
       </div>
-    </el-card>
+
+      <div class="block">
+        <div class="header">
+          <h2>Related Resources</h2>
+        </div>
+        <div class="body">
+          <dl>
+            <dt v-if="productCollection.avatar">Avatar</dt>
+            <dd v-if="productCollection.avatar">
+              <router-link :to="{ name: 'ShowFile', params: { id: productCollection.avatar.id }}">
+               {{productCollection.avatar.id}}
+              </router-link>
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <div class="launchable">
-    <el-dialog :show-close="false" :visible="isAddingMembership" title="Add product to collection" width="500px">
-      <product-collection-membership-form v-model="membershipForAdd" :errors="errors"></product-collection-membership-form>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button :disabled="isCreatingMembership" @click="closeAddMembershipDialog()" plain size="small">Cancel</el-button>
-        <el-button :loading="isCreatingMembership" @click="createMembership()" type="primary" size="small">Save</el-button>
-      </div>
-    </el-dialog>
-  </div>
-</div>
-
+</content-container>
 </template>
 
 <script>
-import 'vue-awesome/icons/folder'
-import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
 import ProductCollection from '@/models/product-collection'
 import ProductCollectionMembership from '@/models/product-collection-membership'
 import ProductCollectionMembershipForm from '@/components/product-collection-membership-form'
-import ConfirmButton from '@/components/confirm-button'
+
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadProductCollection' })
 
 export default {
   name: 'ShowProductCollection',
-  mixins: [PageMixin],
+  mixins: [ResourcePageMixin],
   components: {
-    ProductCollectionMembershipForm,
-    ConfirmButton
+    ProductCollectionMembershipForm
   },
-  props: ['id'],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  },
   data () {
     return {
       isLoading: false,
       productCollection: ProductCollection.objectWithDefaults(),
-      memberships: [],
       errors: {},
 
       isAddingMembership: false,
@@ -206,36 +184,39 @@ export default {
       isCreatingMembership: false
     }
   },
-  created () {
-    this.loadResources()
-  },
-  methods: {
-    loadResources (options = { shouldShowLoading: true }) {
-      if (options.shouldShowLoading) {
-        this.isLoading = true
+  computed: {
+    memberships () {
+      if (this.productCollection && this.productCollection.memberships) {
+        return this.productCollection.memberships
       }
 
-      Promise.all([this.loadProductCollection(), this.loadMemberships()]).then(() => {
-        this.isLoading = false
-      })
+      return []
     },
 
+    avatarUrl () {
+      if (this.productCollection.avatar) {
+        return this.productCollection.avatar.url
+      }
+
+      return ''
+    }
+  },
+  methods: {
     loadProductCollection () {
-      freshcom.retrieveProductCollection(this.id).then(response => {
+      this.isLoading = true
+
+      return freshcom.retrieveProductCollection(this.id, {
+        include: 'memberships.product'
+      }).then(response => {
         this.productCollection = response.data
+        this.isLoading = false
+      }).catch(errors => {
+        this.isLoading = false
+        throw errors
       })
     },
 
     // MARK: Memberships
-
-    loadMemberships () {
-      freshcom.listProductCollectionMembership(this.id, {
-        include: 'product',
-        page: { size: 10 }
-      }).then(response => {
-        this.memberships = response.data
-      })
-    },
 
     openAddMembershipDialog () {
       let membership = ProductCollectionMembership.objectWithDefaults()
@@ -275,21 +256,6 @@ export default {
 
     // MARK: Product
 
-    markProductActive (product) {
-      let productDraft = _.cloneDeep(product)
-      productDraft.status = 'active'
-
-      freshcom.updateProduct(product.id, productDraft).then(() => {
-        return this.loadMemberships()
-      }).then(() => {
-        this.$message({
-          showClose: true,
-          message: `Product marked as active successfully.`,
-          type: 'success'
-        })
-      })
-    },
-
     deleteMembership (id) {
       freshcom.deleteProductCollectionMembership(id).then(() => {
         return this.loadMemberships()
@@ -302,11 +268,7 @@ export default {
       })
     },
 
-    editProductCollection () {
-      this.$store.dispatch('pushRoute', { name: 'EditProductCollection', params: { id: this.id } })
-    },
-
-    back () {
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ListProductCollection' })
     }
   }

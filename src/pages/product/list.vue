@@ -31,6 +31,20 @@
               </div>
             </div>
           </filter-condition>
+
+          <filter-condition v-model="filterObjectDraft" filter-key="collectionId" default="">
+            <span slot="key">Collection ID</span>
+            <div slot="value">
+              <select value="$eq">
+                <option value="$eq">is equal to</option>
+              </select>
+
+              <div style="vertical-align: middle;" class="m-t-5">
+                <icon name="share" class="fa-flip-vertical" scale="0.8"></icon>
+                <input v-model="filterObjectDraft.collectionId" type="text"></input>
+              </div>
+            </div>
+          </filter-condition>
         </filter-button>
 
         <search-input :value="searchKeyword"></search-input>
@@ -107,7 +121,7 @@
           <el-table-column prop="status" label="STATUS" width="100">
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
-                <el-tag v-if="scope.row.status == 'active'" :disable-transitions="true" size="mini">
+                <el-tag v-if="scope.row.status === 'active'" :disable-transitions="true" size="mini">
                   {{$t(`fields.product.status.${scope.row.status}`)}}
                 </el-tag>
                 <el-tag v-else :disable-transitions="true" type="info" size="mini">
@@ -135,6 +149,19 @@
               </router-link>
             </template>
           </el-table-column>
+
+          <el-table-column align="right" width="120">
+            <template slot-scope="scope">
+              <p class="action-group">
+                <el-button v-if="scope.row.status === 'draft'" @click="activateProduct(scope.row)" plain type="primary" size="mini">
+                  Activate
+                </el-button>
+                <el-button v-else @click="deactivateProduct(scope.row)" plain type="info" size="mini">
+                  Deactivate
+                </el-button>
+              </p>
+            </template>
+          </el-table-column>
         </el-table>
       </query-result>
     </div>
@@ -156,6 +183,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
 import DataImportFieldset from '@/components/data-import-fieldset'
@@ -193,6 +221,7 @@ export default {
 
       freshcom.listProduct({
         search: this.searchKeyword,
+        filter: this.filterObject,
         page: this.page
       }).then(response => {
         this.products = response.data
@@ -233,6 +262,36 @@ export default {
         this.errors = response.errors
         this.isCreatingDataImport = false
         throw response
+      })
+    },
+
+    deactivateProduct (product) {
+      let productDraft = _.cloneDeep(product)
+      productDraft.status = 'draft'
+
+      freshcom.updateProduct(product.id, productDraft).then(() => {
+        product.status = 'draft'
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Product deactivated successfully.`,
+          type: 'success'
+        })
+      })
+    },
+
+    activateProduct (product) {
+      let productDraft = _.cloneDeep(product)
+      productDraft.status = 'active'
+
+      freshcom.updateProduct(product.id, productDraft).then(() => {
+        product.status = 'active'
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Product activated successfully.`,
+          type: 'success'
+        })
       })
     }
   }
