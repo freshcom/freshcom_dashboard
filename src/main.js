@@ -28,7 +28,8 @@ import 'vue-awesome/icons/folder' // File Collection
 import 'vue-awesome/icons/user' // Customer
 import 'vue-awesome/icons/plus'
 import 'vue-awesome/icons/file-text' // Order
-import 'vue-awesome/icons/cube' // Product
+import 'vue-awesome/icons/tag' // Product
+import 'vue-awesome/icons/tags' // Product Collection
 
 // -- Sync Store & Router --
 sync(store, router)

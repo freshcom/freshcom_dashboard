@@ -1,5 +1,129 @@
 <template>
-<div class="page-wrapper">
+<content-container @locale-changed="listProductCollection">
+  <div slot="header">
+    <router-link :to="{ name: 'ListProduct' }">Products</router-link>
+    <router-link :to="{ name: 'ListProductCollection' }">Collections</router-link>
+  </div>
+
+  <div slot="card-header">
+    <el-row>
+      <el-col :span="16">
+        <filter-button :current="filterObject" :draft="filterObjectDraft" @cancel="resetFilter" @clear="clearFilter">
+          <filter-condition v-model="filterObjectDraft" filter-key="status" default="active">
+            <span slot="key">Status</span>
+            <div slot="value">
+              <select v-model="filterObjectDraft.status">
+                <option v-for="status in ['active', 'draft']" :value="status">is {{status}}</option>
+              </select>
+            </div>
+          </filter-condition>
+
+          <filter-condition v-model="filterObjectDraft" filter-key="label" default="">
+            <span slot="key">Label</span>
+            <div slot="value">
+              <select value="$eq">
+                <option value="$eq">is equal to</option>
+              </select>
+
+              <div style="vertical-align: middle;" class="m-t-5">
+                <icon name="share" class="fa-flip-vertical" scale="0.8"></icon>
+                <input v-model="filterObjectDraft.label" type="text"></input>
+              </div>
+            </div>
+          </filter-condition>
+        </filter-button>
+
+        <search-input :value="searchKeyword"></search-input>
+      </el-col>
+
+      <el-col :span="8">
+        <div class="text-right">
+          <el-button-group>
+            <router-link :to="{ name: 'NewProduct' }" class="el-button el-button--small is-plain">
+              <span class="with-icon">
+                <span class="icon-wrapper">
+                  <icon name="plus" scale="0.6"></icon>
+                </span>
+                <span>New</span>
+              </span>
+            </router-link>
+          </el-button-group>
+        </div>
+      </el-col>
+    </el-row>
+  </div>
+
+  <div slot="card-content">
+    <div class="data full">
+      <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
+        <div slot="no-content">
+          <p><icon name="tags" scale="3"></icon></p>
+          <p>
+            <span>You haven't created any product collection yet.</span>
+            <a href="javascript:;">Learn more &rarr;</a>
+          </p>
+
+          <router-link :to="{ name: 'NewProductCollection' }" class="el-button el-button--small is-plain">
+            <span class="with-icon">
+              <span class="icon-wrapper">
+                <icon name="plus" scale="0.6"></icon>
+              </span>
+              <span>Create your first product collection</span>
+            </span>
+          </router-link>
+        </div>
+
+        <el-table :data="productCollections" slot="content" class="data-table">
+          <el-table-column prop="name" label="PRODUCT COLLECTION">
+            <template slot-scope="scope">
+              <router-link :to="{ name: 'ShowProductCollection', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }" class="primary">
+                <span v-if="scope.row.code">
+                  [{{scope.row.code}}]
+                </span>
+
+                <span>{{scope.row.name}}</span>
+              </router-link>
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="status" label="STATUS" width="100">
+            <template slot-scope="scope">
+              <router-link :to="{ name: 'ShowProductCollection', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
+                <el-tag v-if="scope.row.status == 'active'" :disable-transitions="true" size="mini">
+                  {{$t(`fields.productCollection.status.${scope.row.status}`)}}
+                </el-tag>
+                <el-tag v-else :disable-transitions="true" type="info" size="mini">
+                  {{$t(`fields.productCollection.status.${scope.row.status}`)}}
+                </el-tag>
+              </router-link>
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="id" label="ID" width="120">
+            <template slot-scope="scope">
+              <el-popover trigger="hover" placement="top">
+                <span>{{ scope.row.id }}</span>
+                <div slot="reference">
+                  {{ scope.row.id | idLastPart }}
+                </div>
+              </el-popover>
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="updatedAt" label="UPDATED" align="right" width="200">
+            <template slot-scope="scope">
+              <router-link :to="{ name: 'ShowProductCollection', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
+                {{scope.row.updatedAt | moment}}
+              </router-link>
+            </template>
+          </el-table-column>
+        </el-table>
+      </query-result>
+    </div>
+  </div>
+</content-container>
+
+<!-- <div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="/product_collections" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
@@ -9,7 +133,7 @@
         Collections
       </el-menu-item>
     </el-menu>
-    <locale-selector @change="searchProductCollection()" class="pull-right"></locale-selector>
+    <locale-selector @change="listProductCollection()" class="pull-right"></locale-selector>
   </div>
 
   <div>
@@ -73,37 +197,18 @@
       </div>
     </el-card>
   </div>
-</div>
+</div> -->
 </template>
 
 <script>
-import 'vue-awesome/icons/search'
-import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
-import Pagination from '@/components/pagination'
-import { idLastPart } from '@/helpers/filters'
+import listPageMixinFactory from '@/mixins/list-page'
+let ListPageMixin = listPageMixinFactory({ listMethodName: 'listProductCollection' })
 
 export default {
   name: 'ListProductCollection',
-  mixins: [PageMixin],
-  components: {
-    Pagination
-  },
-  filters: {
-    idLastPart
-  },
-  props: {
-    searchKeyword: {
-      type: String,
-      default: ''
-    },
-    page: {
-      type: Object,
-      required: true
-    }
-  },
+  mixins: [ListPageMixin],
   data () {
     return {
       productCollections: [],
@@ -113,40 +218,10 @@ export default {
     }
   },
   created () {
-    this.searchProductCollection()
-  },
-  computed: {
-    noSearchResult () {
-      return !this.isLoading && this.totalCount === 0 && this.allCount > 0
-    },
-    hasSearchResult () {
-      return !this.isLoading && this.totalCount !== 0
-    },
-    currentRoutePath () {
-      return this.$store.state.route.fullPath
-    }
-  },
-  watch: {
-    isViewingTestData () {
-      this.searchProductCollection()
-    },
-    searchKeyword (newKeyword) {
-      this.searchProductCollection()
-    },
-    page (newPage, oldPage) {
-      if (_.isEqual(newPage, oldPage)) {
-        return
-      }
-      this.search()
-    }
+    this.listProductCollection()
   },
   methods: {
-    updateSearchKeyword: _.debounce(function (newSearchKeyword) {
-      // Remove page[number] from query to reset to the first page
-      let q = _.merge({}, _.omit(this.$route.query, ['page[number]']), { search: newSearchKeyword })
-      this.$router.replace({ name: this.$store.state.route.name, query: q })
-    }, 300),
-    searchProductCollection () {
+    listProductCollection () {
       this.isLoading = true
 
       freshcom.listProductCollection({
@@ -161,12 +236,6 @@ export default {
       }).catch(errors => {
         this.isLoading = false
       })
-    },
-    viewProductCollection (productCollection) {
-      this.$store.dispatch('pushRoute', { name: 'ShowProductCollection', params: { id: productCollection.id, callbackPath: this.currentRoutePath } })
-    },
-    newProductCollection () {
-      this.$store.dispatch('pushRoute', { name: 'NewProductCollection' })
     }
   }
 }
@@ -174,17 +243,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.main-card .footer {
-  text-align: right;
-  border-top: 0;
-}
-
-.total {
-  float: left;
-  display: inline-block;
-  font-size: 13px;
-  min-width: 28px;
-  height: 28px;
-  line-height: 28px;
-}
 </style>

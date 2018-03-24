@@ -75,7 +75,7 @@
     <div class="data full">
       <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
         <div slot="no-content">
-          <p><icon name="cube" scale="3"></icon></p>
+          <p><icon name="tag" scale="3"></icon></p>
           <p>
             <span>You haven't created any product yet.</span>
             <a href="javascript:;">Learn more &rarr;</a>
@@ -153,110 +153,6 @@
     </el-dialog>
   </div>
 </content-container>
-
-<!-- <div class="page-wrapper">
-  <div>
-    <el-menu :router="true" default-active="/products" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
-        Products
-      </el-menu-item>
-      <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">
-        Collections
-      </el-menu-item>
-    </el-menu>
-    <locale-selector @change="listProduct()" class="pull-right"></locale-selector>
-  </div>
-
-  <div>
-    <el-card class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
-
-        <el-row>
-          <el-col :span="18">
-            <el-button plain size="small"><icon name="filter" scale="0.7" class="v-middle"></icon> Filter</el-button>
-            <div class="search">
-              <el-input :value="searchKeyword" @input="updateSearchKeyword" size="small" placeholder="Search...">
-                <template slot="prepend"><icon name="search" scale="1" class="v-middle"></icon></template>
-              </el-input>
-            </div>
-          </el-col>
-
-          <el-col :span="6">
-            <div class="text-right">
-              <el-dropdown @command="addDataImport" trigger="click" class="m-r-10">
-                <el-button plain size="small">
-                  Import<i class="el-icon-arrow-down el-icon--right"></i>
-                </el-button>
-
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item command="Product">Import products</el-dropdown-item>
-                  <el-dropdown-item command="Price">Import prices</el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-              <el-button @click="newProduct()" plain size="small" class="pull-right">
-                New
-              </el-button>
-            </div>
-          </el-col>
-        </el-row>
-      </div>
-
-      <div class="data full" v-loading="isLoading">
-        <p v-if="noSearchResult" class="search-notice text-center">
-          There is no result that matches "{{searchKeyword}}"
-        </p>
-        <el-table v-if="hasSearchResult" @row-click="viewProduct" :data="products">
-          <el-table-column prop="name" label="Product">
-            <template slot-scope="scope">
-              <span v-if="scope.row.code">
-                [{{scope.row.code}}]
-              </span>
-              <span>{{scope.row.name}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="status" label="Status" width="100">
-            <template slot-scope="scope">
-              {{$t(`fields.product.status.${scope.row.status}`)}}
-            </template>
-          </el-table-column>
-          <el-table-column prop="id" label="ID" width="120">
-            <template slot-scope="scope">
-              <el-popover trigger="hover" placement="top">
-                <span>{{ scope.row.id }}</span>
-                <div slot="reference" class="name-wrapper">
-                  {{ scope.row.id | idLastPart }}
-                </div>
-              </el-popover>
-            </template>
-          </el-table-column>
-          <el-table-column prop="insertedAt" label="" align="right" width="200">
-            <template slot-scope="scope">
-              {{scope.row.insertedAt | moment}}
-            </template>
-          </el-table-column>
-        </el-table>
-
-        <div v-if="hasSearchResult" class="footer">
-          <span class="total">around {{totalCount}} results</span>
-          <pagination :number="page.number" :size="page.size" :total="totalCount"></pagination>
-        </div>
-      </div>
-    </el-card>
-  </div>
-  <div class="launchable">
-    <el-dialog :show-close="false" :visible="isAddingDataImport" title="Import data" width="750px">
-      <data-import-form v-model="dataImportForAdd" :errors="errors"></data-import-form>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button :disabled="isCreatingDataImport" @click="cancelAddDataImport()" plain size="small">Cancel</el-button>
-        <el-button :loading="isCreatingDataImport" @click="createDataImport()" type="primary" size="small">Save</el-button>
-      </div>
-    </el-dialog>
-  </div>
-</div> -->
 </template>
 
 <script>
