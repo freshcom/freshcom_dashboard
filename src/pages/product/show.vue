@@ -1,5 +1,182 @@
 <template>
-<div class="page-wrapper">
+<content-container @locale-changed="reload" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListProduct' }">Products</router-link>
+    <router-link :to="{ name: 'ListProductCollection' }">Collections</router-link>
+  </div>
+
+  <div slot="card-header">
+    <div class="brief">
+      <div class="avatar">
+        <img v-if="avatarUrl" :src="avatarUrl">
+        <icon v-else name="tag" class="avatar-icon"></icon>
+      </div>
+
+      <div class="detail">
+        <p>
+          <span>Product {{$t(`fields.product.kind.${product.kind}`)}}</span>
+          <span>{{product.code}}</span>
+        </p>
+        <h1>{{product.name}}</h1>
+        <p class="id">{{product.id}}</p>
+      </div>
+    </div>
+
+    <div class="brief-action-group">
+      <router-link :to="{ name: 'EditProduct', params: { id: product.id } }" class="el-button el-button--small is-plain">
+        Edit
+      </router-link>
+    </div>
+  </div>
+
+  <div slot="card-content">
+    <div class="data">
+      <div class="block">
+        <div class="header">
+          <h2>Detail</h2>
+        </div>
+
+        <div class="body">
+          <dl>
+            <dt>ID</dt>
+            <dd>{{product.id}}</dd>
+
+            <dt>Code</dt>
+            <dd>{{product.code}}</dd>
+
+            <dt>Status</dt>
+            <dd>
+              {{$t(`fields.product.status.${product.status}`)}}
+            </dd>
+
+            <dt>Kind</dt>
+            <dd>
+              {{$t(`fields.product.kind.${product.kind}`)}}
+            </dd>
+
+            <dt>Name Sync</dt>
+            <dd>{{$t(`fields.product.nameSync.${product.nameSync}`)}}</dd>
+
+            <dt>Name</dt>
+            <dd>{{product.name}}</dd>
+
+            <dt>Short Name</dt>
+            <dd>{{product.shortName}}</dd>
+
+            <dt>Print Name</dt>
+            <dd>{{product.printName}}</dd>
+
+            <dt>Sort Index</dt>
+            <dd>{{product.sortIndex}}</dd>
+
+            <dt>Goods Quantity</dt>
+            <dd>{{product.goodsQuantity}}</dd>
+
+            <dt>Maximum Public OQ</dt>
+            <dd>{{product.maximumPublicOrderQuantity}}</dd>
+
+            <dt>Auto Fulfill</dt>
+            <dd>{{product.autoFulfill}}</dd>
+
+            <dt>Caption</dt>
+            <dd>{{product.caption}}</dd>
+
+            <dt>Description</dt>
+            <dd>{{product.description}}</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div v-if="productHasChildren" class="block">
+        <div v-if="product.kind === 'withVariants'" class="header">
+          <h2>Variants</h2>
+
+          <div class="action-group">
+            <router-link :to="{ name: 'NewProduct', query: { parentId: product.id, kind: 'variant', callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
+              Add
+            </router-link>
+          </div>
+        </div>
+        <div v-if="product.kind === 'combo'" class="header">
+          <h2>Items</h2>
+
+          <div class="action-group">
+            <router-link :to="{ name: 'NewProduct', query: { parentId: product.id, kind: 'item', callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
+              Add
+            </router-link>
+          </div>
+        </div>
+
+        <div class="body full">
+          <el-table :data="product.variants" :show-header="false" class="data-table block-table">
+            <el-table-column label="Name" width="240">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id } }" class="primary">
+                  <span>{{scope.row.name}}</span>
+
+                  <el-tag v-if="scope.row.primary" size="mini" class="m-l-10">
+                    Primary
+                  </el-tag>
+                  <p v-if="canMarkVariantPrimary(scope.row)" class="action-group">
+                    <el-button @click="markVariantPrimary(scope.row)" plain size="mini" class="m-l-10">
+                      Set Primary
+                    </el-button>
+                  </p>
+                </router-link>
+              </template>
+            </el-table-column>
+
+            <el-table-column label="Status" width="100">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id } }">
+                  <el-tag v-if="scope.row.status === 'active'" :disable-transitions="true" size="mini">
+                    {{$t(`fields.product.status.${scope.row.status}`)}}
+                  </el-tag>
+                  <el-tag v-else :disable-transitions="true" type="info" size="mini">
+                    {{$t(`fields.product.status.${scope.row.status}`)}}
+                  </el-tag>
+                </router-link>
+              </template>
+            </el-table-column>
+
+            <el-table-column width="100">
+              <template slot-scope="scope">
+                {{scope.row.defaultPrice | chargeDollar}}
+              </template>
+            </el-table-column>
+
+            <el-table-column label="Added" align="right">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id } }">
+                  <span>{{scope.row.updatedAt | moment}}</span>
+                </router-link>
+              </template>
+            </el-table-column>
+
+            <el-table-column align="right" width="130">
+              <template slot-scope="scope">
+                <p class="action-group">
+                  <el-button-group>
+                    <el-button @click="editProduct(scope.row)" plain size="mini">
+                      Edit
+                    </el-button>
+                    <el-button plain size="mini">
+                      Delete
+                    </el-button>
+                  </el-button-group>
+                </p>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</content-container>
+
+
+<!-- <div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="/products" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
@@ -358,43 +535,48 @@
       </div>
     </el-card>
   </div>
-</div>
+</div> -->
 
 </template>
 
 <script>
-import 'vue-awesome/icons/plus'
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
+import translateErrors from '@/helpers/translate-errors'
+
 import Product from '@/models/product'
 import ConfirmButton from '@/components/confirm-button'
-import translateErrors from '@/helpers/translate-errors'
 import { chargeDollar } from '@/helpers/filters'
+
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadProduct' })
 
 export default {
   name: 'ShowProduct',
-  mixins: [PageMixin],
+  mixins: [ResourcePageMixin],
   components: {
     ConfirmButton
   },
   filters: {
     chargeDollar
   },
-  props: ['id'],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  },
   data () {
     return {
       product: Product.objectWithDefaults(),
       isLoading: false
     }
   },
-  beforeRouteUpdate (to, from, next) {
-    this.loadProduct(to.params.id)
-    next()
-  },
-  created () {
-    this.loadProduct(this.id)
+  watch: {
+    id () {
+      this.reload()
+    }
   },
   computed: {
     avatarUrl () {
@@ -402,17 +584,18 @@ export default {
         return this.product.avatar.url
       }
 
-      return 'http://placehold.it/80x80'
+      return 'https://placehold.it/80x80'
     },
-    currentRoutePath () {
-      return this.$store.state.route.fullPath
+
+    productHasChildren () {
+      return this.product.kind === 'withVariants' || this.product.kind === 'combo'
     }
   },
   methods: {
-    loadProduct (id) {
+    loadProduct () {
       this.isLoading = true
 
-      freshcom.retrieveProduct(id, {
+      return freshcom.retrieveProduct(this.id, {
         include: 'prices,avatar,items,variants.defaultPrice,fileCollections'
       }).then(response => {
         this.product = response.data

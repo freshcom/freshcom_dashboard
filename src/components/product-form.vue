@@ -93,7 +93,7 @@
     <el-form-item label="Name Sync" required>
       <el-radio-group @change="updateValue" v-model="formModel.nameSync">
         <el-radio label="disabled">Disabled</el-radio>
-        <el-radio label="syncWithSource">Sync with Source</el-radio>
+        <el-radio label="syncWithGoods">Sync with Source</el-radio>
       </el-radio-group>
     </el-form-item>
 
@@ -243,9 +243,9 @@ export default {
     },
     handleSourceChange (source) {
       if (source) {
-        this.formModel.source = source
+        this.formModel.goods = source
       } else {
-        this.formMode.source = null
+        this.formMode.goods = null
       }
 
       this.$emit('input', this.formModel)

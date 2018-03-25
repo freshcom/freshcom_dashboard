@@ -190,7 +190,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column width="130">
+            <el-table-column align="right" width="130">
               <template slot-scope="scope">
                 <p class="action-group">
                   <el-button-group>
@@ -250,7 +250,7 @@
                     </template>
                   </el-table-column>
 
-                  <el-table-column width="140px">
+                  <el-table-column align="right" width="140px">
                     <template slot-scope="scope">
                       <p class="action-group">
                         <el-button-group>
@@ -297,7 +297,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column width="130">
+            <el-table-column align="right" width="130">
               <template slot-scope="scope">
                 <p class="action-group">
                   <el-button-group>
@@ -342,7 +342,7 @@
                     </template>
                   </el-table-column>
 
-                  <el-table-column>
+                  <el-table-column align="right">
                     <template slot-scope="scope">
                       <p class="action-group">
                       </p>
@@ -372,7 +372,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column width="130">
+            <el-table-column align="right" width="130">
               <template slot-scope="scope">
                 <p class="action-group">
                   <el-button-group>

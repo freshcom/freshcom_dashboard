@@ -86,7 +86,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column width="130">
+            <el-table-column align="right" width="130">
               <template slot-scope="scope">
                 <p class="action-group">
                   <el-button-group>

@@ -61,6 +61,15 @@ export default {
       errors: {}
     }
   },
+  created () {
+    if (this.parentId) {
+      this.productDraft.parent = { type: 'Product', id: this.parentId }
+    }
+
+    if (this.kind) {
+      this.productDraft.kind = this.kind
+    }
+  },
   methods: {
     submit () {
       this.isCreatingProduct = true

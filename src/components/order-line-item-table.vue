@@ -34,7 +34,7 @@
 
   <el-table-column width="80px" label="GT Amt." prop="grandTotal" align="right"></el-table-column>
 
-  <el-table-column width="120">
+  <el-table-column align="right" width="120">
     <template slot-scope="scope">
       <p class="action-group">
         <el-button-group>

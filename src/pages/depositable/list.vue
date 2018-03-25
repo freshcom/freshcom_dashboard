@@ -56,7 +56,7 @@
     <div class="data full">
       <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
         <div slot="no-content">
-          <p><icon name="unlock-alt" scale="3"></icon></p>
+          <p><icon name="diamond" scale="3"></icon></p>
           <p>
             <span>You haven't created any depositable yet.</span>
             <a href="javascript:;">Learn more &rarr;</a>
