@@ -508,6 +508,14 @@ const sdk = {
     }).catch(this._processHttpError)
   },
 
+  deleteProductCollection (id, params = {}, options = {}) {
+    return this.http.delete(`/product_collections/${id}`, { params: params }).then(response => {
+      if (response.data) {
+        return SimpleJAS.deserialize(response.data)
+      }
+    }).catch(this._processHttpError)
+  },
+
   //
   // ProductCollectionMembership
   //

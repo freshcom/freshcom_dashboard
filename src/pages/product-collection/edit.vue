@@ -1,5 +1,48 @@
 <template>
-<div class="page-wrapper">
+<content-container @locale-changed="reload" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListProduct' }">Products</router-link>
+    <router-link :to="{ name: 'ListProductCollection' }">Collections</router-link>
+  </div>
+
+  <div slot="card-header">
+    <h1>Edit product collection</h1>
+
+    <div class="pull-right">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isUpdating" @click="submit()" type="primary" size="small">
+        Save
+      </el-button>
+    </div>
+  </div>
+
+  <div slot="card-content">
+    <div class="data">
+      <el-row>
+        <el-col :span="14" :offset="5">
+          <el-form @submit.native.prevent="submit()" label-width="100px" size="small">
+            <product-collection-fieldset v-model="productCollectionDraft" :errors="errors"></product-collection-fieldset>
+          </el-form>
+        </el-col>
+      </el-row>
+    </div>
+
+    <div class="foot">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isUpdating" @click="submit()" type="primary" size="small" class="pull-right">
+        Save
+      </el-button>
+    </div>
+  </div>
+</content-container>
+
+<!-- <div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="/product_collections" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
@@ -47,42 +90,46 @@
     </el-card>
   </div>
 
-</div>
+</div> -->
 </template>
 
 <script>
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
 import ProductCollection from '@/models/product-collection'
-import ProductCollectionForm from '@/components/product-collection-form'
+import ProductCollectionFieldset from '@/components/product-collection-fieldset'
+
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadProductCollection' })
 
 export default {
   name: 'EditProductCollection',
-  mixins: [PageMixin],
+  mixins: [ResourcePageMixin],
   components: {
-    ProductCollectionForm
+    ProductCollectionFieldset
   },
-  props: ['id'],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  },
   data () {
     return {
       isLoading: false,
       productCollection: ProductCollection.objectWithDefaults(),
       productCollectionDraft: ProductCollection.objectWithDefaults(),
 
-      isUpdatingProductCollection: false,
+      isUpdating: false,
       errors: {}
     }
-  },
-  created () {
-    this.loadProductCollection()
   },
   methods: {
     loadProductCollection () {
       this.isLoading = true
 
-      freshcom.retrieveProductCollection(this.id).then(response => {
+      return freshcom.retrieveProductCollection(this.id).then(response => {
         this.productCollection = response.data
         this.productCollectionDraft = _.cloneDeep(response.data)
 
@@ -94,7 +141,7 @@ export default {
     },
 
     submit () {
-      this.isUpdatingProductCollection = true
+      this.isUpdating = true
 
       freshcom.updateProductCollection(
         this.productCollectionDraft.id,
@@ -106,16 +153,16 @@ export default {
           type: 'success'
         })
 
-        this.isUpdatingProductCollection = false
+        this.isUpdating = false
         this.back()
       }).catch(response => {
         this.errors = response.data
-        this.isUpdatingProductCollection = false
+        this.isUpdating = false
         throw response
       })
     },
 
-    back () {
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ShowProductCollection', params: { id: this.productCollection.id } })
     }
   }

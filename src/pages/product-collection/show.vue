@@ -145,10 +145,10 @@
               related resources if any will also be deleted:
 
               <ul>
-                <li>All product variants or items associated with this product</li>
-                <li>All prices that are associated with this product, its variants or its items</li>
-                <li>All file collections that are owned by this product</li>
-                <li>File that is the avatar of this product</li>
+                <li>All product variants or items associated with the product</li>
+                <li>All prices that are associated with the product, its variants or its items</li>
+                <li>All file collections that are owned by the product</li>
+                <li>File that is the avatar of the product</li>
               </ul>
 
               <b>Product deletion cannot be undone.</b>
@@ -190,8 +190,38 @@
     </div>
 
     <div class="foot text-right">
-      <el-button plain size="small">Delete</el-button>
+      <el-button @click="attemptDeleteProductCollection()" plain size="small">Delete</el-button>
     </div>
+  </div>
+
+  <div slot="launchable" class="launchable">
+    <el-dialog :show-close="false" :visible="isConfirmingDeleteProductCollection" title="Delete product collection" width="600px">
+      <p>
+        Are you sure you want to delete this product collection?
+        All products inside the collection will also be deleted.
+        If you want to keep certain products, remove them from this collection
+        before deletion.
+
+        <br/><br/>
+
+        For each product in the collection all of the following
+        related resources if any will also be delete:
+
+        <ul>
+          <li>All product variants or items associated with the product</li>
+          <li>All prices that are associated with the product, its variants or its items</li>
+          <li>All file collections that are owned by the product</li>
+          <li>File that is the avatar of the product</li>
+        </ul>
+
+        <b>This action cannot be undone.</b>
+      </p>
+
+      <div slot="footer">
+        <el-button :disabled="isDeletingProductCollection" @click="cancelDeleteProductCollection()" plain size="small">Cancel</el-button>
+        <el-button :loading="isDeletingProductCollection" @click="deleteProductCollection()" type="danger" size="small">Delete</el-button>
+      </div>
+    </el-dialog>
   </div>
 </content-container>
 </template>
@@ -230,7 +260,10 @@ export default {
 
       isConfirmingDeleteMembership: false,
       membershipForDelete: {},
-      isDeletingMembership: false
+      isDeletingMembership: false,
+
+      isDeletingProductCollection: false,
+      isConfirmingDeleteProductCollection: false
     }
   },
   computed: {
@@ -262,6 +295,31 @@ export default {
       }).catch(errors => {
         this.isLoading = false
         throw errors
+      })
+    },
+
+    attemptDeleteProductCollection () {
+      this.isConfirmingDeleteProductCollection = true
+    },
+
+    cancelDeleteProductCollection () {
+      this.isConfirmingDeleteProductCollection = false
+    },
+
+    deleteProductCollection () {
+      this.isDeletingProductCollection = true
+
+      freshcom.deleteProductCollection(this.productCollection.id).then(() => {
+        this.isDeletingProductCollection = false
+        this.$message({
+          showClose: true,
+          message: `Product collection deleted successfully.`,
+          type: 'success'
+        })
+
+        this.back()
+      }).catch(() => {
+        this.isDeletingProductCollection = false
       })
     },
 

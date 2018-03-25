@@ -39,7 +39,7 @@
       <el-col :span="8">
         <div class="text-right">
           <el-button-group>
-            <router-link :to="{ name: 'NewProduct' }" class="el-button el-button--small is-plain">
+            <router-link :to="{ name: 'NewProductCollection' }" class="el-button el-button--small is-plain">
               <span class="with-icon">
                 <span class="icon-wrapper">
                   <icon name="plus" scale="0.6"></icon>

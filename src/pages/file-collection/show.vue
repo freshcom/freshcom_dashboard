@@ -196,12 +196,12 @@
     </div>
 
     <div class="foot text-right">
-      <el-button @click="attemptDeleteCollection()" plain size="small">Delete</el-button>
+      <el-button @click="attemptDeleteFileCollection()" plain size="small">Delete</el-button>
     </div>
   </div>
 
   <div slot="launchable" class="launchable">
-    <el-dialog :show-close="false" :visible="isConfirmingDeleteCollection" title="Delete collection" width="500px">
+    <el-dialog :show-close="false" :visible="isConfirmingDeleteFileCollection" title="Delete file collection" width="500px">
       <p>
         Are you sure you want to delete this file collection?
         All files inside the collection will also be deleted.
@@ -215,8 +215,8 @@
       </p>
 
       <div slot="footer">
-        <el-button :disabled="isDeletingCollection" @click="cancelDeleteCollection()" plain size="small">Cancel</el-button>
-        <el-button :loading="isDeletingCollection" @click="deleteCollection()" type="danger" size="small">Delete</el-button>
+        <el-button :disabled="isDeletingFileCollection" @click="cancelDeleteFileCollection()" plain size="small">Cancel</el-button>
+        <el-button :loading="isDeletingFileCollection" @click="deleteFileCollection()" type="danger" size="small">Delete</el-button>
       </div>
     </el-dialog>
   </div>
@@ -264,8 +264,8 @@ export default {
       isConfirmingDeleteMembership: false,
       membershipForDelete: {},
 
-      isDeletingCollection: false,
-      isConfirmingDeleteCollection: false,
+      isDeletingFileCollection: false,
+      isConfirmingDeleteFileCollection: false,
 
       errors: {}
     }
@@ -420,19 +420,19 @@ export default {
       })
     },
 
-    attemptDeleteCollection () {
-      this.isConfirmingDeleteCollection = true
+    attemptDeleteFileCollection () {
+      this.isConfirmingDeleteFileCollection = true
     },
 
-    cancelDeleteCollection () {
-      this.isConfirmingDeleteCollection = false
+    cancelDeleteFileCollection () {
+      this.isConfirmingDeleteFileCollection = false
     },
 
-    deleteCollection () {
-      this.isDeletingCollection = true
+    deleteFileCollection () {
+      this.isDeletingFileCollection = true
 
       freshcom.deleteFileCollection(this.fileCollection.id).then(() => {
-        this.isDeletingCollection = false
+        this.isDeletingFileCollection = false
         this.$message({
           showClose: true,
           message: `File collection deleted successfully.`,
@@ -441,7 +441,7 @@ export default {
 
         this.back()
       }).catch(() => {
-        this.isDeletingCollection = false
+        this.isDeletingFileCollection = false
       })
     }
   }
