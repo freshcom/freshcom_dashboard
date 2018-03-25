@@ -106,6 +106,67 @@
             <a class="view-more" href="#">View More</a>
           </div>
         </div>
+
+        <div class="launchable">
+          <el-dialog :show-close="false" :visible="isAddingFile" title="Add file" width="600px">
+            <p class="text-center">
+              <el-button @click="addMembership()" size="small" type="primary">Add from existing file</el-button>
+            </p>
+
+            <div class="divider-text">
+              <span class="text">Or</span>
+            </div>
+
+            <p class="text-center">
+              <router-link :to="{ name: 'NewFile', query: { callbackPath: currentRoutePath, collection: { id: fileCollection.id, name: fileCollection.name, code: fileCollection.code } } }" class="el-button el-button--small el-button--primary">
+                Upload new files
+              </router-link>
+            </p>
+
+            <div slot="footer">
+              <el-button :disabled="isCreatingMembership" @click="cancelAddFile()" plain size="small">Cancel</el-button>
+            </div>
+          </el-dialog>
+
+          <el-dialog :show-close="false" :visible="isAddingMembership" title="Add existing file to collection" width="600px">
+            <el-form @submit.native.prevent="createMembership()" label-width="150px" size="small">
+              <file-collection-membership-fieldset v-model="membershipForAdd" :errors="errors"></file-collection-membership-fieldset>
+            </el-form>
+
+            <div slot="footer">
+              <el-button :disabled="isCreatingMembership" @click="cancelAddMembership()" plain size="small">Cancel</el-button>
+              <el-button :loading="isCreatingMembership" @click="createMembership()" type="primary" size="small">Save</el-button>
+            </div>
+          </el-dialog>
+
+          <el-dialog :show-close="false" :visible="isEditingMembership" title="Edit file membership" width="600px">
+            <el-form @submit.native.prevent="updateMembership()" label-width="150px" size="small">
+              <file-collection-membership-fieldset v-model="membershipForEdit" :errors="errors"></file-collection-membership-fieldset>
+            </el-form>
+
+            <div slot="footer">
+              <el-button :disabled="isUpdatingMembership" @click="cancelEditMembership()" plain size="small">Cancel</el-button>
+              <el-button :loading="isUpdatingMembership" @click="updateMembership()" type="primary" size="small">Save</el-button>
+            </div>
+          </el-dialog>
+
+          <el-dialog :show-close="false" :visible="isConfirmingDeleteMembership" title="Remove file from collection" width="500px">
+            <p>
+              Are you sure you want to remove this file from the collection?
+              By default the file itself will not be deleted. If you also want
+              to delete the file click on &quot;Remove and delete file&quot;.
+
+              <br/><br/>
+              <b>File deletion cannot be undone.</b>
+            </p>
+
+            <div slot="footer">
+              <el-button :disabled="isDeletingMembership" @click="cancelDeleteMembership()" plain size="small">Cancel</el-button>
+              <el-button :loading="isDeletingMembership" @click="deleteFile()" type="danger" size="small">Remove and delete file</el-button>
+              <el-button :loading="isDeletingMembership" @click="deleteMembership()" plain size="small">Remove</el-button>
+            </div>
+          </el-dialog>
+        </div>
       </div>
 
       <div class="block">
@@ -137,86 +198,27 @@
     <div class="foot text-right">
       <el-button @click="attemptDeleteCollection()" plain size="small">Delete</el-button>
     </div>
+  </div>
 
-    <div class="launchable">
-      <el-dialog :show-close="false" :visible="isAddingFile" title="Add file" width="600px">
-        <p class="text-center">
-          <el-button @click="addMembership()" size="small" type="primary">Add from existing file</el-button>
-        </p>
+  <div slot="launchable" class="launchable">
+    <el-dialog :show-close="false" :visible="isConfirmingDeleteCollection" title="Delete collection" width="500px">
+      <p>
+        Are you sure you want to delete this file collection?
+        All files inside the collection will also be deleted.
+        If you want to keep certain files, remove them from this collection
+        before deletion.
+        <br/><br/>
+        File deletion will run in the background and may take some time to finish.
 
-        <div class="divider-text">
-          <span class="text">Or</span>
-        </div>
+        <br/><br/>
+        <b>This action cannot be undone.</b>
+      </p>
 
-        <p class="text-center">
-          <router-link :to="{ name: 'NewFile', query: { callbackPath: currentRoutePath, collection: { id: fileCollection.id, name: fileCollection.name, code: fileCollection.code } } }" class="el-button el-button--small el-button--primary">
-            Upload new files
-          </router-link>
-        </p>
-
-        <div slot="footer">
-          <el-button :disabled="isCreatingMembership" @click="cancelAddFile()" plain size="small">Cancel</el-button>
-        </div>
-      </el-dialog>
-
-      <el-dialog :show-close="false" :visible="isAddingMembership" title="Add existing file to collection" width="600px">
-        <el-form @submit.native.prevent="createMembership()" label-width="150px" size="small">
-          <file-collection-membership-fieldset v-model="membershipForAdd" :errors="errors"></file-collection-membership-fieldset>
-        </el-form>
-
-        <div slot="footer">
-          <el-button :disabled="isCreatingMembership" @click="cancelAddMembership()" plain size="small">Cancel</el-button>
-          <el-button :loading="isCreatingMembership" @click="createMembership()" type="primary" size="small">Save</el-button>
-        </div>
-      </el-dialog>
-
-      <el-dialog :show-close="false" :visible="isEditingMembership" title="Edit file membership" width="600px">
-        <el-form @submit.native.prevent="updateMembership()" label-width="150px" size="small">
-          <file-collection-membership-fieldset v-model="membershipForEdit" :errors="errors"></file-collection-membership-fieldset>
-        </el-form>
-
-        <div slot="footer">
-          <el-button :disabled="isUpdatingMembership" @click="cancelEditMembership()" plain size="small">Cancel</el-button>
-          <el-button :loading="isUpdatingMembership" @click="updateMembership()" type="primary" size="small">Save</el-button>
-        </div>
-      </el-dialog>
-
-      <el-dialog :show-close="false" :visible="isConfirmingDeleteMembership" title="Remove file from collection" width="500px">
-        <p>
-          Are you sure you want to remove this file from the collection?
-          By default the file itself will not be deleted. If you also want
-          to delete the file click on &quot;Remove and delete file&quot;.
-
-          <br/><br/>
-          <b>File deletion cannot be undone.</b>
-        </p>
-
-        <div slot="footer">
-          <el-button :disabled="isDeletingMembership" @click="cancelDeleteMembership()" plain size="small">Cancel</el-button>
-          <el-button :loading="isDeletingMembership" @click="deleteFile()" type="danger" size="small">Remove and delete file</el-button>
-          <el-button :loading="isDeletingMembership" @click="deleteMembership()" plain size="small">Remove</el-button>
-        </div>
-      </el-dialog>
-
-      <el-dialog :show-close="false" :visible="isConfirmingDeleteCollection" title="Delete collection" width="500px">
-        <p>
-          Are you sure you want to delete this file collection?
-          All files inside the collection will also be deleted.
-          If you want to keep certain files, remove them from this collection
-          before deletion.
-          <br/><br/>
-          File deletion will run in the background and may take some time to finish.
-
-          <br/><br/>
-          <b>This action cannot be undone.</b>
-        </p>
-
-        <div slot="footer">
-          <el-button :disabled="isDeletingCollection" @click="cancelDeleteCollection()" plain size="small">Cancel</el-button>
-          <el-button :loading="isDeletingCollection" @click="deleteCollection()" type="danger" size="small">Delete</el-button>
-        </div>
-      </el-dialog>
-    </div>
+      <div slot="footer">
+        <el-button :disabled="isDeletingCollection" @click="cancelDeleteCollection()" plain size="small">Cancel</el-button>
+        <el-button :loading="isDeletingCollection" @click="deleteCollection()" type="danger" size="small">Delete</el-button>
+      </div>
+    </el-dialog>
   </div>
 </content-container>
 </template>
@@ -383,8 +385,6 @@ export default {
       return freshcom.deleteFileCollectionMembership(this.membershipForDelete.id).then(() => {
         return this.loadFileCollection()
       }).then(() => {
-        this.cancelDeleteMembership()
-        this.isDeletingMembership = false
         this.membershipForDelete = {}
 
         this.$message({
@@ -392,6 +392,9 @@ export default {
           message: `File removed from collection successfully.`,
           type: 'success'
         })
+
+        this.isDeletingMembership = false
+        this.cancelDeleteMembership()
       }).catch(() => {
         this.isDeletingMembership = false
       })

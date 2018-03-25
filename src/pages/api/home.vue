@@ -6,7 +6,7 @@
 
   <div slot="card-content">
     <div class="data">
-      <div class="block">
+      <div class="block detail">
         <div class="header">
           <h2>Detail</h2>
         </div>
@@ -75,7 +75,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-dl dt {
+.detail dl dt {
   width: 200px;
 }
 </style>

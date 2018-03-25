@@ -108,28 +108,28 @@
     <div class="foot text-right">
       <el-button @click="attemptDeleteDepositable()" plain size="small">Delete</el-button>
     </div>
+  </div>
 
-    <div class="launchable">
-      <el-dialog :show-close="false" :visible="isConfirmingDeleteDepositable" title="Delete depositable" width="500px">
-        <p>
-          Are you sure you want to delete this depositable? If you delete this depositable,
-          all of the following related resources if any will also be deleted:
+  <div slot="launchable" class="launchable">
+    <el-dialog :show-close="false" :visible="isConfirmingDeleteDepositable" title="Delete depositable" width="500px">
+      <p>
+        Are you sure you want to delete this depositable? If you delete this depositable,
+        all of the following related resources if any will also be deleted:
 
-          <ul>
-            <li>All products that contain this depositable</li>
-            <li>All file collections that are owned by this depositable and all files inside those collection</li>
-            <li>File that is the avatar of this depositable</li>
-          </ul>
+        <ul>
+          <li>All products that contain this depositable</li>
+          <li>All file collections that are owned by this depositable and all files inside those collection</li>
+          <li>File that is the avatar of this depositable</li>
+        </ul>
 
-          <b>This action cannot be undone.</b>
-        </p>
+        <b>This action cannot be undone.</b>
+      </p>
 
-        <div slot="footer">
-          <el-button :disabled="isDeletingDepositable" @click="cancelDeleteDepositable()" plain size="small">Cancel</el-button>
-          <el-button :loading="isDeletingDepositable" @click="deleteDepositable()" type="danger" size="small">Delete</el-button>
-        </div>
-      </el-dialog>
-    </div>
+      <div slot="footer">
+        <el-button :disabled="isDeletingDepositable" @click="cancelDeleteDepositable()" plain size="small">Cancel</el-button>
+        <el-button :loading="isDeletingDepositable" @click="deleteDepositable()" type="danger" size="small">Delete</el-button>
+      </div>
+    </el-dialog>
   </div>
 </content-container>
 </template>

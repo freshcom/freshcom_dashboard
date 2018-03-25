@@ -203,6 +203,32 @@
             </el-table-column>
           </el-table>
         </div>
+
+        <div class="launchable">
+          <el-dialog :show-close="false" :visible="isEditingCard" title="Edit card" width="600px">
+            <el-form @submit.native.prevent="updateCard()" label-width="150px" size="small">
+              <card-fieldset v-model="cardForEdit" :errors="errors"></card-fieldset>
+            </el-form>
+
+            <div slot="footer">
+              <el-button :disabled="isUpdatingCard" @click="cancelEditCard()" plain size="small">Cancel</el-button>
+              <el-button :loading="isUpdatingCard" @click="updateCard()" type="primary" size="small">Save</el-button>
+            </div>
+          </el-dialog>
+
+          <el-dialog :show-close="false" :visible="isConfirmingDeleteCard" title="Delete card" width="500px">
+            <p>
+              Are you sure you want to delete this card?
+              <br/></br>
+              <b>This action cannot be undone.</b>
+            </p>
+
+            <div slot="footer">
+              <el-button :disabled="isDeletingCard" @click="cancelDeleteCard()" plain size="small">Cancel</el-button>
+              <el-button :loading="isDeletingCard" @click="deleteCard()" type="danger" size="small">Delete</el-button>
+            </div>
+          </el-dialog>
+        </div>
       </div>
 
       <div class="block">
@@ -249,6 +275,19 @@
           <div v-if="unlocks.length >= 5" class="foot text-center">
             <router-link :to="{ name: 'ListUnlockable', query: { filter: { unlockedBy: customer.id } } }" class="view-more">View More</router-link>
           </div>
+        </div>
+
+        <div class="launchable">
+          <el-dialog :show-close="false" :visible="isAddingUnlock" title="Add unlock" width="600px">
+            <el-form @submit.native.prevent="createUnlock()" label-width="150px" size="small">
+              <unlock-fieldset v-model="unlockForAdd" :errors="errors"></unlock-fieldset>
+            </el-form>
+
+            <div slot="footer">
+              <el-button :disabled="isCreatingUnlock" @click="cancelAddUnlock()" plain size="small">Cancel</el-button>
+              <el-button :loading="isCreatingUnlock" @click="createUnlock()" type="primary" size="small">Save</el-button>
+            </div>
+          </el-dialog>
         </div>
       </div>
 
@@ -304,6 +343,19 @@
           <div v-if="pointTransactions.length >= 5" class="foot text-center">
             <router-link :to="{ name: 'ListPointTransaction', query: { filter: { accountId: customer.pointAccount.id } } }" class="view-more">View More</router-link>
           </div>
+        </div>
+
+        <div class="launchable">
+          <el-dialog :show-close="false" :visible="isAddingPointTransaction" title="Add point transaction" width="600px">
+            <el-form @submit.native.prevent="createPointTransaction()" label-width="150px" size="small">
+              <point-transaction-fieldset v-model="pointTransactionForAdd" :errors="errors"></point-transaction-fieldset>
+            </el-form>
+
+            <div slot="footer">
+              <el-button :disabled="isCreatingPointTransaction" @click="cancelAddPointTransaction()" plain size="small">Cancel</el-button>
+              <el-button :loading="isCreatingPointTransaction" @click="createPointTransaction()" type="primary" size="small">Save</el-button>
+            </div>
+          </el-dialog>
         </div>
       </div>
 
@@ -401,54 +453,6 @@
       <el-button @click="attemptDeleteCustomer()" plain size="small">
         Delete
       </el-button>
-    </div>
-
-    <div class="launchable">
-      <el-dialog :show-close="false" :visible="isEditingCard" title="Edit card" width="600px">
-        <el-form @submit.native.prevent="updateCard()" label-width="150px" size="small">
-          <card-fieldset v-model="cardForEdit" :errors="errors"></card-fieldset>
-        </el-form>
-
-        <div slot="footer">
-          <el-button :disabled="isUpdatingCard" @click="cancelEditCard()" plain size="small">Cancel</el-button>
-          <el-button :loading="isUpdatingCard" @click="updateCard()" type="primary" size="small">Save</el-button>
-        </div>
-      </el-dialog>
-
-      <el-dialog :show-close="false" :visible="isConfirmingDeleteCard" title="Delete card" width="500px">
-        <p>
-          Are you sure you want to delete this card?
-          <br/></br>
-          <b>This action cannot be undone.</b>
-        </p>
-
-        <div slot="footer">
-          <el-button :disabled="isDeletingCard" @click="cancelDeleteCard()" plain size="small">Cancel</el-button>
-          <el-button :loading="isDeletingCard" @click="deleteCard()" type="danger" size="small">Delete</el-button>
-        </div>
-      </el-dialog>
-
-      <el-dialog :show-close="false" :visible="isAddingUnlock" title="Add unlock" width="600px">
-        <el-form @submit.native.prevent="createUnlock()" label-width="150px" size="small">
-          <unlock-fieldset v-model="unlockForAdd" :errors="errors"></unlock-fieldset>
-        </el-form>
-
-        <div slot="footer">
-          <el-button :disabled="isCreatingUnlock" @click="cancelAddUnlock()" plain size="small">Cancel</el-button>
-          <el-button :loading="isCreatingUnlock" @click="createUnlock()" type="primary" size="small">Save</el-button>
-        </div>
-      </el-dialog>
-
-      <el-dialog :show-close="false" :visible="isAddingPointTransaction" title="Add point transaction" width="600px">
-        <el-form @submit.native.prevent="createPointTransaction()" label-width="150px" size="small">
-          <point-transaction-fieldset v-model="pointTransactionForAdd" :errors="errors"></point-transaction-fieldset>
-        </el-form>
-
-        <div slot="footer">
-          <el-button :disabled="isCreatingPointTransaction" @click="cancelAddPointTransaction()" plain size="small">Cancel</el-button>
-          <el-button :loading="isCreatingPointTransaction" @click="createPointTransaction()" type="primary" size="small">Save</el-button>
-        </div>
-      </el-dialog>
     </div>
   </div>
 </content-container>

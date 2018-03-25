@@ -5,7 +5,7 @@ export default {
       type: 'ProductCollectionMembership',
 
       sortIndex: 0,
-      product: null
+      product: {}
     }
   }
 }

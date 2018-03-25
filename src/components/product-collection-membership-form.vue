@@ -14,7 +14,6 @@
   <el-form-item label="Sort Index" :error="errorMsgs.sortIndex" required>
     <el-input-number @change="updateValue" v-model="formModel.sortIndex" :min="0" :step="100"></el-input-number>
   </el-form-item>
-
 </el-form>
 </template>
 

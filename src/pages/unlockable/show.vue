@@ -105,30 +105,30 @@
     <div class="foot text-right">
       <el-button @click="attemptDeleteUnlockable()" plain size="small">Delete</el-button>
     </div>
+  </div>
 
-    <div class="launchable">
-      <el-dialog :show-close="false" :visible="isConfirmingDeleteUnlockable" title="Delete unlockable" width="500px">
-        <p>
-          Are you sure you want to delete this unlockable? If you delete this unlockable,
-          all of the following related resources if any will also be deleted:
+  <div slot="launchable" class="launchable">
+    <el-dialog :show-close="false" :visible="isConfirmingDeleteUnlockable" title="Delete unlockable" width="500px">
+      <p>
+        Are you sure you want to delete this unlockable? If you delete this unlockable,
+        all of the following related resources if any will also be deleted:
 
-          <ul>
-            <li>All unlocks that are associated with this unlockable</li>
-            <li>All products that contain this unlockable</li>
-            <li>All file collections that are owned by this unlockable and all files inside those collection</li>
-            <li>File that is the avatar of this unlockable</li>
-            <li>Any file associated with this unlockable</li>
-          </ul>
+        <ul>
+          <li>All unlocks that are associated with this unlockable</li>
+          <li>All products that contain this unlockable</li>
+          <li>All file collections that are owned by this unlockable and all files inside those collection</li>
+          <li>File that is the avatar of this unlockable</li>
+          <li>Any file associated with this unlockable</li>
+        </ul>
 
-          <b>This action cannot be undone.</b>
-        </p>
+        <b>This action cannot be undone.</b>
+      </p>
 
-        <div slot="footer">
-          <el-button :disabled="isDeletingUnlockable" @click="cancelDeleteUnlockable()" plain size="small">Cancel</el-button>
-          <el-button :loading="isDeletingUnlockable" @click="deleteUnlockable()" type="danger" size="small">Delete</el-button>
-        </div>
-      </el-dialog>
-    </div>
+      <div slot="footer">
+        <el-button :disabled="isDeletingUnlockable" @click="cancelDeleteUnlockable()" plain size="small">Cancel</el-button>
+        <el-button :loading="isDeletingUnlockable" @click="deleteUnlockable()" type="danger" size="small">Delete</el-button>
+      </div>
+    </el-dialog>
   </div>
 </content-container>
 </template>
