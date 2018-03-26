@@ -308,7 +308,6 @@
               <template slot-scope="scope">
                 <a href="javascript:;" class="primary">
                   <span v-if="scope.row.amount >= 0">+</span>
-                  <span v-else="scope.row.amount >= 0">-</span>
                   <span>{{scope.row.amount}}</span>
                 </a>
               </template>
@@ -348,6 +347,7 @@
         <div class="launchable">
           <el-dialog :show-close="false" :visible="isAddingPointTransaction" title="Add point transaction" width="600px">
             <el-form @submit.native.prevent="createPointTransaction()" label-width="150px" size="small">
+              {{pointTransactionForAdd.amount}}
               <point-transaction-fieldset v-model="pointTransactionForAdd" :errors="errors"></point-transaction-fieldset>
             </el-form>
 

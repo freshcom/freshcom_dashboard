@@ -2,7 +2,7 @@
   <div>
     <el-form-item label="Amount" :error="errorMsgs.amount" required>
       <div class="el-input el-input--small">
-        <input :value="formModel.amount" v-money="{ precision: 0, prefix: '' }" @input="amountInputHandler" autocomplete="off" type="text" rows="2" validateevent="true" class="el-input__inner amount">
+        <input :value="formModel.amount" v-money="{ precision: 0, prefix: '' }" @change="handleChange" autocomplete="off" type="text" rows="2" validateevent="true" class="el-input__inner amount">
       </div>
     </el-form-item>
 
@@ -29,9 +29,13 @@ export default {
   name: 'PointTransactionFieldset',
   mixins: [FieldsetMixin],
   methods: {
-    amountInputHandler (e) {
-      this.formModel.amount = Number(e.target.value.replace(/[^0-9.-]/g, ''))
-      this.updateValue()
+    handleChange (e) {
+      let amountValue = Number(e.target.value.replace(/[^0-9.-]/g, ''))
+
+      if (amountValue !== this.formModel.amount) {
+        this.formModel.amount = amountValue
+        this.updateValue()
+      }
     }
   }
 }
