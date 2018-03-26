@@ -1001,6 +1001,7 @@ axiosInstance.interceptors.response.use(undefined, function (error) {
     return sdk.createToken({
       refresh_token: sdk.refreshToken, grant_type: 'refresh_token'
     }).then(token => {
+      sdk.setAccessToken(token.access_token)
       config.headers['Authorization'] = `Bearer ${token.access_token}`
       return axiosInstance(config)
     })

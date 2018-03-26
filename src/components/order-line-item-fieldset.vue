@@ -15,7 +15,7 @@
         <product-select
           v-model="formModel.product"
           :filter="{ status: ['active', 'internal'] }"
-          @input="productChangeHandler"
+          @input="handleProductChange"
           include="prices,defaultPrice"
           size="small">
         </product-select>
@@ -344,7 +344,7 @@ export default {
       this.updateValue(OrderLineItem.balanceByProduct(this.formModel))
     },
 
-    productChangeHandler (product) {
+    handleProductChange (product) {
       if (!product) {
         return this.reset()
       }

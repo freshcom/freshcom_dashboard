@@ -1,44 +1,22 @@
 <template>
-  <div class="component-wrapper unlockable-select">
-    <div v-show="isEditing" class="resource-editor">
-      <remote-select
-        :value="draft"
-        :search-method="searchUnlockable"
-        :record-to-option="unlockableToOption"
-        @change="unlockableChangeHandler($event)"
-        placeholder="Search..."
-      >
-      </remote-select>
-
-      <div v-if="hasExistingValue" class="action-group">
-        <el-button @click="cancelEdit()" plain size="mini">Cancel</el-button>
-      </div>
-    </div>
-    <div v-show="!isEditing" class="resource-block medium">
-      <div class="resource">
-        <p class="primary">
-          <span v-if="value.code">[{{value.code}}]</span>
-          <span>{{value.name}}</span>
-        </p>
-        <p class="secondary">{{value.id}}</p>
-      </div>
-
-      <div v-if="!disabled" class="action-group">
-        <el-button @click="edit()" plain size="mini">Edit</el-button>
-      </div>
-    </div>
-  </div>
+<resource-select
+  :value="value"
+  :disabled="disabled"
+  :search-method="searchUnlockable"
+  :record-to-option="unlockableToOption"
+  @input="handleInput($event)"
+>
+</resource-select>
 </template>
 
 <script>
-import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
-import RemoteSelect from '@/components/remote-select'
+import ResourceSelect from '@/components/resource-select'
 
 export default {
   name: 'UnlockableSelect',
   components: {
-    RemoteSelect
+    ResourceSelect
   },
   props: {
     value: {
@@ -52,35 +30,7 @@ export default {
       default: false
     }
   },
-  data () {
-    return {
-      isEditing: _.isEmpty(this.value),
-      draft: {}
-    }
-  },
-  watch: {
-    value (v) {
-      if (_.isEmpty(v)) {
-        this.isEditing = true
-      } else {
-        this.isEditing = false
-      }
-    }
-  },
-  computed: {
-    hasExistingValue () {
-      return !_.isEmpty(this.value)
-    }
-  },
   methods: {
-    edit () {
-      this.isEditing = true
-    },
-
-    cancelEdit () {
-      this.isEditing = false
-    },
-
     searchUnlockable (keyword) {
       return freshcom.listUnlockable({
         search: keyword
@@ -89,9 +39,8 @@ export default {
       })
     },
 
-    unlockableChangeHandler (unlockable) {
+    handleInput (unlockable) {
       this.$emit('input', unlockable)
-      this.draft = {}
     },
 
     unlockableToOption (unlockable) {
@@ -112,7 +61,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-.editor {
-  display: inline-block;
-}
 </style>

@@ -129,14 +129,24 @@
 
             <el-table-column label="Status" width="100">
               <template slot-scope="scope">
-                <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id } }">
+<!--                 <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id } }">
                   <el-tag v-if="scope.row.status === 'active'" :disable-transitions="true" size="mini">
                     {{$t(`fields.product.status.${scope.row.status}`)}}
                   </el-tag>
                   <el-tag v-else :disable-transitions="true" type="info" size="mini">
                     {{$t(`fields.product.status.${scope.row.status}`)}}
                   </el-tag>
-                </router-link>
+                </router-link> -->
+
+                <hover-button v-if="scope.row.status === 'active'" @click="deactivateChild(scope.row)" type="primary" hover-type="info">
+                  <span slot="normal">{{$t(`fields.product.status.${scope.row.status}`)}}</span>
+                  <span slot="hover">Deactive</span>
+                </hover-button>
+
+                <hover-button v-else @click="activateChild(scope.row)" type="info" hover-type="primary">
+                  <span slot="normal">{{$t(`fields.product.status.${scope.row.status}`)}}</span>
+                  <span slot="hover">Activate</span>
+                </hover-button>
               </template>
             </el-table-column>
 
@@ -651,6 +661,7 @@ import translateErrors from '@/helpers/translate-errors'
 
 import Product from '@/models/product'
 import ConfirmButton from '@/components/confirm-button'
+import HoverButton from '@/components/hover-button'
 import { dollar, chargeDollar } from '@/helpers/filters'
 
 import resourcePageMixinFactory from '@/mixins/resource-page'
@@ -660,7 +671,8 @@ export default {
   name: 'ShowProduct',
   mixins: [ResourcePageMixin],
   components: {
-    ConfirmButton
+    ConfirmButton,
+    HoverButton
   },
   filters: {
     dollar,
@@ -709,6 +721,9 @@ export default {
     }
   },
   methods: {
+    //
+    // MARK: Product
+    //
     loadProduct () {
       this.isLoading = true
 
@@ -743,73 +758,11 @@ export default {
       })
     },
 
-    attemptDeleteChild (child) {
-      this.childForDelete = child
-      this.isConfirmingDeleteChild = true
-    },
-
-    cancelDeleteChild () {
-      this.isConfirmingDeleteChild = false
-    },
-
-    deleteChild () {
-      this.isDeletingChild = true
-
-      freshcom.deleteProduct(this.childForDelete.id).then(() => {
-        return this.loadProduct()
-      }).then(() => {
-        this.$message({
-          showClose: true,
-          message: `Product deleted successfully.`,
-          type: 'success'
-        })
-
-        this.isDeletingChild = false
-        this.cancelDeleteChild()
-      }).catch(() => {
-        this.isDeletingChild = false
-      })
-    },
-
-    editPrice (price) {
-      this.$store.dispatch('pushRoute', {
-        name: 'EditPrice',
-        params: { id: price.id },
-        query: { callbackPath: this.currentRoutePath }
-      })
-    },
-
-    back () {
-      this.$store.dispatch('pushRoute', { name: 'ListProduct' })
-    },
-
+    //
+    // MARK: Child
+    //
     canSetVariantPrimary (variant) {
       return !variant.primary
-    },
-
-    markVariantActive (variant) {
-      let variantDraft = _.cloneDeep(variant)
-      variantDraft.status = 'active'
-
-      freshcom.updateProduct(variantDraft.id, variantDraft).then((response) => {
-        let updatedVariant = response.data
-
-        _.each(this.product.variants, (variant) => {
-          if (variant.id === updatedVariant.id) {
-            variant.status = updatedVariant.status
-          }
-        })
-
-        this.$message({
-          showClose: true,
-          message: 'Product variant updated successfully.',
-          type: 'success'
-        })
-      }).catch(errors => {
-        let translatedErrors = translateErrors(errors, 'product')
-        this.$alert(translatedErrors.status, 'Error')
-        throw errors
-      })
     },
 
     setVariantPrimary (variant) {
@@ -839,6 +792,71 @@ export default {
       })
     },
 
+    activateChild (child) {
+      let childDraft = _.cloneDeep(child)
+      childDraft.status = 'active'
+
+      freshcom.updateProduct(childDraft.id, childDraft).then((response) => {
+        let updatedChild = response.data
+
+        _.each(this.product.childs, (child) => {
+          if (child.id === updatedChild.id) {
+            child.status = updatedChild.status
+          }
+        })
+
+        let childKind = this.$t(`fields.product.kind.${child.kind}`)
+        this.$message({
+          showClose: true,
+          message: `${childKind} activated successfully.`,
+          type: 'success'
+        })
+      }).catch(response => {
+        let translatedErrors = translateErrors(response.errors, 'product')
+        this.$alert(translatedErrors.status, 'Error')
+        throw response.errors
+      })
+    },
+
+    attemptDeleteChild (child) {
+      this.childForDelete = child
+      this.isConfirmingDeleteChild = true
+    },
+
+    cancelDeleteChild () {
+      this.isConfirmingDeleteChild = false
+    },
+
+    deleteChild () {
+      this.isDeletingChild = true
+
+      freshcom.deleteProduct(this.childForDelete.id).then(() => {
+        return this.loadProduct()
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Product deleted successfully.`,
+          type: 'success'
+        })
+
+        this.isDeletingChild = false
+        this.cancelDeleteChild()
+      }).catch(() => {
+        this.isDeletingChild = false
+      })
+    },
+
+    //
+    // MARK: Price
+    //
+    editPrice (price) {
+      this.$store.dispatch('pushRoute', {
+        name: 'EditPrice',
+        params: { id: price.id },
+        query: { callbackPath: this.currentRoutePath }
+      })
+    },
+
     markPriceActive (price) {
       let priceDraft = _.cloneDeep(price)
       priceDraft.status = 'active'
@@ -862,6 +880,10 @@ export default {
         this.$alert(translatedErrors.status, 'Error')
         throw errors
       })
+    },
+
+    defaultBack () {
+      this.$store.dispatch('pushRoute', { name: 'ListProduct' })
     }
   }
 }

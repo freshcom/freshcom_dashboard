@@ -1,7 +1,7 @@
 <template>
 <div class="component-wrapper unlock-fieldset">
   <el-form-item label="Unlockable" :error="errorMsgs.unlockable" required>
-    <unlockable-select v-model="formModel.unlockable" :disabled="!!formModel.id" @input="updateValue"></unlockable-select>
+    <unlockable-select v-model="formModel.unlockable" :disabled="!!formModel.id" @input="updateValue()"></unlockable-select>
   </el-form-item>
 
   <el-form-item label="Sort Index" :error="errorMsgs.sortIndex" required>
