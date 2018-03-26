@@ -194,7 +194,6 @@ input::-webkit-inner-spin-button {
 
   .action-group {
     text-align: right;
-    display: inline-block;
 
     .el-button {
       padding: 5px 10px;

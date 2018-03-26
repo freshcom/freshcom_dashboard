@@ -210,7 +210,7 @@
         <ul>
           <li>All product variants or items associated with the product</li>
           <li>All prices that are associated with the product, its variants or its items</li>
-          <li>All file collections that are owned by the product</li>
+          <li>All file collections that are owned by the product and all files inside those collections</li>
           <li>File that is the avatar of the product</li>
         </ul>
 

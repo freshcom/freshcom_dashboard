@@ -87,7 +87,7 @@
         </div>
       </div>
 
-      <div v-if="productHasChildren" class="block">
+      <div v-if="canViewChildren" class="block">
         <div v-if="product.kind === 'withVariants'" class="header">
           <h2>Variants</h2>
 
@@ -111,18 +111,19 @@
           <el-table :data="product.variants" :show-header="false" class="data-table block-table">
             <el-table-column label="Name" width="240">
               <template slot-scope="scope">
-                <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id } }" class="primary">
+                <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id } }" class="primary" style="display: inline;">
                   <span>{{scope.row.name}}</span>
 
                   <el-tag v-if="scope.row.primary" size="mini" class="m-l-10">
                     Primary
                   </el-tag>
-                  <p v-if="canMarkVariantPrimary(scope.row)" class="action-group">
-                    <el-button @click="markVariantPrimary(scope.row)" plain size="mini" class="m-l-10">
-                      Set Primary
-                    </el-button>
-                  </p>
                 </router-link>
+
+                <p v-if="canSetVariantPrimary(scope.row)" class="action-group" style="display: inline;">
+                  <el-button @click="setVariantPrimary(scope.row)" plain size="mini" class="m-l-10">
+                    Set Primary
+                  </el-button>
+                </p>
               </template>
             </el-table-column>
 
@@ -157,7 +158,85 @@
               <template slot-scope="scope">
                 <p class="action-group">
                   <el-button-group>
-                    <el-button @click="editProduct(scope.row)" plain size="mini">
+                    <router-link :to="{ name: 'EditProduct', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
+                      Edit
+                    </router-link>
+                    <el-button @click="attemptDeleteChild(scope.row)" plain size="mini">
+                      Delete
+                    </el-button>
+                  </el-button-group>
+                </p>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+
+        <div class="launchable">
+          <el-dialog :show-close="false" :visible="isConfirmingDeleteChild" :title="`Delete ${childKindForDelete}`" width="600px">
+            <p>
+              Are you sure you want to delete this {{childKindForDelete}}?
+              If you delete this {{childKindForDelete}}, all of the following
+              related resources if any will also be deleted:
+
+              <ul>
+                <li>All prices that are associated with this {{childKindForDelete}}</li>
+                <li>All file collections that are owned by this {{childKindForDelete}} and all files inside those collections</li>
+                <li>File that is the avatar of this {{childKindForDelete}}</li>
+              </ul>
+
+              <b>This action cannot be undone.</b>
+            </p>
+
+            <div slot="footer">
+              <el-button :disabled="isDeletingChild" @click="cancelDeleteChild()" plain size="small">Cancel</el-button>
+              <el-button :loading="isDeletingChild" @click="deleteChild()" type="danger" size="small">Delete</el-button>
+            </div>
+          </el-dialog>
+        </div>
+      </div>
+
+      <div v-if="canViewPrice" class="block">
+        <div class="header">
+          <h2>Prices</h2>
+
+          <div class="action-group">
+            <router-link :to="{ name: 'NewPrice', query: { productId: product.id, productKind: 'item', callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
+              Add
+            </router-link>
+          </div>
+        </div>
+
+        <div class="body full">
+          <el-table :data="product.prices" class="data-table block-table" :show-header="false">
+            <el-table-column width="240">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowPrice', params: { id: scope.row.id } }" class="primary">
+                  <span>{{scope.row.name}}</span>
+                </router-link>
+              </template>
+            </el-table-column>
+
+            <el-table-column width="120">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowPrice', params: { id: scope.row.id } }">
+                  <span>{{scope.row.minimumOrderQuantity}} or more</span>
+                </router-link>
+              </template>
+            </el-table-column>
+
+            <el-table-column align="right">
+              <template slot-scope="scope">
+                <router-link :to="{ name: 'ShowPrice', params: { id: scope.row.id } }">
+                  <span>{{scope.row.chargeAmountCents | dollar}}/{{scope.row.chargeUnit}}</span>
+                </router-link>
+              </template>
+            </el-table-column>
+
+            <el-table-column align="right" width="130">
+              <template slot-scope="scope">
+                <p class="action-group">
+                  <el-button-group>
+                    <el-button plain size="mini">
                       Edit
                     </el-button>
                     <el-button plain size="mini">
@@ -168,6 +247,31 @@
               </template>
             </el-table-column>
           </el-table>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Custom Data</h2>
+        </div>
+        <div class="body">
+          {{product.customData}}
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Related Resources</h2>
+        </div>
+        <div class="body">
+          <dl>
+            <dt v-if="product.avatar">Avatar</dt>
+            <dd v-if="product.avatar">
+              <router-link :to="{ name: 'ShowFile', params: { id: product.avatar.id }}">
+               {{product.avatar.id}}
+              </router-link>
+            </dd>
+          </dl>
         </div>
       </div>
     </div>
@@ -356,7 +460,7 @@
                         Mark Active
                       </el-button>
 
-                      <el-button v-if="canMarkVariantPrimary(scope.row)" @click="markVariantPrimary(scope.row)" plain size="mini">
+                      <el-button v-if="canSetVariantPrimary(scope.row)" @click="setVariantPrimary(scope.row)" plain size="mini">
                         Mark Primary
                       </el-button>
 
@@ -378,7 +482,7 @@
 
         <div class="clearfix"></div>
 
-        <template v-if="canHavePrice(product)">
+        <template v-if="canViewPrice(product)">
           <div class="block-title">
             <h3>Prices</h3>
 
@@ -547,7 +651,7 @@ import translateErrors from '@/helpers/translate-errors'
 
 import Product from '@/models/product'
 import ConfirmButton from '@/components/confirm-button'
-import { chargeDollar } from '@/helpers/filters'
+import { dollar, chargeDollar } from '@/helpers/filters'
 
 import resourcePageMixinFactory from '@/mixins/resource-page'
 let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadProduct' })
@@ -559,6 +663,7 @@ export default {
     ConfirmButton
   },
   filters: {
+    dollar,
     chargeDollar
   },
   props: {
@@ -570,7 +675,11 @@ export default {
   data () {
     return {
       product: Product.objectWithDefaults(),
-      isLoading: false
+      isLoading: false,
+
+      childForDelete: {},
+      isConfirmingDeleteChild: false,
+      isDeletingChild: false
     }
   },
   watch: {
@@ -587,8 +696,16 @@ export default {
       return 'https://placehold.it/80x80'
     },
 
-    productHasChildren () {
+    canViewChildren () {
       return this.product.kind === 'withVariants' || this.product.kind === 'combo'
+    },
+
+    canViewPrice () {
+      return this.product.kind !== 'withVariants'
+    },
+
+    childKindForDelete () {
+      return this.$t(`fields.product.kind.${this.childForDelete.kind}`).toLowerCase()
     }
   },
   methods: {
@@ -626,6 +743,34 @@ export default {
       })
     },
 
+    attemptDeleteChild (child) {
+      this.childForDelete = child
+      this.isConfirmingDeleteChild = true
+    },
+
+    cancelDeleteChild () {
+      this.isConfirmingDeleteChild = false
+    },
+
+    deleteChild () {
+      this.isDeletingChild = true
+
+      freshcom.deleteProduct(this.childForDelete.id).then(() => {
+        return this.loadProduct()
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Product deleted successfully.`,
+          type: 'success'
+        })
+
+        this.isDeletingChild = false
+        this.cancelDeleteChild()
+      }).catch(() => {
+        this.isDeletingChild = false
+      })
+    },
+
     editPrice (price) {
       this.$store.dispatch('pushRoute', {
         name: 'EditPrice',
@@ -638,12 +783,8 @@ export default {
       this.$store.dispatch('pushRoute', { name: 'ListProduct' })
     },
 
-    canMarkVariantPrimary (product) {
-      return this.product.kind === 'withVariants' && !product.primary
-    },
-
-    canHavePrice (product) {
-      return product.kind !== 'withVariants'
+    canSetVariantPrimary (variant) {
+      return !variant.primary
     },
 
     markVariantActive (variant) {
@@ -671,7 +812,7 @@ export default {
       })
     },
 
-    markVariantPrimary (variant) {
+    setVariantPrimary (variant) {
       let variantDraft = _.cloneDeep(variant)
       variantDraft.primary = true
 
@@ -688,7 +829,7 @@ export default {
 
         this.$message({
           showClose: true,
-          message: 'Product variant marked as primary successfully.',
+          message: 'Variant marked as primary successfully.',
           type: 'success'
         })
       }).catch(errors => {

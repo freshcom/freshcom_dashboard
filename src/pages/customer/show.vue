@@ -507,6 +507,8 @@ export default {
       cardForEdit: {},
       isEditingCard: false,
       isUpdatingCard: false,
+
+      cardForDelete: {},
       isConfirmingDeleteCard: false,
       isDeletingCard: false,
 
@@ -644,14 +646,14 @@ export default {
       freshcom.deleteCard(this.cardForDelete.id).then(() => {
         return this.loadCards()
       }).then(() => {
-        this.cancelDeleteCard()
-        this.isDeletingCard = false
-
         this.$message({
           showClose: true,
           message: `Card deleted successfully.`,
           type: 'success'
         })
+
+        this.isDeletingCard = false
+        this.cancelDeleteCard()
       }).catch(() => {
         this.isDeletingCard = false
       })
