@@ -377,18 +377,23 @@ input::-webkit-inner-spin-button {
   align-items: center;
 
   &.medium .resource {
-    width: 298px;
+    width: 278px;
   }
 
   &.small {
     padding-top: 0px;
     padding-bottom: 0px;
+
+    .resource {
+      width: 180px;
+    }
   }
 
   .resource {
     display: inline-block;
 
     p {
+      white-space: nowrap;
       margin: 0px;
       line-height: 14px;
       text-overflow: ellipsis;
