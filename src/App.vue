@@ -393,6 +393,7 @@ input::-webkit-inner-spin-button {
     display: inline-block;
 
     p {
+      padding: 8px 0;
       white-space: nowrap;
       margin: 0px;
       line-height: 14px;

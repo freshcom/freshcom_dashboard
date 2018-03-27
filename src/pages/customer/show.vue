@@ -143,7 +143,7 @@
         </div>
 
         <div class="body full">
-          <el-table :data="cards" class="data-table block-table" :show-header="false">
+          <el-table :data="customer.cards" class="data-table block-table" :show-header="false">
             <el-table-column width="120">
               <template slot-scope="scope">
                 <a href="javascript:;" class="primary with-icon">
@@ -307,8 +307,7 @@
             <el-table-column width="120">
               <template slot-scope="scope">
                 <a href="javascript:;" class="primary">
-                  <span v-if="scope.row.amount >= 0">+</span>
-                  <span>{{scope.row.amount}}</span>
+                  <span v-if="scope.row.amount >= 0">+</span><span>{{scope.row.amount}}</span>
                 </a>
               </template>
             </el-table-column>
@@ -503,7 +502,6 @@ export default {
       customer: Customer.objectWithDefaults(),
 
       isLoadingCards: false,
-      cards: [],
       cardForEdit: {},
       isEditingCard: false,
       isUpdatingCard: false,
@@ -550,8 +548,7 @@ export default {
           return this.loadPointTransactions()
         }),
         this.loadOrders(),
-        this.loadUnlocks(),
-        this.loadCards()
+        this.loadUnlocks()
       ])
     },
 
@@ -560,7 +557,7 @@ export default {
     //
     loadCustomer () {
       return freshcom.retrieveCustomer(this.id, {
-        include: 'point_account,fileCollections'
+        include: 'point_account,fileCollections,cards'
       }).then(response => {
         this.customer = response.data
       })
@@ -593,14 +590,6 @@ export default {
     //
     // MARK: Card
     //
-    loadCards () {
-      return freshcom.listCard({
-        filter: { ownerId: this.id, ownerType: 'Customer' }
-      }).then(response => {
-        this.cards = response.data
-      })
-    },
-
     editCard (card) {
       this.cardForEdit = _.cloneDeep(card)
       this.errors = {}

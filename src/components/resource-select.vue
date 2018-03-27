@@ -19,9 +19,10 @@
     <div class="resource">
       <p class="primary">
         <span v-if="value.code">[{{value.code}}]</span>
-        <span>{{value.name}}</span>
+        <span v-if="value.name">{{value.name}}</span>
+        <span v-if="!value.name">{{value.id}}</span>
       </p>
-      <p v-if="size !== 'small'" class="secondary">{{value.id}}</p>
+      <p v-if="value.name && size !== 'small'" class="secondary">{{value.id}}</p>
     </div>
 
     <div v-if="!disabled" class="action-group">

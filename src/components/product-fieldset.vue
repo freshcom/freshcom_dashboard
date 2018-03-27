@@ -1,13 +1,15 @@
 <template>
 <div class="component-wrapper product-fieldset">
-  <avatar-input v-model="formModel.avatar" @input="updateValue()"></avatar-input>
+  <div class="el-form-item el-form-item--small">
+    <avatar-input v-model="formModel.avatar" @input="updateValue()"></avatar-input>
+  </div>
 
   <el-form-item label="Code" :error="errorMsgs.code">
-    <el-input v-model="formModel.code"></el-input>
+    <el-input v-model="formModel.code" @input="updateValue()"></el-input>
   </el-form-item>
 
   <el-form-item v-if="formModel.id" label="Status" :error="errorMsgs.status" required>
-    <el-select @change="updateValue" v-model="formModel.status">
+    <el-select v-model="formModel.status" @change="updateValue()">
       <el-option label="Draft" value="draft"></el-option>
       <el-option label="Active" value="active"></el-option>
       <el-option label="Internal" value="internal"></el-option>
@@ -16,7 +18,7 @@
   </el-form-item>
 
   <el-form-item :error="errorMsgs.kind" label="Kind" required>
-    <el-select v-model="formModel.kind" :disabled="!canSelectKind(formModel)" @change="updateValue">
+    <el-select v-model="formModel.kind" :disabled="!canSelectKind" @change="updateValue()">
       <el-option label="Simple" value="simple"></el-option>
       <el-option label="With Variants" value="withVariants"></el-option>
       <el-option label="Combo" value="combo"></el-option>
@@ -26,79 +28,48 @@
   </el-form-item>
 
   <template v-if="formModel.kind === 'simple' || formModel.kind === 'item' || formModel.kind === 'variant'">
-    <el-form-item :error="errorMsgs.source" label="Source" required>
+    <el-form-item :error="errorMsgs.goods" label="Goods" required>
       <el-row>
-        <el-col :span="6">
-          <el-select v-model="sourceType" @change="clearSource()">
+        <el-col :span="8">
+          <el-select v-model="goodsType" :disabled="!!formModel.id" @change="clearGoods()">
             <el-option label="Stockable" value="Stockable"></el-option>
             <el-option label="Unlockable" value="Unlockable"></el-option>
             <el-option label="Depositable" value="Depositable"></el-option>
           </el-select>
         </el-col>
 
-        <el-col v-if="sourceType === 'Stockable'" :span="18">
-          <div class="source-select-wrapper">
-            <remote-select
-              :value="formModel.source"
-              :search-method="searchStockable"
-              @change="handleSourceChange"
-              no-data-text="No matching Stockable"
-              placeholder="Type to search for Stockable..."
-              class="source-select"
-            >
-            </remote-select>
-          </div>
+        <el-col v-if="goodsType === 'Stockable'" :span="16">
         </el-col>
 
-        <el-col v-if="sourceType === 'Unlockable'" :span="18">
-          <div class="source-select-wrapper">
-            <remote-select
-              :value="formModel.source"
-              :search-method="searchUnlockable"
-              @change="handleSourceChange"
-              no-data-text="No matching unlockable"
-              placeholder="Type to search for unlockable..."
-              class="source-select"
-            >
-            </remote-select>
-          </div>
+        <el-col v-if="goodsType === 'Unlockable'" :span="16">
+          <unlockable-select v-model="formModel.goods" :disabled="!!formModel.id" @input="updateValue()" size="small" class="goods-select"></unlockable-select>
         </el-col>
 
-        <el-col v-if="sourceType === 'Depositable'" :span="18">
-          <div class="source-select-wrapper">
-            <remote-select
-              :value="formModel.source"
-              :search-method="searchDepositable"
-              @change="handleSourceChange"
-              no-data-text="No matching depositable"
-              placeholder="Type to search for depositable..."
-              class="source-select"
-            >
-            </remote-select>
-          </div>
+        <el-col v-if="goodsType === 'Depositable'" :span="16">
+          <depositable-select v-model="formModel.goods" :disabled="!!formModel.id" @input="updateValue()" size="small" class="goods-select"></depositable-select>
         </el-col>
       </el-row>
     </el-form-item>
 
-    <el-form-item label="Source Quantity" :error="errorMsgs.sourceQuantity" required>
-      <el-input-number @change="updateValue" v-model="formModel.sourceQuantity" :min="1" :step="1"></el-input-number>
+    <el-form-item label="Goods Quantity" :error="errorMsgs.goodsQuantity" required>
+      <el-input-number v-model="formModel.goodsQuantity" @change="updateValue()" :min="1" :step="1"></el-input-number>
     </el-form-item>
 
     <el-form-item label="Name Sync" required>
-      <el-radio-group @change="updateValue" v-model="formModel.nameSync">
+      <el-radio-group v-model="formModel.nameSync" @change="updateValue()">
         <el-radio label="disabled">Disabled</el-radio>
-        <el-radio label="syncWithGoods">Sync with Source</el-radio>
+        <el-radio label="syncWithGoods">Sync with Goods</el-radio>
       </el-radio-group>
     </el-form-item>
 
   </template>
 
   <el-form-item v-if="formModel.nameSync == 'disabled'" label="Name" :error="errorMsgs.name" required>
-    <el-input v-model="formModel.name"></el-input>
+    <el-input v-model="formModel.name" @input="updateValue()"></el-input>
   </el-form-item>
 
   <el-form-item v-if="formModel.kind === 'simple' || formModel.kind === 'combo' || formModel.kind === 'variant'" label="Maximum PO Quantity" :error="errorMsgs.maximumPublicOrderQuantity" required>
-    <el-input-number @change="updateValue" v-model="formModel.maximumPublicOrderQuantity" :min="1" :step="1"></el-input-number>
+    <el-input-number v-model="formModel.maximumPublicOrderQuantity" :min="1" :step="1" @change="updateValue()"></el-input-number>
   </el-form-item>
 
   <el-form-item :error="errorMsgs.autoFulfill" label="Auto Fulfill" required>
@@ -106,38 +77,33 @@
       v-model="formModel.autoFulfill"
       active-text="Yes"
       inactive-text="No"
-      @change="updateValue"
+      @change="updateValue()"
     >
     </el-switch>
   </el-form-item>
 
   <el-form-item v-if="formModel.kind === 'item' || formModel.kind === 'variant'" label="Sort Index" :error="errorMsgs.sortIndex" required>
-    <el-input-number @change="updateValue" v-model="formModel.sortIndex" :min="0" :step="100"></el-input-number>
+    <el-input-number v-model="formModel.sortIndex" :min="0" :step="100" @change="updateValue()"></el-input-number>
   </el-form-item>
 
   <el-form-item v-if="formModel.itemMode == 'all'" label="Print Name" :error="errorMsgs.printName" required>
-    <el-input v-model="formModel.printName"></el-input>
+    <el-input v-model="formModel.printName" @input="updateValue()"></el-input>
   </el-form-item>
 
   <el-form-item label="Caption">
-    <el-input v-model="formModel.caption"></el-input>
+    <el-input v-model="formModel.caption" @input="updateValue()"></el-input>
   </el-form-item>
 
   <el-form-item label="Description">
-    <el-input type="textarea" v-model="formModel.description"></el-input>
+    <el-input v-model="formModel.description" @input="updateValue()" type="textarea"></el-input>
   </el-form-item>
 </div>
 </template>
 
 <script>
-import _ from 'lodash'
-import freshcom from '@/freshcom-sdk'
-
 import AvatarInput from '@/components/avatar-input'
 import UnlockableSelect from '@/components/unlockable-select'
-
-
-import Unlockable from '@/components/avatar-input'
+import DepositableSelect from '@/components/depositable-select'
 
 import fieldsetMixinFactory from '@/mixins/fieldset'
 let FieldsetMixin = fieldsetMixinFactory({ errorI18nKey: 'product' })
@@ -146,113 +112,36 @@ export default {
   name: 'ProductFieldset',
   mixins: [FieldsetMixin],
   components: {
-    AvatarInput
+    AvatarInput,
+    UnlockableSelect,
+    DepositableSelect
   },
-  props: ['value', 'errors', 'record'],
   data () {
     return {
-      formModel: _.cloneDeep(this.value),
-      sourceType: 'Stockable',
-      isUploadingAvatar: false
+      goodsType: 'Unlockable'
     }
   },
   computed: {
-    isLoadingSelectableStockables () {
-      return this.$store.state.product.isLoadingSelectableStockables
-    },
-    selectableStockables () {
-      return this.$store.state.product.selectableStockables
-    },
-    isLoadingSelectableUnlockables () {
-      return this.$store.state.product.isLoadingSelectableUnlockables
-    },
-    selectableUnlockables () {
-      return this.$store.state.product.selectableUnlockables
-    },
-    errorMsgs () {
-      return translateErrors(this.errors, 'product')
-    },
-    avatarUrl () {
-      if (!this.formModel.avatar) {
-        return
-      }
-
-      if (this.formModel.avatar.status === 'uploaded') {
-        return this.formModel.avatar.url
-      }
-
-      return URL.createObjectURL(this.formModel.avatar.file)
-    }
-  },
-  watch: {
-    value (v) {
-      this.formModel = _.cloneDeep(v)
-    }
-  },
-  methods: {
-    updateValue: _.debounce(function () {
-      this.$emit('input', this.formModel)
-    }, 300),
-    searchStockable (keyword) {
-      return freshcom.listStockable({
-        search: keyword
-      }).then(response => {
-        return response.data
-      })
-    },
-    searchUnlockable (keyword) {
-      return freshcom.listUnlockable({
-        search: keyword
-      }).then(response => {
-        return response.data
-      })
-    },
-    searchDepositable (keyword) {
-      return freshcom.listDepositable({
-        search: keyword
-      }).then(response => {
-        return response.data
-      })
-    },
-    uploadAvatar (e) {
-      let file = e.file
-      let fFile = { type: 'File', name: file.name, sizeBytes: file.size, contentType: file.type, file: file }
-
-      freshcom.uploadFile(fFile, {}, {
-        created: (response) => {
-          this.formModel.avatar = _.merge({}, response.data, { percentage: 0, file: file })
-          this.isUploadingAvatar = true
-        },
-        progress: _.throttle((percentage) => {
-          this.formModel.avatar.percentage = percentage
-        }, 300)
-      }).then(response => {
-        let fFile = response.data
-        this.formModel.avatar = fFile
-        this.updateValue()
-        this.isUploadingAvatar = false
-      }).catch(() => {
-        this.isUploadingAvatar = false
-      })
-    },
-    canSelectKind (formModel) {
-      if (formModel.id || formModel.kind === 'item' || formModel.kind === 'variant') {
+    canSelectKind () {
+      if (this.formModel.id || this.formModel.kind === 'item' || this.formModel.kind === 'variant') {
         return false
       }
 
       return true
-    },
-    handleSourceChange (source) {
-      if (source) {
-        this.formModel.goods = source
+    }
+  },
+  methods: {
+    handleGoodsChange (goods) {
+      if (goods) {
+        this.formModel.goods = goods
       } else {
         this.formMode.goods = null
       }
 
       this.$emit('input', this.formModel)
     },
-    clearSource () {
-      this.formModel.source = null
+    clearGoods () {
+      this.formModel.goods = {}
       this.updateValue()
     }
   }
@@ -261,10 +150,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.source-select {
-  width: 100%;
-}
-.source-select-wrapper {
-  padding-left: 10px;
+.goods-select {
+  margin-left: 10px;
 }
 </style>

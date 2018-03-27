@@ -1,5 +1,48 @@
 <template>
-<div class="page-wrapper">
+<content-container @locale-changed="reload" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListProduct' }">Products</router-link>
+    <router-link :to="{ name: 'ListProductCollection' }">Collections</router-link>
+  </div>
+
+  <div slot="card-header">
+    <h1>Edit product</h1>
+
+    <div class="pull-right">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isUpdating" @click="submit()" type="primary" size="small">
+        Save
+      </el-button>
+    </div>
+  </div>
+
+  <div slot="card-content">
+    <div class="data">
+      <el-row>
+        <el-col :span="18" :offset="3">
+          <el-form @submit.native.prevent="submit()" label-width="180px" size="small">
+            <product-fieldset v-model="productDraft" :errors="errors"></product-fieldset>
+          </el-form>
+        </el-col>
+      </el-row>
+    </div>
+
+    <div class="foot">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isUpdating" @click="submit()" type="primary" size="small" class="pull-right">
+        Save
+      </el-button>
+    </div>
+  </div>
+</content-container>
+
+<!-- <div class="page-wrapper">
 
   <div>
     <el-menu :router="true" default-active="/products" mode="horizontal" class="secondary-nav">
@@ -44,42 +87,46 @@
     </el-card>
   </div>
 
-</div>
+</div> -->
 </template>
 
 <script>
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
 import Product from '@/models/product'
-import ProductForm from '@/components/product-form'
+import ProductFieldset from '@/components/product-fieldset'
+
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadProduct' })
 
 export default {
   name: 'EditProduct',
-  mixins: [PageMixin],
+  mixins: [ResourcePageMixin],
   components: {
-    ProductForm
+    ProductFieldset
   },
-  props: ['id'],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  },
   data () {
     return {
       isLoading: false,
       product: Product.objectWithDefaults(),
       productDraft: Product.objectWithDefaults(),
 
-      isUpdatingProduct: false,
+      isUpdating: false,
       errors: {}
     }
-  },
-  created () {
-    this.loadProduct()
   },
   methods: {
     loadProduct () {
       this.isLoading = true
 
-      freshcom.retrieveProduct(this.id, {
+      return freshcom.retrieveProduct(this.id, {
         include: 'avatar'
       }).then(response => {
         this.product = response.data
@@ -93,7 +140,7 @@ export default {
     },
 
     submit () {
-      this.isUpdatingProduct = true
+      this.isUpdating = true
 
       freshcom.updateProduct(
         this.productDraft.id,
@@ -105,16 +152,16 @@ export default {
           type: 'success'
         })
 
-        this.isUpdatingProduct = false
+        this.isUpdating = false
         this.back()
       }).catch(response => {
         this.errors = response.errors
-        this.isUpdatingProduct = false
+        this.isUpdating = false
         throw response
       })
     },
 
-    back () {
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ShowProduct', params: { id: this.product.id } })
     }
   }

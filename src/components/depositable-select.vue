@@ -2,8 +2,8 @@
 <resource-select
   :value="value"
   :disabled="disabled"
-  :search-method="searchUnlockable"
-  :record-to-option="unlockableToOption"
+  :search-method="searchDepositable"
+  :record-to-option="depositableToOption"
   :size="size"
   @input="handleInput($event)"
 >
@@ -15,7 +15,7 @@ import freshcom from '@/freshcom-sdk'
 import ResourceSelect from '@/components/resource-select'
 
 export default {
-  name: 'UnlockableSelect',
+  name: 'DepositableSelect',
   components: {
     ResourceSelect
   },
@@ -36,29 +36,29 @@ export default {
     }
   },
   methods: {
-    searchUnlockable (keyword) {
-      return freshcom.listUnlockable({
+    searchDepositable (keyword) {
+      return freshcom.listDepositable({
         search: keyword
       }).then(response => {
         return response.data
       })
     },
 
-    handleInput (unlockable) {
-      this.$emit('input', unlockable)
+    handleInput (depositable) {
+      this.$emit('input', depositable)
     },
 
-    unlockableToOption (unlockable) {
-      if (!unlockable) {
+    depositableToOption (depositable) {
+      if (!depositable) {
         return { value: undefined }
       }
 
       let info = ''
-      if (unlockable.code) {
-        info += `[${unlockable.code}] `
+      if (depositable.code) {
+        info += `[${depositable.code}] `
       }
-      info += unlockable.name + ' :: ' + unlockable.status
-      return { value: unlockable.id, label: info }
+      info += depositable.name + ' :: ' + depositable.status
+      return { value: depositable.id, label: info }
     }
   }
 }

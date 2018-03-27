@@ -129,21 +129,12 @@
 
             <el-table-column label="Status" width="100">
               <template slot-scope="scope">
-<!--                 <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id } }">
-                  <el-tag v-if="scope.row.status === 'active'" :disable-transitions="true" size="mini">
-                    {{$t(`fields.product.status.${scope.row.status}`)}}
-                  </el-tag>
-                  <el-tag v-else :disable-transitions="true" type="info" size="mini">
-                    {{$t(`fields.product.status.${scope.row.status}`)}}
-                  </el-tag>
-                </router-link> -->
-
-                <hover-button v-if="scope.row.status === 'active'" @click="deactivateChild(scope.row)" type="primary" hover-type="info">
+                <hover-button v-show="scope.row.status === 'active'" @click="deactivateChild(scope.row)" type="primary" hover-type="info">
                   <span slot="normal">{{$t(`fields.product.status.${scope.row.status}`)}}</span>
                   <span slot="hover">Deactive</span>
                 </hover-button>
 
-                <hover-button v-else @click="activateChild(scope.row)" type="info" hover-type="primary">
+                <hover-button v-show="scope.row.status !== 'active'" @click="activateChild(scope.row)" type="info" hover-type="primary">
                   <span slot="normal">{{$t(`fields.product.status.${scope.row.status}`)}}</span>
                   <span slot="hover">Activate</span>
                 </hover-button>
@@ -705,7 +696,7 @@ export default {
         return this.product.avatar.url
       }
 
-      return 'https://placehold.it/80x80'
+      return ''
     },
 
     canViewChildren () {
