@@ -21,6 +21,7 @@ import App from './app'
 import LeftNav from '@/components/left-nav'
 import LocaleSelector from '@/components/locale-selector'
 
+import 'vue-awesome/icons/filter' // Filter
 import 'vue-awesome/icons/sign-in' // Import
 import 'vue-awesome/icons/sign-out' // Export
 import 'vue-awesome/icons/share' // Filter
