@@ -1,5 +1,171 @@
 <template>
-<div class="page-wrapper">
+<content-container>
+  <div slot="header">
+    <router-link :to="{ name: 'NewOrder' }">Orders</router-link>
+  </div>
+
+  <div slot="card-header">
+    <h1>Create an order</h1>
+
+    <div class="pull-right">
+      <el-button v-show="canCancel" @click="cancel" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button v-show="canNext" :loading="isUpdatingOrder" :disabled="order.rootLineItems.length === 0" @click="next()" size="small" type="primary" class="pull-right">
+        Next
+      </el-button>
+
+      <el-button v-show="canBack" @click="back" plain size="small">
+        Back
+      </el-button>
+
+      <el-button v-show="canPlaceOrder" :loading="isCreatingPayment" @click="createPayment()" size="small" type="primary" class="pull-right">
+        Place Order
+      </el-button>
+    </div>
+  </div>
+
+  <div slot="card-content">
+    <div class="steps">
+      <el-steps :active="activeStep" finish-status="success" simple>
+        <el-step title="Line Items"></el-step>
+        <el-step title="Information"></el-step>
+        <el-step title="Payment"></el-step>
+      </el-steps>
+    </div>
+
+    <div class="data">
+      <div v-show="activeStep === this.step.LINE_ITEMS">
+        <div class="block">
+          <el-form @submit.native.prevent="createLineItem()" label-position="top" size="small">
+            <div class="body full">
+              <order-line-item-fieldset v-model="lineItemForAdd" :errors="errors" class="fieldset">
+              </order-line-item-fieldset>
+
+              <div class="foot text-right">
+                <el-button :loading="isCreatingLineItem" native-type="submit" plain size="small">Add to order</el-button>
+              </div>
+            </div>
+          </el-form>
+        </div>
+
+        <div class="block">
+          <div class="body full">
+            <order-line-item-table :records="order.rootLineItems" @delete="deleteLineItem" @edit="eidtLineItem($event)">
+            </order-line-item-table>
+          </div>
+        </div>
+
+        <div class="order-summary">
+          <el-row>
+            <el-col :span="9" :offset="15">
+              <dl>
+                <template v-if="order.subTotalCents !== order.grandTotalCents">
+                  <dt>Subtotal</dt>
+                  <dd>{{order.subTotalCents | dollar}}</dd>
+                </template>
+
+                <template v-if="order.taxOneCents">
+                  <dt>Tax 1</dt>
+                  <dd>{{order.taxOneCents | dollar}}</dd>
+                </template>
+
+                <template v-if="order.taxTwoCents">
+                  <dt>Tax 2</dt>
+                  <dd>{{order.taxTwoCents | dollar}}</dd>
+                </template>
+
+                <template v-if="order.taxThreeCents">
+                  <dt>Tax 3</dt>
+                  <dd>{{order.taxThreeCents | dollar}}</dd>
+                </template>
+
+                <dt class="total">Total</dt>
+                <dd class="total">{{order.grandTotalCents | dollar}}</dd>
+              </dl>
+            </el-col>
+          </el-row>
+        </div>
+      </div>
+
+      <div v-show="activeStep === this.step.INFORMATION">
+        <el-row>
+          <el-col :span="16" :offset="4">
+            <el-form @submit.native.prevent="submit()" label-width="140px" size="small">
+              <order-fieldset v-model="orderDraft" :errors="errors"></order-fieldset>
+            </el-form>
+          </el-col>
+        </el-row>
+      </div>
+
+      <div v-show="activeStep === this.step.PAYMENT">
+        <div class="block">
+          <div class="body full">
+            <order-line-item-table :records="order.rootLineItems" @delete="deleteLineItem" @edit="eidtLineItem($event)">
+            </order-line-item-table>
+          </div>
+        </div>
+
+        <div class="order-summary">
+          <el-row>
+            <el-col :span="9" :offset="15">
+              <dl>
+                <template v-if="order.subTotalCents !== order.grandTotalCents">
+                  <dt>Subtotal</dt>
+                  <dd>{{order.subTotalCents | dollar}}</dd>
+                </template>
+
+                <template v-if="order.taxOneCents">
+                  <dt>Tax 1</dt>
+                  <dd>{{order.taxOneCents | dollar}}</dd>
+                </template>
+
+                <template v-if="order.taxTwoCents">
+                  <dt>Tax 2</dt>
+                  <dd>{{order.taxTwoCents | dollar}}</dd>
+                </template>
+
+                <template v-if="order.taxThreeCents">
+                  <dt>Tax 3</dt>
+                  <dd>{{order.taxThreeCents | dollar}}</dd>
+                </template>
+
+                <dt class="total">Total</dt>
+                <dd class="total">{{order.grandTotalCents | dollar}}</dd>
+              </dl>
+            </el-col>
+          </el-row>
+        </div>
+
+        <hr/>
+
+        <el-form @submit.native.prevent="submit()" label-position="top" size="small">
+          <payment-fieldset v-model="paymentDraft" :errors="errors"></payment-fieldset>
+        </el-form>
+      </div>
+    </div>
+
+    <div class="foot text-right">
+      <el-button v-show="canCancel" @click="cancel" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button v-show="canNext" :loading="isUpdatingOrder" :disabled="order.rootLineItems.length === 0" @click="next()" size="small" type="primary" class="pull-right">
+        Next
+      </el-button>
+
+      <el-button v-show="canBack" @click="back" plain size="small">
+        Back
+      </el-button>
+
+      <el-button v-show="canPlaceOrder" :loading="isCreatingPayment" @click="createPayment()" size="small" type="primary" class="pull-right">
+        Place Order
+      </el-button>
+    </div>
+  </div>
+</content-container>
+<!-- <div class="page-wrapper">
 
   <div>
     <el-menu :router="true" default-active="/orders" mode="horizontal" class="secondary-nav">
@@ -30,7 +196,7 @@
         <div v-show="activeStep === this.step.LINE_ITEMS">
           <div class="block">
             <div class="block-body">
-              <order-line-item-form v-model="lineItemDraftForAdd" :errors="errors">
+              <order-line-item-form v-model="lineItemForAdd" :errors="errors">
               </order-line-item-form>
             </div>
 
@@ -139,16 +305,16 @@
     </el-dialog>
   </div>
 
-</div>
+</div> -->
 </template>
 
 <script>
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
-import OrderLineItemForm from '@/components/order-line-item-form'
-import PaymentForm from '@/components/payment-form'
-import OrderForm from '@/components/order-form'
+import OrderLineItemFieldset from '@/components/order-line-item-fieldset'
+import PaymentFieldset from '@/components/payment-fieldset'
+import OrderFieldset from '@/components/order-fieldset'
 
 import Order from '@/models/order'
 import OrderLineItem from '@/models/order-line-item'
@@ -164,10 +330,10 @@ export default {
   name: 'NewOrder',
   mixins: [PageMixin],
   components: {
-    OrderLineItemForm,
+    OrderLineItemFieldset,
     OrderLineItemTable,
-    OrderForm,
-    PaymentForm
+    OrderFieldset,
+    PaymentFieldset
   },
   filters: {
     dollar
@@ -182,7 +348,7 @@ export default {
       },
       activeStep: 0,
 
-      lineItemDraftForAdd: OrderLineItem.objectWithDefaults(),
+      lineItemForAdd: OrderLineItem.objectWithDefaults(),
       isCreatingLineItem: false,
 
       lineItemForEdit: OrderLineItem.objectWithDefaults(),
@@ -278,12 +444,12 @@ export default {
       }
 
       orderCreated.then(order => {
-        this.lineItemDraftForAdd.order = order
-        return freshcom.createOrderLineItem(order.id, this.lineItemDraftForAdd)
+        this.lineItemForAdd.order = order
+        return freshcom.createOrderLineItem(order.id, this.lineItemForAdd)
       }).then(response => {
         return this.loadOrder(response.data.order.id)
       }).then(() => {
-        this.lineItemDraftForAdd = OrderLineItem.objectWithDefaults()
+        this.lineItemForAdd = OrderLineItem.objectWithDefaults()
         this.isCreatingLineItem = false
       }).catch(response => {
         this.errors = response.errors
@@ -429,7 +595,24 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style lang="scss" scoped>
+.fieldset {
+  margin: 0 20px;
+}
+
+.order-summary {
+  margin-bottom: 20px;
+
+  .total {
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  dd {
+    text-align: right;
+  }
+}
+
 .el-steps {
   border-radius: 0px;
   padding-top: 10px;
@@ -439,11 +622,5 @@ export default {
 .form-border {
   border: 1px solid #dfe6ec;
   padding: 20px;
-}
-
-#summary p {
-  margin: 5px;
-  color: #5a5e66;
-  font-size: 14px;
 }
 </style>

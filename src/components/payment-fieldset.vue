@@ -1,12 +1,13 @@
 <template>
 <div class="component-wrapper payment-fieldset">
   <el-row :gutter="10">
-    <el-col :span="6">
-      <el-form-item :error="errorMsgs.amountCents" label="Amount" class="amount">
+    <el-col :span="12">
+      <el-form-item :error="errorMsgs.amountCents" label="Pay Amount" class="amount">
         <money-input v-model="formModel.amountCents" @input="updateValue()"></money-input>
       </el-form-item>
     </el-col>
-    <el-col v-if="canSelectGateway" :span="6">
+
+    <el-col v-if="canSelectGateway" :span="12">
       <el-form-item label="Gateway" :error="errorMsgs.gateway" required>
         <el-select @change="updateValue()" v-model="formModel.gateway">
           <el-option label="Freshcom" value="freshcom"></el-option>
@@ -14,7 +15,10 @@
         </el-select>
       </el-form-item>
     </el-col>
-    <el-col :span="6">
+  </el-row>
+
+  <el-row :gutter="10">
+    <el-col :span="12">
       <el-form-item v-if="canSelectStatus" label="Status" :error="errorMsgs.status" required>
         <el-select @change="updateValue()" v-model="formModel.status">
           <el-option label="Pending" value="pending"></el-option>
@@ -22,7 +26,8 @@
         </el-select>
       </el-form-item>
     </el-col>
-    <el-col :span="6">
+
+    <el-col :span="12">
       <el-form-item v-if="formModel.gateway === 'custom' && formModel.status === 'paid'" label="Method" :error="errorMsgs.method" required>
         <el-select @change="updateValue()" v-model="formModel.method">
           <el-option label="Credit" value="credit"></el-option>
@@ -35,17 +40,13 @@
   </el-row>
 
   <el-row>
-    <el-col :span="12">
-      <el-form-item v-if="canSelectAction" :error="errorMsgs.status" required>
-        <b class="m-r-20">Action</b>
+    <el-col :span="24">
+      <el-form-item v-if="canSelectAction" :error="errorMsgs.status" label="Action" required>
         <el-radio-group v-model="action">
           <el-radio label="payNow">Pay Now</el-radio>
           <el-radio label="payLater">Pay through Paylink</el-radio>
         </el-radio-group>
       </el-form-item>
-    </el-col>
-    <el-col :span="12">
-
     </el-col>
   </el-row>
 
@@ -56,11 +57,10 @@
   </el-row>
 
   <template v-if="canEnterCreditCard">
-    <hr>
+    <hr/>
     <el-row>
-      <el-col :span="12">
+      <el-col :span="24">
         <el-form-item class="card-from" required>
-          <b class="m-r-20">Card</b>
           <el-radio-group v-model="formModel.useCardFrom" @change="handleUseCardFromChange">
             <el-radio v-if="canSelectCards" label="savedCard">
               Select from saved cards
@@ -74,14 +74,15 @@
     </el-row>
 
     <el-row v-if="formModel.useCardFrom === 'newCard'">
-      <el-col :span="12">
-        <el-form-item class="card" required>
+      <el-col :span="24">
+        <el-form-item label="Card" class="card" required>
           <card class="stripe-card" :stripe="stripePk" :options="stripeOptions"></card>
         </el-form-item>
       </el-col>
     </el-row>
-     <el-row v-if="formModel.useCardFrom === 'newCard' && hasOwner">
-      <el-col :span="12">
+
+    <el-row v-if="formModel.useCardFrom === 'newCard' && hasOwner">
+      <el-col :span="24">
         <el-form-item class="card" required>
           <el-checkbox v-model="formModel.saveSource" @change="updateValue()">Save this card</el-checkbox>
         </el-form-item>
@@ -89,7 +90,7 @@
     </el-row>
 
     <el-row v-if="formModel.useCardFrom === 'savedCard'">
-      <el-col :span="12">
+      <el-col :span="24">
         <el-form-item class="card" required>
           <el-select v-model="formModel.source" @change="updateValue()" class="full">
             <el-option v-for="card in cards" :key="card.id" :label="`${card.brand} ****${card.lastFourDigit}`" :value="card.stripeCardId">
@@ -99,6 +100,8 @@
         </el-form-item>
       </el-col>
     </el-row>
+
+    <hr/>
 
     <el-row v-if="formModel.gateway === 'freshcom' && formModel.order && formModel.order.fulfillmentMethod === 'ship'">
       <el-form-item label="Billing Address" :error="errorMsgs.status" required>
@@ -111,38 +114,34 @@
 
     <template v-if="canEnterBillingAddress">
       <el-row :gutter="10">
-        <el-col :span="12">
-          <el-form-item label="Street Address 1" :error="errorMsgs.billingAddressLineOne">
-            <el-input v-model="formModel.billingAddressLineOne" @input="updateValue()"></el-input>
+        <el-col :span="24">
+          <el-form-item label="Street Address" :error="errorMsgs.billingAddressLineOne">
+            <el-input v-model="formModel.billingAddressLineOne" @input="updateValue()" placeholder="Line 1"></el-input>
+            <el-input v-model="formModel.billingAddressLineTwo" @input="updateValue()" placeholder="Line 2"></el-input>
           </el-form-item>
         </el-col>
       </el-row>
 
       <el-row :gutter="10">
         <el-col :span="12">
-          <el-form-item label="Street Address 2" :error="errorMsgs.billingAddressLineTwo">
-            <el-input v-model="formModel.billingAddressLineTwo" @input="updateValue()"></el-input>
-          </el-form-item>
-        </el-col>
-      </el-row>
-
-      <el-row :gutter="10">
-        <el-col :span="6">
           <el-form-item label="City" :error="errorMsgs.billingAddressCity">
             <el-input v-model="formModel.billingAddressCity" @input="updateValue()"></el-input>
           </el-form-item>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="12">
           <el-form-item label="Province" :error="errorMsgs.billingAddressProvince">
             <el-input v-model="formModel.billingAddressProvince" @input="updateValue()"></el-input>
           </el-form-item>
         </el-col>
-        <el-col :span="6">
+      </el-row>
+
+      <el-row :gutter="10">
+        <el-col :span="12">
           <el-form-item label="Country" :error="errorMsgs.billingAddressCountryCode">
             <el-input v-model="formModel.billingAddressCountryCode" @input="updateValue()"></el-input>
           </el-form-item>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="12">
           <el-form-item label="Postal Code" :error="errorMsgs.billingAddressPostalCode">
             <el-input v-model="formModel.billingAddressPostalCode" @input="updateValue()"></el-input>
           </el-form-item>

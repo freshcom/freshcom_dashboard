@@ -488,7 +488,7 @@ export default {
       freshcom.updateProduct(variantDraft.id, variantDraft).then((response) => {
         let updatedVariant = response.data
 
-        _.each(this.product.variants, (variant) => {
+        _.each(this.product.children, (variant) => {
           variant.primary = false
 
           if (variant.id === updatedVariant.id) {
@@ -515,7 +515,7 @@ export default {
       freshcom.updateProduct(childDraft.id, childDraft).then((response) => {
         let updatedChild = response.data
 
-        _.each(this.product.childs, (child) => {
+        _.each(this.product.children, (child) => {
           if (child.id === updatedChild.id) {
             child.status = updatedChild.status
           }
@@ -525,6 +525,32 @@ export default {
         this.$message({
           showClose: true,
           message: `${childKind} activated successfully.`,
+          type: 'success'
+        })
+      }).catch(response => {
+        let translatedErrors = translateErrors(response.errors, 'product')
+        this.$alert(translatedErrors.status, 'Error')
+        throw response.errors
+      })
+    },
+
+    deactivateChild (child) {
+      let childDraft = _.cloneDeep(child)
+      childDraft.status = 'draft'
+
+      freshcom.updateProduct(childDraft.id, childDraft).then((response) => {
+        let updatedChild = response.data
+
+        _.each(this.product.children, (child) => {
+          if (child.id === updatedChild.id) {
+            child.status = updatedChild.status
+          }
+        })
+
+        let childKind = this.$t(`fields.product.kind.${child.kind}`)
+        this.$message({
+          showClose: true,
+          message: `${childKind} deactivated successfully.`,
           type: 'success'
         })
       }).catch(response => {

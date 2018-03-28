@@ -148,6 +148,30 @@
           <order-line-item-table :records="order.rootLineItems" @delete="deleteLineItem" @edit="eidtLineItem($event)">
           </order-line-item-table>
         </div>
+
+        <div class="launchable">
+          <el-dialog :show-close="false" :visible="isAddingLineItem" title="Add line item" width="750px">
+            <el-form @submit.native.prevent="createLineItem()" label-position="top" size="small">
+              <order-line-item-fieldset v-model="lineItemForAdd" :errors="errors"></order-line-item-fieldset>
+            </el-form>
+
+            <div slot="footer">
+              <el-button :disabled="isCreatingLineItem" @click="cancelAddLineItem()" plain size="small">Cancel</el-button>
+              <el-button :loading="isCreatingLineItem" @click="createLineItem()" type="primary" size="small">Save</el-button>
+            </div>
+          </el-dialog>
+
+          <el-dialog :show-close="false" :visible="isEditingLineItem" title="Edit line item" width="750px">
+            <el-form @submit.native.prevent="updateLineItem()" label-position="top" size="small">
+              <order-line-item-fieldset v-model="lineItemForEdit" :errors="errors"></order-line-item-fieldset>
+            </el-form>
+
+            <div slot="footer">
+              <el-button :disabled="isUpdatingLineItem" @click="cancelEditLineItem()" plain size="small">Cancel</el-button>
+              <el-button :loading="isUpdatingLineItem" @click="updateLineItem()" type="primary" size="small">Save</el-button>
+            </div>
+          </el-dialog>
+        </div>
       </div>
 
       <div class="block">
@@ -211,6 +235,41 @@
               </template>
             </el-table-column>
           </el-table>
+        </div>
+
+        <div class="launchable">
+          <el-dialog :show-close="false" :visible="isAddingPayment" title="Add payment" width="500px">
+            <el-form @submit.native.prevent="createPayment()" label-width="110px" size="small">
+              <payment-fieldset v-model="paymentForAdd" :errors="errors"></payment-fieldset>
+            </el-form>
+
+            <div slot="footer">
+              <el-button :disabled="isCreatingPayment" @click="cancelAddPayment()" plain size="small">Cancel</el-button>
+              <el-button :loading="isCreatingPayment" @click="createPayment()" type="primary" size="small">Save</el-button>
+            </div>
+          </el-dialog>
+
+          <el-dialog :show-close="false" :visible="isEditingPayment" title="Edit payment" width="750px">
+            <el-form @submit.native.prevent="updatePayment()" label-position="top" size="small">
+              <payment-fieldset v-model="paymentForEdit" :errors="errors"></payment-fieldset>
+            </el-form>
+
+            <div slot="footer">
+              <el-button :disabled="isUpdatingPayment" @click="cancelEditPayment()" plain size="small">Cancel</el-button>
+              <el-button :loading="isUpdatingPayment" @click="updatePayment()" type="primary" size="small">Save</el-button>
+            </div>
+          </el-dialog>
+
+          <el-dialog :show-close="false" :visible="isAddingRefund" title="Add refund" width="500px">
+            <el-form @submit.native.prevent="createRefund()" label-position="top" size="small">
+              <refund-fieldset v-model="refundForAdd" :errors="errors"></refund-fieldset>
+            </el-form>
+
+            <div slot="footer">
+              <el-button :disabled="isCreatingRefund" @click="cancelAddRefund()" plain size="small">Cancel</el-button>
+              <el-button :loading="isCreatingRefund" @click="createRefund()" type="primary" size="small">Save</el-button>
+            </div>
+          </el-dialog>
         </div>
       </div>
 
@@ -417,63 +476,6 @@
       <el-button @click="attemptDeleteOrder()" plain size="small">
         Delete
       </el-button>
-    </div>
-
-    <div class="launchable">
-      <el-dialog :show-close="false" :visible="isAddingLineItem" title="Add line item" width="750px">
-        <el-form @submit.native.prevent="createLineItem()" label-position="top" size="small">
-          <order-line-item-fieldset v-model="lineItemForAdd" :errors="errors"></order-line-item-fieldset>
-        </el-form>
-
-        <div slot="footer">
-          <el-button :disabled="isCreatingLineItem" @click="cancelAddLineItem()" plain size="small">Cancel</el-button>
-          <el-button :loading="isCreatingLineItem" @click="createLineItem()" type="primary" size="small">Save</el-button>
-        </div>
-      </el-dialog>
-
-      <el-dialog :show-close="false" :visible="isEditingLineItem" title="Edit line item" width="750px">
-        <el-form @submit.native.prevent="updateLineItem()" label-position="top" size="small">
-          <order-line-item-fieldset v-model="lineItemForEdit" :errors="errors"></order-line-item-fieldset>
-        </el-form>
-
-        <div slot="footer">
-          <el-button :disabled="isUpdatingLineItem" @click="cancelEditLineItem()" plain size="small">Cancel</el-button>
-          <el-button :loading="isUpdatingLineItem" @click="updateLineItem()" type="primary" size="small">Save</el-button>
-        </div>
-      </el-dialog>
-
-      <el-dialog :show-close="false" :visible="isAddingPayment" title="Add payment" width="750px">
-        <el-form @submit.native.prevent="createPayment()" label-position="top" size="small">
-          <payment-fieldset v-model="paymentForAdd" :errors="errors"></payment-fieldset>
-        </el-form>
-
-        <div slot="footer">
-          <el-button :disabled="isCreatingPayment" @click="cancelAddPayment()" plain size="small">Cancel</el-button>
-          <el-button :loading="isCreatingPayment" @click="createPayment()" type="primary" size="small">Save</el-button>
-        </div>
-      </el-dialog>
-
-      <el-dialog :show-close="false" :visible="isEditingPayment" title="Edit payment" width="750px">
-        <el-form @submit.native.prevent="updatePayment()" label-position="top" size="small">
-          <payment-fieldset v-model="paymentForEdit" :errors="errors"></payment-fieldset>
-        </el-form>
-
-        <div slot="footer">
-          <el-button :disabled="isUpdatingPayment" @click="cancelEditPayment()" plain size="small">Cancel</el-button>
-          <el-button :loading="isUpdatingPayment" @click="updatePayment()" type="primary" size="small">Save</el-button>
-        </div>
-      </el-dialog>
-
-      <el-dialog :show-close="false" :visible="isAddingRefund" title="Add refund" width="500px">
-        <el-form @submit.native.prevent="createRefund()" label-position="top" size="small">
-          <refund-fieldset v-model="refundForAdd" :errors="errors"></refund-fieldset>
-        </el-form>
-
-        <div slot="footer">
-          <el-button :disabled="isCreatingRefund" @click="cancelAddRefund()" plain size="small">Cancel</el-button>
-          <el-button :loading="isCreatingRefund" @click="createRefund()" type="primary" size="small">Save</el-button>
-        </div>
-      </el-dialog>
     </div>
   </div>
 </content-container>

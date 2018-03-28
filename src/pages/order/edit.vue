@@ -21,7 +21,7 @@
   <div slot="card-content">
     <div class="data">
       <el-row>
-        <el-col :span="14" :offset="5">
+        <el-col :span="16" :offset="4">
           <el-form @submit.native.prevent="submit()" label-width="140px" size="small">
             <order-fieldset v-model="orderDraft" :errors="errors"></order-fieldset>
           </el-form>

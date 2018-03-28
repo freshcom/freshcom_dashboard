@@ -51,7 +51,7 @@
     </el-col>
 
     <el-col :span="6">
-      <el-form-item label="Sub Total Amount is" class="is-estimate">
+      <el-form-item label="Subtotal Amount is" class="is-estimate">
         <el-switch
           v-model="formModel.isEstimate"
           :disabled="!canToggleEstimate"
@@ -121,7 +121,7 @@
     </el-form-item>
 
     <span class="sign m-r-20 m-l-20">=</span>
-    <el-form-item label="Sub Total Amt." class="sub-total-right">
+    <el-form-item label="Subtotal Amt." class="sub-total-right">
       <money-input
         :value="formModel.subTotalCents"
         :disabled="!formModel.priceEstimateByDefault"
@@ -132,7 +132,7 @@
   </el-row>
 
   <el-row class="m-b-20">
-    <el-form-item label="Sub Total Amt." class="sub-total-left">
+    <el-form-item label="Subtotal Amt." class="sub-total-left">
       <money-input
         :value="formModel.subTotalCents"
         :disabled="type === 'Product'"
@@ -176,7 +176,7 @@
 
     <span class="sign m-l-5 m-r-5">=</span>
 
-    <el-form-item label="Grand Total Amt." class="grand-total">
+    <el-form-item label="Total Amt." class="grand-total">
       <el-tag type="primary">{{formModel.grandTotalCents | dollar}}</el-tag>
     </el-form-item>
   </el-row>
