@@ -30,6 +30,7 @@ import 'vue-awesome/icons/plus'
 import 'vue-awesome/icons/file-text' // Order
 import 'vue-awesome/icons/tag' // Product
 import 'vue-awesome/icons/tags' // Product Collection
+import 'vue-awesome/icons/dollar' // Product Collection
 
 // -- Sync Store & Router --
 sync(store, router)

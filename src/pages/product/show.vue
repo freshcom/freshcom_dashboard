@@ -243,9 +243,9 @@
               <template slot-scope="scope">
                 <p class="action-group">
                   <el-button-group>
-                    <el-button plain size="mini">
+                    <router-link :to="{ name: 'EditPrice', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
                       Edit
-                    </el-button>
+                    </router-link>
                     <el-button @click="attemptDeletePrice(scope.row)" plain size="mini">
                       Delete
                     </el-button>

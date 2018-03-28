@@ -35,8 +35,8 @@
     <el-switch
       v-model="formModel.estimateByDefault"
       @change="updateValue()"
-      on-text="Yes"
-      off-text="No">
+      active-text="Yes"
+      inactive-text="No">
     </el-switch>
   </el-form-item>
 

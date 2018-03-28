@@ -1,5 +1,48 @@
 <template>
-<div class="page-wrapper">
+<content-container @locale-changed="reload" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListProduct' }">Products</router-link>
+    <router-link :to="{ name: 'ListProductCollection' }">Collections</router-link>
+  </div>
+
+  <div slot="card-header">
+    <h1>Edit price</h1>
+
+    <div class="pull-right">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isUpdating" @click="submit()" type="primary" size="small">
+        Save
+      </el-button>
+    </div>
+  </div>
+
+  <div slot="card-content">
+    <div class="data">
+      <el-row>
+        <el-col :span="18" :offset="3">
+          <el-form @submit.native.prevent="submit()" label-width="180px" size="small">
+            <price-fieldset v-model="priceDraft" :errors="errors"></price-fieldset>
+          </el-form>
+        </el-col>
+      </el-row>
+    </div>
+
+    <div class="foot">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isUpdating" @click="submit()" type="primary" size="small" class="pull-right">
+        Save
+      </el-button>
+    </div>
+  </div>
+</content-container>
+
+<!-- <div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="/products" mode="horizontal"  class="secondary-nav">
       <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
@@ -39,7 +82,7 @@
       </div>
     </el-card>
   </div>
-</div>
+</div> -->
 </template>
 
 <script>
@@ -47,21 +90,30 @@ import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
 import Price from '@/models/price'
-import PriceForm from '@/components/price-form'
+import PriceFieldset from '@/components/price-fieldset'
+
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadPrice' })
 
 export default {
   name: 'EditPrice',
+  mixins: [ResourcePageMixin],
   components: {
-    PriceForm
+    PriceFieldset
   },
-  props: ['id', 'callbackPath'],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  },
   data () {
     return {
       isLoading: false,
       price: Price.objectWithDefaults(),
       priceDraft: Price.objectWithDefaults(),
 
-      isUpdatingPrice: false,
+      isUpdating: false,
       errors: {}
     }
   },
@@ -72,8 +124,8 @@ export default {
     loadPrice () {
       this.isLoading = true
 
-      freshcom.retrievePrice(this.id, {
-        include: 'product,children.product'
+      return freshcom.retrievePrice(this.id, {
+        include: 'product'
       }).then(response => {
         this.price = response.data
         this.priceDraft = _.cloneDeep(response.data)
@@ -86,31 +138,25 @@ export default {
     },
 
     submit () {
-      this.isUpdatingPrice = true
+      this.isUpdating = true
 
-      freshcom.updatePrice(
-        this.priceDraft.id,
-        this.priceDraft
-      ).then(price => {
+      freshcom.updatePrice(this.priceDraft.id, this.priceDraft).then(price => {
         this.$message({
           showClose: true,
           message: `Price saved successfully.`,
           type: 'success'
         })
 
-        this.isUpdatingPrice = false
+        this.isUpdating = false
         this.back()
       }).catch(response => {
         this.errors = response.errors
-        this.isUpdatingPrice = false
+        this.isUpdating = false
         throw response
       })
     },
 
-    back () {
-      if (this.callbackPath) {
-        return this.$store.dispatch('pushRoute', { path: this.callbackPath })
-      }
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ShowPrice', params: { id: this.price.id } })
     }
   }
