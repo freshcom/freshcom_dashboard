@@ -1,63 +1,74 @@
 <template>
-<div class="page-wrapper">
-  <div>
-    <el-menu :router="true" default-active="/products" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
-      <el-menu-item :route="{ name: 'ListProductItem' }" index="/product_items">Items</el-menu-item>
-    </el-menu>
-    <locale-selector class="pull-right"></locale-selector>
+<content-container>
+  <div slot="header">
+    <router-link :to="{ name: 'ListProduct' }">Products</router-link>
+    <router-link :to="{ name: 'ListProductCollection' }">Collections</router-link>
   </div>
 
-  <div>
-    <el-card class="main-card">
-      <div slot="header">
-        <span style="line-height: 36px;">Create a product</span>
+  <div slot="card-header">
+    <h1>Create a product</h1>
 
-        <div class="pull-right">
-          <el-button @click="back()" plain size="small">
-            Cancel
-          </el-button>
+    <div class="pull-right">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
 
-          <el-button @click="submit()" size="small" type="primary">
-            Save
-          </el-button>
-        </div>
-      </div>
-
-      <div class="data">
-        <product-form v-model="productDraft" :errors="errors"></product-form>
-      </div>
-
-      <div class="footer">
-        <el-button @click="back()" plain size="small">
-          Cancel
-        </el-button>
-
-        <el-button @click="submit()" size="small" type="primary" class="pull-right">
-          Save
-        </el-button>
-      </div>
-    </el-card>
+      <el-button :loading="isCreating" @click="submit()" type="primary" size="small">
+        Save
+      </el-button>
+    </div>
   </div>
-</div>
+
+  <div slot="card-content">
+    <div class="data">
+      <el-row>
+        <el-col :span="18" :offset="3">
+          <el-form @submit.native.prevent="submit()" label-width="180px" size="small">
+            <product-fieldset v-model="productDraft" :errors="errors"></product-fieldset>
+          </el-form>
+        </el-col>
+      </el-row>
+    </div>
+
+    <div class="foot">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isCreating" @click="submit()" type="primary" size="small" class="pull-right">
+        Save
+      </el-button>
+    </div>
+  </div>
+</content-container>
 </template>
 
 <script>
 import freshcom from '@/freshcom-sdk'
 
 import Product from '@/models/product'
-import ProductForm from '@/components/product-form'
+import ProductFieldset from '@/components/product-fieldset'
+
+import PageMixin from '@/mixins/page'
 
 export default {
   name: 'NewProduct',
-  props: ['kind', 'parentId'],
+  mixins: [PageMixin],
+  props: {
+    kind: {
+      type: String
+    },
+    parentId: {
+      type: String
+    }
+  },
   components: {
-    ProductForm
+    ProductFieldset
   },
   data () {
     return {
       productDraft: Product.objectWithDefaults(),
-      isCreatingProduct: false,
+      isCreating: false,
       errors: {}
     }
   },
@@ -72,7 +83,7 @@ export default {
   },
   methods: {
     submit () {
-      this.isCreatingProduct = true
+      this.isCreating = true
 
       freshcom.createProduct(this.productDraft).then(response => {
         this.$message({
@@ -81,15 +92,15 @@ export default {
           type: 'success'
         })
 
-        this.isCreatingProduct = false
+        this.isCreating = false
         this.back()
       }).catch(response => {
         this.errors = response.errors
-        this.isCreatingProduct = false
+        this.isCreating = false
         throw response
       })
     },
-    back () {
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ListProduct' })
     }
   }

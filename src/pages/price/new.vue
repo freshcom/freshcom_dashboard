@@ -1,5 +1,48 @@
 <template>
-<div class="page-wrapper">
+<content-container>
+  <div slot="header">
+    <router-link :to="{ name: 'ListProduct' }">Products</router-link>
+    <router-link :to="{ name: 'ListProductCollection' }">Collections</router-link>
+  </div>
+
+  <div slot="card-header">
+    <h1>Create a price</h1>
+
+    <div class="pull-right">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isCreating" @click="submit()" type="primary" size="small">
+        Save
+      </el-button>
+    </div>
+  </div>
+
+  <div slot="card-content">
+    <div class="data">
+      <el-row>
+        <el-col :span="18" :offset="3">
+          <el-form @submit.native.prevent="submit()" label-width="180px" size="small">
+            <price-fieldset v-model="priceDraft" :errors="errors"></price-fieldset>
+          </el-form>
+        </el-col>
+      </el-row>
+    </div>
+
+    <div class="foot">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isCreating" @click="submit()" type="primary" size="small" class="pull-right">
+        Save
+      </el-button>
+    </div>
+  </div>
+</content-container>
+
+<!-- <div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="/products" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
@@ -39,58 +82,57 @@
       </div>
     </el-card>
   </div>
-</div>
+</div> -->
 </template>
 
 <script>
 import freshcom from '@/freshcom-sdk'
 
 import Price from '@/models/price'
-import PriceForm from '@/components/price-form'
+import PriceFieldset from '@/components/price-fieldset'
+import PageMixin from '@/mixins/page'
 
 export default {
   name: 'NewPrice',
+  mixins: [PageMixin],
   components: {
-    PriceForm
+    PriceFieldset
   },
   data () {
     return {
       priceDraft: Price.objectWithDefaults(),
-      isCreatingPrice: false,
+      isCreating: false,
       errors: {}
     }
   },
-  props: ['productKind', 'productId', 'callbackPath'],
+  props: {
+    product: {
+      type: Object
+    }
+  },
   created () {
-    if (this.productId) {
-      this.priceDraft.product = { id: this.productId, type: 'Product', kind: this.productKind }
+    if (this.product) {
+      this.priceDraft.product = this.product
     }
   },
   methods: {
     submit () {
-      this.isCreatingPrice = true
+      this.isCreating = true
 
-      freshcom.createPrice(this.productId, this.priceDraft).then(response => {
+      freshcom.createPrice(this.priceDraft.product.id, this.priceDraft).then(response => {
         this.$message({
           showClose: true,
           message: `Price created successfully.`,
           type: 'success'
         })
 
-        this.isCreatingPrice = false
+        this.isCreating = false
         this.back()
       }).catch(response => {
         this.errors = response.errors
-        this.isCreatingPrice = false
+        this.isCreating = false
         throw response
       })
-    },
-
-    back () {
-      if (this.callbackPath) {
-        return this.$store.dispatch('pushRoute', { path: this.callbackPath })
-      }
-      this.$store.dispatch('pushRoute', { name: 'ListPrice' })
     }
   }
 }

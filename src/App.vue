@@ -387,13 +387,16 @@ input::-webkit-inner-spin-button {
     .resource {
       width: 180px;
     }
+
+    p {
+      padding: 8px 0;
+    }
   }
 
   .resource {
     display: inline-block;
 
     p {
-      padding: 8px 0;
       white-space: nowrap;
       margin: 0px;
       line-height: 14px;

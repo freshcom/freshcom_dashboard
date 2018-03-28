@@ -15,7 +15,7 @@
       <el-button @click="cancelEdit()" plain size="mini">Cancel</el-button>
     </div>
   </div>
-  <div v-show="!isEditing" :class="[size]" class="resource-block">
+  <div v-if="!isEditing" :class="[size]" class="resource-block">
     <div class="resource">
       <p class="primary">
         <span v-if="value.code">[{{value.code}}]</span>

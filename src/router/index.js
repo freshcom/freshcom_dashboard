@@ -382,10 +382,7 @@ const router = new Router({
       name: 'NewPrice',
       component: NewPricePage,
       props (route) {
-        let queryString = route.fullPath.split('?')[1]
-        let query = qs.parse(queryString)
-
-        return { productKind: query.productKind, productId: query.productId, callbackPath: query.callbackPath }
+        return { product: route.query.product, callbackPath: route.query.callbackPath }
       }
     },
     {

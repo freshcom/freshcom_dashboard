@@ -4,8 +4,8 @@
   :disabled="disabled"
   :search-method="searchProduct"
   :record-to-option="productToOption"
+  :size="size"
   @input="handleInput($event)"
-  size="small"
 >
 </resource-select>
 </template>

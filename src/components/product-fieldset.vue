@@ -18,7 +18,7 @@
   </el-form-item>
 
   <el-form-item :error="errorMsgs.kind" label="Kind" required>
-    <el-select v-model="formModel.kind" :disabled="!canSelectKind" @change="updateValue()">
+    <el-select v-model="formModel.kind" :disabled="!canSelectKind" @change="handleKindChange($event)">
       <el-option label="Simple" value="simple"></el-option>
       <el-option label="With Variants" value="withVariants"></el-option>
       <el-option label="Combo" value="combo"></el-option>
@@ -131,6 +131,15 @@ export default {
     }
   },
   methods: {
+    handleKindChange (kind) {
+      this.formModel.goods = null
+
+      if (kind === 'combo') {
+        this.formModel.nameSync = 'disabled'
+      }
+      this.updateValue()
+    },
+
     handleGoodsChange (goods) {
       if (goods) {
         this.formModel.goods = goods
@@ -138,10 +147,10 @@ export default {
         this.formMode.goods = null
       }
 
-      this.$emit('input', this.formModel)
+      this.updateValue()
     },
     clearGoods () {
-      this.formModel.goods = {}
+      this.formModel.goods = null
       this.updateValue()
     }
   }

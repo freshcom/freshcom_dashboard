@@ -108,26 +108,32 @@
         </div>
 
         <div class="body full">
-          <el-table :data="product.variants" :show-header="false" class="data-table block-table">
-            <el-table-column label="Name" width="240">
+          <el-table :data="product.children" :show-header="false" class="data-table block-table">
+            <el-table-column label="Name" width="180">
               <template slot-scope="scope">
                 <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id } }" class="primary" style="display: inline;">
-                  <span>{{scope.row.name}}</span>
+                  {{scope.row.name}}
+                </router-link>
+              </template>
+            </el-table-column>
 
-                  <el-tag v-if="scope.row.primary" size="mini" class="m-l-10">
+            <el-table-column width="105">
+              <template slot-scope="scope">
+                <router-link v-if="scope.row.primary" :to="{ name: 'ShowProduct', params: { id: scope.row.id } }" class="primary" style="display: inline;">
+                  <el-tag size="mini">
                     Primary
                   </el-tag>
                 </router-link>
 
-                <p v-if="canSetVariantPrimary(scope.row)" class="action-group" style="display: inline;">
-                  <el-button @click="setVariantPrimary(scope.row)" plain size="mini" class="m-l-10">
+                <p v-if="canSetChildPrimary(scope.row)" class="action-group">
+                  <el-button @click="setChildPrimary(scope.row)" plain size="mini">
                     Set Primary
                   </el-button>
                 </p>
               </template>
             </el-table-column>
 
-            <el-table-column label="Status" width="100">
+            <el-table-column label="Status" width="80">
               <template slot-scope="scope">
                 <hover-button v-show="scope.row.status === 'active'" @click="deactivateChild(scope.row)" type="primary" hover-type="info">
                   <span slot="normal">{{$t(`fields.product.status.${scope.row.status}`)}}</span>
@@ -201,7 +207,7 @@
           <h2>Prices</h2>
 
           <div class="action-group">
-            <router-link :to="{ name: 'NewPrice', query: { productId: product.id, productKind: 'item', callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
+            <router-link :to="{ name: 'NewPrice', query: { product: { id: product.id, type: 'Product', kind: product.kind, name: product.name }, callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
               Add
             </router-link>
           </div>
@@ -240,7 +246,7 @@
                     <el-button plain size="mini">
                       Edit
                     </el-button>
-                    <el-button plain size="mini">
+                    <el-button @click="attemptDeletePrice(scope.row)" plain size="mini">
                       Delete
                     </el-button>
                   </el-button-group>
@@ -249,7 +255,35 @@
             </el-table-column>
           </el-table>
         </div>
+
+        <div class="launchable">
+          <el-dialog :show-close="false" :visible="isConfirmingDeletePrice" title="Delete price" width="500px">
+            <p>
+              Are you sure you want to delete this price?
+              If you delete this price, all of the following
+              related resources if any will also be deleted:
+
+              <ul>
+                <li>All children of this price</li>
+              </ul>
+
+              <b>This action cannot be undone.</b>
+            </p>
+
+            <div slot="footer">
+              <el-button :disabled="isDeletingPrice" @click="cancelDeletePrice()" plain size="small">Cancel</el-button>
+              <el-button :loading="isDeletingPrice" @click="deletePrice()" type="danger" size="small">Delete</el-button>
+            </div>
+          </el-dialog>
+        </div>
       </div>
+
+      <file-collection-block
+        :owner="product"
+        :records="fileCollections"
+        @deleted="loadProduct()"
+      >
+      </file-collection-block>
 
       <div class="block">
         <div class="header">
@@ -276,372 +310,35 @@
         </div>
       </div>
     </div>
+
+    <div class="foot text-right">
+      <el-button @click="attemptDeleteProduct()" plain size="small">Delete</el-button>
+    </div>
   </div>
 
+  <div slot="launchable" class="launchable">
+    <el-dialog :show-close="false" :visible="isConfirmingDeleteProduct" title="Delete product" width="600px">
+      <p>
+        Are you sure you want to delete this product?
+        If you delete this product, all of the following
+        related resources if any will also be deleted:
+
+        <ul>
+          <li>All prices that are associated with this product</li>
+          <li>All file collections that are owned by this product and all files inside those collections</li>
+          <li>File that is the avatar of this product</li>
+        </ul>
+
+        <b>This action cannot be undone.</b>
+      </p>
+
+      <div slot="footer">
+        <el-button :disabled="isDeletingProduct" @click="cancelDeleteProduct()" plain size="small">Cancel</el-button>
+        <el-button :loading="isDeletingProduct" @click="deleteProduct()" type="danger" size="small">Delete</el-button>
+      </div>
+    </el-dialog>
+  </div>
 </content-container>
-
-
-<!-- <div class="page-wrapper">
-  <div>
-    <el-menu :router="true" default-active="/products" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListProduct' }" index="/products">Products</el-menu-item>
-      <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">Collections</el-menu-item>
-    </el-menu>
-    <locale-selector @change="loadProduct(id)" class="pull-right"></locale-selector>
-  </div>
-
-  <div>
-    <el-card v-loading="isLoading" class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
-
-        <div class="brief">
-          <div class="avatar">
-            <img :src="avatarUrl">
-          </div>
-
-          <div class="detail">
-            <p>
-              <span>Product {{$t(`fields.product.kind.${product.kind}`)}}</span>
-              <span>{{product.code}}</span>
-            </p>
-            <h2>{{product.name}}</h2>
-            <p class="id">{{product.id}}</p>
-          </div>
-        </div>
-
-        <div class="header-actions">
-          <el-button @click="editProduct(product)" plain size="small">Edit</el-button>
-        </div>
-      </div>
-
-      <div class="data">
-        <div class="block-title">
-          <h3>Details</h3>
-        </div>
-        <div class="block">
-          <div class="block-body">
-            <dl>
-              <dt>ID</dt>
-              <dd>{{product.id}}</dd>
-
-              <dt>Code</dt>
-              <dd>{{product.code}}</dd>
-
-              <dt>Status</dt>
-              <dd>
-                {{$t(`fields.product.status.${product.status}`)}}
-              </dd>
-
-              <dt>Kind</dt>
-              <dd>
-                {{$t(`fields.product.kind.${product.kind}`)}}
-              </dd>
-
-              <dt>Name Sync</dt>
-              <dd>{{$t(`fields.product.nameSync.${product.nameSync}`)}}</dd>
-
-              <dt>Name</dt>
-              <dd>{{product.name}}</dd>
-
-              <dt>Short Name</dt>
-              <dd>{{product.shortName}}</dd>
-
-              <dt>Print Name</dt>
-              <dd>{{product.printName}}</dd>
-
-              <dt>Sort Index</dt>
-              <dd>{{product.sortIndex}}</dd>
-
-              <dt>Goods Quantity</dt>
-              <dd>{{product.goodsQuantity}}</dd>
-
-              <dt>Maximum Public OQ</dt>
-              <dd>{{product.maximumPublicOrderQuantity}}</dd>
-
-              <dt>Auto Fulfill</dt>
-              <dd>{{product.autoFulfill}}</dd>
-
-              <dt>Caption</dt>
-              <dd>{{product.caption}}</dd>
-
-              <dt>Description</dt>
-              <dd>{{product.description}}</dd>
-            </dl>
-          </div>
-        </div>
-
-        <template v-if="product.kind === 'combo'">
-          <div class="block-title">
-            <h3>Items</h3>
-
-            <span class="block-title-actions pull-right">
-              <router-link :to="{ name: 'NewProduct', query: { parentId: product.id, callbackPath: currentRoutePath } }">
-                <icon name="plus" scale="0.8" class="v-middle"></icon>
-                <span>Add</span>
-              </router-link>
-            </span>
-          </div>
-
-          <div class="block">
-            <div class="block-body full">
-              <el-table :data="product.items" :show-header="false" class="block-table" style="width: 100%">
-                <el-table-column>
-                  <template slot-scope="scope">
-                    <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id } }">
-                      <span>{{scope.row.name}}</span>
-                      <el-tag v-if="scope.row.status != 'active'" type="gray" size="mini">
-                        {{$t(`fields.product.status.${scope.row.status}`)}}
-                      </el-tag>
-                    </router-link>
-                  </template>
-                </el-table-column>
-
-                <el-table-column width="300">
-                  <template slot-scope="scope">
-                    <p class="text-right actions">
-                      <el-button @click="editProduct(scope.row)" plain size="mini">
-                        Edit
-                      </el-button>
-                    </p>
-                  </template>
-                </el-table-column>
-              </el-table>
-            </div>
-
-            <div class="block-footer text-center">
-              <a class="view-more" href="#">View More</a>
-            </div>
-          </div>
-        </template>
-
-
-        <template v-if="product.kind === 'withVariants'">
-          <div class="block-title">
-            <h3>Variants</h3>
-
-            <span class="block-title-actions pull-right">
-              <router-link :to="{ name: 'NewProduct', query: { parentId: product.id, kind: 'variant', callbackPath: currentRoutePath } }">
-                <icon name="plus" scale="0.8" class="v-middle"></icon>
-                <span>Add</span>
-              </router-link>
-            </span>
-          </div>
-
-          <div class="block">
-            <div class="block-body full">
-              <el-table :data="product.variants" :show-header="false" class="block-table" style="width: 100%">
-                <el-table-column>
-                  <template slot-scope="scope">
-                    <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.id } }">
-                      <span>{{scope.row.name}}</span>
-                      <el-tag v-if="scope.row.status != 'active'" type="gray" size="mini">
-                        {{$t(`fields.product.status.${scope.row.status}`)}}
-                      </el-tag>
-
-                      <el-tag v-if="scope.row.primary" size="mini">
-                        Primary
-                      </el-tag>
-                    </router-link>
-                  </template>
-                </el-table-column>
-
-                <el-table-column width="150">
-                  <template slot-scope="scope">
-                    {{scope.row.defaultPrice | chargeDollar}}
-                  </template>
-                </el-table-column>
-
-                <el-table-column width="300">
-                  <template slot-scope="scope">
-                    <p class="text-right actions">
-                      <el-button v-if="scope.row.status == 'draft'" @click="markVariantActive(scope.row)" plain size="mini">
-                        Mark Active
-                      </el-button>
-
-                      <el-button v-if="canSetVariantPrimary(scope.row)" @click="setVariantPrimary(scope.row)" plain size="mini">
-                        Mark Primary
-                      </el-button>
-
-                      <el-button @click="editProduct(scope.row)" plain size="mini">
-                        Edit
-                      </el-button>
-                    </p>
-                  </template>
-                </el-table-column>
-              </el-table>
-            </div>
-
-
-            <div class="block-footer text-center">
-              <a class="view-more" href="#">View More</a>
-            </div>
-          </div>
-        </template>
-
-        <div class="clearfix"></div>
-
-        <template v-if="canViewPrice(product)">
-          <div class="block-title">
-            <h3>Prices</h3>
-
-            <span class="block-title-actions pull-right">
-              <router-link :to="{ name: 'NewPrice', query: { productKind: product.kind, productId: product.id, callbackPath: currentRoutePath } }">
-                <icon name="plus" scale="0.8" class="v-middle"></icon>
-                <span>Add</span>
-              </router-link>
-            </span>
-          </div>
-
-          <div class="block">
-            <div class="block-body full">
-              <el-table :data="product.prices" class="block-table" :show-header="false" style="width: 100%">
-                <el-table-column width="300">
-                  <template slot-scope="scope">
-                    <router-link :to="{ name: 'ShowPrice', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }">
-                      <span v-if="scope.row.name">{{scope.row.name}}</span>
-                      <span v-if="!scope.row.name">{{scope.row.label}}</span>
-                      <el-tag v-if="scope.row.status != 'active'" type="gray" size="mini">
-                        {{$t(`fields.price.status.${scope.row.status}`)}}
-                      </el-tag>
-                    </router-link>
-                  </template>
-                </el-table-column>
-
-                <el-table-column width="100">
-                  <template slot-scope="scope">
-                    <span>{{scope.row.minimumOrderQuantity}}+</span>
-                  </template>
-                </el-table-column>
-
-                <el-table-column width="150">
-                  <template slot-scope="scope">
-                    <span>${{scope.row.chargeAmountCents / 100}}/{{scope.row.chargeUnit}}</span>
-                  </template>
-                </el-table-column>
-
-                <el-table-column>
-                  <template slot-scope="scope">
-                    <p class="text-right actions">
-                      <el-button v-if="scope.row.status == 'draft'" @click="markPriceActive(scope.row)" plain size="mini">
-                        Mark Active
-                      </el-button>
-
-                      <el-button @click="editPrice(scope.row)" plain size="mini">
-                        Edit
-                      </el-button>
-                    </p>
-                  </template>
-                </el-table-column>
-              </el-table>
-            </div>
-
-            <div class="block-footer text-center">
-              <a class="view-more" href="#">View More</a>
-            </div>
-          </div>
-        </template>
-
-        <div class="block-title">
-          <h3>File Collections</h3>
-
-          <span class="block-title-actions pull-right">
-            <router-link :to="{ name: 'NewFileCollection', query: { ownerId: product.id, ownerType: 'Product', callbackPath: currentRoutePath } }">
-              <icon name="plus" scale="0.8" class="v-middle"></icon>
-              <span>Add</span>
-            </router-link>
-          </span>
-        </div>
-
-        <div class="block">
-          <div class="block-body full">
-            <el-table :data="product.fileCollections" stripe class="block-table" :show-header="false" style="width: 100%">
-              <el-table-column width="500">
-                <template slot-scope="scope">
-                  <router-link :to="{ name: 'ShowFileCollection', params: { id: scope.row.id } }">
-                    <span>{{scope.row.name}}</span>
-                    <span v-if="scope.row.name"> - </span>
-                    <span>{{scope.row.label}}</span>
-                  </router-link>
-                </template>
-              </el-table-column>
-
-              <el-table-column width="100">
-                <template slot-scope="scope">
-                  <span>{{scope.row.fileCount}} files</span>
-                </template>
-              </el-table-column>
-
-              <el-table-column>
-                <template slot-scope="scope">
-                  <p class="text-right actions">
-                    <router-link :to="{ name: 'EditFileCollection', params: { id: scope.row.id }}">
-                      <icon name="pencil" scale="0.8" class="v-middle"></icon>
-                      <span class="v-middle">Edit</span>
-                    </router-link>
-                  </p>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-
-          <div class="block-footer text-center">
-            <a class="view-more" href="#">View More</a>
-          </div>
-        </div>
-
-
-        <div class="block-title">
-          <h3>Custom Data</h3>
-        </div>
-        <div class="block">
-          <div class="block-body">
-            {{product.customData}}
-          </div>
-        </div>
-
-        <h3>Related Resources</h3>
-        <div class="block">
-          <div class="block-body">
-            <dl>
-              <dt v-if="product.avatar">Avatar</dt>
-              <dd v-if="product.avatar"><a href="#">{{product.avatar.id}}</a></dd>
-            </dl>
-            <dl>
-              <dt v-if="product.goods">Goods</dt>
-              <dd v-if="product.goods"><a href="#">{{product.goods.id}}</a></dd>
-            </dl>
-            <dl>
-              <dt v-if="product.parent">Parent</dt>
-              <dd v-if="product.parent"><a href="#">{{product.parent.id}}</a></dd>
-            </dl>
-          </div>
-        </div>
-
-        <h3>Logs</h3>
-        <div class="block">
-          <div class="block-body">
-
-          </div>
-        </div>
-
-        <h3>Events</h3>
-        <div class="block">
-          <div class="block-body">
-
-          </div>
-        </div>
-      </div>
-
-      <div class="footer text-right">
-        <confirm-button @confirmed="deleteProduct()" size="small">Delete</confirm-button>
-      </div>
-    </el-card>
-  </div>
-</div> -->
-
 </template>
 
 <script>
@@ -651,6 +348,7 @@ import freshcom from '@/freshcom-sdk'
 import translateErrors from '@/helpers/translate-errors'
 
 import Product from '@/models/product'
+import FileCollectionBlock from '@/components/file-collection-block'
 import ConfirmButton from '@/components/confirm-button'
 import HoverButton from '@/components/hover-button'
 import { dollar, chargeDollar } from '@/helpers/filters'
@@ -662,6 +360,7 @@ export default {
   name: 'ShowProduct',
   mixins: [ResourcePageMixin],
   components: {
+    FileCollectionBlock,
     ConfirmButton,
     HoverButton
   },
@@ -682,7 +381,13 @@ export default {
 
       childForDelete: {},
       isConfirmingDeleteChild: false,
-      isDeletingChild: false
+      isDeletingChild: false,
+
+      isConfirmingDeleteProduct: false,
+      isDeletingProduct: false,
+
+      isConfirmingDeletePrice: false,
+      isDeletingPrice: false
     }
   },
   watch: {
@@ -704,11 +409,17 @@ export default {
     },
 
     canViewPrice () {
-      return this.product.kind !== 'withVariants'
+      return this.product.kind === 'simple' || this.product.kind === 'combo' || this.product.kind === 'variant'
     },
 
     childKindForDelete () {
       return this.$t(`fields.product.kind.${this.childForDelete.kind}`).toLowerCase()
+    },
+
+    fileCollections () {
+      if (!this.product.fileCollections) { return [] }
+
+      return this.product.fileCollections
     }
   },
   methods: {
@@ -719,7 +430,7 @@ export default {
       this.isLoading = true
 
       return freshcom.retrieveProduct(this.id, {
-        include: 'prices,avatar,items,variants.defaultPrice,fileCollections'
+        include: 'prices,avatar,children.defaultPrice,fileCollections'
       }).then(response => {
         this.product = response.data
         this.isLoading = false
@@ -737,7 +448,17 @@ export default {
       })
     },
 
+    attemptDeleteProduct () {
+      this.isConfirmingDeleteProduct = true
+    },
+
+    cancelDeleteProduct () {
+      this.isConfirmingDeleteProduct = false
+    },
+
     deleteProduct () {
+      this.isDeletingProduct = true
+
       freshcom.deleteProduct(this.product.id).then(() => {
         this.$message({
           showClose: true,
@@ -745,18 +466,22 @@ export default {
           type: 'success'
         })
 
-        this.back()
+        this.isDeletingProduct = false
+        this.cancelDeleteProduct()
+        this.defaultBack()
+      }).catch(() => {
+        this.isDeletingProduct = false
       })
     },
 
     //
     // MARK: Child
     //
-    canSetVariantPrimary (variant) {
-      return !variant.primary
+    canSetChildPrimary (child) {
+      return child.kind === 'variant' && !child.primary
     },
 
-    setVariantPrimary (variant) {
+    setChildPrimary (variant) {
       let variantDraft = _.cloneDeep(variant)
       variantDraft.primary = true
 
@@ -870,6 +595,34 @@ export default {
         let translatedErrors = translateErrors(errors, 'price')
         this.$alert(translatedErrors.status, 'Error')
         throw errors
+      })
+    },
+
+    attemptDeletePrice (price) {
+      this.priceForDelete = price
+      this.isConfirmingDeletePrice = true
+    },
+
+    cancelDeletePrice () {
+      this.isConfirmingDeletePrice = false
+    },
+
+    deletePrice () {
+      this.isDeletingPrice = true
+
+      freshcom.deletePrice(this.priceForDelete.id).then(() => {
+        return this.loadPrice()
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: `Product deleted successfully.`,
+          type: 'success'
+        })
+
+        this.isDeletingPrice = false
+        this.cancelDeletePrice()
+      }).catch(() => {
+        this.isDeletingPrice = false
       })
     },
 

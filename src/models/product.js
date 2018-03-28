@@ -8,11 +8,11 @@ export default {
       status: 'draft',
       kind: 'simple',
 
-      nameSync: 'disabled',
+      nameSync: 'syncWithGoods',
       name: '',
       printName: '',
 
-      sourceQuantity: 1,
+      goodsQuantity: 1,
       sortIndex: 0,
       maximumPublicOrderQuantity: 9999,
       autoFulfill: false,
@@ -23,7 +23,7 @@ export default {
       avatar: null,
       items: [],
       variants: [],
-      source: null
+      goods: {}
     }
   }
 }
