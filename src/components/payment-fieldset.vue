@@ -75,7 +75,7 @@
 
     <el-row v-if="formModel.useCardFrom === 'newCard'">
       <el-col :span="24">
-        <el-form-item label="Card" class="card" required>
+        <el-form-item :error="errorMsgs.source" label="Card" class="card" required>
           <card class="stripe-card" :stripe="stripePk" :options="stripeOptions"></card>
         </el-form-item>
       </el-col>
@@ -91,7 +91,7 @@
 
     <el-row v-if="formModel.useCardFrom === 'savedCard'">
       <el-col :span="24">
-        <el-form-item class="card" required>
+        <el-form-item :error="errorMsgs.source" class="card" required>
           <el-select v-model="formModel.source" @change="updateValue()" class="full">
             <el-option v-for="card in cards" :key="card.id" :label="`${card.brand} ****${card.lastFourDigit}`" :value="card.stripeCardId">
               <span>{{card.brand}} ****{{card.lastFourDigit}}</span>

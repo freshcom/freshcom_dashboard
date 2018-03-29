@@ -31,7 +31,7 @@ export default function (opts = {}) {
       updateValue: _.debounce(function (formModel) {
         formModel = formModel || this.formModel
         this.$emit('input', formModel)
-      }, 300)
+      }, 100)
     }
   }
 }

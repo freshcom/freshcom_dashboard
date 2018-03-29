@@ -52,7 +52,7 @@
 
         <div class="block">
           <div class="body full">
-            <order-line-item-table :records="order.rootLineItems" @delete="deleteLineItem" @edit="eidtLineItem($event)">
+            <order-line-item-table :records="order.rootLineItems" @delete="deleteLineItem($event)" @edit="editLineItem($event)">
             </order-line-item-table>
           </div>
         </div>
@@ -102,7 +102,7 @@
       <div v-show="activeStep === this.step.PAYMENT">
         <div class="block">
           <div class="body full">
-            <order-line-item-table :records="order.rootLineItems" @delete="deleteLineItem" @edit="eidtLineItem($event)">
+            <order-line-item-table :records="order.rootLineItems" @delete="deleteLineItem($event)" @edit="editLineItem($event)">
             </order-line-item-table>
           </div>
         </div>
@@ -140,7 +140,6 @@
 
         <hr/>
 
-
         <el-row>
           <el-col :span="20" :offset="2">
             <div class="block">
@@ -152,7 +151,6 @@
             </div>
           </el-col>
         </el-row>
-
       </div>
     </div>
 
@@ -173,6 +171,19 @@
         Place Order
       </el-button>
     </div>
+  </div>
+
+  <div slot="launchable" class="launchable">
+    <el-dialog :show-close="false" :visible="isEditingLineItem" title="Edit line item" width="750px">
+      <el-form @submit.native.prevent="updateLineItem()" label-position="top" size="small">
+        <order-line-item-fieldset v-model="lineItemForEdit" :errors="errors"></order-line-item-fieldset>
+      </el-form>
+
+      <div slot="footer">
+        <el-button :disabled="isUpdatingLineItem" @click="cancelEditLineItem()" plain size="small">Cancel</el-button>
+        <el-button :loading="isUpdatingLineItem" @click="updateLineItem()" type="primary" size="small">Save</el-button>
+      </div>
+    </el-dialog>
   </div>
 </content-container>
 <!-- <div class="page-wrapper">
@@ -306,7 +317,7 @@
 
   <div class="launchable">
     <el-dialog :show-close="false" :visible="isEditingLineItem" title="Edit Line Item" width="750px">
-      <order-line-item-form v-model="lineItemDraftForEdit"></order-line-item-form>
+      <order-line-item-form v-model="lineItemForEdit"></order-line-item-form>
 
       <div slot="footer" class="dialog-footer">
         <el-button :disabled="isUpdatingLineItem" @click="cancelEditLineItem()" plain size="small">Cancel</el-button>
@@ -362,7 +373,6 @@ export default {
       isCreatingLineItem: false,
 
       lineItemForEdit: OrderLineItem.objectWithDefaults(),
-      lineItemDraftForEdit: OrderLineItem.objectWithDefaults(),
       isEditingLineItem: false,
       isUpdatingLineItem: false,
 
@@ -432,11 +442,11 @@ export default {
   },
   methods: {
     loadOrder (id) {
-      freshcom.retrieveOrder(id, {
+      return freshcom.retrieveOrder(id, {
         include: 'rootLineItems.children,customer'
       }).then(response => {
         this.order = response.data
-        this.orderDraft = _.cloneDeep(response.data)
+        this.orderDraft = _.clone(response.data)
         return response
       })
     },
@@ -467,9 +477,9 @@ export default {
       })
     },
 
-    startEditLineItem (lineItemId) {
-      this.lineItemForEdit = _.find(this.order.rootLineItems, { id: lineItemId })
-      this.lineItemDraftForEdit = _.cloneDeep(this.lineItemForEdit)
+    editLineItem (lineItemId) {
+      let targetLineItem = _.find(this.order.rootLineItems, { id: lineItemId })
+      this.lineItemForEdit = _.clone(targetLineItem)
 
       this.isEditingLineItem = true
     },
@@ -480,22 +490,23 @@ export default {
 
     updateLineItem () {
       this.isUpdatingLineItem = true
-      this.lineItemDraftForEdit.order = this.order
+      this.lineItemForEdit.order = this.order
 
-      freshcom.updateOrderLineItem(this.lineItemDraftForEdit.id, this.lineItemDraftForEdit).then(() => {
+      freshcom.updateOrderLineItem(this.lineItemForEdit.id, this.lineItemForEdit).then(() => {
         return this.loadOrder(this.order.id)
       }).then(() => {
+        this.paymentDraft = _.merge({}, this.paymentDraft, { amountCents: this.order.grandTotalCents })
+
         this.$message({
           showClose: true,
-          message: `Line Item saved successfully.`,
+          message: `Line item saved successfully.`,
           type: 'success'
         })
 
         this.isUpdatingLineItem = false
-        this.isEditingLineItem = false
+        this.cancelEditLineItem()
       }).catch(response => {
         this.errors = response.errors
-        this.isEditingLineItem = false
         this.isUpdatingLineItem = false
         throw response
       })
@@ -504,6 +515,14 @@ export default {
     deleteLineItem (id) {
       freshcom.deleteOrderLineItem(id).then(() => {
         return this.loadOrder(this.order.id)
+      }).then(() => {
+        this.paymentDraft = _.merge({}, this.paymentDraft, { amountCents: this.order.grandTotalCents })
+
+        this.$message({
+          showClose: true,
+          message: `Line item deleted successfully.`,
+          type: 'success'
+        })
       })
     },
 
@@ -525,9 +544,9 @@ export default {
       }).then(response => {
         let order = response.data
         this.order = order
-        this.orderDraft = _.cloneDeep(order)
+        this.orderDraft = _.clone(order)
 
-        let paymentDraft = _.cloneDeep(this.paymentDraft)
+        let paymentDraft = _.clone(this.paymentDraft)
         paymentDraft.target = order
         paymentDraft.owner = order.customer
 
@@ -560,8 +579,9 @@ export default {
 
       let paymentCreated
       if (this.paymentDraft.gateway === 'freshcom' && this.paymentDraft.useCardFrom === 'newCard') {
-        paymentCreated = createStripeToken().then(data => {
-          this.paymentDraft.source = data.token.id
+        paymentCreated = createStripeToken().then(response => {
+          if (response.error) { throw response }
+          this.paymentDraft.source = response.token.id
           return freshcom.createPayment(this.paymentDraft)
         })
       } else {

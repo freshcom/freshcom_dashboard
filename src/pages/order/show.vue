@@ -145,7 +145,7 @@
         </div>
 
         <div class="body full">
-          <order-line-item-table :records="order.rootLineItems" @delete="deleteLineItem" @edit="eidtLineItem($event)">
+          <order-line-item-table :records="order.rootLineItems" @delete="deleteLineItem($event)" @edit="editLineItem($event)">
           </order-line-item-table>
         </div>
 
@@ -632,9 +632,9 @@ export default {
       })
     },
 
-    eidtLineItem (lineItemId) {
-      let lineItem = _.find(this.order.rootLineItems, { id: lineItemId })
-      this.lineItemForEdit = _.cloneDeep(lineItem)
+    editLineItem (lineItemId) {
+      let targetLineItem = _.find(this.order.rootLineItems, { id: lineItemId })
+      this.lineItemForEdit = _.cloneDeep(targetLineItem)
       this.errors = {}
       this.isEditingLineItem = true
     },
@@ -715,8 +715,9 @@ export default {
 
       let paymentCreated
       if (this.paymentForAdd.gateway === 'freshcom' && !this.paymentForAdd.source) {
-        paymentCreated = createStripeToken().then(data => {
-          this.paymentForAdd.source = data.token.id
+        paymentCreated = createStripeToken().then(response => {
+          if (response.error) { throw response }
+          this.paymentForAdd.source = response.token.id
           return freshcom.createPayment(this.paymentForAdd)
         })
       } else {
