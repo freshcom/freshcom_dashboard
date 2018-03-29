@@ -1,6 +1,8 @@
 <template>
 <div class="component-wrapper unlockable-fieldset">
-  <avatar-input v-model="formModel.avatar" @input="updateValue()"></avatar-input>
+  <el-form-item>
+    <avatar-input v-model="formModel.avatar" @input="updateValue()"></avatar-input>
+  </el-form-item>
 
   <el-form-item label="Code" :error="errorMsgs.code">
     <el-input v-model="formModel.code" @input="updateValue()"></el-input>
@@ -20,6 +22,10 @@
 
   <el-form-item label="Print Name" :error="errorMsgs.printName">
     <el-input v-model="formModel.printName" @input="updateValue()"></el-input>
+  </el-form-item>
+
+  <el-form-item label="File">
+    <file-input v-model="formModel.file" @input="updateValue()" text="Upload file"></file-input>
   </el-form-item>
 
   <el-form-item label="Caption">
@@ -51,7 +57,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.avatar-input {
-  margin-top: 22px;
-}
 </style>
