@@ -175,6 +175,51 @@ input::-webkit-inner-spin-button {
 }
 
 //
+// Multi Form Item per Line
+//
+.form-item-wrapper.multi-per-line {
+  .el-form-item {
+    margin: 10px 0px;
+  }
+
+  & > .el-form-item {
+    margin: 0px;
+
+    &:first-child {
+      .el-form-item {
+        margin-top: 4px;
+      }
+    }
+
+    &:last-child {
+      .el-form-item {
+        margin-bottom: 18px;
+      }
+    }
+  }
+
+  &.small {
+    .el-form-item {
+      margin: 4px 0px;
+    }
+
+    & > .el-form-item {
+      &:first-child {
+        .el-form-item {
+          margin-top: 0px;
+        }
+      }
+
+      &:last-child {
+        .el-form-item {
+          margin-bottom: 8px;
+        }
+      }
+    }
+  }
+}
+
+//
 // MARK: Data Table
 //
 .el-table.data-table {

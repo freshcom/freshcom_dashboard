@@ -34,26 +34,45 @@
   <template v-if="formModel.fulfillmentMethod === 'ship'">
     <el-form-item label="Address" :error="errorMsgs.deliveryAddressLineOne" required>
       <el-input v-model="formModel.deliveryAddressLineOne" @input="updateValue()" placeholder="Street address line 1"></el-input>
-
-      <el-input v-model="formModel.deliveryAddressLineTwo" @input="updateValue()" placeholder="Street address line 2"></el-input>
-
-      <el-row :gutter="10">
-        <el-col :span="12">
-          <el-input v-model="formModel.deliveryAddressCity" @input="updateValue()" placeholder="City"></el-input>
-        </el-col>
-        <el-col :span="12">
-          <el-input v-model="formModel.deliveryAddressProvince" @input="updateValue()" placeholder="Province/State"></el-input>
-        </el-col>
-      </el-row>
-      <el-row :gutter="10">
-        <el-col :span="12">
-          <el-input v-model="formModel.deliveryAddressCountryCode" @input="updateValue()" placeholder="Country"></el-input>
-        </el-col>
-        <el-col :span="12">
-          <el-input v-model="formModel.deliveryAddressPostalCode" @input="updateValue()" placeholder="Postal Code"></el-input>
-        </el-col>
-      </el-row>
     </el-form-item>
+
+    <el-form-item :error="errorMsgs.deliveryAddressLineTwo">
+      <el-input v-model="formModel.deliveryAddressLineTwo" @input="updateValue()" placeholder="Street address line 2"></el-input>
+    </el-form-item>
+
+    <div class="form-item-wrapper multi-per-line">
+      <el-form-item>
+        <el-row :gutter="10">
+          <el-col :span="12">
+            <el-form-item label-width="0px" :error="errorMsgs.deliveryAddressCity">
+              <el-input v-model="formModel.deliveryAddressCity" @input="updateValue()" placeholder="City"></el-input>
+            </el-form-item>
+          </el-col>
+
+          <el-col :span="12">
+            <el-form-item label-width="0px">
+              <el-input v-model="formModel.deliveryAddressProvince" @input="updateValue()" placeholder="Province/State"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form-item>
+
+      <el-form-item>
+        <el-row :gutter="10">
+          <el-col :span="12">
+            <el-form-item label-width="0px" :error="errorMsgs.deliveryAddressCountryCode">
+              <el-input v-model="formModel.deliveryAddressCountryCode" @input="updateValue()" placeholder="Country"></el-input>
+            </el-form-item>
+          </el-col>
+
+          <el-col :span="12">
+            <el-form-item label-width="0px">
+              <el-input v-model="formModel.deliveryAddressPostalCode" @input="updateValue()" placeholder="Postal Code"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form-item>
+    </div>
   </template>
 </div>
 </template>
@@ -73,8 +92,5 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-.customer-select {
-  width: 100%;
-}
+<style lang="scss" scoped>
 </style>

@@ -238,7 +238,7 @@
         </div>
 
         <div class="launchable">
-          <el-dialog :show-close="false" :visible="isAddingPayment" title="Add payment" width="500px">
+          <el-dialog :show-close="false" :visible="isAddingPayment" title="Add payment" width="600px">
             <el-form @submit.native.prevent="createPayment()" label-width="110px" size="small">
               <payment-fieldset v-model="paymentForAdd" :errors="errors"></payment-fieldset>
             </el-form>

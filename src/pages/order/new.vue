@@ -140,9 +140,19 @@
 
         <hr/>
 
-        <el-form @submit.native.prevent="submit()" label-position="top" size="small">
-          <payment-fieldset v-model="paymentDraft" :errors="errors"></payment-fieldset>
-        </el-form>
+
+        <el-row>
+          <el-col :span="20" :offset="2">
+            <div class="block">
+              <div class="body">
+                <el-form @submit.native.prevent="submit()" label-width="110px" size="small">
+                  <payment-fieldset v-model="paymentDraft" :errors="errors"></payment-fieldset>
+                </el-form>
+              </div>
+            </div>
+          </el-col>
+        </el-row>
+
       </div>
     </div>
 

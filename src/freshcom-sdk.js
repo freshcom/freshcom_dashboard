@@ -70,7 +70,11 @@ const sdk = {
     return this.http.post('/token', qs.stringify(payload), { headers: headers }).then(response => {
       return response.data
     }).catch(error => {
-      throw error.response.data
+      if (error.response && error.response.data) {
+        throw error.response.data
+      }
+
+      throw error
     })
   },
 

@@ -2,24 +2,24 @@
 <div class="component-wrapper payment-fieldset">
   <el-row :gutter="10">
     <el-col :span="12">
-      <el-form-item :error="errorMsgs.amountCents" label="Pay Amount" class="amount">
+      <el-form-item :error="errorMsgs.amountCents" label="Pay Amount" class="amount" required>
         <money-input v-model="formModel.amountCents" @input="updateValue()"></money-input>
       </el-form-item>
     </el-col>
+  </el-row>
 
-    <el-col v-if="canSelectGateway" :span="12">
-      <el-form-item label="Gateway" :error="errorMsgs.gateway" required>
+  <el-row :gutter="10">
+    <el-col :span="10">
+      <el-form-item :error="errorMsgs.gateway" label="Gateway" required>
         <el-select @change="updateValue()" v-model="formModel.gateway">
           <el-option label="Freshcom" value="freshcom"></el-option>
           <el-option label="Custom" value="custom"></el-option>
         </el-select>
       </el-form-item>
     </el-col>
-  </el-row>
 
-  <el-row :gutter="10">
-    <el-col :span="12">
-      <el-form-item v-if="canSelectStatus" label="Status" :error="errorMsgs.status" required>
+    <el-col :span="7">
+      <el-form-item v-if="canSelectStatus" label="Status" :error="errorMsgs.status" label-width="60px" required>
         <el-select @change="updateValue()" v-model="formModel.status">
           <el-option label="Pending" value="pending"></el-option>
           <el-option label="Paid" value="paid"></el-option>
@@ -27,8 +27,8 @@
       </el-form-item>
     </el-col>
 
-    <el-col :span="12">
-      <el-form-item v-if="formModel.gateway === 'custom' && formModel.status === 'paid'" label="Method" :error="errorMsgs.method" required>
+    <el-col :span="7">
+      <el-form-item v-if="formModel.gateway === 'custom' && formModel.status === 'paid'" label="Method" label-width="70px" :error="errorMsgs.method" required>
         <el-select @change="updateValue()" v-model="formModel.method">
           <el-option label="Credit" value="credit"></el-option>
           <el-option label="Debit" value="debit"></el-option>
@@ -104,7 +104,7 @@
     <hr/>
 
     <el-row v-if="formModel.gateway === 'freshcom' && formModel.order && formModel.order.fulfillmentMethod === 'ship'">
-      <el-form-item label="Billing Address" :error="errorMsgs.status" required>
+      <el-form-item label="Billing Address" :error="errorMsgs.status">
         <el-radio-group v-model="isBillingAndShippingAddressSame" @change="updateValue()">
           <el-radio :label="false">Enter new address</el-radio>
           <el-radio :label="true">Same as shipping address</el-radio>
@@ -113,40 +113,47 @@
     </el-row>
 
     <template v-if="canEnterBillingAddress">
-      <el-row :gutter="10">
-        <el-col :span="24">
-          <el-form-item label="Street Address" :error="errorMsgs.billingAddressLineOne">
-            <el-input v-model="formModel.billingAddressLineOne" @input="updateValue()" placeholder="Line 1"></el-input>
-            <el-input v-model="formModel.billingAddressLineTwo" @input="updateValue()" placeholder="Line 2"></el-input>
-          </el-form-item>
-        </el-col>
-      </el-row>
+      <el-form-item label="Billing Address" :error="errorMsgs.billingAddressLineOne">
+        <el-input v-model="formModel.billingAddressLineOne" @input="updateValue()" placeholder="Street address line 1"></el-input>
+      </el-form-item>
 
-      <el-row :gutter="10">
-        <el-col :span="12">
-          <el-form-item label="City" :error="errorMsgs.billingAddressCity">
-            <el-input v-model="formModel.billingAddressCity" @input="updateValue()"></el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="Province" :error="errorMsgs.billingAddressProvince">
-            <el-input v-model="formModel.billingAddressProvince" @input="updateValue()"></el-input>
-          </el-form-item>
-        </el-col>
-      </el-row>
+      <el-form-item :error="errorMsgs.billingAddressLineTwo">
+        <el-input v-model="formModel.billingAddressLineTwo" @input="updateValue()" placeholder="Street address line 2"></el-input>
+      </el-form-item>
 
-      <el-row :gutter="10">
-        <el-col :span="12">
-          <el-form-item label="Country" :error="errorMsgs.billingAddressCountryCode">
-            <el-input v-model="formModel.billingAddressCountryCode" @input="updateValue()"></el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="Postal Code" :error="errorMsgs.billingAddressPostalCode">
-            <el-input v-model="formModel.billingAddressPostalCode" @input="updateValue()"></el-input>
-          </el-form-item>
-        </el-col>
-      </el-row>
+      <div class="form-item-wrapper multi-per-line small">
+        <el-form-item>
+          <el-row :gutter="10">
+            <el-col :span="12">
+              <el-form-item label-width="0px" :error="errorMsgs.billingAddressCity">
+                <el-input v-model="formModel.billingAddressCity" @input="updateValue()" placeholder="City"></el-input>
+              </el-form-item>
+            </el-col>
+
+            <el-col :span="12">
+              <el-form-item label-width="0px">
+                <el-input v-model="formModel.billingAddressProvince" @input="updateValue()" placeholder="Province/State"></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form-item>
+
+        <el-form-item>
+          <el-row :gutter="10">
+            <el-col :span="12">
+              <el-form-item label-width="0px" :error="errorMsgs.billingAddressCountryCode">
+                <el-input v-model="formModel.billingAddressCountryCode" @input="updateValue()" placeholder="Country"></el-input>
+              </el-form-item>
+            </el-col>
+
+            <el-col :span="12">
+              <el-form-item label-width="0px">
+                <el-input v-model="formModel.billingAddressPostalCode" @input="updateValue()" placeholder="Postal Code"></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form-item>
+      </div>
     </template>
   </template>
 </div>
@@ -282,7 +289,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style lang="scss" scoped>
 .el-form-item {
   margin: 10px 0;
 }
