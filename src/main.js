@@ -32,6 +32,8 @@ import 'vue-awesome/icons/file-text' // Order
 import 'vue-awesome/icons/tag' // Product
 import 'vue-awesome/icons/tags' // Product Collection
 import 'vue-awesome/icons/dollar' // Product Collection
+import 'vue-awesome/icons/truck' // Fulfillment
+import 'vue-awesome/icons/unlock' // Unlock
 
 // -- Sync Store & Router --
 sync(store, router)

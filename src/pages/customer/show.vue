@@ -273,7 +273,7 @@
           </el-table>
 
           <div v-if="unlocks.length >= 5" class="foot text-center">
-            <router-link :to="{ name: 'ListUnlockable', query: { filter: { unlockedBy: customer.id } } }" class="view-more">View More</router-link>
+            <router-link :to="{ name: 'ListUnlock', query: { filter: { customerId: customer.id } } }" class="view-more">View More</router-link>
           </div>
         </div>
 

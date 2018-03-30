@@ -38,6 +38,9 @@ import NewPricePage from '@/pages/price/new'
 import EditPricePage from '@/pages/price/edit'
 import ShowPricePage from '@/pages/price/show'
 
+// Fulfillment
+import ListUnlockPage from '@/pages/unlock/list'
+
 // Goods
 import ListStockablePage from '@/pages/stockable/list'
 import ShowStockablePage from '@/pages/stockable/show'
@@ -190,6 +193,19 @@ const router = new Router({
       component: ShowPaymentPage,
       props (route) {
         return { id: route.params.id }
+      }
+    },
+    {
+      path: '/unlocks',
+      name: 'ListUnlock',
+      component: ListUnlockPage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          filterObject: route.query.filter,
+          page: page
+        }
       }
     },
     {

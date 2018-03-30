@@ -29,6 +29,17 @@
           </el-menu-item>
         </el-submenu>
 
+        <el-submenu index="fulfillment">
+          <template slot="title">
+            <icon name="truck" scale="0.8"></icon>
+            <span>Fulfillment</span>
+          </template>
+          <el-menu-item :route="{ name: 'ListUnlock' }" index="/unlocks">
+            <icon name="unlock" scale="1"></icon>
+            <span>Unlocks</span>
+          </el-menu-item>
+        </el-submenu>
+
         <el-submenu index="inventory">
           <template slot="title">
             <icon name="archive" scale="0.8"></icon>
