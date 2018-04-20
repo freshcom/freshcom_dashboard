@@ -38,6 +38,22 @@ const sdk = {
     throw error
   },
 
+  _clone (dst, src1, src2) {
+    for (let prop in src1) {
+      if (src1.hasOwnProperty(prop)) {
+        dst[prop] = src1[prop]
+      }
+    }
+
+    for (let prop in src2) {
+      if (src2.hasOwnProperty(prop)) {
+        dst[prop] = src2[prop]
+      }
+    }
+
+    return dst
+  },
+
   setLocale (locale) {
     this.http.defaults.params['locale'] = locale
   },
@@ -433,7 +449,7 @@ const sdk = {
   },
 
   updateBalanceSettings (fields, params = {}, options = {}) {
-    let payload = SimpleJAS.serialize(fields)
+    let payload = SimpleJAS.serialize(this._clone({}, fields, { type: 'BalanceSettings' }))
     return this.http.patch('/balance_settings', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)

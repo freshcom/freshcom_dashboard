@@ -4,7 +4,7 @@
     <customer-select v-model="formModel.customer" :disabled="formModel.status !== 'cart'" @input="updateValue()"></customer-select>
   </el-form-item>
 
-  <el-form-item label="Name" :error="errorMsgs.name">
+  <el-form-item label="Name" :error="errorMsgs.name" required>
     <el-input v-model="formModel.name" @input="updateValue()"></el-input>
   </el-form-item>
 

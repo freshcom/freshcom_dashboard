@@ -19,13 +19,13 @@
             <icon name="file-text" scale="1"></icon>
             <span>Orders</span>
           </el-menu-item>
-          <el-menu-item :route="{ name: 'ListCustomer' }" index="/customers">
-            <icon name="user" scale="1"></icon>
-            <span>Customers</span>
-          </el-menu-item>
           <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
             <icon name="tag" scale="0.9"></icon>
             <span>Products</span>
+          </el-menu-item>
+          <el-menu-item :route="{ name: 'ListCustomer' }" index="/customers">
+            <icon name="user" scale="1"></icon>
+            <span>Customers</span>
           </el-menu-item>
         </el-submenu>
 

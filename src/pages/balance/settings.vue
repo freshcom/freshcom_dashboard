@@ -1,36 +1,58 @@
 <template>
-<div class="page-wrapper">
-
-  <div>
-    <el-menu :router="true" default-active="/balance/settings" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ShowBalanceSettings' }" index="/balance/settings">Settings</el-menu-item>
-    </el-menu>
+<content-container>
+  <div slot="header">
+    <router-link :to="{ name: 'ShowBalanceSettings' }">Settings</router-link>
   </div>
 
-  <div>
-    <el-card class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
+  <div slot="card-header">
+    Balance Settings
+  </div>
+
+  <div slot="card-content">
+    <div v-loading="isLoading" class="data">
+      <div v-if="isReady" class="block">
+        <div class="header">
+          <h2>Stripe</h2>
+
+          <div v-if="balanceSettings.stripeUserId" class="action-group">
+            <el-button @click="disconnect()" plain size="mini">
+              Disconnect
+            </el-button>
+          </div>
         </div>
 
-        Balance Settings
-      </div>
+        <div class="body">
+          <template v-if="balanceSettings.stripeUserId">
+            <dl>
+              <dt>User ID</dt>
+              <dd>{{balanceSettings.stripeUserId}}</dd>
+            </dl>
 
-      <div class="data full">
-        <p class="text-center">
-          <a v-if="!balanceSettings.stripeUserId" :href="stripeAuthorizeUrl">Connect with Stripe</a>
-          <span v-if="balanceSettings.stripeUserId">Stripe Connected</span>
-        </p>
+            <dl>
+              <dt>Publishable Key</dt>
+              <dd>{{balanceSettings.stripePublishableKey}}</dd>
+            </dl>
+          </template>
+
+          <template v-else>
+            <p class="text-center">
+              You have no connected Stripe account.
+            </p>
+
+            <p class="text-center">
+              <a :href="stripeAuthorizeUrl" class="el-button el-button--mini is-plain">
+                Connect Now
+              </a>
+            </p>
+          </template>
+        </div>
       </div>
-    </el-card>
+    </div>
   </div>
-
-</div>
+</content-container>
 </template>
 
 <script>
-import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
 import PageMixin from '@/mixins/page'
@@ -45,16 +67,19 @@ export default {
   data () {
     return {
       balanceSettings: BalanceSettings.objectWithDefaults(),
-      balanceSettingsDraft: BalanceSettings.objectWithDefaults(),
+      isReady: false,
       isLoading: false
     }
   },
   created () {
     if (this.stripeCode) {
-      this.balanceSettingsDraft.stripeAuthCode = this.stripeCode
-      this.updateBalanceSettings()
+      this.connect().then(() => {
+        this.isReady = true
+      })
     } else {
-      this.loadBalanceSettings()
+      this.loadBalanceSettings().then(() => {
+        this.isReady = true
+      })
     }
   },
   computed: {
@@ -75,12 +100,35 @@ export default {
     }
   },
   methods: {
-    updateBalanceSettings () {
+    disconnect () {
       this.isLoading = true
 
-      freshcom.updateBalanceSettings(this.balanceSettingsDraft).then(response => {
+      return freshcom.updateBalanceSettings({ stripeUserId: null }).then(response => {
         this.balanceSettings = response.data
-        this.balanceSettingsDraft = _.cloneDeep(response.data)
+
+        this.$message({
+          showClose: true,
+          message: `Stripe account disconnected successfully.`,
+          type: 'success'
+        })
+
+        this.isLoading = false
+      }).catch(response => {
+        this.isLoading = false
+      })
+    },
+
+    connect () {
+      this.isLoading = true
+
+      return freshcom.updateBalanceSettings({ stripeAuthCode: this.stripeCode }).then(response => {
+        this.balanceSettings = response.data
+
+        this.$message({
+          showClose: true,
+          message: `Stripe account connected successfully.`,
+          type: 'success'
+        })
 
         this.isLoading = false
       }).catch(response => {
@@ -99,7 +147,7 @@ export default {
 
     loadBalanceSettings () {
       this.isLoading = true
-      freshcom.retrieveBalanceSettings().then(response => {
+      return freshcom.retrieveBalanceSettings().then(response => {
         this.balanceSettings = response.data
         this.isLoading = false
       }).catch(errors => {
@@ -113,21 +161,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.main-card .footer {
-  text-align: right;
-  border-top: 0;
-}
-
-.total {
-  float: left;
-  display: inline-block;
-  font-size: 13px;
-  min-width: 28px;
-  height: 28px;
-  line-height: 28px;
-}
-
-.dd {
-  font-family: "Courier New";
-}
 </style>
