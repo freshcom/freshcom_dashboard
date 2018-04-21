@@ -103,7 +103,7 @@
         <el-table :data="notificationTriggers" slot="content" class="data-table">
           <el-table-column prop="name" label="TRIGGER">
             <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowNotificationTrigger', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }" class="primary">
+              <router-link :to="{ name: 'ShowNotificationTrigger', params: { id: scope.row.id } }" class="primary">
                 <span>{{scope.row.name}}</span>
               </router-link>
             </template>
@@ -142,7 +142,7 @@
 
           <el-table-column prop="updatedAt" label="UPDATED" align="right" width="200">
             <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowNotificationTrigger', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
+              <router-link :to="{ name: 'ShowNotificationTrigger', params: { id: scope.row.id } }">
                 {{scope.row.updatedAt | moment}}
               </router-link>
             </template>

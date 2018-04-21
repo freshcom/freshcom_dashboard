@@ -1,120 +1,122 @@
 <template>
-<div class="page-wrapper">
-  <div>
-    <el-menu :router="true" default-active="/email-templates" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListEmail' }" index="/emails">Emails</el-menu-item>
-      <el-menu-item :route="{ name: 'ListEmailTemplate' }" index="/email-templates">Templates</el-menu-item>
-    </el-menu>
-    <locale-selector class="pull-right"></locale-selector>
+<content-container @locale-changed="reload" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListEmail' }">Emails</router-link>
+    <router-link :to="{ name: 'ListEmailTemplate' }">Templates</router-link>
   </div>
 
-  <div>
-    <el-card v-loading="isLoading" class="main-card">
-        <div slot="header">
-          <div v-if="isViewingTestData" class="test-data-banner">
-            <div class="banner-content">TEST DATA</div>
-          </div>
+  <div slot="card-header">
+    <div class="brief">
+      <div class="avatar">
+        <icon name="file-code-o" class="avatar-icon"></icon>
+      </div>
 
-          <div class="brief no-avatar">
-            <div class="detail">
-              <p>Email Template</p>
-              <h2>{{emailTemplate.name}}</h2>
-              <p class="id">{{emailTemplate.id}}</p>
-            </div>
-          </div>
+      <div class="detail">
+        <p>
+          <span>Email Template</span>
+        </p>
+        <h1>{{emailTemplate.name}}</h1>
+        <p class="id">{{emailTemplate.id}}</p>
+      </div>
+    </div>
 
-          <div class="header-actions">
-            <el-button @click="editEmailTemplate(emailTemplate)" plain size="small">Edit</el-button>
-          </div>
-        </div>
-
-        <div class="data">
-          <div class="block-title">
-            <h3>Details</h3>
-          </div>
-          <div class="block">
-            <div class="block-body">
-              <dl>
-                <dt>ID</dt>
-                <dd>{{emailTemplate.id}}</dd>
-
-                <dt>Name</dt>
-                <dd>{{emailTemplate.name}}</dd>
-
-                <dt>Description</dt>
-                <dd>{{emailTemplate.description}}</dd>
-
-                <dt>Last updated</dt>
-                <dd>{{emailTemplate.updatedAt | moment}}</dd>
-
-                <dt>Creation date</dt>
-                <dd>{{emailTemplate.insertedAt | moment}}</dd>
-              </dl>
-            </div>
-          </div>
-
-          <div class="block-title">
-            <h3>Preview</h3>
-          </div>
-          <div class="block">
-            <div class="block-body full">
-              <div class="content-preview">
-                <iframe :srcdoc="emailTemplate.bodyHtml"></iframe>
-              </div>
-            </div>
-          </div>
-
-
-          <h3>Related Resources</h3>
-          <div class="block">
-            <div class="block-body">
-
-            </div>
-          </div>
-
-          <h3>Logs</h3>
-          <div class="block">
-            <div class="block-body">
-
-            </div>
-          </div>
-
-          <h3>Events</h3>
-          <div class="block">
-            <div class="block-body">
-
-            </div>
-          </div>
-        </div>
-
-        <div class="footer text-right">
-          <confirm-button @confirmed="deleteEmailTemplate()" size="small">Delete</confirm-button>
-        </div>
-    </el-card>
+    <div class="brief-action-group">
+      <router-link :to="{ name: 'EditEmailTemplate', params: { id: emailTemplate.id } }" class="el-button el-button--small is-plain">
+        Edit
+      </router-link>
+    </div>
   </div>
-</div>
 
+  <div slot="card-content">
+    <div class="data">
+      <div class="block">
+        <div class="header">
+          <h2>Detail</h2>
+        </div>
+
+        <div class="body">
+          <dl>
+            <dt>ID</dt>
+            <dd>{{emailTemplate.id}}</dd>
+
+            <dt>Name</dt>
+            <dd>{{emailTemplate.name}}</dd>
+
+            <dt>Description</dt>
+            <dd>{{emailTemplate.description}}</dd>
+
+            <dt>Last updated</dt>
+            <dd>{{emailTemplate.updatedAt | moment}}</dd>
+
+            <dt>Creation date</dt>
+            <dd>{{emailTemplate.insertedAt | moment}}</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Preview</h2>
+        </div>
+        <div class="body full">
+          <div class="content-preview">
+            <iframe :srcdoc="emailTemplate.bodyHtml"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot text-right">
+      <el-button @click="attemptDeleteEmailTemplate()" plain size="small">Delete</el-button>
+    </div>
+  </div>
+
+  <div slot="launchable" class="launchable">
+    <el-dialog :show-close="false" :visible="isConfirmingDeleteEmailTemplate" title="Delete email template" width="500px">
+      <p>
+        Are you sure you want to delete this email template? If you delete this email template,
+        all of the following related resources if any will also be deleted:
+
+        <ul>
+          <li>All notification triggers that use this email template</li>
+        </ul>
+
+        <b>This action cannot be undone.</b>
+      </p>
+
+      <div slot="footer">
+        <el-button :disabled="isDeletingEmailTemplate" @click="cancelDeleteEmailTemplate()" plain size="small">Cancel</el-button>
+        <el-button :loading="isDeletingEmailTemplate" @click="deleteEmailTemplate()" type="danger" size="small">Delete</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</content-container>
 </template>
 
 <script>
-import 'vue-awesome/icons/file'
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
 import EmailTemplate from '@/models/email-template'
-import ConfirmButton from '@/components/confirm-button'
+
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadEmailTemplate' })
 
 export default {
   name: 'ShowEmailTemplate',
-  mixins: [PageMixin],
-  components: {
-    ConfirmButton
+  mixins: [ResourcePageMixin],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
   },
-  props: ['id'],
   data () {
     return {
       emailTemplate: EmailTemplate.objectWithDefaults(),
       isLoading: false,
+
+      isConfirmingDeleteEmailTemplate: false,
+      isDeletingEmailTemplate: false,
 
       errors: {}
     }
@@ -124,7 +126,7 @@ export default {
   },
   methods: {
     loadEmailTemplate () {
-      freshcom.retrieveEmailTemplate(this.id).then(response => {
+      return freshcom.retrieveEmailTemplate(this.id).then(response => {
         this.emailTemplate = response.data
         this.isLoading = false
       }).catch(errors => {
@@ -137,7 +139,7 @@ export default {
       freshcom.deleteEmailTemplate(this.emailTemplate.id).then(() => {
         this.$message({
           showClose: true,
-          message: `File deleted successfully.`,
+          message: `Email template deleted successfully.`,
           type: 'success'
         })
 
@@ -145,11 +147,15 @@ export default {
       })
     },
 
-    editEmailTemplate (emailTemplate) {
-      this.$store.dispatch('pushRoute', { name: 'EditEmailTemplate', params: { id: emailTemplate.id } })
+    attemptDeleteEmailTemplate () {
+      this.isConfirmingDeleteEmailTemplate = true
     },
 
-    back () {
+    cancelDeleteEmailTemplate () {
+      this.isConfirmingDeleteEmailTemplate = false
+    },
+
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ListEmailTemplate' })
     }
   }

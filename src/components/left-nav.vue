@@ -104,7 +104,7 @@
             <icon name="envelope" scale="0.8"></icon>
             <span>Emails</span>
           </el-menu-item>
-          <el-menu-item :route="{ name: 'ListSms' }" index="/emails">
+          <el-menu-item :route="{ name: 'ListSms' }" index="/sms">
             <icon name="comment" scale="0.8"></icon>
             <span>SMS</span>
           </el-menu-item>

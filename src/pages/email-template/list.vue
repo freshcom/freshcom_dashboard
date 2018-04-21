@@ -67,7 +67,7 @@
         <el-table :data="emailTemplates" slot="content" class="data-table">
           <el-table-column prop="name" label="EMAIL">
             <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowEmailTemplate', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }" class="primary">
+              <router-link :to="{ name: 'ShowEmailTemplate', params: { id: scope.row.id } }" class="primary">
                 <span>{{scope.row.name}}</span>
               </router-link>
             </template>
@@ -75,7 +75,7 @@
 
           <el-table-column prop="to" label="TO" width="200">
             <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowEmailTemplate', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
+              <router-link :to="{ name: 'ShowEmailTemplate', params: { id: scope.row.id } }">
                 {{scope.row.to}}
               </router-link>
             </template>
@@ -94,7 +94,7 @@
 
           <el-table-column prop="updatedAt" label="UPDATED" align="right" width="200">
             <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowEmailTemplate', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
+              <router-link :to="{ name: 'ShowEmailTemplate', params: { id: scope.row.id } }">
                 {{scope.row.updatedAt | moment}}
               </router-link>
             </template>
