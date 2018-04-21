@@ -65,7 +65,7 @@
         </div>
 
         <el-table :data="emailTemplates" slot="content" class="data-table">
-          <el-table-column prop="name" label="EMAIL">
+          <el-table-column prop="name" label="EMAIL TEMPLATE">
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowEmailTemplate', params: { id: scope.row.id } }" class="primary">
                 <span>{{scope.row.name}}</span>

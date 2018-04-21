@@ -31,20 +31,6 @@
               </div>
             </div>
           </filter-condition>
-
-          <filter-condition v-model="filterObjectDraft" filter-key="from" default="">
-            <span slot="key">Sender Email</span>
-            <div slot="value">
-              <select value="$eq">
-                <option value="$eq">is equal to</option>
-              </select>
-
-              <div style="vertical-align: middle;" class="m-t-5">
-                <icon name="share" class="fa-flip-vertical" scale="0.8"></icon>
-                <input v-model="filterObjectDraft.from" type="text"></input>
-              </div>
-            </div>
-          </filter-condition>
         </filter-button>
         <search-input :value="searchKeyword"></search-input>
       </el-col>
@@ -130,6 +116,7 @@ export default {
 
       return freshcom.listSms({
         search: this.searchKeyword,
+        filter: this.filterObject,
         page: this.page
       }).then(response => {
         this.smses = response.data
@@ -148,17 +135,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.main-card .footer {
-  text-align: right;
-  border-top: 0;
-}
-
-.total {
-  float: left;
-  display: inline-block;
-  font-size: 13px;
-  min-width: 28px;
-  height: 28px;
-  line-height: 28px;
-}
 </style>
