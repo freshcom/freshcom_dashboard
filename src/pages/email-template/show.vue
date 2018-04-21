@@ -56,7 +56,7 @@
 
       <div class="block">
         <div class="header">
-          <h2>Preview</h2>
+          <h2>Body HTML Preview</h2>
         </div>
         <div class="body full">
           <div class="body-html-preview">
