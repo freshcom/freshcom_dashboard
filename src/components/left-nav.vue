@@ -169,10 +169,7 @@
 <script>
 import _ from 'lodash'
 
-import 'vue-awesome/icons/external-link'
 import 'vue-awesome/icons/send'
-import 'vue-awesome/icons/envelope'
-import 'vue-awesome/icons/comment'
 import 'vue-awesome/icons/home'
 import 'vue-awesome/icons/shopping-bag'
 import 'vue-awesome/icons/cubes'

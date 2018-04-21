@@ -56,6 +56,12 @@ export default {
     }
   },
   fields: {
+    sms: {
+      status: {
+        pending: 'Pending',
+        sent: 'Sent'
+      }
+    },
     email: {
       status: {
         pending: 'Pending',

@@ -34,7 +34,10 @@ import 'vue-awesome/icons/tags' // Product Collection
 import 'vue-awesome/icons/dollar' // Product Collection
 import 'vue-awesome/icons/truck' // Fulfillment
 import 'vue-awesome/icons/unlock' // Unlock
+import 'vue-awesome/icons/external-link' // Notification Trigger
 import 'vue-awesome/icons/file-code-o' // Email & SMS Template
+import 'vue-awesome/icons/envelope' // Email
+import 'vue-awesome/icons/comment' // SMS
 
 // -- Sync Store & Router --
 sync(store, router)

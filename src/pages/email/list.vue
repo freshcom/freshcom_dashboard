@@ -33,19 +33,18 @@
           </filter-condition>
 
           <filter-condition v-model="filterObjectDraft" filter-key="from" default="">
-              <span slot="key">Sender Email</span>
-              <div slot="value">
-                <select value="$eq">
-                  <option value="$eq">is equal to</option>
-                </select>
+            <span slot="key">Sender Email</span>
+            <div slot="value">
+              <select value="$eq">
+                <option value="$eq">is equal to</option>
+              </select>
 
-                <div style="vertical-align: middle;" class="m-t-5">
-                  <icon name="share" class="fa-flip-vertical" scale="0.8"></icon>
-                  <input v-model="filterObjectDraft.from" type="text"></input>
-                </div>
+              <div style="vertical-align: middle;" class="m-t-5">
+                <icon name="share" class="fa-flip-vertical" scale="0.8"></icon>
+                <input v-model="filterObjectDraft.from" type="text"></input>
               </div>
-            </filter-condition>
-          </filter-button>
+            </div>
+          </filter-condition>
         </filter-button>
         <search-input :value="searchKeyword"></search-input>
       </el-col>
@@ -66,7 +65,7 @@
         <el-table :data="emails" slot="content" class="data-table">
           <el-table-column prop="name" label="EMAIL">
             <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowEmail', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }" class="primary">
+              <router-link :to="{ name: 'ShowEmail', params: { id: scope.row.id } }" class="primary">
                 <span>{{scope.row.subject}}</span>
               </router-link>
             </template>
@@ -74,7 +73,7 @@
 
           <el-table-column prop="status" label="STATUS" width="100">
             <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowEmail', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
+              <router-link :to="{ name: 'ShowEmail', params: { id: scope.row.id } }">
                 <el-tag v-if="scope.row.status == 'active'" :disable-transitions="true" size="mini">
                   {{$t(`fields.email.status.${scope.row.status}`)}}
                 </el-tag>
@@ -93,7 +92,7 @@
 
           <el-table-column prop="updatedAt" label="UPDATED" align="right" width="200">
             <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowEmail', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
+              <router-link :to="{ name: 'ShowEmail', params: { id: scope.row.id } }">
                 {{scope.row.updatedAt | moment}}
               </router-link>
             </template>
