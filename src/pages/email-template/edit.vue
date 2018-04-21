@@ -97,7 +97,7 @@ export default {
       this.isUpdating = true
 
       freshcom.updateEmailTemplate(
-        this.emailTemplateDraft.id,
+        this.emailTemplate.id,
         this.emailTemplateDraft
       ).then(emailTemplate => {
         this.$message({

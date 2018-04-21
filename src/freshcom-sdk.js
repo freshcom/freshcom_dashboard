@@ -38,7 +38,7 @@ const sdk = {
     throw error
   },
 
-  _clone (dst, src1, src2) {
+  _merge (dst, src1, src2) {
     for (let prop in src1) {
       if (src1.hasOwnProperty(prop)) {
         dst[prop] = src1[prop]
@@ -449,7 +449,7 @@ const sdk = {
   },
 
   updateBalanceSettings (fields, params = {}, options = {}) {
-    let payload = SimpleJAS.serialize(this._clone({}, fields, { type: 'BalanceSettings' }))
+    let payload = SimpleJAS.serialize(this._merge({}, fields, { type: 'BalanceSettings' }))
     return this.http.patch('/balance_settings', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
@@ -903,6 +903,8 @@ const sdk = {
   },
 
   createEmailTemplate (fields, params = {}, options = {}) {
+    fields = this._merge({}, fields, { type: 'EmailTemplate' })
+
     let payload = SimpleJAS.serialize(fields)
     return this.http.post('/email_templates', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
@@ -916,6 +918,8 @@ const sdk = {
   },
 
   updateEmailTemplate (id, fields, params = {}, options = {}) {
+    fields = this._merge({}, fields, { type: 'EmailTemplate' })
+
     let payload = SimpleJAS.serialize(fields)
     return this.http.patch(`/email_templates/${id}`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)

@@ -1,51 +1,47 @@
 <template>
-<div class="page-wrapper">
-  <div>
-    <el-menu :router="true" default-active="/email-templates" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListEmail' }" index="/emails">Emails</el-menu-item>
-      <el-menu-item :route="{ name: 'ListEmailTemplate' }" index="/email-templates">Templates</el-menu-item>
-    </el-menu>
-    <locale-selector class="pull-right"></locale-selector>
+<content-container>
+  <div slot="header">
+    <router-link :to="{ name: 'ListEmail' }">Emails</router-link>
+    <router-link :to="{ name: 'ListEmailTemplate' }">Templates</router-link>
   </div>
 
-  <div>
-    <el-card class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
+  <div slot="card-header">
+    <h1>Create an email template</h1>
 
-        <span style="line-height: 36px;">Create an email template</span>
+    <div class="pull-right">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
 
-        <div class="pull-right">
-          <el-button @click="back()" plain size="small">
-            Cancel
-          </el-button>
-
-          <el-button @click="submit()" type="primary" size="small">
-            Save
-          </el-button>
-        </div>
-      </div>
-
-      <div class="data">
-        <el-form @submit.native.prevent="submit()" label-width="150px" size="small">
-          <email-template-fieldset v-model="emailTemplateDraft" :errors="errors"></email-template-fieldset>
-        </el-form>
-      </div>
-
-      <div class="footer">
-        <el-button @click="back()" plain size="small">
-          Cancel
-        </el-button>
-
-        <el-button @click="submit()" type="primary" class="pull-right" size="small">
-          Save
-        </el-button>
-      </div>
-    </el-card>
+      <el-button :loading="isCreating" @click="submit()" type="primary" size="small">
+        Save
+      </el-button>
+    </div>
   </div>
-</div>
+
+  <div slot="card-content">
+    <div class="data">
+      <el-row>
+        <el-col :span="24">
+          <el-form @submit.native.prevent="submit()" label-width="100px" size="small">
+            <email-template-fieldset v-model="emailTemplateDraft" :errors="errors"></email-template-fieldset>
+          </el-form>
+        </el-col>
+      </el-row>
+    </div>
+
+    <div class="foot">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isCreating" @click="submit()" type="primary" size="small" class="pull-right">
+        Save
+      </el-button>
+    </div>
+  </div>
+
+</content-container>
 </template>
 
 <script>
@@ -64,13 +60,13 @@ export default {
   data () {
     return {
       emailTemplateDraft: EmailTemplate.objectWithDefaults(),
-      isCreatingEmailTemplate: false,
+      isCreating: false,
       errors: {}
     }
   },
   methods: {
     submit () {
-      this.isCreatingEmailTemplate = true
+      this.isCreating = true
 
       freshcom.createEmailTemplate(this.emailTemplateDraft).then(response => {
         this.$message({
@@ -79,15 +75,16 @@ export default {
           type: 'success'
         })
 
-        this.isCreatingEmailTemplate = false
+        this.isCreating = false
         this.back()
       }).catch(response => {
         this.errors = response.errors
-        this.isCreatingEmailTemplate = false
+        this.isCreating = false
         throw response
       })
     },
-    back () {
+
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ListEmailTemplate' })
     }
   }

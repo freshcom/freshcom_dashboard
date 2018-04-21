@@ -136,7 +136,10 @@ export default {
     },
 
     deleteEmailTemplate () {
+      this.isDeletingEmailTemplate = true
+
       freshcom.deleteEmailTemplate(this.emailTemplate.id).then(() => {
+        this.isDeletingUnlockable = false
         this.$message({
           showClose: true,
           message: `Email template deleted successfully.`,
@@ -144,6 +147,8 @@ export default {
         })
 
         this.back()
+      }).catch(() => {
+        this.isDeletingUnlockable = false
       })
     },
 
