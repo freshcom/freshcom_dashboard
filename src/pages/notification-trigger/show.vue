@@ -44,6 +44,9 @@
             <dt>Name</dt>
             <dd>{{notificationTrigger.name}}</dd>
 
+            <dt>Event</dt>
+            <dd>{{notificationTrigger.event}}</dd>
+
             <dt>Description</dt>
             <dd>{{notificationTrigger.description}}</dd>
 

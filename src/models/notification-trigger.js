@@ -8,7 +8,9 @@ export default {
       event: '',
       description: undefined,
       actionType: 'sendEmail',
-      actionTarget: ''
+      actionTarget: '',
+
+      targetResource: {}
     }
   }
 }

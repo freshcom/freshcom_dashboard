@@ -1,57 +1,54 @@
 <template>
-<div class="page-wrapper">
-  <div>
-    <el-menu :router="true" default-active="/notification-triggers" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListNotificationTrigger' }" index="/notification-triggers">Templates</el-menu-item>
-    </el-menu>
+<content-container>
+  <div slot="header">
+    <router-link :to="{ name: 'ListNotificationTrigger' }">Triggers</router-link>
   </div>
 
-  <div>
-    <el-card class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
+  <div slot="card-header">
+    <h1>Create a notification trigger</h1>
 
-        <span style="line-height: 36px;">Create a notification trigger</span>
+    <div class="pull-right">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
 
-        <div class="pull-right">
-          <el-button @click="back()" plain size="small">
-            Cancel
-          </el-button>
-
-          <el-button @click="submit()" type="primary" size="small">
-            Save
-          </el-button>
-        </div>
-      </div>
-
-      <div class="data">
-        <el-form @submit.native.prevent="submit()" label-width="150px" size="small">
-          <notification-trigger-fieldset v-model="emailTemplateDraft" :errors="errors"></notification-trigger-fieldset>
-        </el-form>
-      </div>
-
-      <div class="footer">
-        <el-button @click="back()" plain size="small">
-          Cancel
-        </el-button>
-
-        <el-button @click="submit()" type="primary" class="pull-right" size="small">
-          Save
-        </el-button>
-      </div>
-    </el-card>
+      <el-button :loading="isCreating" @click="submit()" type="primary" size="small">
+        Save
+      </el-button>
+    </div>
   </div>
-</div>
+
+  <div slot="card-content">
+    <div class="data">
+      <el-row>
+        <el-col :span="14" :offset="5">
+          <el-form @submit.native.prevent="submit()" label-width="120px" size="small">
+            <notification-trigger-fieldset v-model="notificationTriggerDraft" :errors="errors"></notification-trigger-fieldset>
+          </el-form>
+        </el-col>
+      </el-row>
+    </div>
+
+    <div class="foot">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isCreating" @click="submit()" type="primary" size="small" class="pull-right">
+        Save
+      </el-button>
+    </div>
+  </div>
+</content-container>
 </template>
 
 <script>
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
 import NotificationTrigger from '@/models/notification-trigger'
 import NotificationTriggerFieldset from '@/components/notification-trigger-fieldset'
+
+import PageMixin from '@/mixins/page'
 
 export default {
   name: 'NewNotificationTrigger',
@@ -61,32 +58,33 @@ export default {
   },
   data () {
     return {
-      emailTemplateDraft: NotificationTrigger.objectWithDefaults(),
-      isCreatingNotificationTrigger: false,
+      notificationTriggerDraft: NotificationTrigger.objectWithDefaults(),
+      isCreating: false,
       errors: {}
     }
   },
   methods: {
     submit () {
-      this.isCreatingNotificationTrigger = true
-      this.emailTemplateDraft.actionTarget = this.emailTemplateDraft.actionTarget.id
+      this.isCreating = true
+      this.notificationTriggerDraft.actionTarget = this.notificationTriggerDraft.targetResource.id
 
-      freshcom.createNotificationTrigger(this.emailTemplateDraft).then(response => {
+      freshcom.createNotificationTrigger(this.notificationTriggerDraft).then(response => {
         this.$message({
           showClose: true,
-          message: `Email template created successfully.`,
+          message: `Notification trigger created successfully.`,
           type: 'success'
         })
 
-        this.isCreatingNotificationTrigger = false
+        this.isCreating = false
         this.back()
       }).catch(response => {
         this.errors = response.errors
-        this.isCreatingNotificationTrigger = false
+        this.isCreating = false
         throw response
       })
     },
-    back () {
+
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ListNotificationTrigger' })
     }
   }
