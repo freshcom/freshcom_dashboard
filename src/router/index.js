@@ -640,6 +640,7 @@ const router = new Router({
         let page = extractPagination(route)
         return {
           searchKeyword: route.query.search,
+          filterObject: route.query.filter,
           page: page
         }
       }

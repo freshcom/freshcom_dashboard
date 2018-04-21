@@ -56,6 +56,17 @@ export default {
     }
   },
   fields: {
+    notificationTrigger: {
+      status: {
+        active: 'Active',
+        draft: 'Draft'
+      },
+      actionType: {
+        sendEmail: 'Send Email',
+        sendSms: 'Send SMS',
+        webhook: 'Webhook'
+      }
+    },
     fileCollection: {
       status: {
         active: 'Active',
