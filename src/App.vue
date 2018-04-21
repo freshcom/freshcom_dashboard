@@ -147,6 +147,20 @@ input::-webkit-inner-spin-button {
 }
 
 //
+// MARK: Tab
+//
+.el-tabs.center {
+  .el-tabs__nav-scroll {
+    text-align: center;
+  }
+
+  .el-tabs__nav {
+    display: inline-block;
+    float: none;
+  }
+}
+
+//
 // MARK: Button with Icon
 //
 .el-button {

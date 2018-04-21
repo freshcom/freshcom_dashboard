@@ -59,7 +59,7 @@
           <h2>Preview</h2>
         </div>
         <div class="body full">
-          <div class="content-preview">
+          <div class="body-html-preview">
             <iframe :srcdoc="emailTemplate.bodyHtml"></iframe>
           </div>
         </div>
@@ -164,7 +164,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.content-preview iframe {
+.body-html-preview iframe {
   width: 100%;
   height: 800px;
   border: none;

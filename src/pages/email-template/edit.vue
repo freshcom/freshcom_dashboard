@@ -1,74 +1,77 @@
 <template>
-<div class="page-wrapper">
-  <div>
-    <el-menu :router="true" default-active="/email-templates" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListEmail' }" index="/emails">Emails</el-menu-item>
-      <el-menu-item :route="{ name: 'ListEmailTemplate' }" index="/email-templates">Templates</el-menu-item>
-    </el-menu>
-    <locale-selector class="pull-right"></locale-selector>
+<content-container @locale-changed="reload" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListEmail' }">Emails</router-link>
+    <router-link :to="{ name: 'ListEmailTemplate' }">Templates</router-link>
   </div>
 
-  <div>
-    <el-card class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
-        <span style="line-height: 36px;">Edit email template</span>
+  <div slot="card-header">
+    <h1>Edit email template</h1>
 
-        <div style="float: right;">
-          <el-button @click="back()" plain size="small">
-            Cancel
-          </el-button>
+    <div class="pull-right">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
 
-          <el-button @click="submit()" type="primary" size="small">
-            Save
-          </el-button>
-        </div>
-      </div>
-
-      <div class="data">
-        <el-form @submit.native.prevent="submit()" label-width="150px" size="small">
-          <email-template-fieldset v-model="emailTemplateDraft" :errors="errors"></email-template-fieldset>
-        </el-form>
-      </div>
-
-      <div class="footer">
-        <el-button @click="back()" plain size="small">
-          Cancel
-        </el-button>
-
-        <el-button @click="submit()" type="primary" class="pull-right" size="small">
-          Save
-        </el-button>
-      </div>
-    </el-card>
+      <el-button :loading="isUpdating" @click="submit()" type="primary" size="small">
+        Save
+      </el-button>
+    </div>
   </div>
-</div>
+
+  <div slot="card-content">
+    <div class="data">
+      <el-row>
+        <el-col :span="24">
+          <el-form @submit.native.prevent="submit()" label-width="100px" size="small">
+            <email-template-fieldset v-model="emailTemplateDraft" :errors="errors"></email-template-fieldset>
+          </el-form>
+        </el-col>
+      </el-row>
+    </div>
+
+    <div class="foot">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isUpdating" @click="submit()" type="primary" size="small" class="pull-right">
+        Save
+      </el-button>
+    </div>
+  </div>
+</content-container>
 </template>
 
 <script>
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
 import EmailTemplate from '@/models/email-template'
 import EmailTemplateFieldset from '@/components/email-template-fieldset'
 
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadEmailTemplate' })
+
 export default {
   name: 'EditEmailTemplate',
-  mixins: [PageMixin],
+  mixins: [ResourcePageMixin],
   components: {
     EmailTemplateFieldset
   },
-  props: ['id'],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  },
   data () {
     return {
       isLoading: false,
       emailTemplate: EmailTemplate.objectWithDefaults(),
       emailTemplateDraft: EmailTemplate.objectWithDefaults(),
 
-      isUpdatingEmailTemplate: false,
+      isUpdating: false,
       errors: {}
     }
   },
@@ -79,7 +82,7 @@ export default {
     loadEmailTemplate () {
       this.isLoading = true
 
-      freshcom.retrieveEmailTemplate(this.id).then(response => {
+      return freshcom.retrieveEmailTemplate(this.id).then(response => {
         this.emailTemplate = response.data
         this.emailTemplateDraft = _.cloneDeep(response.data)
 
@@ -91,7 +94,7 @@ export default {
     },
 
     submit () {
-      this.isUpdatingEmailTemplate = true
+      this.isUpdating = true
 
       freshcom.updateEmailTemplate(
         this.emailTemplateDraft.id,
@@ -103,16 +106,16 @@ export default {
           type: 'success'
         })
 
-        this.isUpdatingEmailTemplate = false
+        this.isUpdating = false
         this.back()
       }).catch(response => {
         this.errors = response.errors
-        this.isUpdatingEmailTemplate = false
+        this.isUpdating = false
         throw response
       })
     },
 
-    back () {
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ShowEmailTemplate', params: { id: this.emailTemplate.id } })
     }
   }
