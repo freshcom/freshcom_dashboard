@@ -56,6 +56,12 @@ export default {
     }
   },
   fields: {
+    email: {
+      status: {
+        pending: 'Pending',
+        sent: 'Sent'
+      }
+    },
     notificationTrigger: {
       status: {
         active: 'Active',
