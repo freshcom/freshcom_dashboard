@@ -152,66 +152,9 @@
     </div>
   </div>
 </content-container>
-
-<!-- <div class="page-wrapper">
-
-  <div>
-    <el-menu :router="true" default-active="/notification-triggers" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListNotificationTrigger' }" index="/notification-triggers">Triggers</el-menu-item>
-    </el-menu>
-  </div>
-
-  <div>
-    <el-card class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
-
-        <el-button plain size="small"><icon name="filter" scale="0.7" class="v-middle"></icon> Filter</el-button>
-
-        <div class="search">
-          <el-input :value="searchKeyword" @input="updateSearchKeyword" size="small" placeholder="Search...">
-            <template slot="prepend"><icon name="search" scale="1" class="v-middle"></icon></template>
-          </el-input>
-        </div>
-
-        <el-button @click="newNotificationTrigger()" plain size="small" class="pull-right">
-          <icon name="plus" scale="0.7" class="v-middle"></icon> New
-        </el-button>
-      </div>
-
-      <div class="data full" v-loading="isLoading">
-        <p v-if="noSearchResult" class="search-notice text-center">
-          There is no result that matches "{{searchKeyword}}"
-        </p>
-        <el-table v-if="hasSearchResult" @row-click="viewNotificationTrigger" :data="notificationTriggers">
-          <el-table-column prop="name" label="Name">
-          </el-table-column>
-
-          <el-table-column prop="event" label="Event" width="360">
-          </el-table-column>
-
-          <el-table-column label="Action" width="100">
-            <template slot-scope="scope">
-              {{scope.row.actionType}}
-            </template>
-          </el-table-column>
-        </el-table>
-
-        <div v-if="hasSearchResult" class="footer">
-          <span class="total">around {{totalCount}} results</span>
-          <pagination :number="page.number" :size="page.size" :total="totalCount"></pagination>
-        </div>
-      </div>
-    </el-card>
-  </div>
-
-</div> -->
 </template>
 
 <script>
-import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
 import HoverButton from '@/components/hover-button'
@@ -235,31 +178,6 @@ export default {
   },
   created () {
     this.listNotificationTrigger()
-  },
-  computed: {
-    noSearchResult () {
-      return !this.isLoading && this.totalCount === 0 && this.allCount > 0
-    },
-    hasSearchResult () {
-      return !this.isLoading && this.totalCount !== 0
-    },
-    currentRoutePath () {
-      return this.$store.state.route.fullPath
-    }
-  },
-  watch: {
-    isViewingTestData () {
-      this.listNotificationTrigger()
-    },
-    searchKeyword (newKeyword) {
-      this.listNotificationTrigger()
-    },
-    page (newPage, oldPage) {
-      if (_.isEqual(newPage, oldPage)) {
-        return
-      }
-      this.search()
-    }
   },
   methods: {
     listNotificationTrigger () {
