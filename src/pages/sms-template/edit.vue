@@ -1,5 +1,48 @@
 <template>
-<div class="page-wrapper">
+<content-container @locale-changed="reload" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListSms' }">SMS</router-link>
+    <router-link :to="{ name: 'ListSmsTemplate' }">Templates</router-link>
+  </div>
+
+  <div slot="card-header">
+    <h1>Edit SMS template</h1>
+
+    <div class="pull-right">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isUpdating" @click="submit()" type="primary" size="small">
+        Save
+      </el-button>
+    </div>
+  </div>
+
+  <div slot="card-content">
+    <div class="data">
+      <el-row>
+        <el-col :span="14" :offset="5">
+          <el-form @submit.native.prevent="submit()" label-width="100px" size="small">
+            <sms-template-fieldset v-model="smsTemplateDraft" :errors="errors"></sms-template-fieldset>
+          </el-form>
+        </el-col>
+      </el-row>
+    </div>
+
+    <div class="foot">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isUpdating" @click="submit()" type="primary" size="small" class="pull-right">
+        Save
+      </el-button>
+    </div>
+  </div>
+</content-container>
+
+<!-- <div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="/sms-templates" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListSms' }" index="/sms">SMS</el-menu-item>
@@ -44,31 +87,38 @@
       </div>
     </el-card>
   </div>
-</div>
+</div> -->
 </template>
 
 <script>
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
 import SmsTemplate from '@/models/sms-template'
 import SmsTemplateFieldset from '@/components/sms-template-fieldset'
 
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadSmsTemplate' })
+
 export default {
   name: 'EditSmsTemplate',
-  mixins: [PageMixin],
+  mixins: [ResourcePageMixin],
   components: {
     SmsTemplateFieldset
   },
-  props: ['id'],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  },
   data () {
     return {
       isLoading: false,
       smsTemplate: SmsTemplate.objectWithDefaults(),
       smsTemplateDraft: SmsTemplate.objectWithDefaults(),
 
-      isUpdatingSmsTemplate: false,
+      isUpdating: false,
       errors: {}
     }
   },
@@ -79,7 +129,7 @@ export default {
     loadSmsTemplate () {
       this.isLoading = true
 
-      freshcom.retrieveSmsTemplate(this.id).then(response => {
+      return freshcom.retrieveSmsTemplate(this.id).then(response => {
         this.smsTemplate = response.data
         this.smsTemplateDraft = _.cloneDeep(response.data)
 
@@ -91,9 +141,9 @@ export default {
     },
 
     submit () {
-      this.isUpdatingSmsTemplate = true
+      this.isUpdating = true
 
-      freshcom.updateSmsTemplate(
+      return freshcom.updateSmsTemplate(
         this.smsTemplateDraft.id,
         this.smsTemplateDraft
       ).then(smsTemplate => {
@@ -103,16 +153,16 @@ export default {
           type: 'success'
         })
 
-        this.isUpdatingSmsTemplate = false
+        this.isUpdating = false
         this.back()
       }).catch(response => {
         this.errors = response.errors
-        this.isUpdatingSmsTemplate = false
+        this.isUpdating = false
         throw response
       })
     },
 
-    back () {
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ShowSmsTemplate', params: { id: this.smsTemplate.id } })
     }
   }

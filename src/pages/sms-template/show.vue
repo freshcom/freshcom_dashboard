@@ -42,6 +42,9 @@
             <dt>Name</dt>
             <dd>{{smsTemplate.name}}</dd>
 
+            <dt>To</dt>
+            <dd>{{smsTemplate.to}}</dd>
+
             <dt>Body</dt>
             <dd>{{smsTemplate.body}}</dd>
 
