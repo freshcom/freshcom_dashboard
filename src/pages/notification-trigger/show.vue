@@ -1,130 +1,153 @@
 <template>
-<div class="page-wrapper">
-  <div>
-    <el-menu :router="true" default-active="/notification-triggers" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListNotificationTrigger' }" index="/notification-triggers">Templates</el-menu-item>
-    </el-menu>
+<content-container @locale-changed="reload" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListNotificationTrigger' }">Triggers</router-link>
   </div>
 
-  <div>
-    <el-card v-loading="isLoading" class="main-card">
-        <div slot="header">
-          <div v-if="isViewingTestData" class="test-data-banner">
-            <div class="banner-content">TEST DATA</div>
-          </div>
+  <div slot="card-header">
+    <div class="brief">
+      <div class="avatar">
+        <icon name="external-link" class="avatar-icon"></icon>
+      </div>
 
-          <div class="brief no-avatar">
-            <div class="detail">
-              <p>Notification Trigger</p>
-              <h2>{{notificationTrigger.name}}</h2>
-              <p class="id">{{notificationTrigger.id}}</p>
-            </div>
-          </div>
+      <div class="detail">
+        <p>
+          <span>Notification Trigger</span>
+        </p>
+        <h1>{{notificationTrigger.name}}</h1>
+        <p class="id">{{notificationTrigger.id}}</p>
+      </div>
+    </div>
 
-          <div class="header-actions">
-            <el-button @click="editNotificationTrigger(notificationTrigger)" plain size="small">Edit</el-button>
-          </div>
-        </div>
-
-        <div class="data">
-          <div class="block-title">
-            <h3>Details</h3>
-          </div>
-          <div class="block">
-            <div class="block-body">
-              <dl>
-                <dt>ID</dt>
-                <dd>{{notificationTrigger.id}}</dd>
-
-                <dt>Name</dt>
-                <dd>{{notificationTrigger.name}}</dd>
-
-                <dt>Description</dt>
-                <dd>{{notificationTrigger.description}}</dd>
-
-                <dt>Action Type</dt>
-                <dd>{{notificationTrigger.actionType}}</dd>
-
-                <dt>Last updated</dt>
-                <dd>{{notificationTrigger.updatedAt | moment}}</dd>
-
-                <dt>Creation date</dt>
-                <dd>{{notificationTrigger.insertedAt | moment}}</dd>
-              </dl>
-            </div>
-          </div>
-
-          <div class="block-title">
-            <h3>Related Resources</h3>
-          </div>
-          <div class="block">
-            <div class="block-body">
-              <dl>
-                <dt v-if="notificationTrigger.actionType === 'sendEmail'">
-                  Email Template
-                </dt>
-                <dd v-if="notificationTrigger.actionType === 'sendEmail'">
-                  <router-link :to="{ name: 'ShowEmailTemplate', params: { id: notificationTrigger.actionTarget }}">
-                    {{notificationTrigger.actionTarget}}
-                  </router-link>
-                </dd>
-              </dl>
-            </div>
-          </div>
-
-          <h3>Logs</h3>
-          <div class="block">
-            <div class="block-body">
-
-            </div>
-          </div>
-
-          <h3>Events</h3>
-          <div class="block">
-            <div class="block-body">
-
-            </div>
-          </div>
-        </div>
-
-        <div class="footer text-right">
-          <confirm-button @confirmed="deleteNotificationTrigger()" size="small">Delete</confirm-button>
-        </div>
-    </el-card>
+    <div class="brief-action-group">
+      <router-link :to="{ name: 'EditNotificationTrigger', params: { id: notificationTrigger.id } }" class="el-button el-button--small is-plain">
+        Edit
+      </router-link>
+    </div>
   </div>
-</div>
 
+  <div slot="card-content">
+    <div class="data">
+      <div class="block">
+        <div class="header">
+          <h2>Detail</h2>
+        </div>
+
+        <div class="body">
+          <dl>
+            <dt>ID</dt>
+            <dd>{{notificationTrigger.id}}</dd>
+
+            <dt>Status</dt>
+            <dd>{{notificationTrigger.status}}</dd>
+
+            <dt>Name</dt>
+            <dd>{{notificationTrigger.name}}</dd>
+
+            <dt>Description</dt>
+            <dd>{{notificationTrigger.description}}</dd>
+
+            <dt>Action Type</dt>
+            <dd>{{$t(`fields.notificationTrigger.actionType.${notificationTrigger.actionType}`)}}</dd>
+
+            <template v-if="notificationTrigger.actionType === 'webhook'">
+              <dt>Action Target</dt>
+              <dd>{{notificationTrigger.actionTarget}}</dd>
+            </template>
+
+            <dt>Last updated</dt>
+            <dd>{{notificationTrigger.updatedAt | moment}}</dd>
+
+            <dt>Creation date</dt>
+            <dd>{{notificationTrigger.insertedAt | moment}}</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Related Resources</h2>
+        </div>
+        <div class="body">
+          <dl>
+            <template v-if="notificationTrigger.actionType === 'sendEmail'">
+              <dt>
+                Email Template
+              </dt>
+              <dd>
+                <router-link :to="{ name: 'ShowEmailTemplate', params: { id: notificationTrigger.actionTarget }}">
+                  {{notificationTrigger.actionTarget}}
+                </router-link>
+              </dd>
+            </template>
+
+            <template v-if="notificationTrigger.actionType === 'sendSms'">
+              <dt>
+                SMS Template
+              </dt>
+              <dd>
+                <router-link :to="{ name: 'ShowSmsTemplate', params: { id: notificationTrigger.actionTarget }}">
+                  {{notificationTrigger.actionTarget}}
+                </router-link>
+              </dd>
+            </template>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot text-right">
+      <el-button @click="attemptDeleteNotificationTrigger()" plain size="small">Delete</el-button>
+    </div>
+  </div>
+
+  <div slot="launchable" class="launchable">
+    <el-dialog :show-close="false" :visible="isConfirmingDeleteNotificationTrigger" title="Delete notification trigger" width="500px">
+      <p>
+        Are you sure you want to delete this notification trigger? If you delete this notification trigger, its
+        associated action will no longer be triggered. Note that any associated Email or SMS template will not be
+        deleted.
+      </p>
+
+      <div slot="footer">
+        <el-button :disabled="isDeletingNotificationTrigger" @click="cancelDeleteNotificationTrigger()" plain size="small">Cancel</el-button>
+        <el-button :loading="isDeletingNotificationTrigger" @click="deleteNotificationTrigger()" type="danger" size="small">Delete</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</content-container>
 </template>
 
 <script>
-import 'vue-awesome/icons/file'
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
 import NotificationTrigger from '@/models/email-template'
-import ConfirmButton from '@/components/confirm-button'
+
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadNotificationTrigger' })
 
 export default {
   name: 'ShowNotificationTrigger',
-  mixins: [PageMixin],
-  components: {
-    ConfirmButton
+  mixins: [ResourcePageMixin],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
   },
-  props: ['id'],
   data () {
     return {
       notificationTrigger: NotificationTrigger.objectWithDefaults(),
       isLoading: false,
+      isConfirmingDeleteNotificationTrigger: false,
+      isDeletingNotificationTrigger: false,
 
       errors: {}
     }
   },
-  created () {
-    this.loadNotificationTrigger()
-  },
   methods: {
     loadNotificationTrigger () {
-      freshcom.retrieveNotificationTrigger(this.id).then(response => {
+      return freshcom.retrieveNotificationTrigger(this.id).then(response => {
         this.notificationTrigger = response.data
         this.isLoading = false
       }).catch(errors => {
@@ -134,10 +157,10 @@ export default {
     },
 
     deleteNotificationTrigger () {
-      freshcom.deleteNotificationTrigger(this.notificationTrigger.id).then(() => {
+      return freshcom.deleteNotificationTrigger(this.notificationTrigger.id).then(() => {
         this.$message({
           showClose: true,
-          message: `Trigger deleted successfully.`,
+          message: `Notification trigger deleted successfully.`,
           type: 'success'
         })
 
@@ -145,11 +168,15 @@ export default {
       })
     },
 
-    editNotificationTrigger (notificationTrigger) {
-      this.$store.dispatch('pushRoute', { name: 'EditNotificationTrigger', params: { id: notificationTrigger.id } })
+    attemptDeleteNotificationTrigger () {
+      this.isConfirmingDeleteNotificationTrigger = true
     },
 
-    back () {
+    cancelDeleteNotificationTrigger () {
+      this.isConfirmingDeleteNotificationTrigger = false
+    },
+
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ListNotificationTrigger' })
     }
   }
@@ -158,9 +185,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.content-preview iframe {
-  width: 100%;
-  height: 800px;
-  border: none;
-}
 </style>
