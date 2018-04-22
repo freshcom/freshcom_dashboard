@@ -38,6 +38,7 @@ import 'vue-awesome/icons/external-link' // Notification Trigger
 import 'vue-awesome/icons/file-code-o' // Email & SMS Template
 import 'vue-awesome/icons/envelope' // Email
 import 'vue-awesome/icons/comment' // SMS
+import 'vue-awesome/icons/cubes' // Stockable
 
 // -- Sync Store & Router --
 sync(store, router)

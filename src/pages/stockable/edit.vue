@@ -50,7 +50,7 @@ import freshcom from '@/freshcom-sdk'
 
 import PageMixin from '@/mixins/page'
 import Stockable from '@/models/stockable'
-import StockableForm from '@/components/stockable-form'
+import StockableForm from '@/components/stockable-fieldset'
 
 export default {
   name: 'EditStockable',

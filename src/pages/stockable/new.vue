@@ -1,5 +1,48 @@
 <template>
-<div class="page-wrapper">
+<content-container>
+  <div slot="header">
+    <router-link :to="{ name: 'ListStockable' }">Stockables</router-link>
+  </div>
+
+  <div slot="card-header">
+    <h1>Create a stockable</h1>
+
+    <div class="pull-right">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isCreating" @click="submit()" type="primary" size="small">
+        Save
+      </el-button>
+    </div>
+  </div>
+
+  <div slot="card-content">
+    <div class="data">
+      <el-row>
+        <el-col :span="16" :offset="4">
+          <el-form @submit.native.prevent="submit()" label-width="140px" size="small">
+            <stockable-fieldset v-model="stockableDraft" :errors="errors"></stockable-fieldset>
+          </el-form>
+        </el-col>
+      </el-row>
+    </div>
+
+    <div class="foot">
+      <el-button @click="back()" plain size="small">
+        Cancel
+      </el-button>
+
+      <el-button :loading="isCreating" @click="submit()" type="primary" size="small" class="pull-right">
+        Save
+      </el-button>
+    </div>
+  </div>
+</content-container>
+
+
+<!-- <div class="page-wrapper">
   <div>
     <el-menu :router="true" default-active="/stockables" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListStockable' }" index="/stockables">Stockables</el-menu-item>
@@ -42,32 +85,33 @@
       </div>
     </el-card>
   </div>
-</div>
+</div> -->
 </template>
 
 <script>
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
 import Stockable from '@/models/stockable'
-import StockableForm from '@/components/stockable-form'
+import StockableFieldset from '@/components/stockable-fieldset'
+
+import PageMixin from '@/mixins/page'
 
 export default {
   name: 'NewStockable',
   mixins: [PageMixin],
   components: {
-    StockableForm
+    StockableFieldset
   },
   data () {
     return {
       stockableDraft: Stockable.objectWithDefaults(),
-      isCreatingStockable: false,
+      isCreating: false,
       errors: {}
     }
   },
   methods: {
     submit () {
-      this.isCreatingStockable = true
+      this.isCreating = true
 
       freshcom.createStockable(this.stockableDraft).then(response => {
         this.$message({
@@ -76,15 +120,16 @@ export default {
           type: 'success'
         })
 
-        this.isCreatingStockable = false
+        this.isCreating = false
         this.back()
       }).catch(response => {
         this.errors = response.errors
-        this.isCreatingStockable = false
+        this.isCreating = false
         throw response
       })
     },
-    back () {
+
+    defaultBack () {
       this.$store.dispatch('pushRoute', { name: 'ListStockable' })
     }
   }

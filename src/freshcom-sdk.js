@@ -607,6 +607,8 @@ const sdk = {
   },
 
   createStockable (fields, params = {}, options = {}) {
+    fields = this._merge({}, fields, { type: 'Stockable' })
+
     let payload = SimpleJAS.serialize(fields)
     return this.http.post('/stockables', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)

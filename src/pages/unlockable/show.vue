@@ -193,11 +193,6 @@ export default {
       })
     },
 
-    attemptDeleteFileCollection (fileCollection) {
-      this.isConfirmingDeleteFileCollection = true
-      this.fileCollectionForDelete = fileCollection
-    },
-
     attemptDeleteUnlockable () {
       this.isConfirmingDeleteUnlockable = true
     },
