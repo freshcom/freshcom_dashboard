@@ -5,7 +5,7 @@
     </el-form-item>
 
     <el-form-item label="Event" :error="errorMsgs.event" required>
-      <el-select @change="updateValue()" v-model="formModel.event">
+      <el-select v-model="formModel.event" :disabled="!!formModel.id" @change="updateValue()">
         <el-option label="identity.password_reset_token.created" value="identity.password_reset_token.created"></el-option>
         <el-option label="storefront.order.opened" value="storefront.order.opened"></el-option>
         <el-option label="storefront.order.paid" value="storefront.order.paid"></el-option>
@@ -14,7 +14,7 @@
     </el-form-item>
 
     <el-form-item label="Action Type" :error="errorMsgs.actionType" required>
-      <el-select @change="handleActionTypeChange()" v-model="formModel.actionType">
+      <el-select v-model="formModel.actionType" :disabled="!!formModel.id" @change="handleActionTypeChange()">
         <el-option label="Send Email" value="sendEmail"></el-option>
         <el-option label="Send SMS" value="sendSms"></el-option>
         <el-option label="Webhook" value="webhook"></el-option>
@@ -22,11 +22,11 @@
     </el-form-item>
 
     <el-form-item v-if="formModel.actionType === 'sendEmail'" label="Action Target" :error="errorMsgs.actionTarget" required>
-      <email-template-select v-model="formModel.targetResource" :disabled="!!formModel.id" @input="updateValue()"></email-template-select>
+      <email-template-select v-model="formModel.targetResource" @input="updateValue()"></email-template-select>
     </el-form-item>
 
     <el-form-item v-if="formModel.actionType === 'sendSms'" label="Action Target" :error="errorMsgs.actionTarget" required>
-      <sms-template-select v-model="formModel.targetResource" :disabled="!!formModel.id" @input="updateValue()"></sms-template-select>
+      <sms-template-select v-model="formModel.targetResource" @input="updateValue()"></sms-template-select>
     </el-form-item>
 
     <el-form-item label="Description">

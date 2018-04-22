@@ -40,6 +40,12 @@ import 'vue-awesome/icons/envelope' // Email
 import 'vue-awesome/icons/comment' // SMS
 import 'vue-awesome/icons/cubes' // Stockable
 
+// -- Code Mirror Style --
+import 'codemirror/mode/xml/xml'
+import 'codemirror/theme/monokai.css'
+import 'codemirror/mode/handlebars/handlebars'
+import 'codemirror/lib/codemirror.css'
+
 // -- Sync Store & Router --
 sync(store, router)
 

@@ -45,10 +45,6 @@
 
 <script>
 import { codemirror } from 'vue-codemirror'
-import 'codemirror/mode/xml/xml'
-import 'codemirror/theme/monokai.css'
-import 'codemirror/mode/handlebars/handlebars'
-import 'codemirror/lib/codemirror.css'
 
 import fieldsetMixinFactory from '@/mixins/fieldset'
 let FieldsetMixin = fieldsetMixinFactory({ errorI18nKey: 'emailTemplate' })

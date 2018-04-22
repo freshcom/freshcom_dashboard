@@ -59,6 +59,8 @@ import EditDepositablePage from '@/pages/depositable/edit'
 
 // Notification
 import ListEmailPage from '@/pages/email/list'
+import ShowEmailPage from '@/pages/email/show'
+
 import ListEmailTemplatePage from '@/pages/email-template/list'
 import NewEmailTemplatePage from '@/pages/email-template/new'
 import ShowEmailTemplatePage from '@/pages/email-template/show'
@@ -72,6 +74,7 @@ import EditSmsTemplatePage from '@/pages/sms-template/edit'
 import ListNotificationTriggerPage from '@/pages/notification-trigger/list'
 import NewNotificationTriggerPage from '@/pages/notification-trigger/new'
 import ShowNotificationTriggerPage from '@/pages/notification-trigger/show'
+import EditNotificationTriggerPage from '@/pages/notification-trigger/edit'
 
 // File Storage
 import NewFileCollectionPage from '@/pages/file-collection/new'
@@ -557,6 +560,14 @@ const router = new Router({
       }
     },
     {
+      path: '/emails/:id',
+      name: 'ShowEmail',
+      component: ShowEmailPage,
+      props (route) {
+        return { id: route.params.id }
+      }
+    },
+    {
       path: '/email-templates',
       name: 'ListEmailTemplate',
       component: ListEmailTemplatePage,
@@ -667,6 +678,14 @@ const router = new Router({
       path: '/notification-triggers/:id',
       name: 'ShowNotificationTrigger',
       component: ShowNotificationTriggerPage,
+      props (route) {
+        return { id: route.params.id }
+      }
+    },
+    {
+      path: '/notification-triggers/:id/edit',
+      name: 'EditNotificationTrigger',
+      component: EditNotificationTriggerPage,
       props (route) {
         return { id: route.params.id }
       }

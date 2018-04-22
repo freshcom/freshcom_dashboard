@@ -859,9 +859,11 @@ a:hover {
   padding: 5px;
 }
 
-.component-wrapper.email-template-fieldset .CodeMirror {
+/* Code Mirror */
+.el-tab-pane .CodeMirror {
   height: 800px;
 }
+
 /* END Layout */
 
 /* START Utils */

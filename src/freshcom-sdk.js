@@ -895,6 +895,12 @@ const sdk = {
     }).catch(this._processHttpError)
   },
 
+  retrieveEmail (id, params = {}, options = {}) {
+    return this.http.get(`/emails/${id}`, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
   //
   // MARK: Email Template
   //
@@ -1000,6 +1006,15 @@ const sdk = {
 
   retrieveNotificationTrigger (id, params = {}, options = {}) {
     return this.http.get(`/notification_triggers/${id}`, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  updateNotificationTrigger (id, fields, params = {}, options = {}) {
+    fields = this._merge({}, fields, { type: 'NotificationTrigger' })
+
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.patch(`/notification_triggers/${id}`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
