@@ -600,7 +600,7 @@ const sdk = {
   //
   // Stockable
   //
-  listStockable (id, params = {}, options = {}) {
+  listStockable (params = {}, options = {}) {
     return this.http.get('/stockables', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)

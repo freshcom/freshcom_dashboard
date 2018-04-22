@@ -147,7 +147,7 @@ export default {
     listStockable () {
       this.isLoading = true
 
-      freshcom.listStockable({
+      return freshcom.listStockable({
         search: this.searchKeyword,
         filter: this.filterObject,
         page: this.page
