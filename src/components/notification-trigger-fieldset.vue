@@ -1,5 +1,13 @@
 <template>
   <div class="component-wrapper notification-trigger-fieldset">
+    <el-form-item label="Status" :error="errorMsgs.status" required>
+      <el-select v-model="formModel.status" @change="updateValue()">
+        <el-option label="Draft" value="draft"></el-option>
+        <el-option label="Active" value="active"></el-option>
+        <el-option label="Disabled" value="disabled"></el-option>
+      </el-select>
+    </el-form-item>
+
     <el-form-item label="Name" :error="errorMsgs.name" required>
       <el-input v-model="formModel.name" @input="updateValue()"></el-input>
     </el-form-item>

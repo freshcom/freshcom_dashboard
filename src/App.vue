@@ -635,78 +635,6 @@ input::-webkit-inner-spin-button {
   }
 }
 
-// MARK: Nested Block Table
-
-// .el-table.nested-block-table {
-//   &:before {
-//     height: 0px
-//   }
-
-//   tbody tr:last-child td {
-//     border-bottom: none;
-//   }
-
-//   .el-table {
-//     &:before {
-//       height: 0px;
-//     }
-
-//     tbody tr:last-child td {
-//       border-bottom: none;
-//     }
-//   }
-
-//   th, td {
-//     padding-top: 8px;
-//     padding-bottom: 8px;
-//   }
-
-//   th {
-//     background-color: #f5f7fa;
-//   }
-
-//   .el-table__expanded-cell {
-//     padding: 0px;
-
-//     .cell {
-//       text-align: left;
-//     }
-//   }
-
-//   .el-table__expand-column .cell {
-//     padding-right: 0px;
-//   }
-
-//   tbody tr td:last-child {
-//     text-align: right;
-//   }
-
-//   p {
-//     margin: 0;
-//   }
-
-//   .actions {
-//     .el-button {
-//       padding: 5px 10px;
-//       font-size: 11px;
-//     }
-
-//     a {
-//       margin-left: 10px;
-//     }
-
-//     svg {
-//       line-height: 16px;
-//       min-height: 16px;
-//       height: 16px;
-//     }
-
-//     .el-button+.el-button {
-//       margin-left: 0px;
-//     }
-//   }
-// }
-
 //
 // MARK: Divider Text
 //
@@ -785,64 +713,7 @@ a:hover {
   color: #1D8CE0;
 }
 
-// .block-title {
-//   h3 {
-//     display: inline-block;
-//     margin: 0 0 5px 0;
-//     line-height: 30px;
-//     font-size: 16px;
-//   }
-
-//   .block-title-actions {
-//     line-height: 30px;
-//     a {
-//       line-height: 35px;
-//       color: #888;
-//       font-size: 15px;
-
-//       span {
-//         vertical-align: middle;
-//       }
-//     }
-
-//     .el-button.el-button--mini {
-//       padding: 5px 10px;
-//     }
-
-//     .el-button+.el-button {
-//       margin-left: 0px;
-//     }
-//   }
-// }
-
 .block {
-  // border: 1px solid #eaeefb;
-  // border-radius: 4px;
-  // margin-bottom: 20px;
-  // width: 100%;
-  // overflow: hidden;
-
-  // .block-body {
-  //   padding: 20px;
-
-  //   &.full {
-  //     padding: 0;
-  //   }
-  // }
-
-  // .block-footer {
-  //   padding: 10px 20px;
-  //   border-top: 1px solid #eaeefb;
-
-  //   &.no-divider {
-  //     border-top: 0;
-  //   }
-
-  //   .view-more {
-  //     font-size: 15px;
-  //   }
-  // }
-
   .image {
     display: inline-block;
 
@@ -992,66 +863,6 @@ small {
   line-height: inherit;
 }
 /* END Common Overwrite */
-
-
-/* START Main Card */
-.main-card {
-  // .data.full .el-table {
-  //   th {
-  //     background-color: #f5f7fa;
-  //     padding-top: 5px;
-  //     padding-bottom: 5px;
-  //   }
-
-  //   .el-table__header th:first-child > div, .el-table__body tr td:first-child > div {
-  //     padding-left: 20px;
-  //   }
-
-  //   .el-table__header th:last-child > div, .el-table__body tr td:last-child > div {
-  //     padding-right: 20px
-  //   }
-
-  //   tbody tr {
-  //     cursor: pointer;
-  //   }
-  // }
-
-  // .el-table.full.no-pointer tbody tr {
-  //   cursor: default;
-  // }
-
-  // dl {
-  //   margin: 0px;
-  //   font-size: 14px;
-
-  //   dt {
-  //     padding: 0px 15px 0px 0;
-  //     width: 150px;
-  //     float: left;
-  //     text-align: right;
-  //     color: #888;
-  //     line-height: 25px;
-  //   }
-
-  //   dd {
-  //     min-height: 25px;
-  //     line-height: 25px;
-  //     color: #48576a;
-  //     margin-left: 165px;
-  //   }
-  // }
-
-  // dl.thin {
-  //   dt {
-  //     width: 100px;
-  //   }
-
-  //   dd {
-  //     margin-left: 115px;
-  //   }
-  // }
-}
-/* END Main Card */
 
 /* START File Collection */
 .file-thumbnail {
