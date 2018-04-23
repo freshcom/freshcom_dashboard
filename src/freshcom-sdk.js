@@ -951,6 +951,12 @@ const sdk = {
     }).catch(this._processHttpError)
   },
 
+  retrieveSms (id, params = {}, options = {}) {
+    return this.http.get(`/sms/${id}`, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
   //
   // MARK: SMS Template
   //

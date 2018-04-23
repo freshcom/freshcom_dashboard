@@ -67,6 +67,8 @@ import ShowEmailTemplatePage from '@/pages/email-template/show'
 import EditEmailTemplatePage from '@/pages/email-template/edit'
 
 import ListSmsPage from '@/pages/sms/list'
+import ShowSmsPage from '@/pages/sms/show'
+
 import ListSmsTemplatePage from '@/pages/sms-template/list'
 import ShowSmsTemplatePage from '@/pages/sms-template/show'
 import EditSmsTemplatePage from '@/pages/sms-template/edit'
@@ -618,6 +620,14 @@ const router = new Router({
           filterObject: route.query.filter,
           page: page
         }
+      }
+    },
+    {
+      path: '/sms/:id',
+      name: 'ShowSms',
+      component: ShowSmsPage,
+      props (route) {
+        return { id: route.params.id }
       }
     },
     {

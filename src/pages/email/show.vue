@@ -73,10 +73,6 @@
         </el-tab-pane>
       </el-tabs>
     </div>
-
-    <div class="foot text-right">
-      <el-button plain size="small">Delete</el-button>
-    </div>
   </div>
 </content-container>
 </template>
