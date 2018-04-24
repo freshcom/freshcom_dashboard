@@ -39,6 +39,8 @@ import 'vue-awesome/icons/file-code-o' // Email & SMS Template
 import 'vue-awesome/icons/envelope' // Email
 import 'vue-awesome/icons/comment' // SMS
 import 'vue-awesome/icons/cubes' // Stockable
+import 'vue-awesome/icons/shopping-bag' // Fulfillment Package
+import 'vue-awesome/icons/shopping-cart' // Storefront
 
 // -- Code Mirror Style --
 import 'codemirror/mode/xml/xml'

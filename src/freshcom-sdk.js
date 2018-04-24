@@ -849,6 +849,12 @@ const sdk = {
     }).catch(this._processHttpError)
   },
 
+  retrieveFulfillmentPackage (id, params = {}, options = {}) {
+    return this.http.get(`/fulfillment_packages/${id}`, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
   deleteFulfillmentPackage (id, params = {}, options = {}) {
     return this.http.delete(`/fulfillment_packages/${id}`, { params: params }).then(response => {
       if (response.data) {

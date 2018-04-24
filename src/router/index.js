@@ -39,6 +39,9 @@ import EditPricePage from '@/pages/price/edit'
 import ShowPricePage from '@/pages/price/show'
 
 // Fulfillment
+import ListFulfillmentPackagePage from '@/pages/fulfillment-package/list'
+import ShowFulfillmentPackagePage from '@/pages/fulfillment-package/show'
+
 import ListUnlockPage from '@/pages/unlock/list'
 
 // Goods
@@ -70,6 +73,7 @@ import ListSmsPage from '@/pages/sms/list'
 import ShowSmsPage from '@/pages/sms/show'
 
 import ListSmsTemplatePage from '@/pages/sms-template/list'
+import NewSmsTemplatePage from '@/pages/sms-template/new'
 import ShowSmsTemplatePage from '@/pages/sms-template/show'
 import EditSmsTemplatePage from '@/pages/sms-template/edit'
 
@@ -196,6 +200,27 @@ const router = new Router({
       path: '/payments/:id',
       name: 'ShowPayment',
       component: ShowPaymentPage,
+      props (route) {
+        return { id: route.params.id }
+      }
+    },
+    {
+      path: '/fulfillment-packages',
+      name: 'ListFulfillmentPackage',
+      component: ListFulfillmentPackagePage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          filterObject: route.query.filter,
+          page: page
+        }
+      }
+    },
+    {
+      path: '/fulfillment-packages/:id',
+      name: 'ShowFulfillmentPackage',
+      component: ShowFulfillmentPackagePage,
       props (route) {
         return { id: route.params.id }
       }
@@ -641,6 +666,17 @@ const router = new Router({
           filterObject: route.query.filter,
           page: page
         }
+      }
+    },
+    {
+      path: '/sms-templates/new',
+      name: 'NewSmsTemplate',
+      component: NewSmsTemplatePage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { callbackPath: query.callbackPath }
       }
     },
     {

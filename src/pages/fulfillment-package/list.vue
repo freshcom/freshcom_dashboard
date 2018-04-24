@@ -1,18 +1,19 @@
 <template>
-<content-container @locale-changed="listUnlockable">
+<content-container @locale-changed="listFulfillmentPackage">
   <div slot="header">
-    <router-link :to="{ name: 'ListUnlockable' }">Unlockables</router-link>
+    <router-link :to="{ name: 'ListFulfillmentPackage' }">Fulfillments</router-link>
+    <router-link :to="{ name: 'ListReturnPackage' }">Returns</router-link>
   </div>
 
   <div slot="card-header">
     <el-row>
       <el-col :span="16">
         <filter-button :current="filterObject" :draft="filterObjectDraft" @cancel="resetFilter" @clear="clearFilter">
-          <filter-condition v-model="filterObjectDraft" filter-key="status" default="active">
+          <filter-condition v-model="filterObjectDraft" filter-key="status" default="pending">
             <span slot="key">Status</span>
             <div slot="value">
               <select v-model="filterObjectDraft.status">
-                <option v-for="status in ['active', 'draft']" :value="status">is {{status}}</option>
+                <option v-for="status in ['pending', 'fulfilled']" :value="status">is {{status}}</option>
               </select>
             </div>
           </filter-condition>
@@ -38,7 +39,7 @@
       <el-col :span="8">
         <div class="text-right">
           <el-button-group>
-            <router-link :to="{ name: 'NewUnlockable' }" class="el-button el-button--small is-plain">
+            <router-link :to="{ name: 'NewFulfillmentPackage' }" class="el-button el-button--small is-plain">
               <span class="with-icon">
                 <span class="icon-wrapper">
                   <icon name="plus" scale="0.6"></icon>
@@ -46,22 +47,6 @@
                 <span>New</span>
               </span>
             </router-link>
-            <el-button @click="openAddDataImportDialog()" plain size="small">
-              <span class="with-icon">
-                <span class="icon-wrapper">
-                  <icon name="sign-in" scale="0.65"></icon>
-                </span>
-                <span>Import</span>
-              </span>
-            </el-button>
-            <el-button plain size="small">
-              <span class="with-icon">
-                <span class="icon-wrapper">
-                  <icon name="sign-out" scale="0.65"></icon>
-                </span>
-                <span>Export</span>
-              </span>
-            </el-button>
           </el-button-group>
         </div>
       </el-col>
@@ -72,26 +57,26 @@
     <div class="data full">
       <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
         <div slot="no-content">
-          <p><icon name="unlock-alt" scale="3"></icon></p>
+          <p><icon name="shopping-bag" scale="3"></icon></p>
           <p>
-            <span>You haven't created any unlockable yet.</span>
+            <span>You haven't created any fulfillment package yet.</span>
             <a href="javascript:;">Learn more &rarr;</a>
           </p>
 
-          <router-link :to="{ name: 'NewUnlockable' }" class="el-button el-button--small is-plain">
+          <router-link :to="{ name: 'NewFulfillmentPackage' }" class="el-button el-button--small is-plain">
             <span class="with-icon">
               <span class="icon-wrapper">
                 <icon name="plus" scale="0.6"></icon>
               </span>
-              <span>Create your first unlockable</span>
+              <span>Create your first fulfillment package</span>
             </span>
           </router-link>
         </div>
 
-        <el-table :data="unlockables" slot="content" class="data-table">
-          <el-table-column prop="name" label="UNLOCKABLE">
+        <el-table :data="fulfillmentPackages" slot="content" class="data-table">
+          <el-table-column prop="name" label="FULFILLMENT PACKAGE">
             <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowUnlockable', params: { id: scope.row.id } }" class="primary">
+              <router-link :to="{ name: 'ShowFulfillmentPackage', params: { id: scope.row.id } }" class="primary">
                 <span v-if="scope.row.code">
                   [{{scope.row.code}}]
                 </span>
@@ -103,12 +88,12 @@
 
           <el-table-column prop="status" label="STATUS" width="100">
             <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowUnlockable', params: { id: scope.row.id } }">
+              <router-link :to="{ name: 'ShowFulfillmentPackage', params: { id: scope.row.id } }">
                 <el-tag v-if="scope.row.status == 'active'" :disable-transitions="true" size="mini">
-                  {{$t(`fields.unlockable.status.${scope.row.status}`)}}
+                  {{$t(`fields.fulfillmentPackage.status.${scope.row.status}`)}}
                 </el-tag>
                 <el-tag v-else :disable-transitions="true" type="info" size="mini">
-                  {{$t(`fields.unlockable.status.${scope.row.status}`)}}
+                  {{$t(`fields.fulfillmentPackage.status.${scope.row.status}`)}}
                 </el-tag>
               </router-link>
             </template>
@@ -127,7 +112,7 @@
 
           <el-table-column prop="updatedAt" label="UPDATED" align="right" width="200">
             <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowUnlockable', params: { id: scope.row.id } }">
+              <router-link :to="{ name: 'ShowFulfillmentPackage', params: { id: scope.row.id } }">
                 {{scope.row.updatedAt | moment}}
               </router-link>
             </template>
@@ -136,99 +121,47 @@
       </query-result>
     </div>
   </div>
-
-  <div slot="launchable" class="launchable">
-    <el-dialog :show-close="false" :visible="isAddingDataImport" title="Import unlockable" width="750px">
-      <data-import-form v-model="dataImportDraftForAdd" :errors="errors"></data-import-form>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button :disabled="isCreatingDataImport" @click="closeAddDataImportDialog()" plain size="small">Cancel</el-button>
-        <el-button :loading="isCreatingDataImport" @click="createDataImport()" type="primary" size="small">Save</el-button>
-      </div>
-    </el-dialog>
-  </div>
 </content-container>
 </template>
 
 <script>
 import freshcom from '@/freshcom-sdk'
 
-import DataImportForm from '@/components/data-import-form'
-import DataImport from '@/models/data-import'
-
 import listPageMixinFactory from '@/mixins/list-page'
-let ListPageMixin = listPageMixinFactory({ listMethodName: 'listUnlockable' })
+let ListPageMixin = listPageMixinFactory({ listMethodName: 'listFulfillmentPackage' })
 
 export default {
-  name: 'ListUnlockable',
+  name: 'listFulfillmentPackage',
   mixins: [ListPageMixin],
-  components: {
-    DataImportForm
-  },
   data () {
     return {
-      unlockables: [],
+      fulfillmentPackages: [],
       isLoading: false,
       allCount: 0,
       totalCount: 0,
-
-      isAddingDataImport: false,
-      isCreatingDataImport: false,
-      dataImportDraftForAdd: DataImport.objectWithDefaults(),
 
       errors: {}
     }
   },
   created () {
-    this.listUnlockable()
+    this.listFulfillmentPackage()
   },
   methods: {
-    listUnlockable () {
+    listFulfillmentPackage () {
       this.isLoading = true
 
-      freshcom.listUnlockable({
+      freshcom.listFulfillmentPackage({
         search: this.searchKeyword,
         filter: this.filterObject,
         page: this.page
       }).then(response => {
-        this.unlockables = response.data
+        this.fulfillmentPackages = response.data
         this.allCount = response.meta.allCount
         this.totalCount = response.meta.totalCount
 
         this.isLoading = false
       }).catch(errors => {
         this.isLoading = false
-      })
-    },
-
-    openAddDataImportDialog () {
-      let dataImport = DataImport.objectWithDefaults()
-      dataImport.dataType = 'Unlockable'
-
-      this.dataImportDraftForAdd = dataImport
-      this.isAddingDataImport = true
-    },
-
-    closeAddDataImportDialog () {
-      this.isAddingDataImport = false
-      this.isCreatingDataImport = false
-    },
-
-    createDataImport () {
-      this.isCreatingDataImport = true
-
-      freshcom.createDataImport(this.dataImportDraftForAdd).then(response => {
-        this.$message({
-          showClose: true,
-          message: `Import started successfully.`,
-          type: 'success'
-        })
-
-        this.closeAddDataImportDialog()
-      }).catch(response => {
-        this.errors = response.errors
-        this.isCreatingDataImport = false
-        throw response
       })
     }
   }
@@ -237,5 +170,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
 </style>

@@ -12,7 +12,7 @@
 
         <el-submenu index="storefront">
           <template slot="title">
-            <icon name="shopping-bag" scale="0.8"></icon>
+            <icon name="shopping-cart" scale="1"></icon>
             <span>Storefront</span>
           </template>
           <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">
@@ -34,6 +34,10 @@
             <icon name="truck" scale="0.8"></icon>
             <span>Fulfillment</span>
           </template>
+          <el-menu-item :route="{ name: 'ListFulfillmentPackage' }" index="/fulfillment-packages">
+            <icon name="shopping-bag" scale="0.8"></icon>
+            <span>Packages</span>
+          </el-menu-item>
           <el-menu-item :route="{ name: 'ListUnlock' }" index="/unlocks">
             <icon name="unlock" scale="1"></icon>
             <span>Unlocks</span>
@@ -171,7 +175,6 @@ import _ from 'lodash'
 
 import 'vue-awesome/icons/send'
 import 'vue-awesome/icons/home'
-import 'vue-awesome/icons/shopping-bag'
 import 'vue-awesome/icons/cubes'
 import 'vue-awesome/icons/unlock-alt'
 import 'vue-awesome/icons/file'

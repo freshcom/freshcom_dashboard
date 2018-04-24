@@ -98,8 +98,9 @@ export default {
         auto: 'Auto'
       },
       status: {
+        pending: 'Pending',
         fulfilled: 'Fulfilled',
-        partially_returned: 'Partially Returned',
+        partiallyReturned: 'Partially Returned',
         returned: 'Returned',
         discarded: 'Discarded'
       }
