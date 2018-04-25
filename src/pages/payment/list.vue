@@ -2,6 +2,7 @@
 <content-container @locale-changed="listPayment">
   <div slot="header">
     <router-link :to="{ name: 'ListPayment' }">Payments</router-link>
+    <router-link :to="{ name: 'ShowBalanceSettings' }">Settings</router-link>
   </div>
 
   <div slot="card-header">

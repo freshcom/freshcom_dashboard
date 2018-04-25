@@ -134,11 +134,6 @@
           <span>File Storage</span>
         </el-menu-item>
 
-        <el-menu-item :route="{ name: 'ShowBalanceSettings' }" index="/billing/settings">
-          <icon name="bank" scale="0.9"></icon>
-          <span>Balance</span>
-        </el-menu-item>
-
 <!--         <el-submenu index="fileStorage">
           <template slot="title">
             <icon name="folder" scale="0.9"></icon>
