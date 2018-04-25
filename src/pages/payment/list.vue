@@ -44,7 +44,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column prop="status" label="STATUS" width="100">
+          <el-table-column prop="status" label="STATUS" width="160">
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }">
                 <el-tag v-if="scope.row.status == 'active'" :disable-transitions="true" size="mini">
