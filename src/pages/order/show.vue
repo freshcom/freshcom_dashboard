@@ -767,7 +767,7 @@ export default {
     createRefund () {
       this.isCreatingRefund = true
 
-      freshcom.createRefund(this.refundForAdd.payment.id, this.refundForAdd).then(() => {
+      freshcom.createRefund(this.refundForAdd).then(() => {
         return Promise.all([
           this.loadOrder(),
           this.loadPayments()

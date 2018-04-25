@@ -305,8 +305,11 @@ const sdk = {
     }).catch(this._processHttpError)
   },
 
-  createRefund (paymentId, fields, params = {}, options = {}) {
+  createRefund (fields, params = {}, options = {}) {
+    fields = this._merge({}, fields, { type: 'Refund' })
+
     let payload = SimpleJAS.serialize(fields)
+    let paymentId = fields.payment.id
     return this.http.post(`payments/${paymentId}/refunds`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)

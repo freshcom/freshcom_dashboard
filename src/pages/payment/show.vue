@@ -264,7 +264,7 @@ export default {
     createRefund () {
       this.isCreatingRefund = true
 
-      freshcom.createRefund(this.payment.id, this.refundForAdd).then(() => {
+      freshcom.createRefund(this.refundForAdd).then(() => {
         return this.loadPayment({ shouldShowLoading: false })
       }).then(() => {
         this.$message({
