@@ -1,198 +1,205 @@
 <template>
-<div class="page-wrapper">
-  <div>
-    <el-menu :router="true" default-active="/payments" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">Orders</el-menu-item>
-      <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">Payments</el-menu-item>
-    </el-menu>
-    <locale-selector @change="loadPayment" class="pull-right"></locale-selector>
+<content-container @locale-changed="reload" :ready="isReady">
+  <div slot="header">
+    <router-link :to="{ name: 'ListPayment' }">Payments</router-link>
   </div>
 
-  <div>
-    <el-card v-loading="isLoading" class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
+  <div slot="card-header">
+    <div class="brief">
+      <div class="avatar">
+        <icon name="money" class="avatar-icon"></icon>
+      </div>
+
+      <div class="detail">
+        <p>
+          <span>Payment</span>
+          <span>{{payment.code}}</span>
+        </p>
+        <h1>{{payment.amountCents | dollar}}</h1>
+        <p class="id">{{payment.id}}</p>
+      </div>
+    </div>
+  </div>
+
+  <div slot="card-content">
+    <div class="data">
+      <div class="block">
+        <div class="header">
+          <h2>Detail</h2>
         </div>
 
-        <div class="brief no-avatar">
-          <div class="detail">
-            <p>Payment {{payment.code}}</p>
-            <h2>{{payment.amountCents | dollar}}</h2>
-            <p class="id">{{payment.id}}</p>
-          </div>
+        <div class="body">
+          <dl>
+            <dt>ID</dt>
+            <dd>{{payment.id}}</dd>
+
+            <template v-if="payment.code">
+              <dt>Code</dt>
+              <dd>{{payment.code}}</dd>
+            </template>
+
+            <dt>Status</dt>
+            <dd>
+              {{$t(`fields.payment.status.${payment.status}`)}}
+            </dd>
+
+            <dt>Gateway</dt>
+            <dd>
+              {{$t(`fields.payment.gateway.${payment.gateway}`)}}
+            </dd>
+
+            <template v-if="payment.method">
+              <dt>Method</dt>
+              <dd>{{payment.method}}</dd>
+            </template>
+
+            <dt>Amount</dt>
+            <dd>
+              {{payment.amountCents | dollar}}
+            </dd>
+
+            <template v-if="payment.refundedAmountCents">
+              <dt>Refunded Amount</dt>
+              <dd>
+                {{payment.refundedAmountCents | dollar}}
+              </dd>
+            </template>
+
+            <template v-if="payment.transactionFeeCents">
+              <dt>Transaction Fee</dt>
+              <dd>
+                {{payment.transactionFeeCents - payment.refundedTransactionFeeCents | dollar}}
+              </dd>
+            </template>
+
+            <dt>Net Amount</dt>
+            <dd>
+              {{payment.netAmountCents | dollar}}
+            </dd>
+          </dl>
         </div>
       </div>
 
-      <div class="data">
-        <div class="block-title">
-          <h3>Details</h3>
-        </div>
-        <div class="block">
-          <div class="block-body">
-            <dl>
-              <dt>ID</dt>
-              <dd>{{payment.id}}</dd>
+      <div class="block">
+        <div class="header">
+          <h2>Refunds</h2>
 
-              <dt v-if="payment.code">Code</dt>
-              <dd v-if="payment.code">{{payment.code}}</dd>
-
-              <dt>Status</dt>
-              <dd>
-                {{$t(`fields.payment.status.${payment.status}`)}}
-              </dd>
-
-              <dt v-if="payment.gateway">Gateway</dt>
-              <dd v-if="payment.gateway">
-                {{$t(`fields.payment.gateway.${payment.gateway}`)}}
-              </dd>
-
-              <dt v-if="payment.method">Method</dt>
-              <dd v-if="payment.method">{{payment.method}}</dd>
-
-              <dt v-if="payment.amountCents">Amount</dt>
-              <dd v-if="payment.amountCents">
-                {{payment.amountCents | dollar}}
-              </dd>
-
-              <dt v-if="payment.refundedAmountCents">Refunded Amount</dt>
-              <dd v-if="payment.refundedAmountCents">
-                {{payment.refundedAmountCents | dollar}}
-              </dd>
-
-              <dt v-if="payment.transactionFeeCents">Transaction Fee</dt>
-              <dd v-if="payment.transactionFeeCents">
-                {{payment.transactionFeeCents - payment.refundedTransactionFeeCents | dollar}}
-              </dd>
-
-              <dt v-if="payment.netAmountCents">Net Amount</dt>
-              <dd v-if="payment.netAmountCents">
-                {{payment.netAmountCents | dollar}}
-              </dd>
-            </dl>
+          <div v-if="canRefund" class="action-group">
+            <el-button @click="addRefund()" class="el-button el-button--mini is-plain">
+              Add
+            </el-button>
           </div>
         </div>
 
-        <div class="block-title">
-          <h3>Refunds</h3>
-
-          <span v-if="canRefund" class="block-title-actions pull-right">
-            <a @click="openAddRefundDialog()" href="javascript:;">
-              <icon name="plus" scale="0.8" class="v-middle"></icon>
-              <span>Add</span>
-            </a>
-          </span>
-        </div>
-
-        <div class="block">
-          <div class="block-body full">
-            <el-table :data="payment.refunds" class="block-table" :show-header="false" style="width: 100%">
-              <el-table-column width="300">
-                <template slot-scope="scope">
+        <div class="body full">
+          <el-table :data="payment.refunds" class="data-table block-table" :show-header="false">
+            <el-table-column width="300">
+              <template slot-scope="scope">
+                <a href="javascript:;" class="primary">
                   <b>{{scope.row.amountCents | dollar}}</b>
+
                   <el-tag v-if="scope.row.gateway !== payment.gateway" size="mini" type="info" class="m-l-10">
                     {{$t(`fields.refund.gateway.${scope.row.gateway}`)}}
                   </el-tag>
-                </template>
-              </el-table-column>
+                </a>
+              </template>
+            </el-table-column>
 
-              <el-table-column>
-                <template slot-scope="scope">
-                  <p class="text-right">
-                    {{scope.row.insertedAt | moment}}
-                  </p>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
+            <el-table-column>
+              <template slot-scope="scope">
+                <p class="text-right">
+                  {{scope.row.insertedAt | moment}}
+                </p>
+              </template>
+            </el-table-column>
+          </el-table>
         </div>
 
-        <div class="block-title">
-          <h3>Custom Data</h3>
-        </div>
-        <div class="block">
-          <div class="block-body">
-            {{payment.customData}}
-          </div>
-        </div>
+        <div class="launchable">
+          <el-dialog :show-close="false" :visible="isAddingRefund" title="Add refund" width="500px">
+            <el-form @submit.native.prevent="createRefund()" label-position="top" size="small">
+              <refund-fieldset v-model="refundForAdd" :errors="errors"></refund-fieldset>
+            </el-form>
 
-        <h3>Related Resources</h3>
-        <div class="block">
-          <div class="block-body">
-            <dl>
-              <dt>Target</dt>
-              <dd>
-                <router-link :to="{ name: `Show${payment.targetType}`, params: { id: payment.targetId }}">
-                  {{payment.targetId}}
-                </router-link>
-              </dd>
+            <div slot="footer">
+              <el-button :disabled="isCreatingRefund" @click="cancelAddRefund()" plain size="small">Cancel</el-button>
+              <el-button :loading="isCreatingRefund" @click="createRefund()" type="primary" size="small">Save</el-button>
+            </div>
+          </el-dialog>
+        </div>
+      </div>
 
+      <div class="block">
+        <div class="header">
+          <h2>Custom Data</h2>
+        </div>
+        <div class="body">
+          {{payment.customData}}
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="header">
+          <h2>Related Resource</h2>
+        </div>
+        <div class="body">
+          <dl>
+            <template v-if="payment.owner">
               <dt>Owner</dt>
               <dd>
-                <router-link :to="{ name: `Show${payment.ownerType}`, params: { id: payment.ownerId }}">
-                  {{payment.ownerId}}
+                <router-link :to="{ name: 'ShowCustomer', params: { id: payment.owner.id } }">
+                  {{payment.owner.id}}
                 </router-link>
               </dd>
-            </dl>
-          </div>
-        </div>
+            </template>
 
-        <h3>Logs</h3>
-        <div class="block">
-          <div class="block-body">
-
-          </div>
-        </div>
-
-        <h3>Events</h3>
-        <div class="block">
-          <div class="block-body">
-
-          </div>
+            <template v-if="payment.target">
+              <dt>Target</dt>
+              <dd>
+                <router-link :to="{ name: 'ShowOrder', params: { id: payment.target.id } }">
+                  {{payment.target.id}}
+                </router-link>
+              </dd>
+            </template>
+          </dl>
         </div>
       </div>
+    </div>
 
-      <div v-if="canDelete" class="footer text-right">
-        <confirm-button @confirmed="deletePayment" size="small">Delete</confirm-button>
-      </div>
-    </el-card>
+    <div v-if="canDelete" class="foot text-right">
+      <el-button @click="attemptDeletePayment()" plain size="small">
+        Delete
+      </el-button>
+    </div>
   </div>
 
-  <div class="launchable">
-    <el-dialog :show-close="false" :visible="isAddingRefund" title="Refund Payment" width="500px">
-      <refund-form v-model="refundDraftForAdd" :errors="errors"></refund-form>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button :disabled="isCreatingRefund" @click="closeAddRefundDialog()" plain size="small">Cancel</el-button>
-        <el-button :loading="isCreatingRefund" @click="createRefund()" type="primary" size="small">Refund {{refundDraftForAdd.amountCents | dollar}}</el-button>
-      </div>
-    </el-dialog>
-  </div>
-</div>
-
+</content-container>
 </template>
 
 <script>
-import 'vue-awesome/icons/plus'
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
 import Payment from '@/models/payment'
 import Refund from '@/models/refund'
-import RefundForm from '@/components/refund-form'
-import ConfirmButton from '@/components/confirm-button'
-import { chargeDollar, dollar } from '@/helpers/filters'
+import RefundFieldset from '@/components/refund-fieldset'
+import { dollar } from '@/helpers/filters'
+
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadPayment' })
 
 export default {
   name: 'ShowPayment',
-  mixins: [PageMixin],
-  props: ['id'],
+  mixins: [ResourcePageMixin],
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  },
   components: {
-    ConfirmButton,
-    RefundForm
+    RefundFieldset
   },
   filters: {
-    chargeDollar,
     dollar
   },
   data () {
@@ -200,7 +207,7 @@ export default {
       payment: Payment.objectWithDefaults(),
       isLoading: false,
 
-      refundDraftForAdd: Refund.objectWithDefaults(),
+      refundForAdd: Refund.objectWithDefaults(),
       isAddingRefund: false,
       isCreatingRefund: false,
 
@@ -224,7 +231,7 @@ export default {
         this.isLoading = true
       }
 
-      freshcom.retrievePayment(this.id, {
+      return freshcom.retrievePayment(this.id, {
         include: 'refunds'
       }).then(response => {
         this.payment = response.data
@@ -235,7 +242,7 @@ export default {
       })
     },
 
-    openAddRefundDialog () {
+    addRefund () {
       let refundDraft = Refund.objectWithDefaults()
 
       refundDraft.payment = this.payment
@@ -245,20 +252,19 @@ export default {
       refundDraft.owner = this.payment.owner
       refundDraft.target = this.payment.target
 
-      this.refundDraftForAdd = refundDraft
+      this.refundForAdd = refundDraft
       this.errors = {}
       this.isAddingRefund = true
     },
 
-    closeAddRefundDialog () {
+    cancelAddRefund () {
       this.isAddingRefund = false
-      this.isCreatingRefund = false
     },
 
     createRefund () {
       this.isCreatingRefund = true
 
-      freshcom.createRefund(this.payment.id, this.refundDraftForAdd).then(() => {
+      freshcom.createRefund(this.payment.id, this.refundForAdd).then(() => {
         return this.loadPayment({ shouldShowLoading: false })
       }).then(() => {
         this.$message({
@@ -267,7 +273,8 @@ export default {
           type: 'success'
         })
 
-        this.closeAddRefundDialog()
+        this.isCreatingRefund = false
+        this.cancelAddRefund()
       }).catch(response => {
         this.errors = response.errors
         this.isCreatingRefund = false

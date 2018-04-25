@@ -238,9 +238,11 @@ export default {
       if (routePath.startsWith('/prices')) { return '/products' }
       if (routePath.startsWith('/product-collections')) { return '/products' }
 
-      if (routePath.startsWith('/orders') || routePath.startsWith('/payments')) { return '/orders' }
+      if (routePath.startsWith('/orders')) { return '/orders' }
       if (routePath.startsWith('/customers') || routePath.startsWith('/customers')) { return '/customers' }
       if (routePath.startsWith('/depositables') || routePath.startsWith('/depositables')) { return '/depositables' }
+
+      if (routePath.startsWith('/payments')) { return '/payments' }
 
       if (routePath.startsWith('/emails')) { return '/emails' }
       if (routePath.startsWith('/email-templates')) { return '/emails' }
