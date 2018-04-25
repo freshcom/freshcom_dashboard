@@ -6,17 +6,17 @@
     <div class="primary-nav-scroller">
       <el-menu mode="vertical" :router="true" :default-active="selected" class="primary-nav">
         <el-menu-item :route="{ name: 'Home' }" index="/">
-          <icon name="home" scale="1"></icon>
+          <icon name="home" scale="0.9"></icon>
           <a>Home</a>
         </el-menu-item>
 
         <el-submenu index="storefront">
           <template slot="title">
-            <icon name="shopping-cart" scale="1"></icon>
+            <icon name="shopping-cart" scale="0.9"></icon>
             <span>Storefront</span>
           </template>
           <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">
-            <icon name="file-text" scale="1"></icon>
+            <icon name="file-text" scale="0.9"></icon>
             <span>Orders</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
@@ -24,123 +24,138 @@
             <span>Products</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListCustomer' }" index="/customers">
-            <icon name="user" scale="1"></icon>
+            <icon name="user" scale="0.9"></icon>
             <span>Customers</span>
           </el-menu-item>
         </el-submenu>
 
+        <el-submenu index="balance">
+          <template slot="title">
+            <icon name="bank" scale="0.9"></icon>
+            <span>Balance</span>
+          </template>
+          <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">
+            <icon name="money" scale="0.9"></icon>
+            <span>Payments</span>
+          </el-menu-item>
+<!--           <el-menu-item :route="{ name: 'ListUnlock' }" index="/unlocks">
+            <icon name="unlock" scale="0.9"></icon>
+            <span>Unlocks</span>
+          </el-menu-item> -->
+        </el-submenu>
+
         <el-submenu index="fulfillment">
           <template slot="title">
-            <icon name="truck" scale="0.8"></icon>
+            <icon name="truck" scale="0.9"></icon>
             <span>Fulfillment</span>
           </template>
           <el-menu-item :route="{ name: 'ListFulfillmentPackage' }" index="/fulfillment-packages">
-            <icon name="shopping-bag" scale="0.8"></icon>
+            <icon name="shopping-bag" scale="0.9"></icon>
             <span>Packages</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListUnlock' }" index="/unlocks">
-            <icon name="unlock" scale="1"></icon>
+            <icon name="unlock" scale="0.9"></icon>
             <span>Unlocks</span>
           </el-menu-item>
         </el-submenu>
 
         <el-submenu index="inventory">
           <template slot="title">
-            <icon name="archive" scale="0.8"></icon>
+            <icon name="archive" scale="0.9"></icon>
             <span>Goods</span>
           </template>
           <el-menu-item :route="{ name: 'ListStockable' }" index="/stockables">
-            <icon name="cubes" scale="0.8"></icon>
+            <icon name="cubes" scale="0.9"></icon>
             <span>Stockables</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListUnlockable' }" index="/unlockables">
-            <icon name="unlock-alt" scale="0.8"></icon>
+            <icon name="unlock-alt" scale="0.9"></icon>
             <span>Unlockables</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListDepositable' }" index="/depositables">
-            <icon name="diamond" scale="0.8"></icon>
+            <icon name="diamond" scale="0.9"></icon>
             <span>Depositables</span>
           </el-menu-item>
 <!--           <el-menu-item index="stockTransfers">
-            <icon name="exchange" scale="0.8"></icon>
+            <icon name="exchange" scale="0.9"></icon>
             <span>Stock Transfers</span>
           </el-menu-item>
           <el-menu-item index="branches">
-            <icon name="bank" scale="0.8"></icon>
+            <icon name="bank" scale="0.9"></icon>
             <span>Branches</span>
           </el-menu-item> -->
         </el-submenu>
 
 <!--         <el-submenu index="distribution">
           <template slot="title">
-            <icon name="globe" scale="1"></icon>
+            <icon name="globe" scale="0.9"></icon>
             <span>Distribution</span>
           </template>
           <el-menu-item index="distributioDays">
-            <icon name="calendar" scale="0.8"></icon>
+            <icon name="calendar" scale="0.9"></icon>
             <span>Days</span>
           </el-menu-item>
           <el-menu-item index="distributioAreas">
-            <icon name="map" scale="0.8"></icon>
+            <icon name="map" scale="0.9"></icon>
             <span>Areas</span>
           </el-menu-item>
           <el-menu-item index="distributioTrips">
-            <icon name="map-marker" scale="0.8"></icon>
+            <icon name="map-marker" scale="0.9"></icon>
             <span>Trips</span>
           </el-menu-item>
           <el-menu-item index="distributioVehicles">
-            <icon name="truck" scale="0.8"></icon>
+            <icon name="truck" scale="0.9"></icon>
             <span>Vehicles</span>
           </el-menu-item>
         </el-submenu> -->
 
         <el-submenu index="notification">
           <template slot="title">
-            <icon name="send" scale="0.8"></icon>
+            <icon name="send" scale="0.9"></icon>
             <span>Notification</span>
           </template>
 
           <el-menu-item :route="{ name: 'ListNotificationTrigger' }" index="/notification-triggers">
-            <icon name="external-link" scale="0.8"></icon>
+            <icon name="external-link" scale="0.9"></icon>
             <span>Triggers</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListEmail' }" index="/emails">
-            <icon name="envelope" scale="0.8"></icon>
+            <icon name="envelope" scale="0.9"></icon>
             <span>Emails</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListSms' }" index="/sms">
-            <icon name="comment" scale="0.8"></icon>
+            <icon name="comment" scale="0.9"></icon>
             <span>SMS</span>
           </el-menu-item>
         </el-submenu>
 
         <el-menu-item :route="{ name: 'ListFileCollection' }" index="/file-collections">
-          <icon name="folder" scale="0.8"></icon>
+          <icon name="folder" scale="0.9"></icon>
           <span>File Storage</span>
         </el-menu-item>
 
         <el-menu-item :route="{ name: 'ShowBalanceSettings' }" index="/billing/settings">
-          <icon name="bank" scale="0.8"></icon>
+          <icon name="bank" scale="0.9"></icon>
           <span>Balance</span>
         </el-menu-item>
 
 <!--         <el-submenu index="fileStorage">
           <template slot="title">
-            <icon name="folder" scale="0.8"></icon>
+            <icon name="folder" scale="0.9"></icon>
             <span>File Storage</span>
           </template>
           <el-menu-item :route="{ name: 'ListFileCollection' }" index="/file_collections">
-            <icon name="folder-open" scale="0.8"></icon>
+            <icon name="folder-open" scale="0.9"></icon>
             <span>File Collections</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListFile' }" index="/files">
-            <icon name="file" scale="0.8"></icon>
+            <icon name="file" scale="0.9"></icon>
             <span>Files</span>
           </el-menu-item>
         </el-submenu> -->
 
         <el-menu-item :router="{ name: 'APIHome' }" index="/api">
-          <icon name="terminal" scale="0.8"></icon>
+          <icon name="terminal" scale="0.9"></icon>
           <span>API</span>
         </el-menu-item>
 
@@ -156,19 +171,18 @@
         </el-menu-item>
 
         <el-menu-item index="operators">
-          <icon name="id-card" scale="0.8"></icon>
+          <icon name="id-card" scale="0.9"></icon>
           <span>Operators</span>
         </el-menu-item>
 
         <el-menu-item index="settings">
-          <icon name="cog" scale="0.8"></icon>
+          <icon name="cog" scale="0.9"></icon>
           <span>Settings</span>
         </el-menu-item>
       </el-menu>
     </div>
   </div>
 </template>
-
 
 <script>
 import _ from 'lodash'
@@ -182,7 +196,6 @@ import 'vue-awesome/icons/archive'
 import 'vue-awesome/icons/exchange'
 import 'vue-awesome/icons/truck'
 import 'vue-awesome/icons/terminal'
-import 'vue-awesome/icons/bank'
 import 'vue-awesome/icons/id-card'
 import 'vue-awesome/icons/folder-open'
 import 'vue-awesome/icons/diamond'

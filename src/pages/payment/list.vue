@@ -1,12 +1,101 @@
 <template>
-<div class="page-wrapper">
+<content-container @locale-changed="listPayment">
+  <div slot="header">
+    <router-link :to="{ name: 'ListPayment' }">Payments</router-link>
+  </div>
+
+  <div slot="card-header">
+    <el-row>
+      <el-col :span="16">
+        <filter-button :current="filterObject" :draft="filterObjectDraft" @cancel="resetFilter" @clear="clearFilter">
+          <filter-condition v-model="filterObjectDraft" filter-key="status" default="pending">
+            <span slot="key">Status</span>
+            <div slot="value">
+              <select v-model="filterObjectDraft.status">
+                <option v-for="status in ['pending', 'paid', 'refunded']" :value="status">is {{status}}</option>
+              </select>
+            </div>
+          </filter-condition>
+        </filter-button>
+
+        <search-input :value="searchKeyword"></search-input>
+      </el-col>
+    </el-row>
+  </div>
+
+  <div slot="card-content">
+    <div class="data full">
+      <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
+        <div slot="no-content">
+          <p><icon name="money" scale="3"></icon></p>
+          <p>
+            <span>You haven't created any payment yet.</span>
+            <a href="javascript:;">Learn more &rarr;</a>
+          </p>
+        </div>
+
+        <el-table :data="payments" slot="content" class="data-table">
+          <el-table-column label="PAYMENT">
+            <template slot-scope="scope">
+              <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }" class="primary">
+                <b>{{scope.row.amountCents | dollar}}</b>
+              </router-link>
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="status" label="STATUS" width="100">
+            <template slot-scope="scope">
+              <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }">
+                <el-tag v-if="scope.row.status == 'active'" :disable-transitions="true" size="mini">
+                  {{$t(`fields.payment.status.${scope.row.status}`)}}
+                </el-tag>
+                <el-tag v-else :disable-transitions="true" type="info" size="mini">
+                  {{$t(`fields.payment.status.${scope.row.status}`)}}
+                </el-tag>
+              </router-link>
+            </template>
+          </el-table-column>
+
+          <el-table-column label="GATEWAY">
+            <template slot-scope="scope">
+              <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }">
+                {{$t(`fields.payment.gateway.${scope.row.gateway}`)}}
+              </router-link>
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="id" label="ID" width="120">
+            <template slot-scope="scope">
+              <el-popover trigger="hover" placement="top">
+                <span>{{ scope.row.id }}</span>
+                <div slot="reference">
+                  {{ scope.row.id | idLastPart }}
+                </div>
+              </el-popover>
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="updatedAt" label="UPDATED" align="right" width="200">
+            <template slot-scope="scope">
+              <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }">
+                {{scope.row.updatedAt | moment}}
+              </router-link>
+            </template>
+          </el-table-column>
+        </el-table>
+      </query-result>
+    </div>
+  </div>
+</content-container>
+
+<!-- <div class="page-wrapper">
 
   <div>
     <el-menu :router="true" default-active="/payments" mode="horizontal" class="secondary-nav">
       <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">Orders</el-menu-item>
       <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">Payments</el-menu-item>
     </el-menu>
-    <locale-selector @change="searchPayment()" class="pull-right"></locale-selector>
+    <locale-selector @change="listPayment()" class="pull-right"></locale-selector>
   </div>
 
   <div>
@@ -70,37 +159,22 @@
     </el-card>
   </div>
 
-</div>
+</div> -->
 </template>
 
 <script>
-import 'vue-awesome/icons/search'
-import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 
-import PageMixin from '@/mixins/page'
-import Pagination from '@/components/pagination'
-import { dollar, idLastPart } from '@/helpers/filters'
+import { dollar } from '@/helpers/filters'
+
+import listPageMixinFactory from '@/mixins/list-page'
+let ListPageMixin = listPageMixinFactory({ listMethodName: 'listPayment' })
 
 export default {
   name: 'ListPayment',
-  mixins: [PageMixin],
-  components: {
-    Pagination
-  },
+  mixins: [ListPageMixin],
   filters: {
-    dollar,
-    idLastPart
-  },
-  props: {
-    searchKeyword: {
-      type: String,
-      default: ''
-    },
-    page: {
-      type: Object,
-      required: true
-    }
+    dollar
   },
   data () {
     return {
@@ -111,40 +185,10 @@ export default {
     }
   },
   created () {
-    this.searchPayment()
-  },
-  computed: {
-    noSearchResult () {
-      return !this.isLoading && this.totalCount === 0 && this.allCount > 0
-    },
-    hasSearchResult () {
-      return !this.isLoading && this.totalCount !== 0
-    },
-    currentRoutePath () {
-      return this.$store.state.route.fullPath
-    }
-  },
-  watch: {
-    isViewingTestData () {
-      this.searchPayment()
-    },
-    searchKeyword (newKeyword) {
-      this.searchPayment()
-    },
-    page (newPage, oldPage) {
-      if (_.isEqual(newPage, oldPage)) {
-        return
-      }
-      this.searchPayment()
-    }
+    this.listPayment()
   },
   methods: {
-    updateSearchKeyword: _.debounce(function (newSearchKeyword) {
-      // Remove page[number] from query to reset to the first page
-      let q = _.merge({}, _.omit(this.$route.query, ['page[number]']), { search: newSearchKeyword })
-      this.$router.replace({ name: this.$store.state.route.name, query: q })
-    }, 300),
-    searchPayment () {
+    listPayment () {
       this.isLoading = true
 
       freshcom.listPayment({
@@ -159,12 +203,6 @@ export default {
       }).catch(errors => {
         this.isLoading = false
       })
-    },
-    viewPayment (payment) {
-      this.$store.dispatch('pushRoute', { name: 'ShowPayment', params: { id: payment.id, callbackPath: this.currentRoutePath } })
-    },
-    newPayment () {
-      this.$store.dispatch('pushRoute', { name: 'NewPayment' })
     }
   }
 }
@@ -172,17 +210,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.main-card .footer {
-  text-align: right;
-  border-top: 0;
-}
-
-.total {
-  float: left;
-  display: inline-block;
-  font-size: 13px;
-  min-width: 28px;
-  height: 28px;
-  line-height: 28px;
-}
 </style>

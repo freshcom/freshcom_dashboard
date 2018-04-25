@@ -41,6 +41,9 @@ import 'vue-awesome/icons/comment' // SMS
 import 'vue-awesome/icons/cubes' // Stockable
 import 'vue-awesome/icons/shopping-bag' // Fulfillment Package
 import 'vue-awesome/icons/shopping-cart' // Storefront
+import 'vue-awesome/icons/bank' // Balance
+import 'vue-awesome/icons/money' // Payment
+import 'vue-awesome/icons/search' // Search
 
 // -- Code Mirror Style --
 import 'codemirror/mode/xml/xml'
