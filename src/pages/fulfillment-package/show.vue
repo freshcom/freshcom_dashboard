@@ -160,7 +160,7 @@
             <template v-if="fulfillmentPackage.order">
               <dt>Order</dt>
               <dd>
-                <router-link :to="{ name: 'ShowCustomer', params: { id: fulfillmentPackage.order.id }}">
+                <router-link :to="{ name: 'ShowOrder', params: { id: fulfillmentPackage.order.id }}">
                  {{fulfillmentPackage.order.id}}
                 </router-link>
               </dd>

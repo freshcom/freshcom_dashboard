@@ -143,7 +143,7 @@
         </div>
 
         <div class="body full">
-          <el-table :data="customer.cards" class="data-table block-table" :show-header="false">
+          <el-table :data="cards" class="data-table block-table" :show-header="false">
             <el-table-column width="120">
               <template slot-scope="scope">
                 <a href="javascript:;" class="primary with-icon">
@@ -505,6 +505,7 @@ export default {
       cardForEdit: {},
       isEditingCard: false,
       isUpdatingCard: false,
+      cards: [],
 
       cardForDelete: {},
       isConfirmingDeleteCard: false,
@@ -547,6 +548,7 @@ export default {
         this.loadCustomer().then(() => {
           return this.loadPointTransactions()
         }),
+        this.loadCards(),
         this.loadOrders(),
         this.loadUnlocks()
       ])
@@ -557,7 +559,7 @@ export default {
     //
     loadCustomer () {
       return freshcom.retrieveCustomer(this.id, {
-        include: 'point_account,fileCollections,cards'
+        include: 'pointAccount,fileCollections'
       }).then(response => {
         this.customer = response.data
       })
@@ -590,6 +592,15 @@ export default {
     //
     // MARK: Card
     //
+    loadCards (card) {
+      freshcom.listCard({
+        filter: { ownerId: this.id, ownerType: 'Customer' },
+        page: { size: 50, number: 1 }
+      }).then(response => {
+        this.cards = response.data
+      })
+    },
+
     editCard (card) {
       this.cardForEdit = _.cloneDeep(card)
       this.errors = {}
