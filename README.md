@@ -1,8 +1,18 @@
-# black_jet
+# Freshcom Dashboard
 
-> A Vue.js project
+## This is a work in progress
 
-## Build Setup
+## Introduction
+
+This is the back office front-end for [Freshcom API](https://github.com/freshcom/freshcom-api)
+
+## Getting started
+
+First, make sure you have [Freshcom API](https://github.com/freshcom/freshcom-api) running locally.
+
+Second, rename `.env.example` to `.env` and add the corresponding Stripe keys.
+
+Third, run the following:
 
 ``` bash
 # install dependencies
@@ -10,12 +20,6 @@ npm install
 
 # serve with hot reload at localhost:8080
 npm run dev
-
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
 ```
 
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+This project is built using [VueJS](https://vuejs.org) and [Element UI](https://github.com/ElemeFE/element)
