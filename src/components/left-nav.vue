@@ -62,11 +62,11 @@
         <el-submenu index="inventory">
           <template slot="title">
             <icon name="archive" scale="0.9"></icon>
-            <span>Goods</span>
+            <span id="nav-goods">Goods</span>
           </template>
           <el-menu-item :route="{ name: 'ListStockable' }" index="/stockables">
             <icon name="cubes" scale="0.9"></icon>
-            <span>Stockables</span>
+            <span id="nav-stockables">Stockables</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListUnlockable' }" index="/unlockables">
             <icon name="unlock-alt" scale="0.9"></icon>

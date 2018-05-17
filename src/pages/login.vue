@@ -11,11 +11,11 @@
 
       <el-form @submit.native.prevent="attemptLogin(form)" label-width="80px" size="small">
         <el-form-item label="Email">
-          <el-input v-model="form.username"></el-input>
+          <el-input v-model="form.username" id="username"></el-input>
         </el-form-item>
 
         <el-form-item label="Password">
-          <el-input v-model="form.password" type="password"></el-input>
+          <el-input v-model="form.password" id="password" type="password"></el-input>
         </el-form-item>
 
         <el-form-item class="thin">
