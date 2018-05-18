@@ -17,7 +17,7 @@
   </el-form-item>
 
   <el-form-item label="Name" :error="errorMsgs.name" required>
-    <el-input v-model="formModel.name" @input="updateValue()"></el-input>
+    <el-input v-model="formModel.name" @input="updateValue()" name="name"></el-input>
   </el-form-item>
 
   <el-form-item label="Print Name" :error="errorMsgs.printName">
@@ -25,7 +25,7 @@
   </el-form-item>
 
   <el-form-item label="Unit Of Measure" :error="errorMsgs.unitOfMeasure" required>
-    <el-input v-model="formModel.unitOfMeasure" @input="updateValue()" width="200px"></el-input>
+    <el-input v-model="formModel.unitOfMeasure" @input="updateValue()" name="unit-of-measure" width="200px"></el-input>
   </el-form-item>
 
   <el-form-item label="Variable Weight" :error="errorMsgs.variableWeight" required>
