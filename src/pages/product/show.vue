@@ -202,12 +202,12 @@
         </div>
       </div>
 
-      <div v-if="canViewPrice" class="block">
+      <div v-if="canViewPrice" class="block prices">
         <div class="header">
           <h2>Prices</h2>
 
           <div class="action-group">
-            <router-link :to="{ name: 'NewPrice', query: { product: { id: product.id, type: 'Product', kind: product.kind, name: product.name }, callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
+            <router-link :to="{ name: 'NewPrice', query: { product: { id: product.id, type: 'Product', kind: product.kind, name: product.name }, callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain add-price">
               Add
             </router-link>
           </div>
@@ -243,10 +243,10 @@
               <template slot-scope="scope">
                 <p class="action-group">
                   <el-button-group>
-                    <router-link :to="{ name: 'EditPrice', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain">
+                    <router-link :to="{ name: 'EditPrice', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }" class="el-button el-button--mini is-plain edit-price">
                       Edit
                     </router-link>
-                    <el-button @click="attemptDeletePrice(scope.row)" plain size="mini">
+                    <el-button @click="attemptDeletePrice(scope.row)" plain size="mini" class="delete-price">
                       Delete
                     </el-button>
                   </el-button-group>
@@ -257,7 +257,7 @@
         </div>
 
         <div class="launchable">
-          <el-dialog :show-close="false" :visible="isConfirmingDeletePrice" title="Delete price" width="500px">
+          <el-dialog :show-close="false" :visible="isConfirmingDeletePrice" title="Delete price" width="500px" class="delete-price">
             <p>
               Are you sure you want to delete this price?
               If you delete this price, all of the following
@@ -317,7 +317,7 @@
   </div>
 
   <div slot="launchable" class="launchable">
-    <el-dialog :show-close="false" :visible="isConfirmingDeleteProduct" title="Delete product" width="600px">
+    <el-dialog :show-close="false" :visible="isConfirmingDeleteProduct" title="Delete product" width="600px" class="delete-product">
       <p>
         Are you sure you want to delete this product?
         If you delete this product, all of the following
@@ -637,17 +637,18 @@ export default {
       this.isDeletingPrice = true
 
       freshcom.deletePrice(this.priceForDelete.id).then(() => {
-        return this.loadPrice()
+        return this.loadProduct()
       }).then(() => {
         this.$message({
           showClose: true,
-          message: `Product deleted successfully.`,
+          message: `Price deleted successfully.`,
           type: 'success'
         })
 
         this.isDeletingPrice = false
         this.cancelDeletePrice()
-      }).catch(() => {
+      }).catch((e) => {
+        console.log(e)
         this.isDeletingPrice = false
       })
     },

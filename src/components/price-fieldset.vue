@@ -18,7 +18,7 @@
   </el-form-item>
 
   <el-form-item label="Name" :error="errorMsgs.name" required>
-    <el-input v-model="formModel.name" @input="updateValue()"></el-input>
+    <el-input v-model="formModel.name" @input="updateValue()" name="name"></el-input>
   </el-form-item>
 
   <el-form-item label="Label" :error="errorMsgs.label">
@@ -28,7 +28,7 @@
   <el-form-item label="Charge Amount" :error="chargeAmountError" required>
     <money-input v-model="formModel.chargeAmountCents" @change="updateValue()" class="charge-amount-input"></money-input>
     <span>/</span>
-    <el-input v-model="formModel.chargeUnit" @input="updateValue()" class="unit-input" placeholder="Unit"></el-input>
+    <el-input v-model="formModel.chargeUnit" @input="updateValue()" class="unit-input" placeholder="Unit" name="charge-unit"></el-input>
   </el-form-item>
 
   <el-form-item label="Estimate By Default" :error="errorMsgs.estimateByDefault" required>
@@ -55,7 +55,7 @@
   </el-form-item>
 
   <el-form-item label="Minimum Order Quantity" required>
-    <el-input-number v-model="formModel.minimumOrderQuantity" :min="1" :step="1" @change="updateValue()"></el-input-number>
+    <el-input-number v-model="formModel.minimumOrderQuantity" :min="1" :step="1" @change="updateValue()" name="minimum-order-quantity"></el-input-number>
   </el-form-item>
 
   <el-form-item label="Tax One" required>
