@@ -155,7 +155,7 @@
         </el-menu-item>
 
         <el-menu-item index="" style="padding-left: 12px;" class="no-active">
-          <el-switch :value="isViewingTestData" @input="toggleMode()" :width="23" active-color="#f79a59" class="nav-switch">
+          <el-switch :value="isViewingTestData" :width="23" @input="toggleMode()" active-color="#f79a59" class="nav-switch">
           </el-switch>
 
           <span @click="toggleMode()" :class="{ 'mode-test': isViewingTestData }">
@@ -327,17 +327,17 @@ export default {
   .el-switch__core {
     height: 14px;
 
-    .el-switch__button {
+    &:after {
       top: 0px;
       left: 0px;
-      height: 12px;
       width: 12px;
+      height: 12px;
     }
   }
 
   &.is-checked {
-    .el-switch__core > .el-switch__button {
-      transform: translate3d(9px, 0px, 0px) !important;
+    .el-switch__core:after {
+      margin-left: -12px;
     }
   }
 }
