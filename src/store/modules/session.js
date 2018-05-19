@@ -202,6 +202,10 @@ export default {
         commit(MT.ACCOUNT_CHANGED, account)
         dispatch('setResourceLocale', account.defaultLocale, { root: true })
 
+        if (!account.isReadyForLiveTransaction) {
+          dispatch('setMode', 'test')
+        }
+
         return account
       })
     }
