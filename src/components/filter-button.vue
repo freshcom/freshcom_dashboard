@@ -139,7 +139,6 @@ export default {
 }
 </style>
 
-
 <style lang="scss">
 // We have to use global style here because the
 // actual popover container is outside the scope

@@ -65,7 +65,7 @@
   </template>
 
   <el-form-item v-if="formModel.nameSync == 'disabled'" label="Name" :error="errorMsgs.name" required>
-    <el-input v-model="formModel.name" @input="updateValue()"></el-input>
+    <el-input v-model="formModel.name" @input="updateValue()" name="name"></el-input>
   </el-form-item>
 
   <el-form-item v-if="formModel.kind === 'simple' || formModel.kind === 'combo' || formModel.kind === 'variant'" label="Maximum PO Quantity" :error="errorMsgs.maximumPublicOrderQuantity" required>

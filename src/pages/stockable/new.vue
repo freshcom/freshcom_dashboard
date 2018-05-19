@@ -40,52 +40,6 @@
     </div>
   </div>
 </content-container>
-
-
-<!-- <div class="page-wrapper">
-  <div>
-    <el-menu :router="true" default-active="/stockables" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListStockable' }" index="/stockables">Stockables</el-menu-item>
-    </el-menu>
-    <locale-selector class="pull-right"></locale-selector>
-  </div>
-
-  <div>
-    <el-card class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
-
-        <span style="line-height: 36px;">Create a stockable</span>
-
-        <div class="pull-right">
-          <el-button @click="back()" plain size="small">
-            Cancel
-          </el-button>
-
-          <el-button @click="submit()" type="primary" size="small">
-            Save
-          </el-button>
-        </div>
-      </div>
-
-      <div class="data">
-        <stockable-form v-model="stockableDraft" :errors="errors"></stockable-form>
-      </div>
-
-      <div class="footer">
-        <el-button @click="back()" plain size="small">
-          Cancel
-        </el-button>
-
-        <el-button @click="submit()" type="primary" class="pull-right" size="small">
-          Save
-        </el-button>
-      </div>
-    </el-card>
-  </div>
-</div> -->
 </template>
 
 <script>

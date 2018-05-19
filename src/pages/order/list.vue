@@ -12,7 +12,7 @@
             <span slot="key">Status</span>
             <div slot="value">
               <select v-model="filterObjectDraft.status">
-                <option v-for="status in ['opened', 'closed']" :value="status">is {{status}}</option>
+                <option v-for="status in ['opened', 'closed']" :key="status" :value="status">is {{status}}</option>
               </select>
             </div>
           </filter-condition>
@@ -26,7 +26,7 @@
 
               <div style="vertical-align: middle;" class="m-t-5">
                 <icon name="share" class="fa-flip-vertical" scale="0.8"></icon>
-                <input v-model="filterObjectDraft.label" type="text"></input>
+                <input v-model="filterObjectDraft.label" type="text">
               </div>
             </div>
           </filter-condition>
@@ -35,7 +35,7 @@
             <span slot="key">Payment Status</span>
             <div slot="value">
               <select v-model="filterObjectDraft.paymentStatus">
-                <option v-for="status in ['pending', 'authorized', 'paid', 'refunded']" :value="status">is {{status}}</option>
+                <option v-for="status in ['pending', 'authorized', 'paid', 'refunded']" :key="status" :value="status">is {{status}}</option>
               </select>
             </div>
           </filter-condition>
@@ -44,7 +44,7 @@
             <span slot="key">Fulfillment Status</span>
             <div slot="value">
               <select v-model="filterObjectDraft.fulfillmentStatus">
-                <option v-for="status in ['pending', 'fulfilled', 'returned']" :value="status">is {{status}}</option>
+                <option v-for="status in ['pending', 'fulfilled', 'returned']" :key="status" :value="status">is {{status}}</option>
               </select>
             </div>
           </filter-condition>

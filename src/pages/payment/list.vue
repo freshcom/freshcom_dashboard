@@ -13,7 +13,7 @@
             <span slot="key">Status</span>
             <div slot="value">
               <select v-model="filterObjectDraft.status">
-                <option v-for="status in ['pending', 'paid', 'refunded']" :value="status">is {{status}}</option>
+                <option v-for="status in ['pending', 'paid', 'refunded']" :key="status" :value="status">is {{status}}</option>
               </select>
             </div>
           </filter-condition>

@@ -680,7 +680,6 @@ p.btn-group {
   vertical-align: middle;
 }
 
-
 .text-right {
   text-align: right;
 }
@@ -701,7 +700,6 @@ p.btn-group {
   clear: both
 }
 /* END Util Class */
-
 
 /* START Layout */
 a {

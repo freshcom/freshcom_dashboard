@@ -31,7 +31,9 @@ export default {
     },
     target: {
       type: Object,
-      default: {}
+      default: function () {
+        return {}
+      }
     }
   },
   data () {

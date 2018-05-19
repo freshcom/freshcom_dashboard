@@ -370,7 +370,6 @@ export default {
 }
 </script>
 
-
 <style lang="scss" scoped>
 .sign {
   font-size: 13px;

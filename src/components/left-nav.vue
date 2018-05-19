@@ -13,7 +13,7 @@
         <el-submenu index="storefront">
           <template slot="title">
             <icon name="shopping-cart" scale="0.9"></icon>
-            <span>Storefront</span>
+            <span id="nav-storefront">Storefront</span>
           </template>
           <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">
             <icon name="file-text" scale="0.9"></icon>
@@ -21,7 +21,7 @@
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
             <icon name="tag" scale="0.9"></icon>
-            <span>Products</span>
+            <span id="nav-products">Products</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListCustomer' }" index="/customers">
             <icon name="user" scale="0.9"></icon>

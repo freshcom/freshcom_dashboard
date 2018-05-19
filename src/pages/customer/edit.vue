@@ -18,7 +18,6 @@
     </div>
   </div>
 
-
   <div slot="card-content">
     <div class="data">
       <el-row>

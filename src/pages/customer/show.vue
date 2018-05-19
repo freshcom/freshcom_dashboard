@@ -219,7 +219,7 @@
           <el-dialog :show-close="false" :visible="isConfirmingDeleteCard" title="Delete card" width="500px">
             <p>
               Are you sure you want to delete this card?
-              <br/></br>
+              <br/><br/>
               <b>This action cannot be undone.</b>
             </p>
 

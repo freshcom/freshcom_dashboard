@@ -13,7 +13,7 @@
             <span slot="key">Status</span>
             <div slot="value">
               <select v-model="filterObjectDraft.status">
-                <option v-for="status in ['sent', 'pending']" :value="status">is {{status}}</option>
+                <option v-for="status in ['sent', 'pending']" :key="status" :value="status">is {{status}}</option>
               </select>
             </div>
           </filter-condition>
@@ -27,7 +27,7 @@
 
               <div style="vertical-align: middle;" class="m-t-5">
                 <icon name="share" class="fa-flip-vertical" scale="0.8"></icon>
-                <input v-model="filterObjectDraft.to" type="text"></input>
+                <input v-model="filterObjectDraft.to" type="text">
               </div>
             </div>
           </filter-condition>
@@ -41,7 +41,7 @@
 
               <div style="vertical-align: middle;" class="m-t-5">
                 <icon name="share" class="fa-flip-vertical" scale="0.8"></icon>
-                <input v-model="filterObjectDraft.from" type="text"></input>
+                <input v-model="filterObjectDraft.from" type="text">
               </div>
             </div>
           </filter-condition>

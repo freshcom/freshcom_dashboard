@@ -30,7 +30,6 @@
     </el-select>
   </el-form-item>
 
-
   <template v-if="formModel.fulfillmentMethod === 'ship'">
     <el-form-item label="Address" :error="errorMsgs.deliveryAddressLineOne" required>
       <el-input v-model="formModel.deliveryAddressLineOne" @input="updateValue()" placeholder="Street address line 1"></el-input>

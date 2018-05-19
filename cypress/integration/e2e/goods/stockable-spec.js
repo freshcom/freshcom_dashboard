@@ -9,8 +9,14 @@ describe('Stockable Page', function () {
     cy.get('#nav-stockables').click()
   })
 
-  it('should in the correct path', function () {
+  it('should in the correct path and list the sample data', function () {
     cy.location('pathname').should('equal', '/stockables')
+    cy.get('a.primary').should('have.length', 6)
+  })
+
+  it('should only show resource matching the search keyword if provided', function () {
+    cy.get('.search-input input').type('shirt')
+    cy.get('a.primary').should('have.length', 3)
   })
 
   it('should go to new page when click on new', function () {

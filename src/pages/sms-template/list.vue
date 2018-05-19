@@ -18,7 +18,7 @@
 
               <div style="vertical-align: middle;" class="m-t-5">
                 <icon name="share" class="fa-flip-vertical" scale="0.8"></icon>
-                <input v-model="filterObjectDraft.label" type="text"></input>
+                <input v-model="filterObjectDraft.label" type="text">
               </div>
             </div>
           </filter-condition>
