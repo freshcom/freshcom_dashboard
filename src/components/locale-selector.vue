@@ -2,7 +2,7 @@
 
 <el-dropdown trigger="click" @command="setResourceLocale" class="locale-selector">
   <span class="el-dropdown-link">
-    {{$t(resourceLocale)}} <i class="el-icon-caret-bottom el-icon--right"></i>
+    {{$t(`locales.${resourceLocale}`)}} <i class="el-icon-caret-bottom el-icon--right"></i>
   </span>
   <el-dropdown-menu slot="dropdown">
     <el-dropdown-item command="en">English (en)</el-dropdown-item>
@@ -10,15 +10,6 @@
   </el-dropdown-menu>
 </el-dropdown>
 </template>
-
-<i18n>
-{
-  "en": {
-    "en": "English (en)",
-    "zh-CN": "简体中文 (zh-CN)"
-  }
-}
-</i18n>
 
 <script>
 export default {

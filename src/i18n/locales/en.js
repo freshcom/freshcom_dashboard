@@ -1,4 +1,8 @@
 export default {
+  locales: {
+    "en": "English (en)",
+    "zh-CN": "简体中文 (zh-CN)"
+  },
   hello: 'Hi',
   errors: {
     common: {
