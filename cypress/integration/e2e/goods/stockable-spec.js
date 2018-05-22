@@ -41,7 +41,7 @@ describe('Stockable Page', function () {
 
   it('should go to stockable detail page when clicked', function () {
     cy.get('a.primary:first').click()
-    cy.location('pathname').should(contain, '/stockables/')
+    cy.location('pathname').should('contain', '/stockables/')
 
     cy.contains('Edit')
     cy.contains('Delete')
@@ -50,7 +50,7 @@ describe('Stockable Page', function () {
   it('should go to the edit page when clicked', function () {
     cy.get('.brief-action-group a').click()
 
-    cy.location('pathname').should(contain, 'edit')
+    cy.location('pathname').should('contain', 'edit')
   })
 
   it('should render errors when updating with invalid input', function () {
@@ -66,7 +66,7 @@ describe('Stockable Page', function () {
     cy.get('input[name="unit-of-measure"]').type('BOX')
     cy.get('button.el-button--primary:first').click()
 
-    cy.location('pathname').should(contain, '/stockables/')
+    cy.location('pathname').should('contain', '/stockables/')
     cy.contains('Warp Drive Core V2')
   })
 

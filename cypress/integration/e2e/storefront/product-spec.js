@@ -44,7 +44,7 @@ describe('Product Page', function () {
 
   it('should go to product detail page when clicked', function () {
     cy.get('a.primary:first').click()
-    cy.location('pathname').should(contain, '/products/')
+    cy.location('pathname').should('contain', '/products/')
 
     cy.contains('Edit')
     cy.contains('Delete')
@@ -53,7 +53,7 @@ describe('Product Page', function () {
   it('should go to the edit page when clicked', function () {
     cy.get('.brief-action-group a').click()
 
-    cy.location('pathname').should(contain, 'edit')
+    cy.location('pathname').should('contain', 'edit')
   })
 
   it('should render errors when updating with invalid input', function () {
@@ -67,7 +67,7 @@ describe('Product Page', function () {
     cy.get('input[name="name"]').type('A Game for test V2')
     cy.get('button.el-button--primary:first').click()
 
-    cy.location('pathname').should(contain, '/products/')
+    cy.location('pathname').should('contain', '/products/')
     cy.contains('A Game for test V2')
   })
 
