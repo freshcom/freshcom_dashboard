@@ -27,6 +27,7 @@ describe('Price Page', function () {
     cy.get('.charge-amount-input input').type('1299')
     cy.get('input[name="charge-unit"]').type('EA')
     cy.get('input[name="minimum-order-quantity"]').clear().type('999')
+    cy.get('.tax-one input').type('5')
     cy.get('button.el-button--primary:first').click()
 
     cy.location('pathname').should('contain', '/products/')

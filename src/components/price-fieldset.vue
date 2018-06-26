@@ -59,7 +59,7 @@
   </el-form-item>
 
   <el-form-item label="Tax One" required>
-    <percentage-input v-model="formModel.taxOnePercentage" @input="updateValue()">
+    <percentage-input v-model="formModel.taxOnePercentage" @input="updateValue()" class="tax-one">
     </percentage-input>
   </el-form-item>
 
