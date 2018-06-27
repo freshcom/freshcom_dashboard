@@ -25,7 +25,7 @@
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListCustomer' }" index="/customers">
             <icon name="user" scale="0.9"></icon>
-            <span>Customers</span>
+            <span id="nav-customers">Customers</span>
           </el-menu-item>
         </el-submenu>
 
