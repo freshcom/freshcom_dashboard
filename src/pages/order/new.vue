@@ -29,7 +29,7 @@
   <div slot="card-content">
     <div class="steps">
       <el-steps :active="activeStep" finish-status="success" simple>
-        <el-step title="Line Items"></el-step>
+        <el-step title="Items"></el-step>
         <el-step title="Information"></el-step>
         <el-step title="Payment"></el-step>
       </el-steps>
@@ -44,7 +44,7 @@
               </order-line-item-fieldset>
 
               <div class="foot text-right">
-                <el-button :loading="isCreatingLineItem" native-type="submit" plain size="small">Add to order</el-button>
+                <el-button :loading="isCreatingLineItem" native-type="submit" plain size="small" id="add-to-order">Add to order</el-button>
               </div>
             </div>
           </el-form>

@@ -17,7 +17,7 @@
           </template>
           <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">
             <icon name="file-text" scale="0.9"></icon>
-            <span>Orders</span>
+            <span id="nav-orders">Orders</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
             <icon name="tag" scale="0.9"></icon>

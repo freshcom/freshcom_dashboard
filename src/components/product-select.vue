@@ -6,6 +6,7 @@
   :record-to-option="productToOption"
   :size="size"
   @input="handleInput($event)"
+  class="product-select"
 >
 </resource-select>
 </template>

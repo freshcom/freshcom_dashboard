@@ -1,4 +1,4 @@
-describe('Price Page', function () {
+describe('Price Related Pages', function () {
   before(function () {
     cy.visit('/login')
     cy.get('input#username').type('test@example.com')
