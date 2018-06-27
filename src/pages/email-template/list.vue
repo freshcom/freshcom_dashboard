@@ -1,11 +1,17 @@
 <template>
 <content-container @locale-changed="listEmailTemplate">
   <div slot="header">
-    <router-link :to="{ name: 'ListEmail' }">Emails</router-link>
-    <router-link :to="{ name: 'ListEmailTemplate' }">Templates</router-link>
+    <el-menu :router="true" default-active="/email-templates" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'ListEmail' }" index="/emails">
+        Emails
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ListEmailTemplate' }" index="/email-templates">
+        Templates
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <el-row>
       <el-col :span="16">
         <filter-button :current="filterObject" :draft="filterObjectDraft" @cancel="resetFilter" @clear="clearFilter">
@@ -44,7 +50,7 @@
     </el-row>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data full">
       <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
         <div slot="no-content">
@@ -64,7 +70,7 @@
           </router-link>
         </div>
 
-        <el-table :data="emailTemplates" slot="content" class="data-table">
+        <el-table :data="emailTemplates" slot="content">
           <el-table-column prop="name" label="EMAIL TEMPLATE">
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowEmailTemplate', params: { id: scope.row.id } }" class="primary">

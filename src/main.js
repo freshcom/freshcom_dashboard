@@ -19,6 +19,7 @@ import money from 'v-money'
 
 import App from './app'
 import LeftNav from '@/components/left-nav'
+import TopNav from '@/components/top-nav'
 import LocaleSelector from '@/components/locale-selector'
 
 import 'vue-awesome/icons/filter' // Filter
@@ -57,6 +58,7 @@ sync(store, router)
 // -- Global Component --
 Vue.component('icon', Icon)
 Vue.component('left-nav', LeftNav)
+Vue.component('top-nav', TopNav)
 Vue.component('locale-selector', LocaleSelector)
 
 // -- Element UI --

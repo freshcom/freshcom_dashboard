@@ -1,15 +1,21 @@
 <template>
 <content-container>
   <div slot="header">
-    <router-link :to="{ name: 'ListPayment' }">Payments</router-link>
-    <router-link :to="{ name: 'ShowBalanceSettings' }">Settings</router-link>
+    <el-menu :router="true" default-active="/settings" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">
+        Payments
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ShowBalanceSettings' }" index="/settings">
+        Settings
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     Settings
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div v-loading="isLoading" class="data">
       <div v-if="isReady" class="block">
         <div class="header">

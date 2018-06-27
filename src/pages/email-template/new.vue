@@ -1,11 +1,17 @@
 <template>
 <content-container>
   <div slot="header">
-    <router-link :to="{ name: 'ListEmail' }">Emails</router-link>
-    <router-link :to="{ name: 'ListEmailTemplate' }">Templates</router-link>
+    <el-menu :router="true" default-active="/email-templates" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'ListEmail' }" index="/emails">
+        Emails
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ListEmailTemplate' }" index="/email-templates">
+        Templates
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <h1>Create an email template</h1>
 
     <div class="pull-right">
@@ -19,7 +25,7 @@
     </div>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data">
       <el-row>
         <el-col :span="24">

@@ -5,7 +5,7 @@
     <router-link :to="{ name: 'ListProductCollection' }">Collections</router-link>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <h1>Create a product collection</h1>
 
     <div class="pull-right">
@@ -19,7 +19,7 @@
     </div>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data">
       <el-row>
         <el-col :span="14" :offset="5">

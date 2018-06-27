@@ -1,10 +1,14 @@
 <template>
 <content-container @locale-changed="reload" :ready="isReady">
   <div slot="header">
-    <router-link :to="{ name: 'ListCustomer' }">Customers</router-link>
+    <el-menu :router="true" default-active="/customers" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'ListCustomer' }" index="/customers">
+        Customers
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <h1>Edit customer</h1>
 
     <div class="pull-right">
@@ -18,7 +22,7 @@
     </div>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data">
       <el-row>
         <el-col :span="14" :offset="5">

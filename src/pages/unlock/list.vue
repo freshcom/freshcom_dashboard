@@ -1,10 +1,14 @@
 <template>
 <content-container @locale-changed="listUnlock">
   <div slot="header">
-    <router-link :to="{ name: 'ListUnlock' }">Unlocks</router-link>
+    <el-menu :router="true" default-active="/unlocks" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'ListUnlock' }" index="/unlocks">
+        Unlocks
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <el-row>
       <el-col :span="16">
         <filter-button :current="filterObject" :draft="filterObjectDraft" @cancel="resetFilter" @clear="clearFilter">
@@ -43,7 +47,7 @@
     </el-row>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data full">
       <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
         <div slot="no-content">

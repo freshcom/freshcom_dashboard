@@ -1,10 +1,14 @@
 <template>
 <content-container @locale-changed="reload" :ready="isReady">
   <div slot="header">
-    <router-link :to="{ name: 'ListOrder' }">Orders</router-link>
+    <el-menu :router="true" default-active="/orders" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">
+        Orders
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <div class="brief">
       <div class="avatar">
         <icon name="file-text" class="avatar-icon"></icon>
@@ -27,7 +31,7 @@
     </div>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data">
       <div class="block">
         <div class="header">

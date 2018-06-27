@@ -1,5 +1,5 @@
 <template>
-<div class="component-wrapper filter-button">
+<div class="filter-button">
   <el-popover v-model="isPopoverVisible" :visible-arrow="false" @hide="cancel()" ref="filter" placement="bottom-start" width="240" trigger="click" popper-class="filter">
     <form @submit.prevent="done()">
       <el-row class="header">

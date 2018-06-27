@@ -1,11 +1,17 @@
 <template>
 <content-container @locale-changed="reload" :ready="isReady">
   <div slot="header">
-    <router-link :to="{ name: 'ListSms' }">SMS</router-link>
-    <router-link :to="{ name: 'ListSmsTemplate' }">Templates</router-link>
+    <el-menu :router="true" default-active="/sms-templates" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'ListSms' }" index="/sms">
+        SMS
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ListSmsTemplate' }" index="/sms-templates">
+        Templates
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <h1>Edit SMS template</h1>
 
     <div class="pull-right">
@@ -19,7 +25,7 @@
     </div>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data">
       <el-row>
         <el-col :span="14" :offset="5">

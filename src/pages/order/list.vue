@@ -1,10 +1,14 @@
 <template>
 <content-container @locale-changed="listOrder">
   <div slot="header">
-    <router-link :to="{ name: 'ListOrder'}">Orders</router-link>
+    <el-menu :router="true" default-active="/orders" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">
+        Orders
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <el-row>
       <el-col :span="16">
         <filter-button :current="filterObject" :draft="filterObjectDraft" @cancel="resetFilter" @clear="clearFilter">
@@ -70,7 +74,7 @@
     </el-row>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data full">
       <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
         <div slot="no-content">
@@ -90,7 +94,7 @@
           </router-link>
         </div>
 
-        <el-table :data="orders" slot="content" class="data-table">
+        <el-table :data="orders" slot="content">
           <el-table-column label="ORDER" width="150">
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowOrder', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }" class="primary">

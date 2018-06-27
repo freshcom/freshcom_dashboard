@@ -1,11 +1,18 @@
 <template>
 <content-container @locale-changed="listProductCollection">
   <div slot="header">
-    <router-link :to="{ name: 'ListProduct' }">Products</router-link>
-    <router-link :to="{ name: 'ListProductCollection' }">Collections</router-link>
+    <el-menu :router="true" default-active="/product-collections" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
+        Products
+      </el-menu-item>
+
+      <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product-collections">
+        Collections
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <el-row>
       <el-col :span="16">
         <filter-button :current="filterObject" :draft="filterObjectDraft" @cancel="resetFilter" @clear="clearFilter">
@@ -53,7 +60,7 @@
     </el-row>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data full">
       <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
         <div slot="no-content">
@@ -73,7 +80,7 @@
           </router-link>
         </div>
 
-        <el-table :data="productCollections" slot="content" class="data-table">
+        <el-table :data="productCollections" slot="content">
           <el-table-column prop="name" label="PRODUCT COLLECTION">
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowProductCollection', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }" class="primary">
@@ -122,82 +129,6 @@
     </div>
   </div>
 </content-container>
-
-<!-- <div class="page-wrapper">
-  <div>
-    <el-menu :router="true" default-active="/product_collections" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
-        Products
-      </el-menu-item>
-      <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product_collections">
-        Collections
-      </el-menu-item>
-    </el-menu>
-    <locale-selector @change="listProductCollection()" class="pull-right"></locale-selector>
-  </div>
-
-  <div>
-    <el-card class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
-
-        <el-button plain size="small"><icon name="filter" scale="0.7" class="v-middle"></icon> Filter</el-button>
-        <div class="search">
-          <el-input :value="searchKeyword" @input="updateSearchKeyword" size="small" placeholder="Search...">
-            <template slot="prepend"><icon name="search" scale="1" class="v-middle"></icon></template>
-          </el-input>
-        </div>
-
-        <el-button @click="newProductCollection()" plain size="small" class="pull-right">
-          <icon name="plus" scale="0.7" class="v-middle"></icon> New
-        </el-button>
-      </div>
-
-      <div class="data full" v-loading="isLoading">
-        <p v-if="noSearchResult" class="search-notice text-center">
-          There is no result that matches "{{searchKeyword}}"
-        </p>
-        <el-table v-if="hasSearchResult" @row-click="viewProductCollection" :data="productCollections">
-          <el-table-column prop="name" label="Product Collection">
-            <template slot-scope="scope">
-              <span v-if="scope.row.code">
-                [{{scope.row.code}}]
-              </span>
-              <span>{{scope.row.name}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="status" label="Status" width="100">
-            <template slot-scope="scope">
-              {{$t(`fields.productCollection.status.${scope.row.status}`)}}
-            </template>
-          </el-table-column>
-          <el-table-column prop="id" label="ID" width="120">
-            <template slot-scope="scope">
-              <el-popover trigger="hover" placement="top">
-                <span>{{ scope.row.id }}</span>
-                <div slot="reference" class="name-wrapper">
-                  {{ scope.row.id | idLastPart }}
-                </div>
-              </el-popover>
-            </template>
-          </el-table-column>
-          <el-table-column prop="insertedAt" label="" align="right" width="200">
-            <template slot-scope="scope">
-              {{scope.row.insertedAt | moment}}
-            </template>
-          </el-table-column>
-        </el-table>
-
-        <div v-if="hasSearchResult" class="footer">
-          <span class="total">around {{totalCount}} results</span>
-          <pagination :number="page.number" :size="page.size" :total="totalCount"></pagination>
-        </div>
-      </div>
-    </el-card>
-  </div>
-</div> -->
 </template>
 
 <script>

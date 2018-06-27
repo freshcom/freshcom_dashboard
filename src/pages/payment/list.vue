@@ -1,11 +1,17 @@
 <template>
 <content-container @locale-changed="listPayment">
   <div slot="header">
-    <router-link :to="{ name: 'ListPayment' }">Payments</router-link>
-    <router-link :to="{ name: 'ShowBalanceSettings' }">Settings</router-link>
+    <el-menu :router="true" default-active="/payments" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">
+        Payments
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ShowBalanceSettings' }" index="/settings">
+        Settings
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <el-row>
       <el-col :span="16">
         <filter-button :current="filterObject" :draft="filterObjectDraft" @cancel="resetFilter" @clear="clearFilter">
@@ -24,7 +30,7 @@
     </el-row>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data full">
       <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
         <div slot="no-content">
@@ -35,7 +41,7 @@
           </p>
         </div>
 
-        <el-table :data="payments" slot="content" class="data-table">
+        <el-table :data="payments" slot="content">
           <el-table-column label="PAYMENT">
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }" class="primary">

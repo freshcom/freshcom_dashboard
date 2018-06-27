@@ -1,14 +1,18 @@
 <template>
 <content-container>
   <div slot="header">
-    <router-link :to="{ name: 'Home' }">Home</router-link>
+    <el-menu :router="true" default-active="/" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'Home' }" index="/">
+        Home
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <h1>Welcome</h1>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data">
       <p class="text-center">You are currently using</p>
       <p class="text-center">Freshcom Alpha v0.1.0</p>

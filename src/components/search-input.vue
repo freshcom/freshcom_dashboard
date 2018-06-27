@@ -1,11 +1,9 @@
 <template>
-<div class="component-wrapper search-input">
-  <el-input :value="value" @input="inputHandler" size="small" placeholder="Search...">
-    <div slot="prefix" class="prefix">
-      <icon name="search" scale="0.8"></icon>
-    </div>
-  </el-input>
-</div>
+<el-input :value="value" @input="inputHandler" class="search-input" size="small" placeholder="Search...">
+  <div slot="prefix" class="prefix">
+    <icon name="search" scale="0.8"></icon>
+  </div>
+</el-input>
 </template>
 
 <script>

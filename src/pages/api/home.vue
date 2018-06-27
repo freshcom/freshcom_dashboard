@@ -1,10 +1,14 @@
 <template>
 <content-container :ready="isReady">
   <div slot="header">
-    <router-link :to="{ name: 'APIHome' }">API</router-link>
+    <el-menu :router="true" default-active="/api" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'APIHome' }" index="/api">
+        API
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data">
       <div class="block detail">
         <div class="header">

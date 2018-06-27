@@ -1,5 +1,5 @@
 <template>
-<div class="component-wrapper query-result" v-loading="isLoading">
+<div class="query-result" v-loading="isLoading">
   <div v-if="isLoading" class="spinner-holder"></div>
 
   <div v-if="noContent" class="notice small">
@@ -83,7 +83,7 @@ export default {
 
   .footer {
     text-align: right;
-    padding: 20px;
+    padding: 10px;
     border-top: 0;
 
     .total {

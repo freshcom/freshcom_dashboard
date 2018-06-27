@@ -1,11 +1,17 @@
 <template>
 <content-container @locale-changed="listFulfillmentPackage">
   <div slot="header">
-    <router-link :to="{ name: 'ListFulfillmentPackage' }">Fulfillments</router-link>
-    <router-link :to="{ name: 'ListReturnPackage' }">Returns</router-link>
+    <el-menu :router="true" default-active="/fulfillment-packages" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'ListFulfillmentPackage' }" index="/fulfillment-packages">
+        Fulfillments
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ListReturnPackage' }" index="/returns">
+        Returns
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <el-row>
       <el-col :span="16">
         <filter-button :current="filterObject" :draft="filterObjectDraft" @cancel="resetFilter" @clear="clearFilter">
@@ -53,7 +59,7 @@
     </el-row>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data full">
       <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
         <div slot="no-content">
@@ -73,7 +79,7 @@
           </router-link>
         </div>
 
-        <el-table :data="fulfillmentPackages" slot="content" class="data-table">
+        <el-table :data="fulfillmentPackages" slot="content">
           <el-table-column prop="name" label="FULFILLMENT PACKAGE">
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowFulfillmentPackage', params: { id: scope.row.id } }" class="primary">

@@ -77,7 +77,6 @@ export default {
 
 <style lang="scss">
 html, body {
-  background-color: #eef1f6;
   height: 100%;
   margin: 0px;
 
@@ -112,33 +111,8 @@ input::-webkit-inner-spin-button {
   }
 }
 
-.secondary-nav {
-  display: inline-block;
-  border-bottom: none;
-
-  &.el-menu--horizontal > .el-menu-item {
-    height: 36px;
-    line-height: 36px;
-    border-bottom: none;
-  }
-
-  &.el-menu {
-    border-right: none;
-    background-color: inherit;
-  }
-
-  .el-menu-item:focus, .el-menu-item:hover {
-    background-color: inherit;
-  }
-
-  .el-menu-item.is-active {
-    font-weight: 500;
-    color: #409EFF;
-  }
-
-  .el-menu-item:first-child {
-    padding-left: 10px;
-  }
+.header-menu {
+  border-bottom: 0px;
 }
 
 .el-input-group__prepend {
@@ -282,13 +256,11 @@ input::-webkit-inner-spin-button {
   a {
     display: block;
     padding: 8px 0px;
-    color: inherit;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 
     &.primary {
-      color: #3297d3;
       font-weight: 500;
     }
 
@@ -304,99 +276,79 @@ input::-webkit-inner-spin-button {
 }
 
 //
-// MARK: Main Card
+// MARK: Content Body
 //
-.main-card {
-  min-height: 120px;
-
-  .el-card__header {
-    padding: 20px;
-    position: relative;
-
-    h1 {
-      display: inline-block;
-      line-height: 32px;
-      margin: 0px;
-      font-weight: 400;
-      font-size: 16px;
-      width: 450px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .brief-action-group {
-      display: inline-block;
-      float: right;
-      line-height: 82px;
-    }
-  }
-
-  .el-card__body {
-    padding: 0px;
-  }
-
+.content-body {
   .foot {
-    padding: 20px;
-    border-top: 1px solid #d1dbe5;
+    padding: 10px;
+    border-top: 1px solid #e6e6e6;
   }
 }
 
 //
 // MARK: Brief
 //
-.brief {
-  display: inline-block;
+.content-header {
+  .brief-action-group {
+    display: inline-block;
+    float: right;
+    line-height: 82px;
+  }
 
-  .avatar {
-    float: left;
-    height: 80px;
-    width: 80px;
-    border-radius: 6px;
-    border: 1px dashed #d9d9d9;
-    text-align: center;
+  .brief {
+    display: inline-block;
 
-    img {
-      border-radius: 6px;
+    .avatar {
+      float: left;
       height: 80px;
       width: 80px;
+      border-radius: 6px;
+      border: 1px dashed #d9d9d9;
+      text-align: center;
+
+      img {
+        border-radius: 6px;
+        height: 80px;
+        width: 80px;
+      }
+
+      .avatar-icon {
+        color: #8c939d;
+        width: 45px;
+        height: 80px;
+        vertical-align: middle;
+        line-height: 80px;
+        text-align: center;
+      }
     }
 
-    .avatar-icon {
-      color: #8c939d;
-      width: 45px;
+    &.no-avatar .detail {
+      padding-left: 0px;
+    }
+
+    .detail {
+      padding: 0 120px 0 91px;
       height: 80px;
       vertical-align: middle;
-      line-height: 80px;
-      text-align: center;
-    }
-  }
 
-  &.no-avatar .detail {
-    padding-left: 0px;
-  }
+      h1 {
+        margin: 0;
+        font-weight: 500;
+        line-height: 25px;
+        font-size: 1.5em;
+      }
 
-  .detail {
-    padding: 0 120px 0 91px;
-    height: 80px;
-    vertical-align: middle;
+      p {
+        padding: 5px 0 0 0;
+        margin: 0;
+        line-height: 20px;
+        min-height: 20px;
+        white-space: nowrap;
 
-    h1 {
-      margin: 0;
-      font-weight: 500;
-      line-height: 25px;
-      font-size: 1.5em;
-    }
-
-    p {
-      padding: 5px 0 0 0;
-      margin: 0;
-      line-height: 20px;
-      min-height: 20px;
-      white-space: nowrap;
-
-      &.id {
-        color: #888;
-        font-size: 13px;
+        &.id {
+          color: #888;
+          font-size: 13px;
+        }
       }
     }
   }
@@ -489,7 +441,7 @@ input::-webkit-inner-spin-button {
 //
 .data {
   min-height: 100px;
-  padding: 0px 20px;
+  padding: 0px 10px;
 
   &.full {
     padding: 0;
@@ -668,10 +620,6 @@ input::-webkit-inner-spin-button {
   text-align: center;
 }
 
-.cursor-pointer {
-  cursor: pointer;
-}
-
 p.btn-group {
   display: inline-block;
 }
@@ -705,10 +653,6 @@ p.btn-group {
 a {
   color: #20a0ff;
   text-decoration: none;
-}
-
-a:hover {
-  color: #1D8CE0;
 }
 
 .block {
@@ -792,10 +736,6 @@ a:hover {
 /* START Common Overwrite */
 .hidden {
   display: none;
-}
-
-.card-wrapper {
-  min-height: 300px;
 }
 
 .el-table {
@@ -933,11 +873,9 @@ small {
     }
   }
 }
-
 /* END File Collection */
 
 /* Dialog */
-
 .fw-lg .el-dialog {
   width: 750px;
 }

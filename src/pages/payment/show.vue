@@ -1,10 +1,17 @@
 <template>
 <content-container @locale-changed="reload" :ready="isReady">
   <div slot="header">
-    <router-link :to="{ name: 'ListPayment' }">Payments</router-link>
+    <el-menu :router="true" default-active="/payments" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">
+        Payments
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ShowBalanceSettings' }" index="/settings">
+        Settings
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <div class="brief">
       <div class="avatar">
         <icon name="money" class="avatar-icon"></icon>
@@ -21,7 +28,7 @@
     </div>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data">
       <div class="block">
         <div class="header">

@@ -1,10 +1,14 @@
 <template>
 <content-container @locale-changed="listDepositable">
   <div slot="header">
-    <router-link :to="{ name: 'ListDepositable' }">Depositables</router-link>
+    <el-menu :router="true" default-active="/depositables" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'ListDepositable' }" index="/depositables">
+        Depositables
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <el-row>
       <el-col :span="16">
         <filter-button :current="filterObject" :draft="filterObjectDraft" @cancel="resetFilter" @clear="clearFilter">
@@ -52,7 +56,7 @@
     </el-row>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data full">
       <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
         <div slot="no-content">
@@ -72,7 +76,7 @@
           </router-link>
         </div>
 
-        <el-table :data="depositables" slot="content" class="data-table">
+        <el-table :data="depositables" slot="content">
           <el-table-column prop="name" label="DEPOSITABLE">
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowDepositable', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }" class="primary">

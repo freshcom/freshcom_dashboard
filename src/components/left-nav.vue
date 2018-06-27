@@ -1,182 +1,131 @@
 <template>
-  <div class="component-wrapper">
-    <div class="account">
-      <p class="text-center">{{sessionAccount.name}}</p>
-    </div>
-    <div class="primary-nav-scroller">
-      <el-menu mode="vertical" :router="true" :default-active="selected" class="primary-nav">
-        <el-menu-item :route="{ name: 'Home' }" index="/">
-          <icon name="home" scale="0.9"></icon>
-          <a>Home</a>
-        </el-menu-item>
-
-        <el-submenu index="storefront">
-          <template slot="title">
-            <icon name="shopping-cart" scale="0.9"></icon>
-            <span id="nav-storefront">Storefront</span>
-          </template>
-          <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">
-            <icon name="file-text" scale="0.9"></icon>
-            <span id="nav-orders">Orders</span>
-          </el-menu-item>
-          <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
-            <icon name="tag" scale="0.9"></icon>
-            <span id="nav-products">Products</span>
-          </el-menu-item>
-          <el-menu-item :route="{ name: 'ListCustomer' }" index="/customers">
-            <icon name="user" scale="0.9"></icon>
-            <span id="nav-customers">Customers</span>
-          </el-menu-item>
-        </el-submenu>
-
-        <el-submenu index="balance">
-          <template slot="title">
-            <icon name="bank" scale="0.9"></icon>
-            <span>Balance</span>
-          </template>
-          <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">
-            <icon name="money" scale="0.9"></icon>
-            <span>Payments</span>
-          </el-menu-item>
-<!--           <el-menu-item :route="{ name: 'ListUnlock' }" index="/unlocks">
-            <icon name="unlock" scale="0.9"></icon>
-            <span>Unlocks</span>
-          </el-menu-item> -->
-        </el-submenu>
-
-        <el-submenu index="fulfillment">
-          <template slot="title">
-            <icon name="truck" scale="0.9"></icon>
-            <span>Fulfillment</span>
-          </template>
-          <el-menu-item :route="{ name: 'ListFulfillmentPackage' }" index="/fulfillment-packages">
-            <icon name="shopping-bag" scale="0.9"></icon>
-            <span>Packages</span>
-          </el-menu-item>
-          <el-menu-item :route="{ name: 'ListUnlock' }" index="/unlocks">
-            <icon name="unlock" scale="0.9"></icon>
-            <span>Unlocks</span>
-          </el-menu-item>
-        </el-submenu>
-
-        <el-submenu index="inventory">
-          <template slot="title">
-            <icon name="archive" scale="0.9"></icon>
-            <span id="nav-goods">Goods</span>
-          </template>
-          <el-menu-item :route="{ name: 'ListStockable' }" index="/stockables">
-            <icon name="cubes" scale="0.9"></icon>
-            <span id="nav-stockables">Stockables</span>
-          </el-menu-item>
-          <el-menu-item :route="{ name: 'ListUnlockable' }" index="/unlockables">
-            <icon name="unlock-alt" scale="0.9"></icon>
-            <span>Unlockables</span>
-          </el-menu-item>
-          <el-menu-item :route="{ name: 'ListDepositable' }" index="/depositables">
-            <icon name="diamond" scale="0.9"></icon>
-            <span>Depositables</span>
-          </el-menu-item>
-<!--           <el-menu-item index="stockTransfers">
-            <icon name="exchange" scale="0.9"></icon>
-            <span>Stock Transfers</span>
-          </el-menu-item>
-          <el-menu-item index="branches">
-            <icon name="bank" scale="0.9"></icon>
-            <span>Branches</span>
-          </el-menu-item> -->
-        </el-submenu>
-
-<!--         <el-submenu index="distribution">
-          <template slot="title">
-            <icon name="globe" scale="0.9"></icon>
-            <span>Distribution</span>
-          </template>
-          <el-menu-item index="distributioDays">
-            <icon name="calendar" scale="0.9"></icon>
-            <span>Days</span>
-          </el-menu-item>
-          <el-menu-item index="distributioAreas">
-            <icon name="map" scale="0.9"></icon>
-            <span>Areas</span>
-          </el-menu-item>
-          <el-menu-item index="distributioTrips">
-            <icon name="map-marker" scale="0.9"></icon>
-            <span>Trips</span>
-          </el-menu-item>
-          <el-menu-item index="distributioVehicles">
-            <icon name="truck" scale="0.9"></icon>
-            <span>Vehicles</span>
-          </el-menu-item>
-        </el-submenu> -->
-
-        <el-submenu index="notification">
-          <template slot="title">
-            <icon name="send" scale="0.9"></icon>
-            <span>Notification</span>
-          </template>
-
-          <el-menu-item :route="{ name: 'ListNotificationTrigger' }" index="/notification-triggers">
-            <icon name="external-link" scale="0.9"></icon>
-            <span>Triggers</span>
-          </el-menu-item>
-          <el-menu-item :route="{ name: 'ListEmail' }" index="/emails">
-            <icon name="envelope" scale="0.9"></icon>
-            <span>Emails</span>
-          </el-menu-item>
-          <el-menu-item :route="{ name: 'ListSms' }" index="/sms">
-            <icon name="comment" scale="0.9"></icon>
-            <span>SMS</span>
-          </el-menu-item>
-        </el-submenu>
-
-        <el-menu-item :route="{ name: 'ListFileCollection' }" index="/file-collections">
-          <icon name="folder" scale="0.9"></icon>
-          <span>File Storage</span>
-        </el-menu-item>
-
-<!--         <el-submenu index="fileStorage">
-          <template slot="title">
-            <icon name="folder" scale="0.9"></icon>
-            <span>File Storage</span>
-          </template>
-          <el-menu-item :route="{ name: 'ListFileCollection' }" index="/file_collections">
-            <icon name="folder-open" scale="0.9"></icon>
-            <span>File Collections</span>
-          </el-menu-item>
-          <el-menu-item :route="{ name: 'ListFile' }" index="/files">
-            <icon name="file" scale="0.9"></icon>
-            <span>Files</span>
-          </el-menu-item>
-        </el-submenu> -->
-
-        <el-menu-item :router="{ name: 'APIHome' }" index="/api">
-          <icon name="terminal" scale="0.9"></icon>
-          <span>API</span>
-        </el-menu-item>
-
-        <el-menu-item index="" style="padding-left: 12px;" class="no-active">
-          <el-switch :value="isViewingTestData" :width="23" @input="toggleMode()" active-color="#f79a59" class="nav-switch">
-          </el-switch>
-
-          <span @click="toggleMode()" :class="{ 'mode-test': isViewingTestData }">
-            <span v-if="isViewingTestData">Viewing test data</span>
-            <span v-else>View test data</span>
-            <span v-loading="isTogglingMode" element-loading-spinner="el-icon-loading" class="test-toggle-loading"></span>
-          </span>
-        </el-menu-item>
-
-        <el-menu-item index="operators">
-          <icon name="id-card" scale="0.9"></icon>
-          <span>Operators</span>
-        </el-menu-item>
-
-        <el-menu-item index="settings">
-          <icon name="cog" scale="0.9"></icon>
-          <span>Settings</span>
-        </el-menu-item>
-      </el-menu>
-    </div>
+<div class="left-nav">
+  <div class="account">
+    <p class="text-center">{{sessionAccount.name}}</p>
   </div>
+
+  <el-menu mode="vertical" :router="true" :default-active="selected" class="primary-nav">
+    <el-menu-item :route="{ name: 'Home' }" index="/">
+      <icon name="home" scale="0.9"></icon>
+      <a>Home</a>
+    </el-menu-item>
+
+    <el-submenu index="storefront">
+      <template slot="title">
+        <icon name="shopping-cart" scale="0.9"></icon>
+        <span id="nav-storefront">Storefront</span>
+      </template>
+      <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">
+        <icon name="file-text" scale="0.9"></icon>
+        <span id="nav-orders">Orders</span>
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
+        <icon name="tag" scale="0.9"></icon>
+        <span id="nav-products">Products</span>
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ListCustomer' }" index="/customers">
+        <icon name="user" scale="0.9"></icon>
+        <span id="nav-customers">Customers</span>
+      </el-menu-item>
+    </el-submenu>
+
+    <el-submenu index="balance">
+      <template slot="title">
+        <icon name="bank" scale="0.9"></icon>
+        <span>Balance</span>
+      </template>
+      <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">
+        <icon name="money" scale="0.9"></icon>
+        <span>Payments</span>
+      </el-menu-item>
+    </el-submenu>
+
+    <el-submenu index="fulfillment">
+      <template slot="title">
+        <icon name="truck" scale="0.9"></icon>
+        <span>Fulfillment</span>
+      </template>
+      <el-menu-item :route="{ name: 'ListFulfillmentPackage' }" index="/fulfillment-packages">
+        <icon name="shopping-bag" scale="0.9"></icon>
+        <span>Packages</span>
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ListUnlock' }" index="/unlocks">
+        <icon name="unlock" scale="0.9"></icon>
+        <span>Unlocks</span>
+      </el-menu-item>
+    </el-submenu>
+
+    <el-submenu index="inventory">
+      <template slot="title">
+        <icon name="archive" scale="0.9"></icon>
+        <span id="nav-goods">Goods</span>
+      </template>
+      <el-menu-item :route="{ name: 'ListStockable' }" index="/stockables">
+        <icon name="cubes" scale="0.9"></icon>
+        <span id="nav-stockables">Stockables</span>
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ListUnlockable' }" index="/unlockables">
+        <icon name="unlock-alt" scale="0.9"></icon>
+        <span>Unlockables</span>
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ListDepositable' }" index="/depositables">
+        <icon name="diamond" scale="0.9"></icon>
+        <span>Depositables</span>
+      </el-menu-item>
+    </el-submenu>
+
+    <el-submenu index="notification">
+      <template slot="title">
+        <icon name="send" scale="0.9"></icon>
+        <span>Notification</span>
+      </template>
+
+      <el-menu-item :route="{ name: 'ListNotificationTrigger' }" index="/notification-triggers">
+        <icon name="external-link" scale="0.9"></icon>
+        <span>Triggers</span>
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ListEmail' }" index="/emails">
+        <icon name="envelope" scale="0.9"></icon>
+        <span>Emails</span>
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ListSms' }" index="/sms">
+        <icon name="comment" scale="0.9"></icon>
+        <span>SMS</span>
+      </el-menu-item>
+    </el-submenu>
+
+    <el-menu-item :route="{ name: 'ListFileCollection' }" index="/file-collections">
+      <icon name="folder" scale="0.9"></icon>
+      <span>File Storage</span>
+    </el-menu-item>
+
+    <el-menu-item :router="{ name: 'APIHome' }" index="/api">
+      <icon name="terminal" scale="0.9"></icon>
+      <span>API</span>
+    </el-menu-item>
+
+    <el-menu-item index="" style="padding-left: 12px;" class="no-active">
+      <el-switch :value="isViewingTestData" :width="23" @input="toggleMode()" active-color="#f79a59" class="nav-switch">
+      </el-switch>
+
+      <span @click="toggleMode()" :class="{ 'mode-test': isViewingTestData }">
+        <span v-if="isViewingTestData">Viewing test data</span>
+        <span v-else>View test data</span>
+        <span v-loading="isTogglingMode" element-loading-spinner="el-icon-loading" class="test-toggle-loading"></span>
+      </span>
+    </el-menu-item>
+
+    <el-menu-item index="operators">
+      <icon name="id-card" scale="0.9"></icon>
+      <span>Operators</span>
+    </el-menu-item>
+
+    <el-menu-item index="settings">
+      <icon name="cog" scale="0.9"></icon>
+      <span>Settings</span>
+    </el-menu-item>
+  </el-menu>
+</div>
 </template>
 
 <script>
@@ -288,39 +237,39 @@ export default {
 </script>
 
 <style lang="scss">
-.primary-nav .el-menu-item, .primary-nav .el-submenu__title {
-  height: 40px;
-  line-height: 40px;
+.left-nav {
+  display: flex;
+  flex-direction: column;
+  border-right: solid 1px #e6e6e6;
+  height: 100%;
 
-  svg {
-    margin-right: 3px;
+  ul {
+    border-right: 0px;
   }
-}
 
-.primary-nav .el-submenu .el-menu-item {
-  height: 40px;
-  line-height: 40px;
-}
+  .el-submenu__title, .el-menu-item {
+    height: 40px;
+    line-height: 40px;
+  }
 
-.primary-nav.el-menu, .primary-nav .el-menu {
-  border-right: none;
-  background-color: inherit;
-}
+  .account {
+    height: 60px;
+  }
 
-.primary-nav .el-submenu__title:hover, .primary-nav .el-menu-item:focus, .primary-nav .el-menu-item:hover {
-  background-color: inherit;
-  font-weight: 500;
-}
+  .test-toggle-loading {
+    float: right;
+    margin-right: 6px;
+    margin-top: 22px;
 
-.account {
-  margin: 10px;
-  height: 50px;
-  line-height: 50px;
-  vertical-align: middle;
-}
+    .el-icon-loading {
+      font-size: 16px;
+    }
+  }
 
-.primary-nav {
-  padding-bottom: 20px;
+  .mode-test {
+    color: #f79a59;
+    font-weight: 500;
+  }
 }
 
 .nav-switch {
@@ -339,24 +288,6 @@ export default {
     .el-switch__core:after {
       margin-left: -12px;
     }
-  }
-}
-
-.mode-test {
-  color: #f79a59;
-  font-weight: 500;
-}
-
-.el-menu-item.is-active.no-active {
-  color: #2d2f33;
-}
-
-.test-toggle-loading {
-  float: right;
-  margin-top: 22px;
-
-  .el-icon-loading {
-    font-size: 16px;
   }
 }
 </style>

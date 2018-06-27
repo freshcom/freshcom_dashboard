@@ -1,11 +1,18 @@
 <template>
 <content-container>
   <div slot="header">
-    <router-link :to="{ name: 'ListProduct' }">Products</router-link>
-    <router-link :to="{ name: 'ListProductCollection' }">Collections</router-link>
+    <el-menu :router="true" default-active="/products" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
+        Products
+      </el-menu-item>
+
+      <el-menu-item :route="{ name: 'ListProductCollection' }" index="/product-collections">
+        Collections
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <h1>Create a price</h1>
 
     <div class="pull-right">
@@ -19,7 +26,7 @@
     </div>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data">
       <el-row>
         <el-col :span="18" :offset="3">

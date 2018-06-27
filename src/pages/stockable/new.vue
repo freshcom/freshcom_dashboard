@@ -1,10 +1,14 @@
 <template>
 <content-container>
   <div slot="header">
-    <router-link :to="{ name: 'ListStockable' }">Stockables</router-link>
+    <el-menu :router="true" default-active="/stockables" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'ListStockable' }" index="/stockables">
+        Stockables
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <h1>Create a stockable</h1>
 
     <div class="pull-right">
@@ -18,7 +22,7 @@
     </div>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data">
       <el-row>
         <el-col :span="16" :offset="4">

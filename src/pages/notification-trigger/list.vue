@@ -1,10 +1,14 @@
 <template>
 <content-container @locale-changed="listNotificationTrigger">
   <div slot="header">
-    <router-link :to="{ name: 'ListNotificationTrigger' }">Triggers</router-link>
+    <el-menu :router="true" default-active="/notification-triggers" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'ListNotificationTrigger' }" index="/notification-triggers">
+        Triggers
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <el-row>
       <el-col :span="16">
         <filter-button :current="filterObject" :draft="filterObjectDraft" @cancel="resetFilter" @clear="clearFilter">
@@ -80,7 +84,7 @@
     </el-row>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data full">
       <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
         <div slot="no-content">
@@ -100,7 +104,7 @@
           </router-link>
         </div>
 
-        <el-table :data="notificationTriggers" slot="content" class="data-table">
+        <el-table :data="notificationTriggers" slot="content">
           <el-table-column prop="name" label="TRIGGER">
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowNotificationTrigger', params: { id: scope.row.id } }" class="primary">

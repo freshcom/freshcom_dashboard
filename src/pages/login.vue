@@ -4,7 +4,7 @@
 
     <h1>Freshcom</h1>
 
-    <el-card>
+    <el-card shadow="never">
       <div slot="header" class="text-center">
         Please sign in to continue
       </div>

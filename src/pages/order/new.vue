@@ -1,10 +1,14 @@
 <template>
 <content-container>
   <div slot="header">
-    <router-link :to="{ name: 'NewOrder' }">Orders</router-link>
+    <el-menu :router="true" default-active="/orders" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">
+        Orders
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <h1>Create an order</h1>
 
     <div class="pull-right">
@@ -26,9 +30,9 @@
     </div>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="steps">
-      <el-steps :active="activeStep" finish-status="success" simple>
+      <el-steps :active="activeStep" finish-status="success" align-center>
         <el-step title="Items"></el-step>
         <el-step title="Information"></el-step>
         <el-step title="Payment"></el-step>
@@ -186,147 +190,6 @@
     </el-dialog>
   </div>
 </content-container>
-<!-- <div class="page-wrapper">
-
-  <div>
-    <el-menu :router="true" default-active="/orders" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">Orders</el-menu-item>
-    </el-menu>
-    <locale-selector class="pull-right"></locale-selector>
-  </div>
-
-  <div>
-    <el-card class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
-
-        <span>Create an order</span>
-      </div>
-
-      <div>
-        <el-steps :active="activeStep" finish-status="success" simple>
-          <el-step title="Line Items"></el-step>
-          <el-step title="Information"></el-step>
-          <el-step title="Payment"></el-step>
-        </el-steps>
-      </div>
-
-      <div class="data">
-        <div v-show="activeStep === this.step.LINE_ITEMS">
-          <div class="block">
-            <div class="block-body">
-              <order-line-item-form v-model="lineItemForAdd" :errors="errors">
-              </order-line-item-form>
-            </div>
-
-            <div class="block-footer text-right">
-              <el-button @click="createLineItem()" :loading="isCreatingLineItem" plain size="small">
-                Add to Order
-              </el-button>
-            </div>
-          </div>
-
-          <div class="block">
-            <div class="block-body full">
-                <order-line-item-table
-                  :records="order.rootLineItems"
-                  @delete="deleteLineItem"
-                  @edit="startEditLineItem"
-                >
-                </order-line-item-table>
-            </div>
-          </div>
-
-          <div id="summary" class="m-b-10">
-            <div id="summary-labels" style="width: 560px; float: left;" class="text-right">
-              <p>Sub Total</p>
-              <p>Tax 1</p>
-              <p>Tax 2</p>
-              <p>Tax 3</p>
-              <p><b>Grand Total</b></p>
-              <p v-if="order.isEstimate"><b>Authorization Amount</b></p>
-            </div>
-
-            <div id="summary-values" style="overflow: hidden; width: 120px;" class="text-right">
-              <p><span v-if="order.isEstimate">~</span> <span>{{order.subTotalCents | dollar}}</span></p>
-              <p><span>{{order.taxOneCents | dollar}}</span></p>
-              <p><span>{{order.taxTwoCents | dollar}}</span></p>
-              <p><span>{{order.taxThreeCents | dollar}}</span></p>
-              <p><span v-if="order.isEstimate">~</span> <span>{{order.grandTotalCents | dollar}}</span></p>
-              <p v-if="order.isEstimate">{{order.authorizationTotalCents | dollar}}</p>
-            </div>
-          </div>
-        </div>
-
-        <div v-show="activeStep === this.step.INFORMATION">
-          <order-form v-model="orderDraft" :errors="errors" :can-select-customer="!this.customerId"></order-form>
-        </div>
-
-        <div v-show="activeStep === this.step.PAYMENT">
-          <el-row>
-            <el-col :span="8" :offset="8">
-              <p v-if="order.customer" class="text-right">
-                <el-button plain size="mini">Use Points</el-button>
-              </p>
-
-              <div class="block">
-                <div class="block-body full">
-                  <el-table :data="summaryTableData" class="block-table" :show-header="false">
-                    <el-table-column width="150px">
-                      <template slot-scope="scope">
-                        {{scope.row.name}}
-                      </template>
-                    </el-table-column>
-
-                    <el-table-column align="right">
-                      <template slot-scope="scope">
-                        <span>{{scope.row.valueCents | dollar}}</span>
-                      </template>
-                    </el-table-column>
-                  </el-table>
-                </div>
-              </div>
-            </el-col>
-          </el-row>
-          <hr/>
-          <payment-form v-model="paymentDraft" :errors="errors"></payment-form>
-        </div>
-      </div>
-
-      <div class="footer">
-        <el-button v-show="canCancel" @click="cancel" plain size="small">
-          Cancel
-        </el-button>
-
-        <el-button v-show="canNext" :loading="isUpdatingOrder" :disabled="order.rootLineItems.length === 0" @click="next()" size="small" type="primary" class="pull-right">
-          Next
-        </el-button>
-
-        <el-button v-show="canBack" @click="back" plain size="small">
-          Back
-        </el-button>
-
-        <el-button v-show="canPlaceOrder" :loading="isCreatingPayment" @click="createPayment()" size="small" type="primary" class="pull-right">
-          Place Order
-        </el-button>
-      </div>
-    </el-card>
-  </div>
-
-  <div class="launchable">
-    <el-dialog :show-close="false" :visible="isEditingLineItem" title="Edit Line Item" width="750px">
-      <order-line-item-form v-model="lineItemForEdit"></order-line-item-form>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button :disabled="isUpdatingLineItem" @click="cancelEditLineItem()" plain size="small">Cancel</el-button>
-        <el-button :loading="isUpdatingLineItem" @click="updateLineItem()" type="primary" size="small">Save</el-button>
-      </div>
-    </el-dialog>
-  </div>
-
-</div> -->
 </template>
 
 <script>

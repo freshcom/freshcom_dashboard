@@ -1,11 +1,17 @@
 <template>
 <content-container @locale-changed="reload" :ready="isReady">
   <div slot="header">
-    <router-link :to="{ name: 'ListFileCollection' }">File Collections</router-link>
-    <router-link :to="{ name: 'ListFile' }">Files</router-link>
+    <el-menu :router="true" default-active="/files" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'ListFileCollection' }" index="/file-collections">
+        Collections
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ListFile' }" index="/files">
+        Files
+      </el-menu-item>
+    </el-menu>
   </div>
 
-  <div slot="card-header">
+  <div slot="content-header">
     <div class="brief">
       <div class="avatar">
         <img v-if="isImage(file)" :src="file.url">
@@ -29,7 +35,7 @@
     </div>
   </div>
 
-  <div slot="card-content">
+  <div slot="content-body">
     <div class="data">
       <div class="block">
         <div class="header">
