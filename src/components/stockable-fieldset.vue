@@ -32,8 +32,8 @@
     <el-switch
       v-model="formModel.variableWeight"
       @change="updateValue()"
-      on-text="Yes"
-      off-text="No">
+      active-text="Yes"
+      inactive-text="No">
     </el-switch>
   </el-form-item>
 
@@ -51,8 +51,8 @@
     <el-switch
       v-model="formModel.stackable"
       @change="updateValue()"
-      on-text="Yes"
-      off-text="No">
+      active-text="Yes"
+      inactive-text="No">
     </el-switch>
   </el-form-item>
 

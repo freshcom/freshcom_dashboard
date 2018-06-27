@@ -109,8 +109,8 @@
                   @change="updateValue"
                   v-model="isEstimate"
                   :disabled="!isIsEstimateTogglable"
-                  on-text="Yes"
-                  off-text="No">
+                  active-text="Yes"
+                  inactive-text="No">
                 </el-switch>
 
                 <el-button type="default" @click="addProductLineItem()" :disabled="!isAddClickable">
@@ -159,8 +159,8 @@
                 <el-switch
                   @change="updateValue"
                   v-model="isEstimate"
-                  on-text="Yes"
-                  off-text="No">
+                  active-text="Yes"
+                  inactive-text="No">
                 </el-switch>
 
                 <el-button type="default" @click="addCustomLineItem()" :disabled="!isAddClickable">
