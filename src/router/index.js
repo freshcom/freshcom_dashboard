@@ -8,6 +8,8 @@ import store from '@/store'
 
 import HomePage from '@/pages/home'
 import LoginPage from '@/pages/login'
+import RegisterPage from '@/pages/register'
+
 import ForgotPasswordPage from '@/pages/forgot-password'
 
 // Storefront
@@ -132,6 +134,11 @@ const router = new Router({
       path: '/login',
       name: 'Login',
       component: LoginPage
+    },
+    {
+      path: '/register',
+      name: 'Register',
+      component: RegisterPage
     },
     {
       path: '/forgot-password',
