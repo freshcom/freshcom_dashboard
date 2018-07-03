@@ -4,17 +4,16 @@
 
     <h1>Freshcom</h1>
 
-    <el-card class="box-card">
+    <el-card class="box-card" shadow="never">
       <div slot="header" class="clearfix text-center">
         <span>Reset your password</span>
       </div>
 
       <div v-if="isSubmitted">
-        <el-alert type="success" :closable="false" title="">
+        <el-alert :closable="false" type="success" title="">
           <p class="text-center">
           An email containing instructions to reset your password has been sent to
-          <br/>
-          <b>{{email}}</b>
+          your entered email.
           <br/>
           <br/>
 
@@ -33,8 +32,8 @@
         </p>
 
         <el-form @submit.native.prevent="submit()" label-width="80px" size="small">
-          <el-form-item label="Email" :error="errorMsgs.email" required>
-            <el-input v-model="email"></el-input>
+          <el-form-item label="Email" :error="errorMsgs.username" required>
+            <el-input v-model="username"></el-input>
           </el-form-item>
 
           <el-form-item>
@@ -61,7 +60,7 @@ export default {
   name: 'ForgotPassword',
   data () {
     return {
-      email: '',
+      username: '',
       isSubmitted: false,
       isSubmitting: false,
       errors: {}
@@ -75,7 +74,7 @@ export default {
   methods: {
     submit (form) {
       this.isSubmitting = true
-      freshcom.createPasswordResetToken({ email: this.email, type: 'PasswordResetToken' }).then(() => {
+      freshcom.createPasswordResetToken({ username: this.username, type: 'PasswordResetToken' }).then(() => {
         this.isSubmitting = false
         this.isSubmitted = true
       }).catch(response => {

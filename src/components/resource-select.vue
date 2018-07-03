@@ -17,7 +17,7 @@
   </div>
   <div v-if="!isEditing" :class="[size]" class="resource-block">
     <div class="resource">
-      <p class="primary">
+      <p>
         <span v-if="value.code">[{{value.code}}]</span>
         <span v-if="value.name">{{value.name}}</span>
         <span v-if="!value.name">{{value.id}}</span>
