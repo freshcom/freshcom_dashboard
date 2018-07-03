@@ -149,8 +149,7 @@
         </div>
 
         <div class="body full">
-          <order-line-item-table :records="order.rootLineItems" @delete="deleteLineItem($event)" @edit="editLineItem($event)">
-          </order-line-item-table>
+          <order-line-item-tree :value="order.rootLineItems" @edit="editLineItem($event)" @delete="attemptDeleteLineItem($event)" mode="detail"></order-line-item-tree>
         </div>
 
         <div class="launchable">
@@ -173,6 +172,26 @@
             <div slot="footer">
               <el-button :disabled="isUpdatingLineItem" @click="cancelEditLineItem()" plain size="small">Cancel</el-button>
               <el-button :loading="isUpdatingLineItem" @click="updateLineItem()" type="primary" size="small">Save</el-button>
+            </div>
+          </el-dialog>
+
+          <el-dialog :show-close="false" :visible="isConfirmingDeleteLineItem" title="Delete Line Item" width="600px">
+            <p>
+              Are you sure you want to delete this line item?
+              If you delete this line item, all of the following
+              related resources if any will also be deleted:
+
+              <ul>
+                <li>The children this line item</li>
+              </ul>
+
+              Note that deleting line item will not automatically refund the payment
+              you will need to create the refund manually as necessary.
+            </p>
+
+            <div slot="footer">
+              <el-button :disabled="isDeletingLineItem" @click="cancelDeleteLineItem()" plain size="small">Cancel</el-button>
+              <el-button :loading="isDeletingLineItem" @click="deleteLineItem()" type="danger" size="small">Delete</el-button>
             </div>
           </el-dialog>
         </div>
@@ -497,9 +516,9 @@ import Refund from '@/models/refund'
 import OrderLineItemFieldset from '@/components/order-line-item-fieldset'
 import PaymentFieldset from '@/components/payment-fieldset'
 import RefundFieldset from '@/components/refund-fieldset'
+import OrderLineItemTree from '@/components/order-line-item-tree'
 
 import ConfirmButton from '@/components/confirm-button'
-import OrderLineItemTable from '@/components/order-line-item-table'
 import { dollar } from '@/helpers/filters'
 import { createToken as createStripeToken } from 'vue-stripe-elements-plus'
 
@@ -514,7 +533,7 @@ export default {
     PaymentFieldset,
     OrderLineItemFieldset,
     ConfirmButton,
-    OrderLineItemTable
+    OrderLineItemTree
   },
   filters: {
     dollar
@@ -542,6 +561,10 @@ export default {
       lineItemForEdit: OrderLineItem.objectWithDefaults(),
       isEditingLineItem: false,
       isUpdatingLineItem: false,
+
+      lineItemForDelete: undefined,
+      isConfirmingDeleteLineItem: false,
+      isDeletingLineItem: false,
 
       paymentForEdit: Payment.objectWithDefaults(),
       isEditingPayment: false,
@@ -636,9 +659,8 @@ export default {
       })
     },
 
-    editLineItem (lineItemId) {
-      let targetLineItem = _.find(this.order.rootLineItems, { id: lineItemId })
-      this.lineItemForEdit = _.cloneDeep(targetLineItem)
+    editLineItem (lineItem) {
+      this.lineItemForEdit = _.cloneDeep(lineItem)
       this.errors = {}
       this.isEditingLineItem = true
     },
@@ -668,10 +690,25 @@ export default {
       })
     },
 
-    deleteLineItem (id) {
-      freshcom.deleteOrderLineItem(id).then(() => {
+    attemptDeleteLineItem (lineItem) {
+      this.isConfirmingDeleteLineItem = true
+      this.lineItemForDelete = lineItem
+    },
+
+    cancelDeleteLineItem () {
+      this.isConfirmingDeleteLineItem = false
+      this.lineItemForDelete = undefined
+    },
+
+    deleteLineItem () {
+      this.isDeletingLineItem = true
+
+      freshcom.deleteOrderLineItem(this.lineItemForDelete.id).then(() => {
         return this.loadOrder()
       }).then(response => {
+        this.isDeletingLineItem = false
+        this.cancelDeleteLineItem()
+
         this.$message({
           showClose: true,
           message: `Line item deleted successfully.`,

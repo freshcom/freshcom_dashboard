@@ -267,7 +267,7 @@ export default {
 
         let lowestActivePrice = Price.getLowestPrice(prices, this.formModel.orderQuantity, 'active')
         let internalPrices = _.filter(prices, (price) => {
-          return price.status === 'internal' && price.minimumOrderQuantity <= this.formModel.price.minimumOrderQuantity
+          return price.status === 'internal' && price.minimumOrderQuantity <= this.formModel.orderQuantity
         })
 
         if (lowestActivePrice) {

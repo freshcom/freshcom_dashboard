@@ -58,9 +58,11 @@ export default {
   watch: {
     value (newValue) {
       this.selectedOption = this.recordToOption(newValue).value
+      if (!this.selectedOption) {
+        this.records = []
+      }
     },
     selectedOption (newValue) {
-      console.log(newValue)
       let record = _.find(this.records, { id: newValue })
       this.$emit('input', record)
     }

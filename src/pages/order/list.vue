@@ -95,7 +95,7 @@
         </div>
 
         <el-table :data="orders" slot="content">
-          <el-table-column label="ORDER" width="150">
+          <el-table-column label="ORDER" width="200" fixed="left">
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowOrder', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }" class="primary">
                 <span v-if="scope.row.code">
@@ -107,7 +107,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column width="100">
+          <el-table-column label="TOTAL" width="100">
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowOrder', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
                 {{scope.row.grandTotalCents | dollar}}
@@ -115,7 +115,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="STATUS">
+          <el-table-column label="STATUS" width="320">
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowOrder', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
                 <el-tag v-if="scope.row.status === 'opened'" :disable-transitions="true" size="mini">
@@ -153,7 +153,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="OPENED" align="right" width="180">
+          <el-table-column label="OPENED" align="right" width="180" fixed="right">
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowOrder', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
                 {{scope.row.openedAt | moment}}

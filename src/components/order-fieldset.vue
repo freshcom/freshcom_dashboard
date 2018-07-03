@@ -1,7 +1,7 @@
 <template>
 <div class="component-wrapper order-fieldset">
   <el-form-item label="Customer" :error="errorMsgs.customer">
-    <customer-select v-model="formModel.customer" :disabled="formModel.status !== 'cart'" @input="updateValue()"></customer-select>
+    <customer-select v-model="formModel.customer" :disabled="formModel.status !== 'cart'" @input="handleCustomerChange($event)"></customer-select>
   </el-form-item>
 
   <el-form-item label="Name" :error="errorMsgs.name" required>
@@ -86,6 +86,15 @@ export default {
   mixins: [FieldsetMixin],
   components: {
     CustomerSelect
+  },
+  methods: {
+    handleCustomerChange (customer) {
+      this.formModel.name = customer.name
+      this.formModel.email = customer.email
+      this.formModel.phoneNumber = customer.phoneNumber
+
+      this.updateValue()
+    }
   }
 }
 </script>
