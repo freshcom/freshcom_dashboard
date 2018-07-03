@@ -174,6 +174,13 @@ const sdk = {
     }).catch(this._processHttpError)
   },
 
+  createUser (fields = {}, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post('/users', payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
   updateCurrentUser (fields = {}, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.patch('/user', payload, { params: params }).then(response => {
@@ -1051,7 +1058,7 @@ axiosInstance.interceptors.response.use(undefined, function (error) {
     response = error.response
   }
 
-  if (response && response.status === 401 && !config.retried) {
+  if (response && response.status === 401 && sdk.refreshToken && !config.retried) {
     config.retried = true
 
     return sdk.createToken({

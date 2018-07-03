@@ -9,25 +9,25 @@
         Create your Freshcom account
       </div>
 
-      <el-form @submit.native.prevent="attemptLogin(form)" label-width="130px" size="small">
-        <el-form-item label="Email">
-          <el-input v-model="form.username" placeholder="Enter your email..."></el-input>
+      <el-form @submit.native.prevent="submit()" label-width="130px" size="small">
+        <el-form-item :error="errorMsgs.email || errorMsgs.username" label="Email">
+          <el-input v-model="userDraft.email" placeholder="Enter your email..."></el-input>
         </el-form-item>
 
-        <el-form-item label="Name">
-          <el-input v-model="form.name" placeholder="Enter your full name..."></el-input>
+        <el-form-item :error="errorMsgs.name" label="Name">
+          <el-input v-model="userDraft.name" placeholder="Enter your full name..."></el-input>
         </el-form-item>
 
-        <el-form-item label="Password">
-          <el-input v-model="form.password" id="password" type="password" placeholder="Enter your password..."></el-input>
+        <el-form-item :error="errorMsgs.password" label="Password">
+          <el-input v-model="userDraft.password" id="password" type="password" placeholder="Enter your password..."></el-input>
         </el-form-item>
 
         <el-form-item label="Confirm Password">
-          <el-input v-model="form.confirmPassword" id="confirm-password" type="password" placeholder="Enter your password again..."></el-input>
+          <el-input v-model="userDraft.confirmPassword" id="confirm-password" type="password" placeholder="Enter your password again..."></el-input>
         </el-form-item>
 
         <el-form-item>
-          <el-button :loading="isSubmitting" type="primary" native-type="submit" size="medium">Create your Freshcom account</el-button>
+          <el-button :loading="isCreating" type="primary" native-type="submit" size="medium">Create your Freshcom account</el-button>
         </el-form-item>
 
       </el-form>
@@ -41,18 +41,24 @@
 </template>
 
 <script>
+import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
 import translateErrors from '@/helpers/translate-errors'
 
 export default {
   name: 'Register',
   data () {
     return {
-      isSubmitting: false,
-      form: {
+      isCreating: false,
+      userDraft: {
+        type: 'User',
         username: '',
+        email: '',
+        name: '',
         password: '',
-        errors: {}
-      }
+        confirmPassword: ''
+      },
+      errors: {}
     }
   },
   created () {
@@ -69,27 +75,25 @@ export default {
     }
   },
   methods: {
-    attemptLogin (form) {
-      this.isSubmitting = true
-      this.$store.dispatch('session/create', form).then(data => {
-        this.isSubmitting = false
-        let user = data[1]
+    submit () {
+      this.isCreating = true
 
+      this.userDraft.username = this.userDraft.email
+      freshcom.createUser(this.userDraft).then(() => {
+
+      }).then(response => {
         this.$message({
           showClose: true,
-          message: `You are now logged in, welcome back ${user.firstName}!`,
+          message: `Sign up successful, you are now logged in.`,
           type: 'success'
         })
 
+        this.isCreating = false
         this.$store.dispatch('pushRoute', { name: 'Home' })
       }).catch(response => {
-        this.$message({
-          showClose: true,
-          message: response.error_description,
-          type: 'error'
-        })
-
-        this.isSubmitting = false
+        this.errors = response.errors
+        this.isCreating = false
+        throw response
       })
     }
   }
