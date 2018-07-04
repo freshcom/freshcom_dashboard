@@ -61,13 +61,12 @@ export default {
   methods: {
     attemptLogin (form) {
       this.isSubmitting = true
-      this.$store.dispatch('session/create', form).then(data => {
+      this.$store.dispatch('session/create', form).then(() => {
         this.isSubmitting = false
-        let user = data[1]
 
         this.$message({
           showClose: true,
-          message: `You are now logged in, welcome back ${user.firstName}!`,
+          message: `You are now logged in, welcome back!`,
           type: 'success'
         })
 

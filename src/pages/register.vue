@@ -41,7 +41,6 @@
 </template>
 
 <script>
-import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 import translateErrors from '@/helpers/translate-errors'
 
@@ -80,7 +79,7 @@ export default {
 
       this.userDraft.username = this.userDraft.email
       freshcom.createUser(this.userDraft).then(() => {
-
+        return this.$store.dispatch('session/create', { username: this.userDraft.username, password: this.userDraft.password })
       }).then(response => {
         this.$message({
           showClose: true,

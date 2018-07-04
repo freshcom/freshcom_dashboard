@@ -1,7 +1,20 @@
 <template>
 <div class="left-nav">
   <div class="account">
-    <p class="text-center">{{sessionAccount.name}}</p>
+    <p class="text-center">
+      <el-dropdown>
+        <span class="el-dropdown-link">
+          {{sessionAccount.name}}<i class="el-icon-arrow-down el-icon--right"></i>
+        </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item>Placeholder</el-dropdown-item>
+          <el-dropdown-item>Placeholder</el-dropdown-item>
+          <el-dropdown-item divided>
+            <a href="javascript:;">Create new account</a>
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+    </p>
   </div>
 
   <el-menu mode="vertical" :router="true" :default-active="selected" class="primary-nav">
@@ -254,6 +267,10 @@ export default {
 
   .account {
     height: 60px;
+
+    p {
+      margin-top: 24px;
+    }
   }
 
   .test-toggle-loading {

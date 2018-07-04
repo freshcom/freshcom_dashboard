@@ -7,7 +7,8 @@ export default {
   errors: {
     common: {
       required: '{name} is required.',
-      format: '{name} is invalid.'
+      format: '{name} is invalid.',
+      taken: '{name} is taken.'
     },
     required: '{name} is required.',
     invalid: '{name} is invalid.',
