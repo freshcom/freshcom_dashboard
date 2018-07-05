@@ -2,7 +2,7 @@
 <div class="left-nav">
   <div class="account">
     <p class="text-center">
-      <el-dropdown>
+      <el-dropdown trigger="click">
         <span class="el-dropdown-link">
           {{sessionAccount.name}}<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
@@ -112,6 +112,11 @@
       <span>File Storage</span>
     </el-menu-item>
 
+    <el-menu-item index="operators">
+      <icon name="id-card" scale="0.9"></icon>
+      <span>Operators</span>
+    </el-menu-item>
+
     <el-menu-item :router="{ name: 'APIHome' }" index="/api">
       <icon name="terminal" scale="0.9"></icon>
       <span>API</span>
@@ -126,11 +131,6 @@
         <span v-else>View test data</span>
         <span v-loading="isTogglingMode" element-loading-spinner="el-icon-loading" class="test-toggle-loading"></span>
       </span>
-    </el-menu-item>
-
-    <el-menu-item index="operators">
-      <icon name="id-card" scale="0.9"></icon>
-      <span>Operators</span>
     </el-menu-item>
 
     <el-menu-item index="settings">
@@ -267,6 +267,10 @@ export default {
 
   .account {
     height: 60px;
+
+    .el-dropdown-link {
+      cursor: pointer;
+    }
 
     p {
       margin-top: 24px;

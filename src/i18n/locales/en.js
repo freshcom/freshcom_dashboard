@@ -12,6 +12,11 @@ export default {
     },
     required: '{name} is required.',
     invalid: '{name} is invalid.',
+    user: {
+      confirmPassword: {
+        notMatch: 'Confirm password does not match the password.'
+      }
+    },
     unlock: {
       unlockable: {
         invalid: 'Unlockable is invalid or already unlocked.'

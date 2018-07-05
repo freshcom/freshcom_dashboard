@@ -7,7 +7,7 @@
         </div>
 
         <div class="right-menu">
-          <el-menu mode="horizontal" menu-trigger="click">
+          <el-menu mode="horizontal">
             <el-submenu index="locale">
               <template slot="title">{{$t(`locales.${resourceLocale}`)}}</template>
               <el-menu-item @click="setResourceLocale('en')" index="en">

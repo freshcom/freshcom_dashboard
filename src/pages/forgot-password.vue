@@ -32,7 +32,7 @@
         </p>
 
         <el-form @submit.native.prevent="submit()" label-width="80px" size="small">
-          <el-form-item label="Email" :error="errorMsgs.username" required>
+          <el-form-item label="Email" :error="errorMsgs.username">
             <el-input v-model="username"></el-input>
           </el-form-item>
 

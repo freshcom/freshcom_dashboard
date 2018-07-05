@@ -616,6 +616,11 @@ input::-webkit-inner-spin-button {
 //
 // MARK: Utils
 //
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
 .text-center {
   text-align: center;
 }
