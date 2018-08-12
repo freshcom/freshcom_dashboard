@@ -104,6 +104,15 @@ const sdk = {
   },
 
   //
+  // MARK: Account Membership
+  //
+  listAccountMembership (params = {}, options = {}) {
+    return this.http.get('/account_memberships', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  //
   // MARK: Password Reset Token
   //
   createPasswordResetToken (fields, params = {}, options = {}) {

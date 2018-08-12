@@ -20,7 +20,7 @@
   <el-menu mode="vertical" :router="true" :default-active="selected" class="primary-nav">
     <el-menu-item :route="{ name: 'Home' }" index="/">
       <icon name="home" scale="0.9"></icon>
-      <a>Home</a>
+      <span>Home</span>
     </el-menu-item>
 
     <el-submenu index="storefront">
@@ -112,9 +112,9 @@
       <span>File Storage</span>
     </el-menu-item>
 
-    <el-menu-item index="operators">
+    <el-menu-item index="/users">
       <icon name="id-card" scale="0.9"></icon>
-      <span>Operators</span>
+      <span>Team</span>
     </el-menu-item>
 
     <el-menu-item :router="{ name: 'APIHome' }" index="/api">
@@ -153,7 +153,6 @@ import 'vue-awesome/icons/archive'
 import 'vue-awesome/icons/exchange'
 import 'vue-awesome/icons/truck'
 import 'vue-awesome/icons/terminal'
-import 'vue-awesome/icons/id-card'
 import 'vue-awesome/icons/folder-open'
 import 'vue-awesome/icons/diamond'
 
@@ -187,6 +186,9 @@ export default {
     },
     selected () {
       let routePath = this.currentRoutePath
+
+      if (routePath === '/') { return '/' }
+
       if (routePath.startsWith('/stockables')) { return '/stockables' }
       if (routePath.startsWith('/unlockables')) { return '/unlockables' }
       if (routePath.startsWith('/file')) { return '/file-collections' }

@@ -45,6 +45,7 @@ import 'vue-awesome/icons/shopping-cart' // Storefront
 import 'vue-awesome/icons/bank' // Balance
 import 'vue-awesome/icons/money' // Payment
 import 'vue-awesome/icons/search' // Search
+import 'vue-awesome/icons/id-card' // Team
 
 // -- Code Mirror Style --
 import 'codemirror/mode/xml/xml'

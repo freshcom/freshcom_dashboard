@@ -13,6 +13,8 @@ import ProfilePage from '@/pages/profile'
 
 import ForgotPasswordPage from '@/pages/forgot-password'
 
+import ListUserPage from '@/pages/user/list'
+
 // Storefront
 import ListOrderPage from '@/pages/order/list'
 import NewOrderPage from '@/pages/order/new'
@@ -150,6 +152,19 @@ const router = new Router({
       path: '/profile',
       name: 'Profile',
       component: ProfilePage
+    },
+    {
+      path: '/users',
+      name: 'ListUser',
+      component: ListUserPage,
+      props (route) {
+        let page = extractPagination(route)
+        return {
+          searchKeyword: route.query.search,
+          filterObject: route.query.filter,
+          page: page
+        }
+      }
     },
     {
       path: '/orders',

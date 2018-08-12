@@ -9,7 +9,7 @@
 
         <div class="body full">
           <el-row>
-            <el-col :span="18" :offset="3">
+            <el-col :span="14" :offset="5">
               <el-form @submit.native.prevent="submit()" label-width="130px" size="small">
                 <el-form-item :error="errorMsgs.email || errorMsgs.username" label="Email">
                   <el-input v-model="userDraft.email" id="email" placeholder="Enter your email..."></el-input>
