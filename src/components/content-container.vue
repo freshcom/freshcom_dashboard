@@ -21,6 +21,7 @@
             <el-submenu index="user">
               <template slot="title">{{user.name}}</template>
               <el-menu-item @click="nuke()" index="nuke">Nuke</el-menu-item>
+              <el-menu-item @click="profile()" index="logout">Profile</el-menu-item>
               <el-menu-item @click="logout()" index="logout">Log Out</el-menu-item>
             </el-submenu>
           </el-menu>
@@ -56,6 +57,10 @@ import freshcom from '@/freshcom-sdk'
 export default {
   name: 'ContentContainer',
   props: {
+    disableTestBanner: {
+      type: Boolean,
+      default: false
+    },
     ready: {
       type: Boolean,
       default: true
@@ -74,7 +79,11 @@ export default {
       return this.$store.state.session.user
     },
     isViewingTestData () {
-      return this.$store.state.session.mode === 'test'
+      if (this.disableTestBanner) {
+        return false
+      } else {
+        return this.$store.state.session.mode === 'test'
+      }
     },
     resourceLocale () {
       return this.$store.state.resourceLocale
@@ -94,6 +103,10 @@ export default {
         this.$store.dispatch('setResourceLocale', locale)
         this.$emit('locale-changed')
       })
+    },
+
+    profile () {
+      this.$store.dispatch('pushRoute', { name: 'Profile' })
     },
 
     nuke () {

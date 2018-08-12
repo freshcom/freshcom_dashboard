@@ -9,6 +9,7 @@ import store from '@/store'
 import HomePage from '@/pages/home'
 import LoginPage from '@/pages/login'
 import RegisterPage from '@/pages/register'
+import ProfilePage from '@/pages/profile'
 
 import ForgotPasswordPage from '@/pages/forgot-password'
 
@@ -144,6 +145,11 @@ const router = new Router({
       path: '/forgot-password',
       name: 'ForgotPassword',
       component: ForgotPasswordPage
+    },
+    {
+      path: '/profile',
+      name: 'Profile',
+      component: ProfilePage
     },
     {
       path: '/orders',

@@ -188,12 +188,16 @@ export default {
     getUser ({ state, commit }) {
       if (!state.token) { return }
 
-      return freshcom.retrieveUser().then(response => {
+      return freshcom.retrieveCurrentUser().then(response => {
         let user = response.data
         commit(MT.USER_CHANGED, user)
 
         return user
       })
+    },
+
+    setUser ({ state, commit }, user) {
+      commit(MT.USER_CHANGED, user)
     },
 
     getAccount ({ state, commit, dispatch }) {

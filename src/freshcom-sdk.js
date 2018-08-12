@@ -168,7 +168,7 @@ const sdk = {
   //
   // MARK: User
   //
-  retrieveUser (params = {}, options = {}) {
+  retrieveCurrentUser (params = {}, options = {}) {
     return this.http.get('/user', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)

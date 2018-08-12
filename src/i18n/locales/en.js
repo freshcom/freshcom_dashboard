@@ -15,6 +15,9 @@ export default {
     user: {
       confirmPassword: {
         notMatch: 'Confirm password does not match the password.'
+      },
+      currentPassword: {
+        mustMatch: 'Current password is invalid.'
       }
     },
     unlock: {
