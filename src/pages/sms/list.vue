@@ -11,7 +11,7 @@
     </el-menu>
   </div>
 
-  <div slot="content-header">
+  <div v-if="allCount > 0" slot="content-header">
     <el-row>
       <el-col :span="16">
         <filter-button :current="filterObject" :draft="filterObjectDraft" @cancel="resetFilter" @clear="clearFilter">

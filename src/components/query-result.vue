@@ -69,7 +69,7 @@ export default {
 
 .query-result {
   .notice {
-    padding-top: 50px;
+    padding-top: 70px;
     color: #909399;
     padding-bottom: 100px;
     text-align: center;

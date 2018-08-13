@@ -12,7 +12,7 @@
     </el-menu>
   </div>
 
-  <div slot="content-header">
+  <div v-if="allCount > 0" slot="content-header">
     <el-row>
       <el-col :span="16">
         <filter-button :current="filterObject" :draft="filterObjectDraft" @cancel="resetFilter" @clear="clearFilter">
@@ -110,6 +110,15 @@
               <span>Create your first product</span>
             </span>
           </router-link>
+
+          <el-button @click="addDataImport()" plain size="small">
+            <span class="with-icon">
+              <span class="icon-wrapper">
+                <icon name="sign-in" scale="0.65"></icon>
+              </span>
+              <span>Import products</span>
+            </span>
+          </el-button>
         </div>
 
         <el-table :data="products" slot="content">
