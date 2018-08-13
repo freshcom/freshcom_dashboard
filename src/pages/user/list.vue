@@ -67,10 +67,10 @@
             </template>
           </el-table-column>
 
-          <el-table-column prop="status" label="ROLE" width="120">
+          <el-table-column prop="status" label="ROLE" width="150">
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowUser', params: { id: scope.row.id } }">
-                <span>{{scope.row.role}}</span>
+                <span>{{$t(`fields.accountMembership.role.${scope.row.role}`)}}</span>
               </router-link>
             </template>
           </el-table-column>
@@ -91,6 +91,7 @@
 
 <script>
 import freshcom from '@/freshcom-sdk'
+import withLiveMode from '@/helpers/with-live-mode'
 
 import listPageMixinFactory from '@/mixins/list-page'
 let ListPageMixin = listPageMixinFactory({ listMethodName: 'listAccountMembership' })
@@ -113,24 +114,20 @@ export default {
     listAccountMembership () {
       this.isLoading = true
 
-      let currentAccessToken = this.$store.state.session.token.access_token
-      let liveAccessToken = this.$store.state.session.liveToken.access_token
+      withLiveMode(() => {
+        return freshcom.listAccountMembership({
+          search: this.searchKeyword,
+          filter: this.filterObject,
+          page: this.page
+        }).then(response => {
+          this.memberships = response.data
+          this.allCount = response.meta.allCount
+          this.totalCount = response.meta.totalCount
 
-      freshcom.setAccessToken(liveAccessToken)
-      return freshcom.listAccountMembership({
-        search: this.searchKeyword,
-        filter: this.filterObject,
-        page: this.page
-      }).then(response => {
-        this.memberships = response.data
-        this.allCount = response.meta.allCount
-        this.totalCount = response.meta.totalCount
-
-        this.isLoading = false
-        freshcom.setAccessToken(currentAccessToken)
-      }).catch(errors => {
-        this.isLoading = false
-        freshcom.setAccessToken(currentAccessToken)
+          this.isLoading = false
+        }).catch(errors => {
+          this.isLoading = false
+        })
       })
     }
   }

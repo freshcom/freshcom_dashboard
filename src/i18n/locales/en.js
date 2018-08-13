@@ -69,6 +69,11 @@ export default {
     }
   },
   fields: {
+    accountMembership: {
+      role: {
+        administrator: 'Administrator'
+      }
+    },
     sms: {
       status: {
         pending: 'Pending',

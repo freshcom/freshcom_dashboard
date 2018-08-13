@@ -71,6 +71,7 @@
 <script>
 import freshcom from '@/freshcom-sdk'
 import translateErrors from '@/helpers/translate-errors'
+import withLiveMode from '@/helpers/with-live-mode'
 
 import ContentContainer from '@/components/content-container'
 
@@ -109,17 +110,19 @@ export default {
   },
   methods: {
     changePassword () {
-      this.isChangingPassword = true
-    },
-
-    closeChangePasswordDialog () {
-      this.isChangingPassword = false
       this.password = {
         type: 'User',
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
       }
+      this.errors = {}
+
+      this.isChangingPassword = true
+    },
+
+    closeChangePasswordDialog () {
+      this.isChangingPassword = false
     },
 
     cancel () {
@@ -138,26 +141,21 @@ export default {
       }
 
       this.isUpdatingPassword = true
+      withLiveMode(() => {
+        return freshcom.updateCurrentUser(this.password).then(user => {
+          this.$message({
+            showClose: true,
+            message: `Password changed successfully.`,
+            type: 'success'
+          })
 
-      let currentAccessToken = this.$store.state.session.token.access_token
-      let liveAccessToken = this.$store.state.session.liveToken.access_token
-
-      freshcom.setAccessToken(liveAccessToken)
-      freshcom.updateCurrentUser(this.password).then(user => {
-        this.$message({
-          showClose: true,
-          message: `Password changed successfully.`,
-          type: 'success'
+          this.isUpdatingPassword = false
+          this.closeChangePasswordDialog()
+        }).catch(response => {
+          this.errors = response.errors
+          this.isUpdatingPassword = false
+          throw response
         })
-
-        this.isUpdatingPassword = false
-        this.closeChangePasswordDialog()
-        freshcom.setAccessToken(currentAccessToken)
-      }).catch(response => {
-        this.errors = response.errors
-        this.isUpdatingPassword = false
-        freshcom.setAccessToken(currentAccessToken)
-        throw response
       })
     },
 
