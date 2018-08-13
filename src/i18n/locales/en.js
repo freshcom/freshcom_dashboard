@@ -18,6 +18,9 @@ export default {
       },
       currentPassword: {
         mustMatch: 'Current password is invalid.'
+      },
+      username: {
+        unique: 'This username already exist in your account.'
       }
     },
     unlock: {
@@ -71,6 +74,12 @@ export default {
   fields: {
     accountMembership: {
       role: {
+        readOnly: 'Read Only',
+        supportSpecialist: 'Support Specialist',
+        marketingSpecialist: 'Marketing Specialist',
+        goodsSpecialist: 'Goods Specialist',
+        manager: 'Manager',
+        developer: 'Developer',
         administrator: 'Administrator'
       }
     },

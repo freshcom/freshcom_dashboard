@@ -14,6 +14,7 @@ import ProfilePage from '@/pages/profile'
 import ForgotPasswordPage from '@/pages/forgot-password'
 
 import ListUserPage from '@/pages/user/list'
+import NewUserPage from '@/pages/user/new'
 
 // Storefront
 import ListOrderPage from '@/pages/order/list'
@@ -165,6 +166,11 @@ const router = new Router({
           page: page
         }
       }
+    },
+    {
+      path: '/users/new',
+      name: 'NewUser',
+      component: NewUserPage
     },
     {
       path: '/orders',

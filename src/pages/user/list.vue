@@ -53,33 +53,29 @@
         <el-table :data="memberships" slot="content">
           <el-table-column prop="name" label="USER">
             <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowUser', params: { id: scope.row.id } }" class="primary">
-                <span>{{scope.row.userName}}</span>
+              <router-link v-if="scope.row.userKind === 'managed'" :to="{ name: 'ShowUser', params: { id: scope.row.user.id } }" class="primary">
+                <span>{{scope.row.userName}} (<span>{{scope.row.userUsername}}</span>)</span>
               </router-link>
-            </template>
-          </el-table-column>
-
-          <el-table-column prop="email" label="USERNAME">
-            <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowUser', params: { id: scope.row.id } }" class="primary">
-                <span>{{scope.row.userUsername}}</span>
-              </router-link>
+              <span v-else>
+                {{scope.row.userName}} (<span>{{scope.row.userUsername}}</span>)
+              </span>
             </template>
           </el-table-column>
 
           <el-table-column prop="status" label="ROLE" width="150">
             <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowUser', params: { id: scope.row.id } }">
+              <span v-if="currentUser.id === scope.row.user.id">
+                {{$t(`fields.accountMembership.role.${scope.row.role}`)}}
+              </span>
+              <a v-else href="javascript:;">
                 <span>{{$t(`fields.accountMembership.role.${scope.row.role}`)}}</span>
-              </router-link>
+              </a>
             </template>
           </el-table-column>
 
           <el-table-column prop="updatedAt" label="UPDATED" align="right" width="200">
             <template slot-scope="scope">
-              <router-link :to="{ name: 'ShowStockable', params: { id: scope.row.id } }">
-                {{scope.row.updatedAt | moment}}
-              </router-link>
+              {{scope.row.updatedAt | moment}}
             </template>
           </el-table-column>
         </el-table>
@@ -110,6 +106,11 @@ export default {
   created () {
     this.listAccountMembership()
   },
+  computed: {
+    currentUser () {
+      return this.$store.state.session.user
+    }
+  },
   methods: {
     listAccountMembership () {
       this.isLoading = true
@@ -118,7 +119,8 @@ export default {
         return freshcom.listAccountMembership({
           search: this.searchKeyword,
           filter: this.filterObject,
-          page: this.page
+          page: this.page,
+          include: 'user'
         }).then(response => {
           this.memberships = response.data
           this.allCount = response.meta.allCount
