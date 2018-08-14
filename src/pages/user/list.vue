@@ -67,7 +67,7 @@
               <span v-if="currentUser.id === scope.row.user.id">
                 {{$t(`fields.accountMembership.role.${scope.row.role}`)}}
               </span>
-              <a v-else href="javascript:;">
+              <a v-else @click="changeRole(scope.row)" href="javascript:;">
                 <span>{{$t(`fields.accountMembership.role.${scope.row.role}`)}}</span>
               </a>
             </template>
@@ -81,6 +81,32 @@
         </el-table>
       </query-result>
     </div>
+  </div>
+
+  <div slot="launchable" class="launchable">
+    <el-dialog :show-close="false" :visible="isChangingRole" title="Change Role" width="300px">
+
+      <el-form>
+        <el-form @submit.native.prevent="updateRole()" label-width="50px" size="small">
+          <el-form-item label="Role" required>
+            <el-select v-model="membershipDraft.role">
+              <el-option label="Read Only" value="readOnly"></el-option>
+              <el-option label="Support Specialist" value="supportSpecialist"></el-option>
+              <el-option label="Goods Specialist" value="goodsSpecialist"></el-option>
+              <el-option label="Marketing Specialist" value="marketingSpecialist"></el-option>
+              <el-option label="Manager" value="manager"></el-option>
+              <el-option label="Developer" value="developer"></el-option>
+              <el-option label="Administrator" value="administrator"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </el-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button :disabled="isUpdatingRole" @click="closeChangeRoleDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isUpdatingRole" @click="updateRole()" type="primary" size="small">Save</el-button>
+      </div>
+    </el-dialog>
   </div>
 </content-container>
 </template>
@@ -98,6 +124,11 @@ export default {
   data () {
     return {
       memberships: [],
+      targetMembership: {},
+      membershipDraft: {},
+      isChangingRole: false,
+      isUpdatingRole: false,
+
       isLoading: false,
       allCount: 0,
       totalCount: 0
@@ -129,6 +160,41 @@ export default {
           this.isLoading = false
         }).catch(errors => {
           this.isLoading = false
+        })
+      })
+    },
+
+    changeRole (membership) {
+      this.isChangingRole = true
+      this.targetMembership = membership
+      this.membershipDraft = {
+        id: membership.id,
+        type: 'AccountMembership',
+        role: membership.role
+      }
+    },
+
+    closeChangeRoleDialog () {
+      this.isChangingRole = false
+    },
+
+    updateRole () {
+      this.isUpdatingRole = true
+
+      withLiveMode(() => {
+        return freshcom.updateAccountMembership(this.membershipDraft.id, this.membershipDraft).then(response => {
+          this.targetMembership.role = response.data.role
+          this.$message({
+            showClose: true,
+            message: `Role changed successfully.`,
+            type: 'success'
+          })
+
+          this.isUpdatingRole = false
+          this.closeChangeRoleDialog()
+        }).catch(errors => {
+          this.isUpdatingRole = false
+          throw errors
         })
       })
     }

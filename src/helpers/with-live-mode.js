@@ -18,5 +18,7 @@ export default function (callback) {
   }).catch(response => {
     freshcom.setAccessToken(currentAccessToken)
     freshcom.setRefreshToken(currentRefreshToken)
+
+    throw response
   })
 }

@@ -44,52 +44,6 @@
     </div>
   </div>
 </content-container>
-
-<!-- <div class="page-wrapper">
-
-  <div>
-    <el-menu :router="true" default-active="/customers" mode="horizontal" class="secondary-nav">
-      <el-menu-item :route="{ name: 'ListCustomer' }" index="/customers">Customers</el-menu-item>
-    </el-menu>
-    <locale-selector @change="loadCustomer()" class="pull-right"></locale-selector>
-  </div>
-
-  <div>
-    <el-card class="main-card">
-      <div slot="header">
-        <div v-if="isViewingTestData" class="test-data-banner">
-          <div class="banner-content">TEST DATA</div>
-        </div>
-        <span style="line-height: 36px;">Edit Customer</span>
-
-        <div style="float: right;">
-          <el-button @click="back()" plain size="small">
-            Cancel
-          </el-button>
-
-          <el-button @click="submit()" size="small" type="primary">
-            Save
-          </el-button>
-        </div>
-      </div>
-
-      <div class="data">
-        <customer-form v-model="customerDraft" :errors="errors"></customer-form>
-      </div>
-
-      <div class="footer">
-        <el-button @click="back()" plain size="small">
-          Cancel
-        </el-button>
-
-        <el-button @click="submit()" type="primary" size="small" class="pull-right">
-          Save
-        </el-button>
-      </div>
-    </el-card>
-  </div>
-
-</div> -->
 </template>
 
 <script>

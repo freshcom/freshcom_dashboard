@@ -20,7 +20,7 @@
     <el-select v-model="formModel.role" @change="updateValue()" placeholder="Select a role">
       <el-option label="Read Only" value="readOnly"></el-option>
       <el-option label="Support Specialist" value="supportSpecialist"></el-option>
-      <el-option label="Goods Specialist" value="supportSpecialist"></el-option>
+      <el-option label="Goods Specialist" value="goodsSpecialist"></el-option>
       <el-option label="Marketing Specialist" value="marketingSpecialist"></el-option>
       <el-option label="Manager" value="manager"></el-option>
       <el-option label="Developer" value="developer"></el-option>

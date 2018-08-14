@@ -112,6 +112,14 @@ const sdk = {
     }).catch(this._processHttpError)
   },
 
+  updateAccountMembership (id, fields = {}, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+
+    return this.http.patch(`/account_memberships/${id}`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
   //
   // MARK: Password Reset Token
   //
