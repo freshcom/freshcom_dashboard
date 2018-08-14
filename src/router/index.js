@@ -15,6 +15,8 @@ import ForgotPasswordPage from '@/pages/forgot-password'
 
 import ListUserPage from '@/pages/user/list'
 import NewUserPage from '@/pages/user/new'
+import ShowUserPage from '@/pages/user/show'
+import EditUserPage from '@/pages/user/edit'
 
 // Storefront
 import ListOrderPage from '@/pages/order/list'
@@ -171,6 +173,28 @@ const router = new Router({
       path: '/users/new',
       name: 'NewUser',
       component: NewUserPage
+    },
+    {
+      path: '/users/:id',
+      name: 'ShowUser',
+      component: ShowUserPage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { id: route.params.id, callbackPath: query.callbackPath }
+      }
+    },
+    {
+      path: '/users/:id/edit',
+      name: 'EditUser',
+      component: EditUserPage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { id: route.params.id, callbackPath: query.callbackPath }
+      }
     },
     {
       path: '/orders',

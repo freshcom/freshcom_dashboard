@@ -191,6 +191,12 @@ const sdk = {
     }).catch(this._processHttpError)
   },
 
+  retrieveUser (id, params = {}, options = {}) {
+    return this.http.get(`/users/${id}`, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
   createUser (fields = {}, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.post('/users', payload, { params: params }).then(response => {
@@ -205,6 +211,24 @@ const sdk = {
     }).catch(this._processHttpError)
   },
 
+  updateUser (id, fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.patch(`/users/${id}`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  deleteUser (id, params = {}, options = {}) {
+    return this.http.delete(`/users/${id}`, { params: params }).then(response => {
+      if (response.data) {
+        return SimpleJAS.deserialize(response.data)
+      }
+    }).catch(this._processHttpError)
+  },
+
+  //
+  // Data Import
+  //
   createDataImport (fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.post('/data_imports', payload, { params: params }).then(response => {

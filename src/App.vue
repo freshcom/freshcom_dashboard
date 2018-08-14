@@ -677,6 +677,11 @@ a {
   padding: 5px;
 }
 
+.el-button.el-button--mini.tiny {
+  font-size: 11px;
+  padding: 5px 10px;
+}
+
 /* Code Mirror */
 .el-tab-pane .CodeMirror {
   height: 800px;

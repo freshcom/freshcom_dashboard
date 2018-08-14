@@ -146,7 +146,7 @@ export default {
     listAccountMembership () {
       this.isLoading = true
 
-      withLiveMode(() => {
+      return withLiveMode(() => {
         return freshcom.listAccountMembership({
           search: this.searchKeyword,
           filter: this.filterObject,

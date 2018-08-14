@@ -209,6 +209,7 @@ export default {
       if (routePath.startsWith('/sms-templates')) { return '/sms' }
 
       if (routePath.startsWith('/notification-triggers')) { return '/notification-triggers' }
+      if (routePath.startsWith('/users')) { return '/users' }
 
       return routePath
     },
