@@ -155,9 +155,16 @@ const sdk = {
   //
   // MARK: Password
   //
-  updatePassword (fields, params = {}, options = {}) {
+  resetPassword (fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.patch(`/password`, payload, { params: params }).then(response => {
+      return {}
+    }).catch(this._processHttpError)
+  },
+
+  updatePassword (id, fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.patch(`/passwords/${id}`, payload, { params: params }).then(response => {
       return {}
     }).catch(this._processHttpError)
   },

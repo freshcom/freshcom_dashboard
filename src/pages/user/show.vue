@@ -24,6 +24,7 @@
     </div>
 
     <div class="brief-action-group">
+      <el-button @click="changePassword()" size="small" plain>Change Password</el-button>
       <router-link :to="{ name: 'EditUser', params: { id: this.user.id } }" class="el-button el-button--small is-plain">
         Edit
       </router-link>
@@ -82,6 +83,21 @@
         <el-button :loading="isDeletingUser" @click="deleteUser()" type="danger" size="small">Delete</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog :show-close="false" :visible="isChangingPassword" title="Change password" width="400px">
+      <el-form>
+        <el-form @submit.native.prevent="updatePassword()" label-width="120px" size="small">
+          <el-form-item :error="errorMsgs.value" label="New Password" required>
+            <el-input v-model="password.value" id="password" type="password" placeholder="Enter a new password..."></el-input>
+          </el-form-item>
+        </el-form>
+      </el-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button :disabled="isUpdatingPassword" @click="closeChangePasswordDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isUpdatingPassword" @click="updatePassword()" type="primary" size="small" :disabled="!password.value">Change password</el-button>
+      </div>
+    </el-dialog>
   </div>
 </content-container>
 </template>
@@ -89,6 +105,7 @@
 <script>
 import freshcom from '@/freshcom-sdk'
 import withLiveMode from '@/helpers/with-live-mode'
+import translateErrors from '@/helpers/translate-errors'
 import User from '@/models/user'
 
 import resourcePageMixinFactory from '@/mixins/resource-page'
@@ -109,11 +126,22 @@ export default {
       isLoading: false,
 
       isConfirmingDeleteUser: false,
-      isDeletingUser: false
+      isDeletingUser: false,
+
+      isChangingPassword: false,
+      isUpdatingPassword: false,
+
+      password: {},
+      errors: {}
     }
   },
   created () {
     this.loadUser()
+  },
+  computed: {
+    errorMsgs () {
+      return translateErrors(this.errors, 'password')
+    }
   },
   methods: {
     loadUser () {
@@ -126,6 +154,41 @@ export default {
         }).catch(errors => {
           this.isLoading = false
           throw errors
+        })
+      })
+    },
+
+    changePassword () {
+      this.password = {
+        type: 'Password',
+        value: ''
+      }
+      this.errors = {}
+
+      this.isChangingPassword = true
+    },
+
+    closeChangePasswordDialog () {
+      this.isChangingPassword = false
+    },
+
+    updatePassword () {
+      this.isUpdatingPassword = true
+
+      withLiveMode(() => {
+        return freshcom.updatePassword(this.user.id, this.password).then(() => {
+          this.$message({
+            showClose: true,
+            message: `Password changed successfully.`,
+            type: 'success'
+          })
+
+          this.isUpdatingPassword = false
+          this.closeChangePasswordDialog()
+        }).catch(response => {
+          this.errors = response.errors
+          this.isUpdatingPassword = false
+          throw response
         })
       })
     },

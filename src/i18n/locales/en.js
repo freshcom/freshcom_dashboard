@@ -12,6 +12,19 @@ export default {
     },
     required: '{name} is required.',
     invalid: '{name} is invalid.',
+    passwordResetToken: {
+      username: {
+        notFound: 'This email is not registered.'
+      }
+    },
+    password: {
+      value: {
+        length: 'Password must be at least 8 characters long.'
+      },
+      confirmPassword: {
+        notMatch: 'Confirm password does not match the new password.'
+      }
+    },
     user: {
       confirmPassword: {
         notMatch: 'Confirm password does not match the password.'

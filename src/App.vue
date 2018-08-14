@@ -327,7 +327,8 @@ input::-webkit-inner-spin-button {
     }
 
     .detail {
-      padding: 0 120px 0 91px;
+      // padding: 0 120px 0 91px;
+      padding-left: 91px;
       height: 80px;
       vertical-align: middle;
 

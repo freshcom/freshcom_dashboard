@@ -7,11 +7,14 @@ import { DEFAULT_PAGE_SIZE } from '@/env'
 import store from '@/store'
 
 import HomePage from '@/pages/home'
+
+// Identity
 import LoginPage from '@/pages/login'
 import RegisterPage from '@/pages/register'
 import ProfilePage from '@/pages/profile'
 
 import ForgotPasswordPage from '@/pages/forgot-password'
+import ResetPasswordPage from '@/pages/reset-password'
 
 import ListUserPage from '@/pages/user/list'
 import NewUserPage from '@/pages/user/new'
@@ -150,6 +153,17 @@ const router = new Router({
       path: '/forgot-password',
       name: 'ForgotPassword',
       component: ForgotPasswordPage
+    },
+    {
+      path: '/reset-password',
+      name: 'ResetPassword',
+      component: ResetPasswordPage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { resetToken: query.token }
+      }
     },
     {
       path: '/profile',
@@ -815,7 +829,7 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   let isSessionReady = store.state.session.ready
-  let excludedRouteNames = ['Login', 'Register', 'ForgotPassword']
+  let excludedRouteNames = ['Login', 'Register', 'ForgotPassword', 'ResetPassword']
 
   let _resolve
   let currentUserPromise = new Promise((resolve) => {

@@ -113,7 +113,7 @@ export default {
       this.password = {
         type: 'User',
         currentPassword: '',
-        newPassword: '',
+        password: '',
         confirmPassword: ''
       }
       this.errors = {}
@@ -161,28 +161,24 @@ export default {
 
     submit () {
       this.isUpdating = true
-
-      let currentAccessToken = this.$store.state.session.token.access_token
-      let liveAccessToken = this.$store.state.session.liveToken.access_token
-
-      freshcom.setAccessToken(liveAccessToken)
       this.userDraft.username = this.userDraft.email
-      freshcom.updateCurrentUser(this.userDraft).then(user => {
-        this.$message({
-          showClose: true,
-          message: `Profile saved successfully.`,
-          type: 'success'
+
+      withLiveMode(() => {
+        return freshcom.updateCurrentUser(this.userDraft).then(response => {
+          this.$message({
+            showClose: true,
+            message: `Profile saved successfully.`,
+            type: 'success'
+          })
+
+          this.$store.dispatch('session/setUser', response.data)
+
+          this.isUpdating = false
+        }).catch(response => {
+          this.errors = response.errors
+          this.isUpdating = false
+          throw response
         })
-
-        this.$store.dispatch('session/setUser', user)
-
-        this.isUpdating = false
-        freshcom.setAccessToken(currentAccessToken)
-      }).catch(response => {
-        this.errors = response.errors
-        this.isUpdating = false
-        freshcom.setAccessToken(currentAccessToken)
-        throw response
       })
     }
   }

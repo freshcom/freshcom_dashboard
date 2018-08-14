@@ -12,7 +12,7 @@
     <el-input v-model="formModel.name" @input="updateValue()" id="name" placeholder="Enter a name..."></el-input>
   </el-form-item>
 
-  <el-form-item :error="errorMsgs.password" label="Password" required>
+  <el-form-item v-if="!formModel.id" :error="errorMsgs.password" label="Password" required>
     <el-input v-model="formModel.password" @input="updateValue()" id="password" type="password" placeholder="Enter your password..."></el-input>
   </el-form-item>
 
