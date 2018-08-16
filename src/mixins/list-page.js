@@ -65,6 +65,7 @@ export default function (opts = {}) {
         if (_.isEqual(newObject, oldObject)) {
           return
         }
+        this.filterObjectDraft = _.cloneDeep(this.filterObject)
         this[opts.listMethodName]()
       },
 

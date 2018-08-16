@@ -15,14 +15,10 @@
           <filter-condition v-model="filterObjectDraft" filter-key="role" default="">
             <span slot="key">Role</span>
             <div slot="value">
-              <select value="$eq">
-                <option value="$eq">is equal to</option>
+              <select v-model="filterObjectDraft.role">
+                <option value="">Please select a role</option>
+                <option v-for="role in roles" :key="role" :value="role">is {{$t(`fields.accountMembership.role.${role}`)}}</option>
               </select>
-
-              <div style="vertical-align: middle;" class="m-t-5">
-                <icon name="share" class="fa-flip-vertical" scale="0.8"></icon>
-                <input v-model="filterObjectDraft.role" type="text">
-              </div>
             </div>
           </filter-condition>
         </filter-button>
@@ -112,6 +108,7 @@
 </template>
 
 <script>
+import { ROLES } from '@/env'
 import freshcom from '@/freshcom-sdk'
 import withLiveMode from '@/helpers/with-live-mode'
 
@@ -123,6 +120,7 @@ export default {
   mixins: [ListPageMixin],
   data () {
     return {
+      roles: ROLES,
       memberships: [],
       targetMembership: {},
       membershipDraft: {},

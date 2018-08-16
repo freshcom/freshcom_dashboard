@@ -6,3 +6,12 @@ export const STRIPE_TEST_PUBLISHABLE_KEY = process.env.STRIPE_TEST_PUBLISHABLE_K
 export const STRIPE_LIVE_PUBLISHABLE_KEY = process.env.STRIPE_LIVE_PUBLISHABLE_KEY
 export const STRIPE_LIVE_CLIENT_ID = process.env.STRIPE_LIVE_CLIENT_ID
 export const STRIPE_TEST_CLIENT_ID = process.env.STRIPE_TEST_CLIENT_ID
+export const ROLES = [
+  'readOnly',
+  'supportSpecialist',
+  'marketingSpecialist',
+  'goodsSpecialist',
+  'manager',
+  'developer',
+  'administrator'
+]

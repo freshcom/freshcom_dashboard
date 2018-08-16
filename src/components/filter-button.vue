@@ -80,12 +80,22 @@ export default {
     },
 
     setFilter () {
+      let compact = _.pickBy(this.draft, (v) => {
+        if (v === '' || v === undefined) { return false }
+        return true
+      })
+
+      if (_.isEqual(this.current, compact)) {
+        this.$emit('cancel')
+        return
+      }
+
       let q
-      if (_.isEmpty(this.draft)) {
+      if (_.isEmpty(compact)) {
         q = _.omit(this.$route.query, ['filter', 'page'])
       } else {
         q = _.omit(this.$route.query, 'page')
-        q.filter = this.draft
+        q.filter = compact
       }
 
       this.$router.replace({ name: this.$route.name, query: q })

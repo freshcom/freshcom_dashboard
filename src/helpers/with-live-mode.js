@@ -7,7 +7,7 @@ export default function (callback) {
   let currentRefreshToken = store.state.session.token.refresh_token
 
   let liveAccessToken = store.state.session.liveToken.access_token
-  let liveRefreshToken = store.state.session.liveToken.access_token
+  let liveRefreshToken = store.state.session.liveToken.refresh_token
 
   freshcom.setAccessToken(liveAccessToken)
   freshcom.setRefreshToken(liveRefreshToken)
