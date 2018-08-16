@@ -46,7 +46,7 @@
 
     <p class="pull-left"><router-link :to="{ name: 'Login' }" >« Log in</router-link></p>
     <p class="pull-right">
-      Don't have an account? <a href="#">Sign up</a>
+      Don't have an account? <router-link :to="{ name: 'Register' }">Sign up</router-link>
     </p>
   </div>
 </div>

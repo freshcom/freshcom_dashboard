@@ -11,6 +11,6 @@ describe('Forgot Password Page', function () {
   it('should show success when email is provided', function () {
     cy.get('input').type('forgot-password@example.com')
     cy.get('button[type="submit"]').click()
-    cy.get('.el-alert--success').should('be.visible')
+    cy.get('.el-form-item__error').should('be.visible')
   })
 })

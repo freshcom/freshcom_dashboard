@@ -207,7 +207,11 @@ const sdk = {
   createUser (fields = {}, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.post('/users', payload, { params: params }).then(response => {
-      return SimpleJAS.deserialize(response.data)
+      if (response.status === 201) {
+        return SimpleJAS.deserialize(response.data)
+      }
+
+      return response.data
     }).catch(this._processHttpError)
   },
 

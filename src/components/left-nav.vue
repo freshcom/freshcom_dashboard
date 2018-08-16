@@ -114,7 +114,7 @@
 
     <el-menu-item index="/users">
       <icon name="id-card" scale="0.9"></icon>
-      <span>Team</span>
+      <span id="nav-team">Team</span>
     </el-menu-item>
 
     <el-menu-item :router="{ name: 'APIHome' }" index="/api">
