@@ -17,7 +17,7 @@ import '@/assets/element-theme.scss'
 import vueMoment from 'vue-moment'
 import money from 'v-money'
 
-import App from './app'
+import App from '@/app.vue'
 import LeftNav from '@/components/left-nav'
 import TopNav from '@/components/top-nav'
 import LocaleSelector from '@/components/locale-selector'
@@ -78,12 +78,18 @@ Vue.use(money, { precision: 2, masked: false, prefix: '$ ' })
 
 Vue.config.productionTip = false
 
-/* eslint-disable no-new */
+// new Vue({
+//   el: '#app',
+//   router,
+//   store,
+//   i18n,
+//   template: '<App/>',
+//   components: { App }
+// })
+
 new Vue({
-  el: '#app',
   router,
   store,
   i18n,
-  template: '<App/>',
-  components: { App }
-})
+  render: h => h(App)
+}).$mount('#app')
