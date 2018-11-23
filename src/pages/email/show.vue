@@ -14,7 +14,7 @@
   <div slot="content-header">
     <div class="brief">
       <div class="avatar">
-        <icon name="file-code-o" class="avatar-icon"></icon>
+        <icon name="file-code" class="avatar-icon"></icon>
       </div>
 
       <div class="detail">

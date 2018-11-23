@@ -462,8 +462,8 @@
 </template>
 
 <script>
-import 'vue-awesome/icons/cc-visa'
-import 'vue-awesome/icons/cc-mastercard'
+import 'vue-awesome/icons/brands/cc-visa'
+import 'vue-awesome/icons/brands/cc-mastercard'
 
 import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'

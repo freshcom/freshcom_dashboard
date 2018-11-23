@@ -17,7 +17,7 @@
     </p>
   </div>
 
-  <el-menu mode="vertical" :router="true" :default-active="selected" class="primary-nav">
+  <el-menu mode="vertical" :router="true" :default-active="selected">
     <el-menu-item :route="{ name: 'Home' }" index="/">
       <icon name="home" scale="0.9"></icon>
       <span>Home</span>
@@ -29,7 +29,7 @@
         <span id="nav-storefront">Storefront</span>
       </template>
       <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">
-        <icon name="file-text" scale="0.9"></icon>
+        <icon name="file-alt" scale="0.9"></icon>
         <span id="nav-orders">Orders</span>
       </el-menu-item>
       <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
@@ -44,11 +44,11 @@
 
     <el-submenu index="balance">
       <template slot="title">
-        <icon name="bank" scale="0.9"></icon>
+        <icon name="university" scale="0.9"></icon>
         <span>Balance</span>
       </template>
       <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">
-        <icon name="money" scale="0.9"></icon>
+        <icon name="money-bill-alt"></icon>
         <span>Payments</span>
       </el-menu-item>
     </el-submenu>
@@ -82,19 +82,19 @@
         <span>Unlockables</span>
       </el-menu-item>
       <el-menu-item :route="{ name: 'ListDepositable' }" index="/depositables">
-        <icon name="diamond" scale="0.9"></icon>
+        <icon name="gem" scale="0.9"></icon>
         <span>Depositables</span>
       </el-menu-item>
     </el-submenu>
 
     <el-submenu index="notification">
       <template slot="title">
-        <icon name="send" scale="0.9"></icon>
+        <icon name="paper-plane" scale="0.9"></icon>
         <span>Notification</span>
       </template>
 
       <el-menu-item :route="{ name: 'ListNotificationTrigger' }" index="/notification-triggers">
-        <icon name="external-link" scale="0.9"></icon>
+        <icon name="external-link-alt" scale="0.9"></icon>
         <span>Triggers</span>
       </el-menu-item>
       <el-menu-item :route="{ name: 'ListEmail' }" index="/emails">
@@ -144,17 +144,17 @@
 <script>
 import _ from 'lodash'
 
-import 'vue-awesome/icons/send'
+import 'vue-awesome/icons/paper-plane'
 import 'vue-awesome/icons/home'
 import 'vue-awesome/icons/cubes'
 import 'vue-awesome/icons/unlock-alt'
 import 'vue-awesome/icons/file'
 import 'vue-awesome/icons/archive'
-import 'vue-awesome/icons/exchange'
+import 'vue-awesome/icons/exchange-alt'
 import 'vue-awesome/icons/truck'
 import 'vue-awesome/icons/terminal'
 import 'vue-awesome/icons/folder-open'
-import 'vue-awesome/icons/diamond'
+import 'vue-awesome/icons/gem'
 
 import 'vue-awesome/icons/cog'
 import 'vue-awesome/icons/podcast'
@@ -263,9 +263,12 @@ export default {
     border-right: 0px;
   }
 
-  .el-submenu__title, .el-menu-item {
+  .el-submenu__title, .el-menu-item, .el-submenu .el-menu-item {
     height: 40px;
     line-height: 40px;
+    svg {
+      margin-right: 6px;
+    }
   }
 
   .account {

@@ -34,7 +34,7 @@
     <div class="data full">
       <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
         <div slot="no-content">
-          <p><icon name="money" scale="3"></icon></p>
+          <p><icon name="money-bill-alt" scale="3"></icon></p>
           <p>
             <span>You haven't created any payment yet.</span>
             <a href="javascript:;">Learn more &rarr;</a>

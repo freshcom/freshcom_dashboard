@@ -23,27 +23,27 @@ import TopNav from '@/components/top-nav'
 import LocaleSelector from '@/components/locale-selector'
 
 import 'vue-awesome/icons/filter' // Filter
-import 'vue-awesome/icons/sign-in' // Import
-import 'vue-awesome/icons/sign-out' // Export
+import 'vue-awesome/icons/sign-in-alt' // Import
+import 'vue-awesome/icons/sign-out-alt' // Export
 import 'vue-awesome/icons/share' // Filter
 import 'vue-awesome/icons/folder' // File Collection
 import 'vue-awesome/icons/user' // Customer
 import 'vue-awesome/icons/plus'
-import 'vue-awesome/icons/file-text' // Order
+import 'vue-awesome/icons/file-alt' // Order
 import 'vue-awesome/icons/tag' // Product
 import 'vue-awesome/icons/tags' // Product Collection
-import 'vue-awesome/icons/dollar' // Product Collection
+import 'vue-awesome/icons/dollar-sign' // Price
 import 'vue-awesome/icons/truck' // Fulfillment
 import 'vue-awesome/icons/unlock' // Unlock
-import 'vue-awesome/icons/external-link' // Notification Trigger
-import 'vue-awesome/icons/file-code-o' // Email & SMS Template
+import 'vue-awesome/icons/external-link-alt' // Notification Trigger
+import 'vue-awesome/icons/regular/file-code' // Email & SMS Template
 import 'vue-awesome/icons/envelope' // Email
 import 'vue-awesome/icons/comment' // SMS
 import 'vue-awesome/icons/cubes' // Stockable
 import 'vue-awesome/icons/shopping-bag' // Fulfillment Package
 import 'vue-awesome/icons/shopping-cart' // Storefront
-import 'vue-awesome/icons/bank' // Balance
-import 'vue-awesome/icons/money' // Payment
+import 'vue-awesome/icons/university' // Balance
+import 'vue-awesome/icons/money-bill-alt' // Payment
 import 'vue-awesome/icons/search' // Search
 import 'vue-awesome/icons/id-card' // Team
 

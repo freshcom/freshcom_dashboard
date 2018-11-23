@@ -45,7 +45,7 @@
             </p>
 
             <span slot="reference" class="m-l-10">
-              <icon name="question-circle-o" class="v-middle"></icon>
+              <icon name="question-circle" class="v-middle"></icon>
             </span>
           </el-popover>
         </el-form-item>
@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import 'vue-awesome/icons/question-circle-o'
+import 'vue-awesome/icons/regular/question-circle'
 
 import freshcom from '@/freshcom-sdk'
 import translateErrors from '@/helpers/translate-errors'

@@ -16,7 +16,7 @@
             <span id="nav-storefront">Storefront</span>
           </template>
           <el-menu-item :route="{ name: 'ListOrder' }" index="/orders">
-            <icon name="file-text" scale="0.9"></icon>
+            <icon name="file-alt" scale="0.9"></icon>
             <span id="nav-orders">Orders</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListProduct' }" index="/products">
@@ -35,7 +35,7 @@
             <span>Balance</span>
           </template>
           <el-menu-item :route="{ name: 'ListPayment' }" index="/payments">
-            <icon name="money" scale="0.9"></icon>
+            <icon name="money-bill-alt" scale="0.9"></icon>
             <span>Payments</span>
           </el-menu-item>
 <!--           <el-menu-item :route="{ name: 'ListUnlock' }" index="/unlocks">
@@ -73,11 +73,11 @@
             <span>Unlockables</span>
           </el-menu-item>
           <el-menu-item :route="{ name: 'ListDepositable' }" index="/depositables">
-            <icon name="diamond" scale="0.9"></icon>
+            <icon name="gem" scale="0.9"></icon>
             <span>Depositables</span>
           </el-menu-item>
 <!--           <el-menu-item index="stockTransfers">
-            <icon name="exchange" scale="0.9"></icon>
+            <icon name="exchange-alt" scale="0.9"></icon>
             <span>Stock Transfers</span>
           </el-menu-item>
           <el-menu-item index="branches">
@@ -111,7 +111,7 @@
 
         <el-submenu index="notification">
           <template slot="title">
-            <icon name="send" scale="0.9"></icon>
+            <icon name="paper-plane" scale="0.9"></icon>
             <span>Notification</span>
           </template>
 
@@ -188,12 +188,12 @@ import 'vue-awesome/icons/cubes'
 import 'vue-awesome/icons/unlock-alt'
 import 'vue-awesome/icons/file'
 import 'vue-awesome/icons/archive'
-import 'vue-awesome/icons/exchange'
+import 'vue-awesome/icons/exchange-alt'
 import 'vue-awesome/icons/truck'
 import 'vue-awesome/icons/terminal'
 import 'vue-awesome/icons/id-card'
 import 'vue-awesome/icons/folder-open'
-import 'vue-awesome/icons/diamond'
+import 'vue-awesome/icons/gem'
 
 import 'vue-awesome/icons/cog'
 import 'vue-awesome/icons/podcast'

@@ -14,7 +14,7 @@
   <div slot="content-header">
     <div class="brief">
       <div class="avatar">
-        <icon name="money" class="avatar-icon"></icon>
+        <icon name="money-bill-alt" class="avatar-icon"></icon>
       </div>
 
       <div class="detail">

@@ -72,7 +72,7 @@
             <el-button @click="addDataImport()" plain size="small">
               <span class="with-icon">
                 <span class="icon-wrapper">
-                  <icon name="sign-in" scale="0.65"></icon>
+                  <icon name="sign-in-alt" scale="0.65"></icon>
                 </span>
                 <span>Import</span>
               </span>
@@ -81,7 +81,7 @@
             <el-button plain size="small">
               <span class="with-icon">
                 <span class="icon-wrapper">
-                  <icon name="sign-out" scale="0.65"></icon>
+                  <icon name="sign-out-alt" scale="0.65"></icon>
                 </span>
                 <span>Export</span>
               </span>
@@ -114,7 +114,7 @@
           <el-button @click="addDataImport()" plain size="small">
             <span class="with-icon">
               <span class="icon-wrapper">
-                <icon name="sign-in" scale="0.65"></icon>
+                <icon name="sign-in-alt" scale="0.65"></icon>
               </span>
               <span>Import products</span>
             </span>

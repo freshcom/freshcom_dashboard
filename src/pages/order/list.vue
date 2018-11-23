@@ -78,7 +78,7 @@
     <div class="data full">
       <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
         <div slot="no-content">
-          <p><icon name="file-text" scale="3"></icon></p>
+          <p><icon name="file-alt" scale="3"></icon></p>
           <p>
             <span>You haven't created any order yet.</span>
             <a href="javascript:;">Learn more &rarr;</a>

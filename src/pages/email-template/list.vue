@@ -54,7 +54,7 @@
     <div class="data full">
       <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
         <div slot="no-content">
-          <p><icon name="file-code-o" scale="3"></icon></p>
+          <p><icon name="file-code" scale="3"></icon></p>
           <p>
             <span>You haven't created any email template yet.</span>
             <a href="javascript:;">Learn more &rarr;</a>

@@ -20,9 +20,6 @@
 </template>
 
 <script>
-import 'vue-awesome/icons/user-circle-o'
-import 'vue-awesome/icons/bell'
-import 'vue-awesome/icons/book'
 import freshcom from '@/freshcom-sdk'
 
 export default {
