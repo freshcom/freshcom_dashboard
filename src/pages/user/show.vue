@@ -58,7 +58,7 @@
             <dd>{{user.email}}</dd>
 
             <dt>Role</dt>
-            <dd>{{$t(`fields.accountMembership.role.${user.role}`)}}</dd>
+            <dd>{{$t(`fields.user.role.${user.role}`)}}</dd>
           </dl>
         </div>
       </div>

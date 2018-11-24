@@ -17,7 +17,7 @@
             <div slot="value">
               <select v-model="filterObjectDraft.role">
                 <option value="">Please select a role</option>
-                <option v-for="role in roles" :key="role" :value="role">is {{$t(`fields.accountMembership.role.${role}`)}}</option>
+                <option v-for="role in roles" :key="role" :value="role">is {{$t(`fields.user.role.${role}`)}}</option>
               </select>
             </div>
           </filter-condition>
@@ -46,25 +46,22 @@
   <div slot="content-body">
     <div class="data full">
       <query-result :is-loading="isLoading" :total-count="totalCount" :all-count="allCount" :page="page">
-        <el-table :data="memberships" slot="content">
+        <el-table :data="users" slot="content">
           <el-table-column prop="name" label="USER">
             <template slot-scope="scope">
-              <router-link v-if="scope.row.userKind === 'managed'" :to="{ name: 'ShowUser', params: { id: scope.row.user.id } }" class="primary">
-                <span>{{scope.row.userName}} (<span>{{scope.row.userUsername}}</span>)</span>
+              <router-link :to="{ name: 'ShowUser', params: { id: scope.row.id } }" class="primary">
+                <span>{{scope.row.username}}</span>
               </router-link>
-              <span v-else>
-                {{scope.row.userName}} (<span>{{scope.row.userUsername}}</span>)
-              </span>
             </template>
           </el-table-column>
 
           <el-table-column prop="status" label="ROLE" width="150">
             <template slot-scope="scope">
-              <span v-if="currentUser.id === scope.row.user.id">
-                {{$t(`fields.accountMembership.role.${scope.row.role}`)}}
+              <span v-if="currentUser.id === scope.id">
+                {{$t(`fields.user.role.${scope.row.role}`)}}
               </span>
               <a v-else @click="changeRole(scope.row)" href="javascript:;">
-                <span>{{$t(`fields.accountMembership.role.${scope.row.role}`)}}</span>
+                <span>{{$t(`fields.user.role.${scope.row.role}`)}}</span>
               </a>
             </template>
           </el-table-column>
@@ -113,7 +110,7 @@ import freshcom from '@/freshcom-sdk'
 import withLiveMode from '@/helpers/with-live-mode'
 
 import listPageMixinFactory from '@/mixins/list-page'
-let ListPageMixin = listPageMixinFactory({ listMethodName: 'listAccountMembership' })
+let ListPageMixin = listPageMixinFactory({ listMethodName: 'listUser' })
 
 export default {
   name: 'ListUser',
@@ -121,7 +118,7 @@ export default {
   data () {
     return {
       roles: ROLES,
-      memberships: [],
+      users: [],
       targetMembership: {},
       membershipDraft: {},
       isChangingRole: false,
@@ -133,7 +130,7 @@ export default {
     }
   },
   created () {
-    this.listAccountMembership()
+    this.listUser()
   },
   computed: {
     currentUser () {
@@ -141,17 +138,17 @@ export default {
     }
   },
   methods: {
-    listAccountMembership () {
+    listUser () {
       this.isLoading = true
 
       return withLiveMode(() => {
-        return freshcom.listAccountMembership({
+        return freshcom.listUser({
           search: this.searchKeyword,
           filter: this.filterObject,
-          page: this.page,
-          include: 'user'
+          page: this.page
         }).then(response => {
-          this.memberships = response.data
+          this.users = response.data
+          console.log(this.users)
           this.allCount = response.meta.allCount
           this.totalCount = response.meta.totalCount
 

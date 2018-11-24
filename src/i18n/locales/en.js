@@ -85,7 +85,7 @@ export default {
     }
   },
   fields: {
-    accountMembership: {
+    user: {
       role: {
         readOnly: 'Read Only',
         supportSpecialist: 'Support Specialist',

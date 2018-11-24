@@ -106,16 +106,16 @@ const sdk = {
   //
   // MARK: Account Membership
   //
-  listAccountMembership (params = {}, options = {}) {
-    return this.http.get('/account_memberships', { params: params }).then(response => {
+  listUser (params = {}, options = {}) {
+    return this.http.get('/users', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
 
-  updateAccountMembership (id, fields = {}, params = {}, options = {}) {
+  updateUser (id, fields = {}, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
 
-    return this.http.patch(`/account_memberships/${id}`, payload, { params: params }).then(response => {
+    return this.http.patch(`/users/${id}`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },

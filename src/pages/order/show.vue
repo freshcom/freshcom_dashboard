@@ -425,7 +425,7 @@
                   </el-table-column>
 
                   <el-table-column align="right">
-                    <template slot-scope="scope">
+                    <template>
                       <p class="action-group">
                       </p>
                     </template>
