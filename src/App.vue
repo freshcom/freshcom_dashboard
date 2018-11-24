@@ -147,6 +147,14 @@ input::-webkit-inner-spin-button {
 }
 
 //
+// MARK: Dropdown
+//
+
+.el-dropdown .el-dropdown__caret-button::before {
+  background: #dcdfe6;
+}
+
+//
 // MARK: Input
 //
 .el-input {
@@ -289,7 +297,9 @@ input::-webkit-inner-spin-button {
   .brief-action-group {
     display: inline-block;
     float: right;
-    line-height: 82px;
+    display: flex;
+    align-items: center;
+    height: 82px;
   }
 
   .brief {

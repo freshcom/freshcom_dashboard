@@ -8,7 +8,7 @@
     <el-input v-model="formModel.username" @input="updateValue()" name="username" placeholder="Enter a username..."></el-input>
   </el-form-item>
 
-  <el-form-item :error="errorMsgs.name" label="Name" required>
+  <el-form-item :error="errorMsgs.name" label="Name">
     <el-input v-model="formModel.name" @input="updateValue()" name="name" placeholder="Enter a name..."></el-input>
   </el-form-item>
 

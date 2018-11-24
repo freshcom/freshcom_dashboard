@@ -24,10 +24,13 @@
     </div>
 
     <div class="brief-action-group">
-      <el-button @click="changePassword()" size="small" plain>Change Password</el-button>
-      <router-link :to="{ name: 'EditUser', params: { id: this.user.id } }" class="el-button el-button--small is-plain">
+      <el-dropdown size="small" split-button @click="editUser()" @command="(cmd) => {this[cmd]()}">
         Edit
-      </router-link>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="changePassword">Change Password</el-dropdown-item>
+          <el-dropdown-item command="changeRole">Change Role</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
     </div>
   </div>
 
@@ -156,6 +159,10 @@ export default {
           throw errors
         })
       })
+    },
+
+    editUser () {
+      this.$store.dispatch('pushRoute', { name: 'EditUser', params: { id: this.user.id } })
     },
 
     changePassword () {

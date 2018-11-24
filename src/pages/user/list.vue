@@ -51,6 +51,7 @@
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowUser', params: { id: scope.row.id } }" class="primary">
                 <span>{{scope.row.username}}</span>
+                <span v-if="scope.row.name"> ({{scope.row.name}})</span>
               </router-link>
             </template>
           </el-table-column>
@@ -82,7 +83,7 @@
       <el-form>
         <el-form @submit.native.prevent="updateRole()" label-width="50px" size="small">
           <el-form-item label="Role" required>
-            <el-select v-model="membershipDraft.role">
+            <el-select v-model="userDraft.role">
               <el-option label="Read Only" value="readOnly"></el-option>
               <el-option label="Support Specialist" value="supportSpecialist"></el-option>
               <el-option label="Goods Specialist" value="goodsSpecialist"></el-option>
@@ -119,8 +120,8 @@ export default {
     return {
       roles: ROLES,
       users: [],
-      targetMembership: {},
-      membershipDraft: {},
+      targetUser: {},
+      userDraft: {},
       isChangingRole: false,
       isUpdatingRole: false,
 
@@ -158,13 +159,13 @@ export default {
       })
     },
 
-    changeRole (membership) {
+    changeRole (user) {
       this.isChangingRole = true
-      this.targetMembership = membership
-      this.membershipDraft = {
-        id: membership.id,
-        type: 'AccountMembership',
-        role: membership.role
+      this.targetUser = user
+      this.userDraft = {
+        id: user.id,
+        type: 'User',
+        role: user.role
       }
     },
 
@@ -176,8 +177,8 @@ export default {
       this.isUpdatingRole = true
 
       withLiveMode(() => {
-        return freshcom.updateAccountMembership(this.membershipDraft.id, this.membershipDraft).then(response => {
-          this.targetMembership.role = response.data.role
+        return freshcom.updateUser(this.userDraft.id, this.userDraft).then(response => {
+          this.targetUser.role = response.data.role
           this.$message({
             showClose: true,
             message: `Role changed successfully.`,
