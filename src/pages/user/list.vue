@@ -148,7 +148,6 @@ export default {
           page: this.page
         }).then(response => {
           this.users = response.data
-          console.log(this.users)
           this.allCount = response.meta.allCount
           this.totalCount = response.meta.totalCount
 

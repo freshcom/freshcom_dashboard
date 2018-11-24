@@ -21,7 +21,7 @@
     "vue": "^2.5.17",
     "vue-awesome": "^3.2.0",
     "vue-codemirror": "^4.0.5",
-    "vue-i18n": "^7.3.2",
+    "vue-i18n": "^8.3.2",
     "vue-moment": "^3.2.0",
     "vue-router": "^3.0.1",
     "vue-stripe-elements-plus": "^0.2.8",
@@ -29,7 +29,7 @@
     "vuex-router-sync": "^5.0.0"
   },
   "devDependencies": {
-    "@kazupon/vue-i18n-loader": "^0.2.1",
+    "@kazupon/vue-i18n-loader": "^0.3.0",
     "ember-cli-deploy-display-revisions": "^1.0.0",
     "ember-cli-deploy-revision-data": "^1.0.0",
     "ember-cli-deploy-s3": "^1.1.0",
