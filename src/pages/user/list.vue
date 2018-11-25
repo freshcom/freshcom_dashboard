@@ -79,15 +79,12 @@
 
   <div slot="launchable" class="launchable">
     <el-dialog :show-close="false" :visible="isChangingRole" title="Change Role" width="300px">
-
-      <el-form>
-        <el-form @submit.native.prevent="updateRole()" label-width="50px" size="small">
-          <el-form-item label="Role" required>
-            <el-select v-model="userDraft.role">
-              <el-option v-for="role in roles" :key="role" :label="$t(`fields.user.role.${role}`)" :value="role"></el-option>
-            </el-select>
-          </el-form-item>
-        </el-form>
+      <el-form @submit.native.prevent="updateRole()" label-width="50px" size="small">
+        <el-form-item label="Role" required>
+          <el-select v-model="userDraft.role">
+            <el-option v-for="role in roles" :key="role" :label="$t(`fields.user.role.${role}`)" :value="role"></el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
 
       <div slot="footer" class="dialog-footer">
