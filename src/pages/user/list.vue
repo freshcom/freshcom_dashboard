@@ -84,13 +84,7 @@
         <el-form @submit.native.prevent="updateRole()" label-width="50px" size="small">
           <el-form-item label="Role" required>
             <el-select v-model="userDraft.role">
-              <el-option label="Read Only" value="readOnly"></el-option>
-              <el-option label="Support Specialist" value="supportSpecialist"></el-option>
-              <el-option label="Goods Specialist" value="goodsSpecialist"></el-option>
-              <el-option label="Marketing Specialist" value="marketingSpecialist"></el-option>
-              <el-option label="Manager" value="manager"></el-option>
-              <el-option label="Developer" value="developer"></el-option>
-              <el-option label="Administrator" value="administrator"></el-option>
+              <el-option v-for="role in roles" :key="role" :label="$t(`fields.user.role.${role}`)" :value="role"></el-option>
             </el-select>
           </el-form-item>
         </el-form>
@@ -177,7 +171,7 @@ export default {
       this.isUpdatingRole = true
 
       withLiveMode(() => {
-        return freshcom.updateUser(this.userDraft.id, this.userDraft).then(response => {
+        return freshcom.changeUserRole(this.userDraft.id, { value: this.userDraft.role }).then(response => {
           this.targetUser.role = response.data.role
           this.$message({
             showClose: true,

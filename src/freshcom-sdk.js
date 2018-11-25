@@ -104,15 +104,6 @@ const sdk = {
   },
 
   //
-  // MARK: Account Membership
-  //
-  listUser (params = {}, options = {}) {
-    return this.http.get('/users', { params: params }).then(response => {
-      return SimpleJAS.deserialize(response.data)
-    }).catch(this._processHttpError)
-  },
-
-  //
   // MARK: Password Reset Token
   //
   createPasswordResetToken (fields, params = {}, options = {}) {
@@ -184,6 +175,12 @@ const sdk = {
   //
   // MARK: User
   //
+  listUser (params = {}, options = {}) {
+    return this.http.get('/users', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
   retrieveCurrentUser (params = {}, options = {}) {
     return this.http.get('/user', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
@@ -217,6 +214,13 @@ const sdk = {
   updateUser (id, fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.patch(`/users/${id}`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  changeUserRole (id, fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.patch(`/users/${id}/role`, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
