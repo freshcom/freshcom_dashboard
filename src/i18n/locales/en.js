@@ -19,13 +19,16 @@ export default {
     },
     password: {
       value: {
-        length: 'Password must be at least 8 characters long.'
+        length: 'Password must be at least {min} characters long.'
       },
       confirmPassword: {
         notMatch: 'Confirm password does not match the new password.'
       }
     },
     user: {
+      password: {
+        invalid_length: 'Password must be at least {min} characters long.'
+      },
       confirmPassword: {
         notMatch: 'Confirm password does not match the password.'
       },
