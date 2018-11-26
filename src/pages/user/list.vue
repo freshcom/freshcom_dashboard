@@ -81,7 +81,7 @@
     <el-dialog :show-close="false" :visible="isChangingRole" title="Change Role" width="300px">
       <el-form @submit.native.prevent="updateRole()" label-width="50px" size="small">
         <el-form-item label="Role" required>
-          <el-select v-model="userDraft.role">
+          <el-select v-model="roleDraft.value">
             <el-option v-for="role in roles" :key="role" :label="$t(`enums.user.role.${role}`)" :value="role"></el-option>
           </el-select>
         </el-form-item>
@@ -112,7 +112,7 @@ export default {
       roles: ROLES,
       users: [],
       targetUser: {},
-      userDraft: {},
+      roleDraft: {},
       isChangingRole: false,
       isUpdatingRole: false,
 
@@ -153,10 +153,10 @@ export default {
     changeRole (user) {
       this.isChangingRole = true
       this.targetUser = user
-      this.userDraft = {
+      this.roleDraft = {
         id: user.id,
-        type: 'User',
-        role: user.role
+        type: 'Role',
+        value: user.role
       }
     },
 
@@ -168,7 +168,7 @@ export default {
       this.isUpdatingRole = true
 
       withLiveMode(() => {
-        return freshcom.changeUserRole(this.userDraft.id, { value: this.userDraft.role }).then(response => {
+        return freshcom.changeUserRole(this.roleDraft.id, this.roleDraft).then(response => {
           this.targetUser.role = response.data.role
           this.$message({
             showClose: true,
