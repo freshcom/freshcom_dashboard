@@ -50,6 +50,17 @@ export default function (opts = {}) {
 
       currentRoutePath () {
         return this.$store.state.route.fullPath
+      },
+
+      normalizedFilter () {
+        let nf = []
+        for (let key in this.filterObject) {
+          let condition = {}
+          condition[key] = this.filterObject[key]
+          nf.push(condition)
+        }
+
+        return nf
       }
     },
     watch: {

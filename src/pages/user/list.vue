@@ -136,7 +136,7 @@ export default {
       return withLiveMode(() => {
         return freshcom.listUser({
           search: this.searchKeyword,
-          filter: this.filterObject,
+          filter: this.normalizedFilter,
           page: this.page
         }).then(response => {
           this.users = response.data
