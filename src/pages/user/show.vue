@@ -24,7 +24,7 @@
     </div>
 
     <div class="brief-action-group">
-      <el-dropdown size="small" split-button @click="editUser()" @command="(cmd) => {this[cmd]()}">
+      <el-dropdown size="small" split-button @click="editUser()" @command="(cmd) => { this[cmd]() }">
         Edit
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="changePassword">Change Password</el-dropdown-item>
@@ -101,11 +101,27 @@
         <el-button :loading="isUpdatingPassword" @click="updatePassword()" type="primary" size="small" :disabled="!password.value">Change password</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog :show-close="false" :visible="isChangingRole" title="Change Role" width="300px">
+      <el-form @submit.native.prevent="updateRole()" label-width="50px" size="small">
+        <el-form-item label="Role" required>
+          <el-select v-model="roleDraft.value">
+            <el-option v-for="role in roles" :key="role" :label="$t(`enums.user.role.${role}`)" :value="role"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button :disabled="isUpdatingRole" @click="closeChangeRoleDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isUpdatingRole" @click="updateRole()" type="primary" size="small">Save</el-button>
+      </div>
+    </el-dialog>
   </div>
 </content-container>
 </template>
 
 <script>
+import { ROLES } from '@/env'
 import freshcom from '@/freshcom-sdk'
 import withLiveMode from '@/helpers/with-live-mode'
 import translateErrors from '@/helpers/translate-errors'
@@ -125,6 +141,7 @@ export default {
   },
   data () {
     return {
+      roles: ROLES,
       user: User.objectWithDefaults(),
       isLoading: false,
 
@@ -133,6 +150,10 @@ export default {
 
       isChangingPassword: false,
       isUpdatingPassword: false,
+
+      roleDraft: {},
+      isChangingRole: false,
+      isUpdatingRole: false,
 
       password: {},
       errors: {}
@@ -196,6 +217,40 @@ export default {
           this.errors = response.errors
           this.isUpdatingPassword = false
           throw response
+        })
+      })
+    },
+
+    changeRole () {
+      this.isChangingRole = true
+      this.roleDraft = {
+        id: this.user.id,
+        type: 'Role',
+        value: this.user.role
+      }
+    },
+
+    closeChangeRoleDialog () {
+      this.isChangingRole = false
+    },
+
+    updateRole () {
+      this.isUpdatingRole = true
+
+      withLiveMode(() => {
+        return freshcom.changeUserRole(this.roleDraft.id, this.roleDraft).then(response => {
+          this.user.role = response.data.role
+          this.$message({
+            showClose: true,
+            message: `Role changed successfully.`,
+            type: 'success'
+          })
+
+          this.isUpdatingRole = false
+          this.closeChangeRoleDialog()
+        }).catch(errors => {
+          this.isUpdatingRole = false
+          throw errors
         })
       })
     },
