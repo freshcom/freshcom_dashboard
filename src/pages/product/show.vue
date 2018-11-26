@@ -21,7 +21,7 @@
 
       <div class="detail">
         <p>
-          <span>Product {{$t(`fields.product.kind.${product.kind}`)}}</span>
+          <span>Product {{$t(`enums.product.kind.${product.kind}`)}}</span>
           <span>{{product.code}}</span>
         </p>
         <h1>{{product.name}}</h1>
@@ -53,16 +53,16 @@
 
             <dt>Status</dt>
             <dd>
-              {{$t(`fields.product.status.${product.status}`)}}
+              {{$t(`enums.product.status.${product.status}`)}}
             </dd>
 
             <dt>Kind</dt>
             <dd>
-              {{$t(`fields.product.kind.${product.kind}`)}}
+              {{$t(`enums.product.kind.${product.kind}`)}}
             </dd>
 
             <dt>Name Sync</dt>
-            <dd>{{$t(`fields.product.nameSync.${product.nameSync}`)}}</dd>
+            <dd>{{$t(`enums.product.nameSync.${product.nameSync}`)}}</dd>
 
             <dt>Name</dt>
             <dd>{{product.name}}</dd>
@@ -143,12 +143,12 @@
             <el-table-column label="Status" width="80">
               <template slot-scope="scope">
                 <hover-button v-show="scope.row.status === 'active'" @click="deactivateChild(scope.row)" type="primary" hover-type="info">
-                  <span slot="normal">{{$t(`fields.product.status.${scope.row.status}`)}}</span>
+                  <span slot="normal">{{$t(`enums.product.status.${scope.row.status}`)}}</span>
                   <span slot="hover">Deactive</span>
                 </hover-button>
 
                 <hover-button v-show="scope.row.status !== 'active'" @click="activateChild(scope.row)" type="info" hover-type="primary">
-                  <span slot="normal">{{$t(`fields.product.status.${scope.row.status}`)}}</span>
+                  <span slot="normal">{{$t(`enums.product.status.${scope.row.status}`)}}</span>
                   <span slot="hover">Activate</span>
                 </hover-button>
               </template>
@@ -420,7 +420,7 @@ export default {
     },
 
     childKindForDelete () {
-      return this.$t(`fields.product.kind.${this.childForDelete.kind}`).toLowerCase()
+      return this.$t(`enums.product.kind.${this.childForDelete.kind}`).toLowerCase()
     },
 
     fileCollections () {
@@ -528,7 +528,7 @@ export default {
           }
         })
 
-        let childKind = this.$t(`fields.product.kind.${child.kind}`)
+        let childKind = this.$t(`enums.product.kind.${child.kind}`)
         this.$message({
           showClose: true,
           message: `${childKind} activated successfully.`,
@@ -554,7 +554,7 @@ export default {
           }
         })
 
-        let childKind = this.$t(`fields.product.kind.${child.kind}`)
+        let childKind = this.$t(`enums.product.kind.${child.kind}`)
         this.$message({
           showClose: true,
           message: `${childKind} deactivated successfully.`,

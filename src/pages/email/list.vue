@@ -81,10 +81,10 @@
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowEmail', params: { id: scope.row.id } }">
                 <el-tag v-if="scope.row.status == 'active'" :disable-transitions="true" size="mini">
-                  {{$t(`fields.email.status.${scope.row.status}`)}}
+                  {{$t(`enums.email.status.${scope.row.status}`)}}
                 </el-tag>
                 <el-tag v-else :disable-transitions="true" type="info" size="mini">
-                  {{$t(`fields.email.status.${scope.row.status}`)}}
+                  {{$t(`enums.email.status.${scope.row.status}`)}}
                 </el-tag>
               </router-link>
             </template>

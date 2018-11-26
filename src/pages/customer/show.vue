@@ -49,7 +49,7 @@
             </template>
 
             <dt>Status</dt>
-            <dd>{{$t(`fields.customer.status.${customer.status}`)}}</dd>
+            <dd>{{$t(`enums.customer.status.${customer.status}`)}}</dd>
 
             <dt>Name</dt>
             <dd>{{customer.name}}</dd>
@@ -101,10 +101,10 @@
               <template slot-scope="scope">
                 <router-link :to="{ name: 'ShowOrder', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }">
                   <el-tag v-if="scope.row.status === 'opened'" size="mini" class="m-l-10">
-                    {{$t(`fields.order.status.${scope.row.status}`)}}
+                    {{$t(`enums.order.status.${scope.row.status}`)}}
                   </el-tag>
                   <el-tag v-else size="mini" type="info" class="m-l-10">
-                    {{$t(`fields.order.status.${scope.row.status}`)}}
+                    {{$t(`enums.order.status.${scope.row.status}`)}}
                   </el-tag>
                 </router-link>
               </template>

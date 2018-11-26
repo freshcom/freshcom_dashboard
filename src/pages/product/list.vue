@@ -137,12 +137,12 @@
           <el-table-column prop="status" label="STATUS" width="100">
             <template slot-scope="scope">
               <hover-button v-show="scope.row.status === 'active'" @click="deactivateProduct(scope.row)" type="primary" hover-type="info">
-                <span slot="normal">{{$t(`fields.product.status.${scope.row.status}`)}}</span>
+                <span slot="normal">{{$t(`enums.product.status.${scope.row.status}`)}}</span>
                 <span slot="hover">Deactive</span>
               </hover-button>
 
               <hover-button v-show="scope.row.status !== 'active'" @click="activateProduct(scope.row)" type="info" hover-type="primary">
-                <span slot="normal">{{$t(`fields.product.status.${scope.row.status}`)}}</span>
+                <span slot="normal">{{$t(`enums.product.status.${scope.row.status}`)}}</span>
                 <span slot="hover">Activate</span>
               </hover-button>
             </template>

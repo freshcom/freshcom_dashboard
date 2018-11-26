@@ -82,10 +82,10 @@
               <template slot-scope="scope">
                 <router-link :to="{ name: 'ShowProduct', params: { id: scope.row.product.id }, query: { callbackPath: currentRoutePath } }">
                   <el-tag v-if="scope.row.product.status === 'active'" :disable-transitions="true" size="mini">
-                    {{$t(`fields.product.status.${scope.row.product.status}`)}}
+                    {{$t(`enums.product.status.${scope.row.product.status}`)}}
                   </el-tag>
                   <el-tag v-else :disable-transitions="true" type="info" size="mini">
-                    {{$t(`fields.product.status.${scope.row.product.status}`)}}
+                    {{$t(`enums.product.status.${scope.row.product.status}`)}}
                   </el-tag>
                 </router-link>
               </template>

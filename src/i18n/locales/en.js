@@ -84,7 +84,7 @@ export default {
       }
     }
   },
-  fields: {
+  enums: {
     user: {
       role: {
         readOnly: 'Read Only',

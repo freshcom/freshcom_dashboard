@@ -50,12 +50,12 @@
 
             <dt>Status</dt>
             <dd>
-              {{$t(`fields.order.status.${order.status}`)}}
+              {{$t(`enums.order.status.${order.status}`)}}
             </dd>
 
             <dt>Payment Status</dt>
             <dd>
-              {{$t(`fields.order.paymentStatus.${order.paymentStatus}`)}}
+              {{$t(`enums.order.paymentStatus.${order.paymentStatus}`)}}
             </dd>
 
             <dt>Name</dt>
@@ -77,10 +77,10 @@
             <hr>
 
             <dt>Fulfillment Method</dt>
-            <dd>{{$t(`fields.order.fulfillmentMethod.${order.fulfillmentMethod}`)}}</dd>
+            <dd>{{$t(`enums.order.fulfillmentMethod.${order.fulfillmentMethod}`)}}</dd>
 
             <dt>Fulfillment Status</dt>
-            <dd>{{$t(`fields.order.fulfillmentStatus.${order.fulfillmentStatus}`)}}</dd>
+            <dd>{{$t(`enums.order.fulfillmentStatus.${order.fulfillmentStatus}`)}}</dd>
 
             <template v-if="order.fulfillmentMethod === 'ship'">
               <dt>Delivery Address</dt>
@@ -222,10 +222,10 @@
               <template slot-scope="scope">
                 <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id }, query: { callbackPath: currentRoutePath } }">
                   <el-tag v-if="scope.row.status === 'pending'" size="mini" type="warning" class="m-l-10">
-                    {{$t(`fields.payment.status.${scope.row.status}`)}}
+                    {{$t(`enums.payment.status.${scope.row.status}`)}}
                   </el-tag>
                   <el-tag v-else size="mini" type="info" class="m-l-10">
-                    {{$t(`fields.payment.status.${scope.row.status}`)}}
+                    {{$t(`enums.payment.status.${scope.row.status}`)}}
                   </el-tag>
                 </router-link>
               </template>
@@ -314,7 +314,7 @@
                         <span>{{scope.row.name}}</span>
 
                         <el-tag size="mini" type="info" class="m-l-10">
-                          {{$t(`fields.fulfillmentItem.status.${scope.row.status}`)}}
+                          {{$t(`enums.fulfillmentItem.status.${scope.row.status}`)}}
                         </el-tag>
                       </a>
                     </template>
@@ -365,7 +365,7 @@
                   <b>{{scope.row.insertedAt | moment}}</b>
 
                   <el-tag size="mini" type="info" class="m-l-10">
-                    {{$t(`fields.fulfillmentPackage.status.${scope.row.status}`)}}
+                    {{$t(`enums.fulfillmentPackage.status.${scope.row.status}`)}}
                   </el-tag>
                 </a>
               </template>
@@ -374,7 +374,7 @@
             <el-table-column>
               <template slot-scope="scope">
                 <b class="m-l-10">
-                  {{$t(`fields.fulfillmentPackage.systemLabel.${scope.row.systemLabel}`)}}
+                  {{$t(`enums.fulfillmentPackage.systemLabel.${scope.row.systemLabel}`)}}
                 </b>
               </template>
             </el-table-column>
@@ -412,7 +412,7 @@
                         <span>{{scope.row.name}}</span>
 
                         <el-tag size="mini" type="info" class="m-l-10">
-                          {{$t(`fields.returnItem.status.${scope.row.status}`)}}
+                          {{$t(`enums.returnItem.status.${scope.row.status}`)}}
                         </el-tag>
                       </a>
                     </template>
@@ -440,7 +440,7 @@
                   <b>{{scope.row.insertedAt | moment}}</b>
 
                   <el-tag size="mini" type="info" class="m-l-10">
-                    {{$t(`fields.returnPackage.status.${scope.row.status}`)}}
+                    {{$t(`enums.returnPackage.status.${scope.row.status}`)}}
                   </el-tag>
                 </a>
               </template>
@@ -449,7 +449,7 @@
             <el-table-column>
               <template slot-scope="scope">
                 <b class="m-l-10">
-                  {{$t(`fields.returnPackage.systemLabel.${scope.row.systemLabel}`)}}
+                  {{$t(`enums.returnPackage.systemLabel.${scope.row.systemLabel}`)}}
                 </b>
               </template>
             </el-table-column>

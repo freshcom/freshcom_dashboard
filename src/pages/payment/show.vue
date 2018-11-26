@@ -47,12 +47,12 @@
 
             <dt>Status</dt>
             <dd>
-              {{$t(`fields.payment.status.${payment.status}`)}}
+              {{$t(`enums.payment.status.${payment.status}`)}}
             </dd>
 
             <dt>Gateway</dt>
             <dd>
-              {{$t(`fields.payment.gateway.${payment.gateway}`)}}
+              {{$t(`enums.payment.gateway.${payment.gateway}`)}}
             </dd>
 
             <template v-if="payment.method">
@@ -106,7 +106,7 @@
                   <b>{{scope.row.amountCents | dollar}}</b>
 
                   <el-tag v-if="scope.row.gateway !== payment.gateway" size="mini" type="info" class="m-l-10">
-                    {{$t(`fields.refund.gateway.${scope.row.gateway}`)}}
+                    {{$t(`enums.refund.gateway.${scope.row.gateway}`)}}
                   </el-tag>
                 </a>
               </template>

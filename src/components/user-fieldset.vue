@@ -10,7 +10,7 @@
 
   <el-form-item :error="errorMsgs.role" label="Role" id="role" required>
     <el-select v-model="formModel.role" @change="updateValue()" placeholder="Select a role">
-      <el-option v-for="role in roles" :key="role" :label="$t(`fields.user.role.${role}`)" :value="role"></el-option>
+      <el-option v-for="role in roles" :key="role" :label="$t(`enums.user.role.${role}`)" :value="role"></el-option>
     </el-select>
   </el-form-item>
 

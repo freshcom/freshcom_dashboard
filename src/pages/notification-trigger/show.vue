@@ -55,7 +55,7 @@
             <dd>{{notificationTrigger.description}}</dd>
 
             <dt>Action Type</dt>
-            <dd>{{$t(`fields.notificationTrigger.actionType.${notificationTrigger.actionType}`)}}</dd>
+            <dd>{{$t(`enums.notificationTrigger.actionType.${notificationTrigger.actionType}`)}}</dd>
 
             <template v-if="notificationTrigger.actionType === 'webhook'">
               <dt>Action Target</dt>

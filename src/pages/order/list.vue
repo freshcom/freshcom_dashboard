@@ -119,24 +119,24 @@
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowOrder', params: { id: scope.row.id, callbackPath: this.currentRoutePath } }">
                 <el-tag v-if="scope.row.status === 'opened'" :disable-transitions="true" size="mini">
-                  {{$t(`fields.order.status.${scope.row.status}`)}}
+                  {{$t(`enums.order.status.${scope.row.status}`)}}
                 </el-tag>
                 <el-tag v-else :disable-transitions="true" type="info" size="mini">
-                  {{$t(`fields.order.status.${scope.row.status}`)}}
+                  {{$t(`enums.order.status.${scope.row.status}`)}}
                 </el-tag>
 
                 <el-tag v-if="scope.row.paymentStatus === 'pending'" :disable-transitions="true" size="mini" type="warning">
                   Pending Payment
                 </el-tag>
                 <el-tag v-else :disable-transitions="true" type="info" size="mini">
-                  {{$t(`fields.order.paymentStatus.${scope.row.paymentStatus}`)}}
+                  {{$t(`enums.order.paymentStatus.${scope.row.paymentStatus}`)}}
                 </el-tag>
 
                 <el-tag v-if="scope.row.fulfillmentStatus === 'pending'" :disable-transitions="true" size="mini" type="warning">
                   Pending Fulfillment
                 </el-tag>
                 <el-tag v-else :disable-transitions="true" type="info" size="mini">
-                  {{$t(`fields.order.fulfillmentStatus.${scope.row.fulfillmentStatus}`)}}
+                  {{$t(`enums.order.fulfillmentStatus.${scope.row.fulfillmentStatus}`)}}
                 </el-tag>
               </router-link>
             </template>

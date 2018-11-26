@@ -17,7 +17,7 @@
             <div slot="value">
               <select v-model="filterObjectDraft.role">
                 <option value="">Please select a role</option>
-                <option v-for="role in roles" :key="role" :value="role">is {{$t(`fields.user.role.${role}`)}}</option>
+                <option v-for="role in roles" :key="role" :value="role">is {{$t(`enums.user.role.${role}`)}}</option>
               </select>
             </div>
           </filter-condition>
@@ -59,10 +59,10 @@
           <el-table-column prop="status" label="ROLE" width="150">
             <template slot-scope="scope">
               <span v-if="currentUser.id === scope.id">
-                {{$t(`fields.user.role.${scope.row.role}`)}}
+                {{$t(`enums.user.role.${scope.row.role}`)}}
               </span>
               <a v-else @click="changeRole(scope.row)" href="javascript:;">
-                <span>{{$t(`fields.user.role.${scope.row.role}`)}}</span>
+                <span>{{$t(`enums.user.role.${scope.row.role}`)}}</span>
               </a>
             </template>
           </el-table-column>
@@ -82,7 +82,7 @@
       <el-form @submit.native.prevent="updateRole()" label-width="50px" size="small">
         <el-form-item label="Role" required>
           <el-select v-model="userDraft.role">
-            <el-option v-for="role in roles" :key="role" :label="$t(`fields.user.role.${role}`)" :value="role"></el-option>
+            <el-option v-for="role in roles" :key="role" :label="$t(`enums.user.role.${role}`)" :value="role"></el-option>
           </el-select>
         </el-form-item>
       </el-form>

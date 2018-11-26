@@ -52,7 +52,7 @@
 
             <dt>Status</dt>
             <dd>
-              {{$t(`fields.price.status.${price.status}`)}}
+              {{$t(`enums.price.status.${price.status}`)}}
             </dd>
 
             <dt>Name</dt>

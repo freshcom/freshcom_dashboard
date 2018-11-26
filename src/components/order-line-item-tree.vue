@@ -15,7 +15,7 @@
 
     <el-col :span="8 + node.level" class="text-right">
       <span v-if="mode === 'detail'" class="m-r-20">
-        {{$t(`fields.orderLineItem.fulfillmentStatus.${data.fulfillmentStatus}`)}}
+        {{$t(`enums.orderLineItem.fulfillmentStatus.${data.fulfillmentStatus}`)}}
       </span>
 
       <span class="m-r-10">

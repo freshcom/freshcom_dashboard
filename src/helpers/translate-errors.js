@@ -14,8 +14,10 @@ export default function (errors, namespace, interpolations = {}) {
     }
 
     let errorCode = errorObj['code']
+    let errorMeta = errorObj['meta']
+
     let errorKey = `errors.${namespace}.${k}.${errorCode}`
-    let errorInterpolations = Object.assign({}, { name: fieldName }, interpolations)
+    let errorInterpolations = Object.assign({}, { name: fieldName }, errorMeta, interpolations)
     let errorMsg = i18n.t(errorKey, errorInterpolations)
 
     if (errorKey === errorMsg) {

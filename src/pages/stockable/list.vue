@@ -93,10 +93,10 @@
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowStockable', params: { id: scope.row.id } }">
                 <el-tag v-if="scope.row.status == 'active'" :disable-transitions="true" size="mini">
-                  {{$t(`fields.unlockable.status.${scope.row.status}`)}}
+                  {{$t(`enums.unlockable.status.${scope.row.status}`)}}
                 </el-tag>
                 <el-tag v-else :disable-transitions="true" type="info" size="mini">
-                  {{$t(`fields.unlockable.status.${scope.row.status}`)}}
+                  {{$t(`enums.unlockable.status.${scope.row.status}`)}}
                 </el-tag>
               </router-link>
             </template>

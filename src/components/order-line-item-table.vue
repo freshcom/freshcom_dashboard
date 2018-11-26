@@ -20,7 +20,7 @@
       <a href="javascript:;" class="primary">
         <span>{{scope.row.name}}</span>
         <el-tag size="mini" type="info" class="m-l-10">
-          {{$t(`fields.orderLineItem.fulfillmentStatus.${scope.row.fulfillmentStatus}`)}}
+          {{$t(`enums.orderLineItem.fulfillmentStatus.${scope.row.fulfillmentStatus}`)}}
         </el-tag>
       </a>
     </template>

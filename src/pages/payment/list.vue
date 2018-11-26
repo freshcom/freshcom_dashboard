@@ -54,10 +54,10 @@
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }">
                 <el-tag v-if="scope.row.status == 'active'" :disable-transitions="true" size="mini">
-                  {{$t(`fields.payment.status.${scope.row.status}`)}}
+                  {{$t(`enums.payment.status.${scope.row.status}`)}}
                 </el-tag>
                 <el-tag v-else :disable-transitions="true" type="info" size="mini">
-                  {{$t(`fields.payment.status.${scope.row.status}`)}}
+                  {{$t(`enums.payment.status.${scope.row.status}`)}}
                 </el-tag>
               </router-link>
             </template>
@@ -66,7 +66,7 @@
           <el-table-column label="GATEWAY">
             <template slot-scope="scope">
               <router-link :to="{ name: 'ShowPayment', params: { id: scope.row.id } }">
-                {{$t(`fields.payment.gateway.${scope.row.gateway}`)}}
+                {{$t(`enums.payment.gateway.${scope.row.gateway}`)}}
               </router-link>
             </template>
           </el-table-column>
@@ -133,12 +133,12 @@
           </el-table-column>
           <el-table-column prop="status" label="Status" width="200">
             <template slot-scope="scope">
-              {{$t(`fields.payment.status.${scope.row.status}`)}}
+              {{$t(`enums.payment.status.${scope.row.status}`)}}
             </template>
           </el-table-column>
           <el-table-column prop="status" label="Gateway" width="100">
             <template slot-scope="scope">
-              {{$t(`fields.payment.gateway.${scope.row.gateway}`)}}
+              {{$t(`enums.payment.gateway.${scope.row.gateway}`)}}
             </template>
           </el-table-column>
           <el-table-column prop="id" label="ID" width="120">
