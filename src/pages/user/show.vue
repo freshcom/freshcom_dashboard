@@ -52,11 +52,6 @@
             <dt>Username</dt>
             <dd>{{user.username}}</dd>
 
-            <dt>Password</dt>
-            <dd>
-              ********
-            </dd>
-
             <dt>Email</dt>
             <dd>{{user.email}}</dd>
 
@@ -90,15 +85,15 @@
     <el-dialog :show-close="false" :visible="isChangingPassword" title="Change password" width="400px">
       <el-form>
         <el-form @submit.native.prevent="updatePassword()" label-width="120px" size="small">
-          <el-form-item :error="errorMsgs.value" label="New Password" required>
-            <el-input v-model="password.value" id="password" type="password" placeholder="Enter a new password..."></el-input>
+          <el-form-item :error="errorMsgs.newPassword" label="New Password" required>
+            <el-input v-model="password.newPassword" id="password" type="password" placeholder="Enter a new password..."></el-input>
           </el-form-item>
         </el-form>
       </el-form>
 
       <div slot="footer" class="dialog-footer">
         <el-button :disabled="isUpdatingPassword" @click="closeChangePasswordDialog()" plain size="small">Cancel</el-button>
-        <el-button :loading="isUpdatingPassword" @click="updatePassword()" type="primary" size="small" :disabled="!password.value">Change password</el-button>
+        <el-button :loading="isUpdatingPassword" @click="updatePassword()" type="primary" size="small" :disabled="!password.newPassword">Change password</el-button>
       </div>
     </el-dialog>
 
@@ -189,7 +184,7 @@ export default {
     changePassword () {
       this.password = {
         type: 'Password',
-        value: ''
+        newPassword: ''
       }
       this.errors = {}
 
@@ -204,7 +199,7 @@ export default {
       this.isUpdatingPassword = true
 
       withLiveMode(() => {
-        return freshcom.updatePassword(this.user.id, this.password).then(() => {
+        return freshcom.changePasswordById(this.user.id, this.password).then(() => {
           this.$message({
             showClose: true,
             message: `Password changed successfully.`,

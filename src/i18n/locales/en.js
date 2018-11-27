@@ -7,7 +7,7 @@ export default {
   errors: {
     common: {
       required: '{name} is required.',
-      invalid_format: '{name} is invalid.',
+      invalidFormat: '{name} is invalid.',
       taken: '{name} is taken.'
     },
     required: '{name} is required.',
@@ -18,8 +18,8 @@ export default {
       }
     },
     password: {
-      value: {
-        length: 'Password must be at least {min} characters long.'
+      newPassword: {
+        invalidLength: 'Password must be at least {min} characters long.'
       },
       confirmPassword: {
         notMatch: 'Confirm password does not match the new password.'
@@ -27,7 +27,7 @@ export default {
     },
     user: {
       password: {
-        invalid_length: 'Password must be at least {min} characters long.'
+        invalidLength: 'Password must be at least {min} characters long.'
       },
       confirmPassword: {
         notMatch: 'Confirm password does not match the password.'
