@@ -1,5 +1,7 @@
 export const API_ROOT_URL = process.env.VUE_APP_API_ROOT_URL
 export const HOST_URL = process.env.VUE_APP_HOST_URL
+export const SIGNIN_DOMAIN = process.env.VUE_APP_SIGNIN_DOMAIN
+export const SIGNIN_SCHEME = process.env.VUE_APP_SIGNIN_SCHEME
 export const DEFAULT_PAGE_SIZE = 25
 export const DEFAULT_LOCALE = 'en'
 export const STRIPE_TEST_PUBLISHABLE_KEY = process.env.VUE_APP_STRIPE_TEST_PUBLISHABLE_KEY

@@ -171,6 +171,11 @@ const router = new Router({
       component: ProfilePage
     },
     {
+      path: '/team',
+      name: 'TeamOverview',
+      component: TeamOverviewPage
+    },
+    {
       path: '/users',
       name: 'ListUser',
       component: ListUserPage,

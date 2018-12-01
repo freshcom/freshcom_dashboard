@@ -2,8 +2,12 @@
 <content-container :disable-test-banner="true">
   <div slot="header">
     <el-menu :router="true" default-active="/users" mode="horizontal" class="header-menu">
+      <el-menu-item :route="{ name: 'TeamOverview' }" index="/team">
+        Overview
+      </el-menu-item>
+
       <el-menu-item :route="{ name: 'ListUser' }" index="/users">
-        Team
+        Users
       </el-menu-item>
     </el-menu>
   </div>
@@ -34,7 +38,7 @@
                 <span class="icon-wrapper">
                   <icon name="plus" scale="0.6"></icon>
                 </span>
-                <span>New</span>
+                <span>Add</span>
               </span>
             </router-link>
           </el-button-group>

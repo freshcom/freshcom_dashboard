@@ -112,7 +112,7 @@
       <span>File Storage</span>
     </el-menu-item>
 
-    <el-menu-item index="/users">
+    <el-menu-item index="/team">
       <icon name="id-card" scale="0.9"></icon>
       <span id="nav-team">Team</span>
     </el-menu-item>
