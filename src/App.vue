@@ -529,7 +529,7 @@ input::-webkit-inner-spin-button {
     }
 
     .foot {
-      padding: 10px 20px;
+      padding: 10px;
       border-top: 1px solid #eaeefb;
 
       &.no-divider {
@@ -624,17 +624,12 @@ input::-webkit-inner-spin-button {
 //
 // MARK: Utils
 //
-
 .cursor-pointer {
   cursor: pointer;
 }
 
 .text-center {
   text-align: center;
-}
-
-p.btn-group {
-  display: inline-block;
 }
 
 .v-middle {
@@ -657,6 +652,7 @@ p.btn-group {
   display: table;
   content: "";
 }
+
 .clearfix:after {
   clear: both
 }
@@ -752,6 +748,20 @@ a {
 /* END Utils */
 
 /* START Common Overwrite */
+p.btn-group {
+  display: inline-block;
+}
+
+hr {
+  margin: 0;
+  border: none;
+  border-bottom: 1px solid #d1dbe5;
+}
+
+small {
+  font-size: 12px;
+}
+
 .hidden {
   display: none;
 }
@@ -797,18 +807,8 @@ a {
   padding: 0px;
 }
 
-hr {
-  margin: 0;
-  border: none;
-  border-bottom: 1px solid #d1dbe5;
-}
-
 .el-form-item {
   margin: 22px 0px;
-}
-
-small {
-  font-size: 12px;
 }
 
 .el-autocomplete {
