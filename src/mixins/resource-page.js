@@ -13,6 +13,8 @@ export default function (opts = {}) {
         this[opts.loadMethodName]().then(() => {
           this.isReady = true
         })
+      } else {
+        this.isReady = true
       }
     },
     methods: {
