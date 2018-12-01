@@ -133,9 +133,9 @@
       </span>
     </el-menu-item>
 
-    <el-menu-item index="settings">
+    <el-menu-item :router="{ name: 'AccountOverview' }" index="/account">
       <icon name="cog" scale="0.9"></icon>
-      <span>Settings</span>
+      <span>Account Settings</span>
     </el-menu-item>
   </el-menu>
 </div>

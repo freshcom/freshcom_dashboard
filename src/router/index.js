@@ -16,10 +16,15 @@ import ProfilePage from '@/pages/profile'
 import ForgotPasswordPage from '@/pages/forgot-password'
 import ResetPasswordPage from '@/pages/reset-password'
 
+// Team
+import TeamOverviewPage from '@/pages/team/overview'
 import ListUserPage from '@/pages/user/list'
 import NewUserPage from '@/pages/user/new'
 import ShowUserPage from '@/pages/user/show'
 import EditUserPage from '@/pages/user/edit'
+
+// Account
+import AccountOverviewPage from '@/pages/account/overview'
 
 // Storefront
 import ListOrderPage from '@/pages/order/list'
@@ -214,6 +219,11 @@ const router = new Router({
 
         return { id: route.params.id, callbackPath: query.callbackPath }
       }
+    },
+    {
+      path: '/account',
+      name: 'AccountOverview',
+      component: AccountOverviewPage
     },
     {
       path: '/orders',
