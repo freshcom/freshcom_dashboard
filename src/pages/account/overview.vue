@@ -1,5 +1,5 @@
 <template>
-<content-container>
+<content-container :disable-test-banner="true">
   <div slot="content-body">
     <div class="data">
       <div class="block" style="margin-top: 0px;">
@@ -34,9 +34,11 @@
 
 <script>
 import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+import withLiveMode from '@/helpers/with-live-mode'
 import AccountFieldset from '@/components/account-fieldset'
 import resourcePageMixinFactory from '@/mixins/resource-page'
-let ResourcePageMixin = resourcePageMixinFactory()
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadAccount' })
 
 export default {
   name: 'AccountOverview',
@@ -49,13 +51,57 @@ export default {
   },
   data () {
     return {
+      account: {},
       accountDraft: {},
-      errors: {}
+      errors: {},
+      isUpdating: false
     }
   },
   computed: {
-    account () {
-      return this.$store.state.session.account
+    mode () {
+      return this.$store.state.session.mode
+    }
+  },
+  methods: {
+    loadAccount () {
+      this.isLoading = true
+
+      return withLiveMode(() => {
+        return freshcom.retrieveAccount().then(response => {
+          this.account = response.data
+          this.accountDraft = _.cloneDeep(this.account)
+
+          this.isLoading = false
+        }).catch(errors => {
+          this.isLoading = false
+          throw errors
+        })
+      })
+    },
+
+    submit () {
+      this.isUpdating = true
+
+      return withLiveMode(() => {
+        return freshcom.updateCurrentAccount(this.accountDraft).then(response => {
+          this.$message({
+            showClose: true,
+            message: `Account updated successfully.`,
+            type: 'success'
+          })
+
+          this.account = response.data
+          if (this.mode === 'live') {
+            this.$store.dispatch('session/setAccount', this.account)
+          }
+
+          this.isUpdating = false
+        }).catch(response => {
+          this.errors = response.errors
+          this.isUpdating = false
+          throw response
+        })
+      })
     }
   }
 }

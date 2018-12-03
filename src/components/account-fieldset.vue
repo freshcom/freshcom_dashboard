@@ -4,8 +4,8 @@
     <el-input v-model="formModel.name" @input="updateValue()" name="name" placeholder="Enter a name..."></el-input>
   </el-form-item>
 
-  <el-form-item :error="errorMsgs.alias" label="Alias">
-    <el-input v-model="formModel.alias" @input="updateValue()" name="alias" placeholder="Enter a alias..."></el-input>
+  <el-form-item :error="errorMsgs.handle" label="Handle">
+    <el-input v-model="formModel.handle" @input="updateValue()" name="handle" placeholder="Enter a alias..."></el-input>
   </el-form-item>
 
   <el-form-item label="Default Locale">

@@ -241,6 +241,16 @@ const sdk = {
   },
 
   //
+  // MARK: Account
+  //
+  updateCurrentAccount (fields = {}, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.patch('/account', payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  //
   // Data Import
   //
   createDataImport (fields, params = {}, options = {}) {
