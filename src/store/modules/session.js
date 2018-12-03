@@ -88,7 +88,13 @@ export default {
 
         dispatch('startLiveTokenRefresher')
 
-        return Promise.all([dispatch('getAccount'), dispatch('getUser')])
+        return Promise.all([dispatch('getAccount'), dispatch('getUser')]).then(data => {
+          let account = data[0]
+
+          if (!account.isReadyForLiveTransaction) {
+            dispatch('setMode', 'test')
+          }
+        })
       })
     },
 
@@ -114,16 +120,17 @@ export default {
         commit(MT.TEST_TOKEN_REFRESHER_STOPPED)
         commit(MT.TOKEN_CHANGED, state.liveToken)
         commit(MT.MODE_CHANGED, 'live')
-        return
+        return dispatch('getAccount')
       }
 
       return freshcom.createToken({
-        refresh_token: state.token.refresh_token, grant_type: 'refresh_token', scope: `account_id:${state.account.testAccountId}`
+        refresh_token: state.token.refresh_token, grant_type: 'refresh_token', scope: `aid:${state.account.testAccountId}`
       }).then(token => {
         commit(MT.TOKEN_CHANGED, token)
         commit(MT.MODE_CHANGED, 'test')
 
         dispatch('startTestTokenRefresher')
+        return dispatch('getAccount')
       })
     },
 
@@ -196,7 +203,7 @@ export default {
       })
     },
 
-    setUser ({ state, commit }, user) {
+    setUser ({ commit }, user) {
       commit(MT.USER_CHANGED, user)
     },
 
@@ -206,13 +213,13 @@ export default {
         commit(MT.ACCOUNT_CHANGED, account)
         dispatch('setResourceLocale', account.defaultLocale, { root: true })
 
-        if (!account.isReadyForLiveTransaction) {
-          dispatch('setMode', 'test')
-        }
-
         return account
       })
-    }
+    },
+
+    setAccount ({ commit }, account) {
+      commit(MT.ACCOUNT_CHANGED, account)
+    },
   },
 
   mutations: {
