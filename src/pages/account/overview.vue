@@ -17,7 +17,7 @@
           </el-row>
 
           <div class="foot text-right">
-            <el-button @click="back()" plain size="small">
+            <el-button @click="reset()" plain size="small">
               Cancel
             </el-button>
 
@@ -63,6 +63,10 @@ export default {
     }
   },
   methods: {
+    reset () {
+      this.accountDraft = _.cloneDeep(this.account)
+    },
+
     loadAccount () {
       this.isLoading = true
 

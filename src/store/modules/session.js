@@ -219,7 +219,7 @@ export default {
 
     setAccount ({ commit }, account) {
       commit(MT.ACCOUNT_CHANGED, account)
-    },
+    }
   },
 
   mutations: {
