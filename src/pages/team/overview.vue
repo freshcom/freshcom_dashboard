@@ -22,8 +22,7 @@
         <div class="body">
           <dl>
             <dt>Managed user sign-in link</dt>
-            <dd v-if="isViewingTestData">{{testSigninLink}}</dd>
-            <dd v-else>{{liveSigninLink}}</dd>
+            <dd>{{signinLink}}</dd>
 
             <dl>
               <dt>Publishable Refresh Token</dt>
@@ -54,11 +53,8 @@ export default {
     account () {
       return this.$store.state.session.account
     },
-    liveSigninLink () {
-      return `${SIGNIN_SCHEME}${this.account.id}.${SIGNIN_DOMAIN}`
-    },
-    testSigninLink () {
-      return `${SIGNIN_SCHEME}${this.account.testAccountId}.${SIGNIN_DOMAIN}`
+    signinLink () {
+      return `${SIGNIN_SCHEME}${this.account.handle}.${SIGNIN_DOMAIN}`
     }
   }
 }
