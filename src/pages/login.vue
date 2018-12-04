@@ -9,8 +9,30 @@
         Please sign in to continue
       </div>
 
-      <el-form @submit.native.prevent="attemptLogin(form)" label-width="80px" size="small">
-        <el-form-item label="Email">
+      <el-form @submit.native.prevent="attemptLogin(form)" label-position="top" size="small">
+        <el-form-item label="Sign in as" style="margin-top: 10px;">
+          <el-radio-group v-model="form.type">
+            <el-radio-button label="standard">Standard User</el-radio-button>
+            <el-radio-button label="managed">Managed User</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+
+        <el-form-item v-if="form.type === 'managed'" label="Account ID or Account Handle">
+          <div slot="label">
+            <el-tooltip popper-class="tooltip-poppper-md" effect="dark" content="A 36-characters account ID provided by your administrator" placement="right">
+              <span class="tooltip-trigger">Account ID</span>
+            </el-tooltip>
+            <span> or </span>
+            <el-tooltip popper-class="tooltip-poppper-md" effect="dark" content="A friendly account identifier from your administrator that includes alphanumeric characters or dashes" placement="right">
+              <span class="tooltip-trigger">Account Handle</span>
+            </el-tooltip>
+          </div>
+          <el-input v-model="form.accountHandle" id="accountHandle"></el-input>
+        </el-form-item>
+
+        <el-form-item>
+          <span slot="label" v-if="form.type === 'standard'">Email</span>
+          <span v-else>Username</span>
           <el-input v-model="form.username" id="username"></el-input>
         </el-form-item>
 
@@ -23,14 +45,14 @@
           <router-link :to="{ name: 'ForgotPassword'} " class="pull-right">Forgot your password?</router-link>
         </el-form-item>
 
-        <el-form-item>
+        <el-form-item style="margin-bottom: 10px;">
           <el-button :loading="isSubmitting" type="primary" native-type="submit" size="medium">Sign in to your account</el-button>
         </el-form-item>
 
       </el-form>
     </el-card>
 
-    <p class="text-center">Don't have an account? <router-link :to="{ name: 'Register' }" >Sign up</router-link></p>
+    <p class="text-center">New to Freshcom?<br/><router-link :to="{ name: 'Register' }" >Create a new Freshcom account</router-link></p>
   </div>
 </div>
 </template>
@@ -42,6 +64,7 @@ export default {
     return {
       isSubmitting: false,
       form: {
+        type: 'standard',
         username: '',
         password: '',
         rememberMe: false
@@ -102,6 +125,10 @@ h1 {
 
 .center {
   margin: auto;
-  width: 420px;
+  width: 360px;
+}
+
+.tooltip-trigger {
+  text-decoration: underline;
 }
 </style>

@@ -118,6 +118,14 @@ input::-webkit-inner-spin-button {
 }
 
 //
+// MARKR: Tool Tip
+//
+
+.tooltip-poppper-md {
+  width: 200px;
+}
+
+//
 // MARK: Tab
 //
 .el-tabs.center {

@@ -17,7 +17,7 @@ import '@/assets/element-theme.scss'
 import vueMoment from 'vue-moment'
 import money from 'v-money'
 
-import App from '@/app.vue'
+import App from '@/app'
 import LeftNav from '@/components/left-nav'
 import TopNav from '@/components/top-nav'
 import LocaleSelector from '@/components/locale-selector'
