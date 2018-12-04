@@ -147,7 +147,13 @@ const router = new Router({
     {
       path: '/login',
       name: 'Login',
-      component: LoginPage
+      component: LoginPage,
+      props (route) {
+        let queryString = route.fullPath.split('?')[1]
+        let query = qs.parse(queryString)
+
+        return { account: query.account }
+      }
     },
     {
       path: '/register',

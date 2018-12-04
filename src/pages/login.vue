@@ -10,7 +10,7 @@
       </div>
 
       <el-form @submit.native.prevent="attemptLogin(form)" label-position="top" size="small">
-        <el-form-item label="Sign in as" style="margin-top: 10px;">
+        <el-form-item v-if="isTypeChangeable" label="Sign in as" style="margin-top: 10px;">
           <el-radio-group v-model="form.type">
             <el-radio-button label="standard">Standard User</el-radio-button>
             <el-radio-button label="managed">Managed User</el-radio-button>
@@ -20,14 +20,14 @@
         <el-form-item v-if="form.type === 'managed'" label="Account ID or Account Handle">
           <div slot="label">
             <el-tooltip popper-class="tooltip-poppper-md" effect="dark" content="A 36-characters account ID provided by your administrator" placement="right">
-              <span class="tooltip-trigger">Account ID</span>
+              <span class="text-underline">Account ID</span>
             </el-tooltip>
             <span> or </span>
             <el-tooltip popper-class="tooltip-poppper-md" effect="dark" content="A friendly account identifier from your administrator that includes alphanumeric characters or dashes" placement="right">
-              <span class="tooltip-trigger">Account Handle</span>
+              <span class="text-underline">Account Handle</span>
             </el-tooltip>
           </div>
-          <el-input v-model="form.accountHandle" id="accountHandle"></el-input>
+          <el-input v-model="form.account" id="account"></el-input>
         </el-form-item>
 
         <el-form-item>
@@ -49,6 +49,9 @@
           <el-button :loading="isSubmitting" type="primary" native-type="submit" size="medium">Sign in to your account</el-button>
         </el-form-item>
 
+        <small v-if="!isTypeChangeable" class="text-underline">
+          <router-link :to="{ name: 'Login' }" >Sign in using standard user credentials</router-link>
+        </small>
       </el-form>
     </el-card>
 
@@ -60,11 +63,14 @@
 <script>
 export default {
   name: 'Login',
+  props: ['account'],
   data () {
     return {
+      isTypeChangeable: true,
       isSubmitting: false,
       form: {
         type: 'standard',
+        account: '',
         username: '',
         password: '',
         rememberMe: false
@@ -75,6 +81,22 @@ export default {
     if (this.isLoggedIn) {
       this.$store.dispatch('pushRoute', { name: 'Home' })
     }
+
+    if (this.account) {
+      this.form.type = 'managed'
+      this.isTypeChangeable = false
+      this.form.account = this.account
+    }
+  },
+  beforeRouteUpdate (to, from, next) {
+    console.log(to)
+    if (!to.query.account) {
+      this.isTypeChangeable = true
+      this.form.type = 'standard'
+      this.form.account = ''
+    }
+
+    next()
   },
   computed: {
     isLoggedIn () {
@@ -126,9 +148,5 @@ h1 {
 .center {
   margin: auto;
   width: 360px;
-}
-
-.tooltip-trigger {
-  text-decoration: underline;
 }
 </style>

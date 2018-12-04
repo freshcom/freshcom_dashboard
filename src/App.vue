@@ -640,6 +640,10 @@ input::-webkit-inner-spin-button {
   text-align: center;
 }
 
+.text-underline {
+  text-decoration: underline;
+}
+
 .v-middle {
   vertical-align: middle;
 }
