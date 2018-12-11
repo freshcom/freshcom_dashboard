@@ -1,13 +1,13 @@
-describe('Login Page', function () {
+describe('Signin Page', function () {
   beforeEach(function () {
-    cy.visit('/login')
+    cy.visit('/signin')
   })
 
   it('should contain correct text', function () {
     cy.contains('sign in')
   })
 
-  it('should show alert when login using wrong credentials', function () {
+  it('should show alert when signin using wrong credentials', function () {
     cy.get('input#username').type('test@example.com')
     cy.get('input#password').type('invalid')
     cy.get('button[type="submit"]').click()
@@ -15,7 +15,7 @@ describe('Login Page', function () {
     cy.contains('does not match')
   })
 
-  it('should redirect to home page when login using correct credentials', function () {
+  it('should redirect to home page when signin using correct credentials', function () {
     cy.get('input#username').type('test@example.com')
     cy.get('input#password').type('test1234')
     cy.get('button[type="submit"]').click()

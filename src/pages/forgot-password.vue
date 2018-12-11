@@ -44,7 +44,7 @@
       </div>
     </el-card>
 
-    <p class="pull-left"><router-link :to="{ name: 'Login' }" >« Log in</router-link></p>
+    <p class="pull-left"><router-link :to="{ name: 'Signin' }" >« Log in</router-link></p>
     <p class="pull-right">
       Don't have an account? <router-link :to="{ name: 'Register' }">Sign up</router-link>
     </p>

@@ -1,5 +1,5 @@
 <template>
-<div id="login" class="page-wrapper">
+<div id="signin" class="page-wrapper">
   <div class="center">
 
     <h1>Freshcom</h1>
@@ -9,7 +9,7 @@
         Please sign in to continue
       </div>
 
-      <el-form @submit.native.prevent="attemptLogin(form)" label-position="top" size="small">
+      <el-form @submit.native.prevent="signin(form)" label-position="top" size="small">
         <el-form-item v-if="isTypeChangeable" label="Sign in as" style="margin-top: 10px;">
           <el-radio-group v-model="form.type">
             <el-radio-button label="standard">Standard User</el-radio-button>
@@ -19,7 +19,7 @@
 
         <el-form-item v-if="form.type === 'managed'" label="Account ID or Account Handle">
           <div slot="label">
-            <el-tooltip popper-class="tooltip-poppper-md" effect="dark" content="A 36-characters account ID provided by your administrator" placement="right">
+            <el-tooltip popper-class="tooltip-poppper-md" effect="dark" content="A 36-characters account ID provided by your administrator" placement="left">
               <span class="text-underline">Account ID</span>
             </el-tooltip>
             <span> or </span>
@@ -50,7 +50,7 @@
         </el-form-item>
 
         <small v-if="!isTypeChangeable" class="text-underline">
-          <router-link :to="{ name: 'Login' }" >Sign in using standard user credentials</router-link>
+          <router-link :to="{ name: 'Signin' }" >Sign in using standard user credentials</router-link>
         </small>
       </el-form>
     </el-card>
@@ -62,7 +62,7 @@
 
 <script>
 export default {
-  name: 'Login',
+  name: 'Signin',
   props: ['account'],
   data () {
     return {
@@ -104,7 +104,7 @@ export default {
     }
   },
   methods: {
-    attemptLogin (form) {
+    signin (form) {
       this.isSubmitting = true
       this.$store.dispatch('session/create', form).then(() => {
         this.isSubmitting = false
@@ -132,7 +132,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-.page-wrapper#login {
+.page-wrapper#signin {
   margin-top: 50px;
 }
 

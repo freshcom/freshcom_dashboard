@@ -1,6 +1,6 @@
 describe('Order Related Pages', function () {
   before(function () {
-    cy.visit('/login')
+    cy.visit('/signin')
     cy.get('input#username').type('test@example.com')
     cy.get('input#password').type('test1234')
     cy.get('button[type="submit"]').click()

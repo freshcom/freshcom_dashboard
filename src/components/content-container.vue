@@ -115,7 +115,7 @@ export default {
 
     logout () {
       this.$store.dispatch('session/reset')
-      this.$store.dispatch('pushRoute', { name: 'Login' })
+      this.$store.dispatch('pushRoute', { name: 'Signin' })
     }
   }
 }

@@ -58,7 +58,7 @@ export default {
     userDropdownHandler (item) {
       if (item === 'logout') {
         this.$store.dispatch('session/reset')
-        this.$store.dispatch('pushRoute', { name: 'Login' })
+        this.$store.dispatch('pushRoute', { name: 'Signin' })
       }
 
       if (item === 'nuke') {

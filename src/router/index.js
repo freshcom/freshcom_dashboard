@@ -9,7 +9,7 @@ import store from '@/store'
 import HomePage from '@/pages/home'
 
 // Identity
-import LoginPage from '@/pages/login'
+import SigninPage from '@/pages/signin'
 import RegisterPage from '@/pages/register'
 import ProfilePage from '@/pages/profile'
 
@@ -145,9 +145,9 @@ const router = new Router({
       component: HomePage
     },
     {
-      path: '/login',
-      name: 'Login',
-      component: LoginPage,
+      path: '/signin',
+      name: 'Signin',
+      component: SigninPage,
       props (route) {
         let queryString = route.fullPath.split('?')[1]
         let query = qs.parse(queryString)
@@ -850,7 +850,7 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   let isSessionReady = store.state.session.ready
-  let excludedRouteNames = ['Login', 'Register', 'ForgotPassword', 'ResetPassword']
+  let excludedRouteNames = ['Signin', 'Register', 'ForgotPassword', 'ResetPassword']
 
   let _resolve
   let currentUserPromise = new Promise((resolve) => {
@@ -869,7 +869,7 @@ router.beforeEach((to, from, next) => {
 
   currentUserPromise.then(currentUser => {
     if (!currentUser && !_.includes(excludedRouteNames, to.name)) {
-      store.dispatch('pushRoute', { name: 'Login' })
+      store.dispatch('pushRoute', { name: 'Signin' })
     } else {
       next()
     }

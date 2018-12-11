@@ -58,7 +58,7 @@
     </el-card>
 
     <p class="text-center">
-      Already have an account? <router-link :to="{ name: 'Login' }" >Log in</router-link>
+      Already have an account? <router-link :to="{ name: 'Signin' }" >Log in</router-link>
     </p>
   </div>
 </div>
