@@ -80,7 +80,7 @@ export default {
         grant_type: 'password'
       }
       if (form.type === 'managed') {
-        payload.scope = `a:${form.account}`
+        payload.scope = `acc:${form.account}`
       }
 
       return freshcom.createToken(payload).then(token => {
@@ -127,7 +127,7 @@ export default {
       }
 
       return freshcom.createToken({
-        refresh_token: state.token.refresh_token, grant_type: 'refresh_token', scope: `a:${state.account.testAccountId}`
+        refresh_token: state.token.refresh_token, grant_type: 'refresh_token', scope: `acc:${state.account.testAccountId}`
       }).then(token => {
         commit(MT.TOKEN_CHANGED, token)
         commit(MT.MODE_CHANGED, 'test')
