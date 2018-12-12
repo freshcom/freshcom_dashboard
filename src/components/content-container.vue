@@ -19,7 +19,7 @@
             </el-submenu>
 
             <el-submenu index="user">
-              <template slot="title">{{user.name}}</template>
+              <template slot="title">{{user.name || user.username}}</template>
               <el-menu-item @click="nuke()" index="nuke">Nuke</el-menu-item>
               <el-menu-item @click="profile()" index="logout">Profile</el-menu-item>
               <el-menu-item @click="logout()" index="logout">Log Out</el-menu-item>

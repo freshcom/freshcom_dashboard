@@ -11,7 +11,7 @@
 
       <el-form @submit.native.prevent="signin(form)" label-position="top" size="small">
         <el-form-item v-if="isTypeChangeable" label="Sign in as" style="margin-top: 10px;">
-          <el-radio-group v-model="form.type">
+          <el-radio-group v-model="form.type" @input="resetForm()">
             <el-radio-button label="standard">Standard User</el-radio-button>
             <el-radio-button label="managed">Managed User</el-radio-button>
           </el-radio-group>
@@ -89,7 +89,6 @@ export default {
     }
   },
   beforeRouteUpdate (to, from, next) {
-    console.log(to)
     if (!to.query.account) {
       this.isTypeChangeable = true
       this.form.type = 'standard'
@@ -104,6 +103,12 @@ export default {
     }
   },
   methods: {
+    resetForm () {
+      this.form.username = ''
+      this.form.password = ''
+      this.form.account = ''
+    },
+
     signin (form) {
       this.isSubmitting = true
       this.$store.dispatch('session/create', form).then(() => {

@@ -79,6 +79,9 @@ export default {
         password: form.password,
         grant_type: 'password'
       }
+      if (form.type === 'managed') {
+        payload.scope = `a:${form.account}`
+      }
 
       return freshcom.createToken(payload).then(token => {
         setObjectToStorage('state.session.liveToken', token)
@@ -124,7 +127,7 @@ export default {
       }
 
       return freshcom.createToken({
-        refresh_token: state.token.refresh_token, grant_type: 'refresh_token', scope: `aid:${state.account.testAccountId}`
+        refresh_token: state.token.refresh_token, grant_type: 'refresh_token', scope: `a:${state.account.testAccountId}`
       }).then(token => {
         commit(MT.TOKEN_CHANGED, token)
         commit(MT.MODE_CHANGED, 'test')
