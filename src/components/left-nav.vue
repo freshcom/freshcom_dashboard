@@ -112,11 +112,6 @@
       <span>File Storage</span>
     </el-menu-item>
 
-    <el-menu-item index="/team">
-      <icon name="id-card" scale="0.9"></icon>
-      <span id="nav-team">Team</span>
-    </el-menu-item>
-
     <el-menu-item :router="{ name: 'APIHome' }" index="/api">
       <icon name="terminal" scale="0.9"></icon>
       <span>API</span>
@@ -131,6 +126,11 @@
         <span v-else>View test data</span>
         <span v-loading="isTogglingMode" element-loading-spinner="el-icon-loading" class="test-toggle-loading"></span>
       </span>
+    </el-menu-item>
+
+    <el-menu-item index="/team">
+      <icon name="id-card" scale="0.9"></icon>
+      <span id="nav-team">Team</span>
     </el-menu-item>
 
     <el-menu-item :router="{ name: 'AccountOverview' }" index="/account">

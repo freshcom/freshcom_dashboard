@@ -1,5 +1,5 @@
 <template>
-<content-container>
+<content-container :disable-test-banner="true">
   <div slot="header">
     <el-menu :router="true" default-active="/team" mode="horizontal" class="header-menu">
       <el-menu-item :route="{ name: 'TeamOverview' }" index="/team">
@@ -15,19 +15,13 @@
   <div slot="content-body">
     <div class="data">
       <div class="block detail" style="margin-top: 0px;">
-        <div class="header">
-          <h2>Lala</h2>
-        </div>
-
         <div class="body">
           <dl>
+            <dt>Account Handle</dt>
+            <dd>{{account.handle}}</dd>
+
             <dt>Managed user sign-in link</dt>
             <dd>{{signinLink}}</dd>
-
-            <dl>
-              <dt>Publishable Refresh Token</dt>
-              <dd>{{refreshToken.prefixedId}}</dd>
-            </dl>
           </dl>
         </div>
       </div>
@@ -37,24 +31,40 @@
 </template>
 
 <script>
+import freshcom from '@/freshcom-sdk'
+import withLiveMode from '@/helpers/with-live-mode'
 import { SIGNIN_DOMAIN, SIGNIN_SCHEME } from '@/env'
-import PageMixin from '@/mixins/page'
+import resourcePageMixinFactory from '@/mixins/resource-page'
+let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadAccount' })
 
 export default {
   name: 'TeamOverview',
-  mixins: [PageMixin],
+  mixins: [ResourcePageMixin],
   data () {
     return {
       isLoading: false,
-      refreshToken: {}
+      account: {}
     }
   },
   computed: {
-    account () {
-      return this.$store.state.session.account
-    },
     signinLink () {
       return `${SIGNIN_SCHEME}${this.account.handle}.${SIGNIN_DOMAIN}`
+    }
+  },
+  methods: {
+    loadAccount () {
+      this.isLoading = true
+
+      return withLiveMode(() => {
+        return freshcom.retrieveAccount().then(response => {
+          this.account = response.data
+
+          this.isLoading = false
+        }).catch(errors => {
+          this.isLoading = false
+          throw errors
+        })
+      })
     }
   }
 }
