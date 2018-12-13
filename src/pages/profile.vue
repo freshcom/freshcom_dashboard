@@ -11,12 +11,12 @@
           <el-row>
             <el-col :span="14" :offset="5">
               <el-form @submit.native.prevent="submit()" label-width="130px" size="small">
-                <el-form-item v-if="user.type === 'standard'" :error="errorMsgs.email || errorMsgs.username" label="Email">
-                  <el-input v-model="userDraft.email" id="email" placeholder="Enter your email..."></el-input>
-                </el-form-item>
-
                 <el-form-item v-if="user.type === 'managed'" label="Username">
                   <el-input v-model="user.username" id="username" :disabled="true"></el-input>
+                </el-form-item>
+
+                <el-form-item :error="errorMsgs.email || errorMsgs.username" label="Email">
+                  <el-input v-model="userDraft.email" id="email" placeholder="Enter your email..."></el-input>
                 </el-form-item>
 
                 <el-form-item :error="errorMsgs.name" label="Name">
