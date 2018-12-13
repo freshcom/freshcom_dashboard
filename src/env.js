@@ -1,4 +1,5 @@
 export const API_ROOT_URL = process.env.VUE_APP_API_ROOT_URL
+export const API_CLIENT_ID = process.env.VUE_APP_API_CLIENT_ID
 export const HOST_URL = process.env.VUE_APP_HOST_URL
 export const SIGNIN_DOMAIN = process.env.VUE_APP_SIGNIN_DOMAIN
 export const SIGNIN_SCHEME = process.env.VUE_APP_SIGNIN_SCHEME

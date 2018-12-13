@@ -1,7 +1,7 @@
 import qs from 'qs'
 import axios from 'axios'
 import SimpleJAS from 'simple-jas'
-import { API_ROOT_URL, DEFAULT_LOCALE } from '@/env'
+import { API_ROOT_URL, API_CLIENT_ID, DEFAULT_LOCALE } from '@/env'
 
 let axiosInstance = axios.create({
   baseURL: API_ROOT_URL,
@@ -1127,7 +1127,9 @@ axiosInstance.interceptors.response.use(undefined, function (error) {
     config.retried = true
 
     return sdk.createToken({
-      refresh_token: sdk.refreshToken, grant_type: 'refresh_token'
+      refresh_token: sdk.refreshToken,
+      grant_type: 'refresh_token',
+      client_id: API_CLIENT_ID
     }).then(token => {
       sdk.setAccessToken(token.access_token)
       config.headers['Authorization'] = `Bearer ${token.access_token}`

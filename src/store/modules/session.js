@@ -1,3 +1,4 @@
+import { API_CLIENT_ID } from '@/env'
 import freshcom from '@/freshcom-sdk'
 import Cookies from 'js-cookie'
 
@@ -77,6 +78,7 @@ export default {
       let payload = {
         username: form.username,
         password: form.password,
+        client_id: API_CLIENT_ID,
         grant_type: 'password'
       }
       if (form.type === 'managed') {
@@ -127,7 +129,10 @@ export default {
       }
 
       return freshcom.createToken({
-        refresh_token: state.token.refresh_token, grant_type: 'refresh_token', scope: `acc:${state.account.testAccountId}`
+        refresh_token: state.token.refresh_token,
+        grant_type: 'refresh_token',
+        client_id: API_CLIENT_ID,
+        scope: `acc:${state.account.testAccountId}`
       }).then(token => {
         commit(MT.TOKEN_CHANGED, token)
         commit(MT.MODE_CHANGED, 'test')
@@ -139,7 +144,9 @@ export default {
 
     refreshLiveToken ({ dispatch, state, commit }) {
       return freshcom.createToken({
-        refresh_token: state.liveToken.refresh_token, grant_type: 'refresh_token'
+        refresh_token: state.liveToken.refresh_token,
+        grant_type: 'refresh_token',
+        client_id: API_CLIENT_ID
       }).then(liveToken => {
         setObjectToStorage('state.session.liveToken', liveToken)
         commit(MT.LIVE_TOKEN_CHANGED, liveToken)
@@ -171,7 +178,9 @@ export default {
       if (state.mode === 'live') { Promise.reject(new Error('Currently in live mode')) }
 
       return freshcom.createToken({
-        refresh_token: state.token.refresh_token, grant_type: 'refresh_token'
+        refresh_token: state.token.refresh_token,
+        grant_type: 'refresh_token',
+        client_id: API_CLIENT_ID
       }).then(testToken => {
         console.log('Refreshed test token')
 
