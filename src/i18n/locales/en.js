@@ -8,7 +8,8 @@ export default {
     common: {
       required: '{name} is required.',
       invalidFormat: '{name} is invalid.',
-      taken: '{name} is taken.'
+      taken: '{name} is taken.',
+      invalid: '{name} is invalid.'
     },
     required: '{name} is required.',
     invalid: '{name} is invalid.',
@@ -26,7 +27,7 @@ export default {
       }
     },
     user: {
-      password: {
+      newPassword: {
         invalidLength: 'Password must be at least {min} characters long.'
       },
       confirmPassword: {

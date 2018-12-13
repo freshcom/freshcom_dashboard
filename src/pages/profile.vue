@@ -11,8 +11,12 @@
           <el-row>
             <el-col :span="14" :offset="5">
               <el-form @submit.native.prevent="submit()" label-width="130px" size="small">
-                <el-form-item :error="errorMsgs.email || errorMsgs.username" label="Email">
+                <el-form-item v-if="user.type === 'standard'" :error="errorMsgs.email || errorMsgs.username" label="Email">
                   <el-input v-model="userDraft.email" id="email" placeholder="Enter your email..."></el-input>
+                </el-form-item>
+
+                <el-form-item v-if="user.type === 'managed'" label="Username">
+                  <el-input v-model="user.username" id="username" :disabled="true"></el-input>
                 </el-form-item>
 
                 <el-form-item :error="errorMsgs.name" label="Name">
@@ -49,8 +53,8 @@
             <el-input v-model="password.currentPassword" id="current-password" type="password" placeholder="Enter your current password..."></el-input>
           </el-form-item>
 
-          <el-form-item :error="errorMsgs.password" label="New Password">
-            <el-input v-model="password.password" id="password" type="password" placeholder="Enter a new password..."></el-input>
+          <el-form-item :error="errorMsgs.newPassword" label="New Password">
+            <el-input v-model="password.newPassword" id="password" type="password" placeholder="Enter a new password..."></el-input>
           </el-form-item>
 
           <el-form-item :error="errorMsgs.confirmPassword" label="Confirm Password">
@@ -61,7 +65,7 @@
 
       <div slot="footer" class="dialog-footer">
         <el-button :disabled="isUpdatingPassword" @click="closeChangePasswordDialog()" plain size="small">Cancel</el-button>
-        <el-button :loading="isUpdatingPassword" @click="updatePassword()" type="primary" size="small" :disabled="!password.password">Change password</el-button>
+        <el-button :loading="isUpdatingPassword" @click="updatePassword()" type="primary" size="small" :disabled="!password.newPassword">Change password</el-button>
       </div>
     </el-dialog>
   </div>
@@ -111,7 +115,7 @@ export default {
   methods: {
     changePassword () {
       this.password = {
-        type: 'User',
+        type: 'Password',
         currentPassword: '',
         password: '',
         confirmPassword: ''
@@ -135,14 +139,14 @@ export default {
     },
 
     updatePassword () {
-      if (this.password.password && this.password.password !== this.password.confirmPassword) {
+      if (this.password.newPassword && this.password.newPassword !== this.password.confirmPassword) {
         this.errors = { confirmPassword: [{ code: 'notMatch' }] }
         return
       }
 
       this.isUpdatingPassword = true
       withLiveMode(() => {
-        return freshcom.updateCurrentUser(this.password).then(user => {
+        return freshcom.changePasswordById(this.user.id, this.password).then(() => {
           this.$message({
             showClose: true,
             message: `Password changed successfully.`,
@@ -161,10 +165,12 @@ export default {
 
     submit () {
       this.isUpdating = true
-      this.userDraft.username = this.userDraft.email
+      if (this.user.type === 'standard') {
+        this.userDraft.username = this.userDraft.email
+      }
 
       withLiveMode(() => {
-        return freshcom.updateCurrentUser(this.userDraft).then(response => {
+        return freshcom.updateUser(this.user.id, this.userDraft).then(response => {
           this.$message({
             showClose: true,
             message: `Profile saved successfully.`,
