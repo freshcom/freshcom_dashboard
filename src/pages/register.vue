@@ -45,7 +45,7 @@
             </p>
 
             <span slot="reference" class="m-l-10">
-              <icon name="question-circle" class="v-middle"></icon>
+              <icon name="regular/question-circle" class="v-middle"></icon>
             </span>
           </el-popover>
         </el-form-item>

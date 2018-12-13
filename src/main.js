@@ -1,7 +1,8 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
-// import _ from 'lodash'
+import freshcom from '@/freshcom-sdk'
+import { API_CLIENT_ID } from '@/env'
 
 import { sync } from 'vuex-router-sync'
 import router from './router'
@@ -75,6 +76,9 @@ Vue.use(vueMoment, { defaultFormat: 'YYYY-MM', defaultFormatUtc: 'YYYY-MM' })
 Vue.moment.defaultFormat = 'MMM DD YYYY HH:mm:ss'
 
 Vue.use(money, { precision: 2, masked: false, prefix: '$ ' })
+
+// -- Freshcom --
+freshcom.setAccessToken(API_CLIENT_ID)
 
 Vue.config.productionTip = false
 

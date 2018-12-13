@@ -116,6 +116,8 @@ export default {
       commit(MT.TOKEN_CHANGED, undefined)
       commit(MT.MODE_CHANGED, 'live')
       commit(MT.READY, true)
+
+      freshcom.setAccessToken(API_CLIENT_ID)
     },
 
     setMode ({ state, commit, dispatch }, mode) {

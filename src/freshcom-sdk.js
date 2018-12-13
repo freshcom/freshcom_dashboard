@@ -1123,6 +1123,7 @@ axiosInstance.interceptors.response.use(undefined, function (error) {
     response = error.response
   }
 
+  // If we have not retried lets try refresh the token and try again
   if (response && response.status === 401 && sdk.refreshToken && !config.retried) {
     config.retried = true
 
