@@ -233,8 +233,18 @@ const sdk = {
     }).catch(this._processHttpError)
   },
 
+  //
+  // MARK: App
+  //
   listApp (params = {}, options = {}) {
     return this.http.get('/apps', { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
+  addApp (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post('/apps', payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },

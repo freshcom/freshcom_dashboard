@@ -83,12 +83,10 @@
     </el-dialog>
 
     <el-dialog :show-close="false" :visible="isChangingPassword" title="Change password" width="400px">
-      <el-form>
-        <el-form @submit.native.prevent="updatePassword()" label-width="120px" size="small">
-          <el-form-item :error="errorMsgs.newPassword" label="New Password" required>
-            <el-input v-model="password.newPassword" id="password" type="password" placeholder="Enter a new password..."></el-input>
-          </el-form-item>
-        </el-form>
+      <el-form @submit.native.prevent="updatePassword()" label-width="120px" size="small">
+        <el-form-item :error="errorMsgs.newPassword" label="New Password" required>
+          <el-input v-model="password.newPassword" id="password" type="password" placeholder="Enter a new password..."></el-input>
+        </el-form-item>
       </el-form>
 
       <div slot="footer" class="dialog-footer">
