@@ -31,7 +31,7 @@
 
         <div class="body full">
           <el-table :data="apps" class="data-table block-table">
-            <el-table-column label="NAME" width="300">
+            <el-table-column label="NAME">
               <template slot-scope="scope">
                 <a href="javascript:;" class="primary">
                   {{scope.row.name}}
@@ -39,15 +39,31 @@
               </template>
             </el-table-column>
 
-            <el-table-column label="APP ID">
+            <el-table-column label="APP ID" width="360">
               <template slot-scope="scope">
                 {{scope.row.prefixedId}}
               </template>
             </el-table-column>
 
-            <el-table-column label="CREATED" width="200">
+            <el-table-column label="CREATED" width="170">
               <template slot-scope="scope">
                 {{scope.row.insertedAt | moment}}
+              </template>
+            </el-table-column>
+
+            <el-table-column align="right" width="130">
+              <template slot-scope="scope">
+                <p class="action-group">
+                  <el-button-group>
+                    <el-button size="mini" plain>
+                      Edit
+                    </el-button>
+
+                    <el-button @click="openDeleteAppDialog(scope.row)" size="mini" plain>
+                      Delete
+                    </el-button>
+                  </el-button-group>
+                </p>
               </template>
             </el-table-column>
           </el-table>
@@ -67,6 +83,32 @@
       <div slot="footer">
         <el-button :disabled="isAddingApp" @click="closeAddAppDialog()" plain size="small">Cancel</el-button>
         <el-button :loading="isAddingApp" @click="addApp()" type="primary" size="small">Add</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog :show-close="false" :visible="isDeleteAppDialogVisible" title="Delete App" width="600px">
+      <p>
+      <el-alert
+        :closable="false"
+        title="Dangerous Action"
+        type="error"
+        description="Please read carefully before proceeding"
+        >
+      </el-alert>
+      </p>
+
+      <p>
+        Are you sure you want to delete this app?
+        Any application that are using this app's App ID
+        will immediately lose all access to Freshcom API.
+
+        <br/><br/>
+        <b>This action cannot be undone.</b>
+      </p>
+
+      <div slot="footer">
+        <el-button :disabled="isDeletingApp" @click="closeDeleteAppDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isDeletingApp" @click="deleteApp()" type="danger" size="small">Delete</el-button>
       </div>
     </el-dialog>
   </div>
@@ -92,7 +134,11 @@ export default {
       appDraft: { name: '', type: 'App' },
       isAddAppDialogVisible: false,
       isAddingApp: false,
-      errors: {}
+      errors: {},
+
+      isDeleteAppDialogVisible: false,
+      isDeletingApp: false,
+      appForDelete: {}
     }
   },
   computed: {
@@ -166,7 +212,38 @@ export default {
         this.closeAddAppDialog()
         throw response
       })
-    }
+    },
+
+    openDeleteAppDialog (targetApp) {
+      this.appForDelete = targetApp
+      this.isDeleteAppDialogVisible = true
+    },
+
+    closeDeleteAppDialog () {
+      this.isDeleteAppDialogVisible = false
+    },
+
+    deleteApp () {
+      this.isDeletingApp = true
+
+      return freshcom.deleteApp(this.appForDelete.id).then(() => {
+        return this.listApp()
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: `App deleted successfully.`,
+          type: 'success'
+        })
+
+        this.isDeletingApp = false
+        this.closeDeleteAppDialog()
+      }).catch(response => {
+        this.errors = response.errors
+        this.isDeletingApp = false
+        this.closeDeleteAppDialog()
+        throw response
+      })
+    },
   }
 }
 </script>
