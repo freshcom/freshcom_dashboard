@@ -109,7 +109,7 @@ import ShowFilePage from '@/pages/file/show'
 import NewFilePage from '@/pages/file/new'
 
 import ShowBalanceSettingsPage from '@/pages/balance/settings'
-import APIHomePage from '@/pages/api/home'
+import DevelopmentOverviewPage from '@/pages/development/overview'
 
 Vue.use(Router)
 
@@ -841,9 +841,9 @@ const router = new Router({
       }
     },
     {
-      path: '/api',
-      name: 'APIHome',
-      component: APIHomePage
+      path: '/development',
+      name: 'DevelopmentOverview',
+      component: DevelopmentOverviewPage
     }
   ]
 })

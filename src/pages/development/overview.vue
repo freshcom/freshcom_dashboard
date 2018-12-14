@@ -10,13 +10,10 @@
         <div class="body">
           <dl>
             <dt>Account ID</dt>
-            <dd v-if="isViewingTestData">{{account.testAccountId}}</dd>
-            <dd v-else>{{account.id}}</dd>
+            <dd>{{account.prefixedId}}</dd>
 
-            <dl>
-              <dt>Publishable Refresh Token</dt>
-              <dd>{{refreshToken.prefixedId}}</dd>
-            </dl>
+            <dt>Publishable Refresh Token</dt>
+            <dd>{{refreshToken.prefixedId}}</dd>
           </dl>
         </div>
       </div>
@@ -32,7 +29,7 @@ import resourcePageMixinFactory from '@/mixins/resource-page'
 let ResourcePageMixin = resourcePageMixinFactory({ loadMethodName: 'loadRefreshToken' })
 
 export default {
-  name: 'APIHome',
+  name: 'DevelopmentOverview',
   mixins: [ResourcePageMixin],
   data () {
     return {

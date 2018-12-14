@@ -112,9 +112,9 @@
       <span>File Storage</span>
     </el-menu-item>
 
-    <el-menu-item :router="{ name: 'APIHome' }" index="/api">
+    <el-menu-item v-if="can('viewDevelopment')" :router="{ name: 'DevelopmentOverview' }" index="/development">
       <icon name="terminal" scale="0.9"></icon>
-      <span>API</span>
+      <span>Development</span>
     </el-menu-item>
 
     <el-menu-item index="" style="padding-left: 12px;" class="no-active">
@@ -128,12 +128,12 @@
       </span>
     </el-menu-item>
 
-    <el-menu-item index="/team">
+    <el-menu-item v-if="can('viewTeam')" index="/team">
       <icon name="id-card" scale="0.9"></icon>
       <span id="nav-team">Team</span>
     </el-menu-item>
 
-    <el-menu-item :router="{ name: 'AccountOverview' }" index="/account">
+    <el-menu-item v-if="can('viewAccountSettings')" :router="{ name: 'AccountOverview' }" index="/account">
       <icon name="cog" scale="0.9"></icon>
       <span>Account Settings</span>
     </el-menu-item>
@@ -181,6 +181,9 @@ export default {
 
       return {}
     },
+    user () {
+      return this.$store.state.session.user
+    },
     currentRoutePath () {
       return this.$store.state.route.fullPath
     },
@@ -209,7 +212,7 @@ export default {
       if (routePath.startsWith('/sms-templates')) { return '/sms' }
 
       if (routePath.startsWith('/notification-triggers')) { return '/notification-triggers' }
-      if (routePath.startsWith('/users')) { return '/users' }
+      if (routePath.startsWith('/team')) { return '/team' }
 
       return routePath
     },
@@ -227,6 +230,19 @@ export default {
     }
   },
   methods: {
+    can (action) {
+      if (['owner', 'administrator'].includes(this.user.role)) {
+        return true
+      }
+
+      switch (action) {
+        case 'viewDevelopment':
+          return ['developer'].includes(this.user.role)
+        default:
+          return false
+      }
+    },
+
     toggleMode () {
       this.isTogglingMode = true
 

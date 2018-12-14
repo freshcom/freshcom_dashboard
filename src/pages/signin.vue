@@ -19,7 +19,7 @@
 
         <el-form-item v-if="form.type === 'managed'" label="Account ID or Account Handle">
           <div slot="label">
-            <el-tooltip popper-class="tooltip-poppper-md" effect="dark" content="A 36-characters account ID provided by your administrator" placement="left">
+            <el-tooltip popper-class="tooltip-poppper-md" effect="dark" content="A 36 to 45 characters account ID provided by your administrator" placement="left">
               <span class="text-underline">Account ID</span>
             </el-tooltip>
             <span> or </span>
