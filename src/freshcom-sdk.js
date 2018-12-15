@@ -218,9 +218,16 @@ const sdk = {
     }).catch(this._processHttpError)
   },
 
-  changePasswordById (id, fields, params = {}, options = {}) {
+  changePassword (identifiers, fields, params = {}, options = {}) {
+    let path = '/password?'
+    if (identifiers.id) {
+      path += `id=${identifiers.id}`
+    } else {
+      path += `resetToken=${identifiers.resetToken}`
+    }
+
     let payload = SimpleJAS.serialize(fields)
-    return this.http.put(`/password?id=${id}`, payload, { params: params }).then(response => {
+    return this.http.put(path, payload, { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },

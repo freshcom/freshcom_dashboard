@@ -267,7 +267,7 @@ export default {
       this.isUpdatingPassword = true
 
       withLiveMode(() => {
-        return freshcom.changePasswordById(this.user.id, this.password).then(() => {
+        return freshcom.changePassword({ id: this.user.id }, this.password).then(() => {
           this.$message({
             showClose: true,
             message: `Password changed successfully.`,

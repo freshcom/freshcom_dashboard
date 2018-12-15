@@ -10,13 +10,13 @@
       </div>
 
       <div v-if="isSubmitted">
-        <el-alert :closable="false" type="success" title="" class="text-center">
+        <el-alert :closable="false" type="success" title="" :center="true">
           <p>
             Your new password has been set successfully.
           </p>
 
-          <p>
-            <router-link :to="{ name: 'Signin' }">Log in now »</router-link>
+          <p class="text-center">
+            <router-link :to="{ name: 'Signin' }">Sign in now »</router-link>
           </p>
         </el-alert>
       </div>
@@ -31,7 +31,7 @@
         </el-alert>
 
         <el-form @submit.native.prevent="submit()" label-width="130px" size="small">
-          <el-form-item label="New Password" :error="errorMsgs.value">
+          <el-form-item label="New Password" :error="errorMsgs.newPassword">
             <el-input v-model="newPassword" type="password"></el-input>
           </el-form-item>
 
@@ -46,7 +46,7 @@
       </div>
     </el-card>
 
-    <p class="pull-left" v-if="!isSubmitted"><router-link :to="{ name: 'Signin' }" >« Log in</router-link></p>
+    <p class="pull-left" v-if="!isSubmitted"><router-link :to="{ name: 'Signin' }" >« Sign in</router-link></p>
     <p class="pull-right">
       Don't have an account? <router-link :to="{ name: 'Register' }">Sign up</router-link>
     </p>
@@ -72,7 +72,16 @@ export default {
       errors: {}
     }
   },
+  created () {
+    if (this.isLoggedIn) {
+      this.$store.dispatch('pushRoute', { name: 'Home' })
+    }
+  },
   computed: {
+    isLoggedIn () {
+      return !!this.$store.state.session.user
+    },
+
     errorMsgs () {
       return translateErrors(this.errors, 'password')
     }
@@ -85,18 +94,17 @@ export default {
       }
 
       this.isSubmitting = true
-      freshcom.resetPassword({
-        resetToken: this.resetToken,
-        type: 'Password',
-        value: this.newPassword
-      }).then(() => {
+      let password = { type: 'Password', newPassword: this.newPassword }
+      freshcom.changePassword({ resetToken: this.resetToken }, password).then(() => {
         this.isSubmitting = false
         this.isSubmitted = true
       }).catch(response => {
         this.errors = response.errors
         this.isSubmitting = false
 
-        if (response.status === 422) {
+        if (response.status === 404 || this.errors.resetToken) {
+          this.newPassword = ''
+          this.confirmPassword = ''
           this.isResetTokenValid = false
         }
 
@@ -125,6 +133,6 @@ p.note {
 
 .center {
   margin: auto;
-  width: 420px;
+  width: 500px;
 }
 </style>

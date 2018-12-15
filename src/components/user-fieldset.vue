@@ -19,7 +19,6 @@
 </template>
 
 <script>
-import { ROLES } from '@/env'
 import fieldsetMixinFactory from '@/mixins/fieldset'
 let FieldsetMixin = fieldsetMixinFactory({ errorI18nKey: 'user' })
 
