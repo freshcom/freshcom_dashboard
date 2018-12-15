@@ -7,8 +7,7 @@
           {{sessionAccount.name}}<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item>Placeholder</el-dropdown-item>
-          <el-dropdown-item>Placeholder</el-dropdown-item>
+          <el-dropdown-item>List all accounts</el-dropdown-item>
           <el-dropdown-item divided>
             <a href="javascript:;">Create new account</a>
           </el-dropdown-item>

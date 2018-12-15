@@ -1,5 +1,5 @@
 <template>
-<content-container :disable-test-banner="true">
+<content-container :disable-test-banner="true" :ready="isReady">
   <div slot="content-body">
     <div class="data">
       <div class="block" style="margin-top: 0px;">
