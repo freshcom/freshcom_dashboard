@@ -249,6 +249,14 @@ const sdk = {
     }).catch(this._processHttpError)
   },
 
+  updateApp (id, fields = {}, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+
+    return this.http.patch(`/apps/${id}`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
   deleteApp (id, params = {}, options = {}) {
     return this.http.delete(`/apps/${id}`, { params: params }).then(response => {
       if (response.data) {

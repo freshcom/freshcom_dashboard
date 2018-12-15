@@ -33,7 +33,7 @@
           <el-table :data="apps" class="data-table block-table">
             <el-table-column label="NAME">
               <template slot-scope="scope">
-                <a href="javascript:;" class="primary">
+                <a @click="openEditAppDialog(scope.row)" href="javascript:;" class="primary">
                   {{scope.row.name}}
                 </a>
               </template>
@@ -55,7 +55,7 @@
               <template slot-scope="scope">
                 <p class="action-group">
                   <el-button-group>
-                    <el-button size="mini" plain>
+                    <el-button @click="openEditAppDialog(scope.row)" size="mini" plain>
                       Edit
                     </el-button>
 
@@ -76,13 +76,26 @@
     <el-dialog :show-close="false" :visible="isAddAppDialogVisible" title="Add App" width="500px">
       <el-form @submit.native.prevent="addApp()" label-width="120px" size="small">
         <el-form-item :error="errorMsgs.name" label="Name" required>
-          <el-input v-model="appDraft.name" id="name" type="text" placeholder="Enter a name..."></el-input>
+          <el-input v-model="appForAdd.name" id="name" type="text" placeholder="Enter a name..."></el-input>
         </el-form-item>
       </el-form>
 
       <div slot="footer">
         <el-button :disabled="isAddingApp" @click="closeAddAppDialog()" plain size="small">Cancel</el-button>
         <el-button :loading="isAddingApp" @click="addApp()" type="primary" size="small">Add</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog :show-close="false" :visible="isEditAppDialogVisible" title="Edit App" width="500px">
+      <el-form @submit.native.prevent="updateApp()" label-width="120px" size="small">
+        <el-form-item :error="errorMsgs.name" label="Name" required>
+          <el-input v-model="appForEdit.name" id="name" type="text" placeholder="Enter a name..."></el-input>
+        </el-form-item>
+      </el-form>
+
+      <div slot="footer">
+        <el-button :disabled="isUpdatingApp" @click="closeEditAppDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isUpdatingApp" @click="updateApp()" type="primary" size="small">Update</el-button>
       </div>
     </el-dialog>
 
@@ -116,6 +129,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import freshcom from '@/freshcom-sdk'
 import translateErrors from '@/helpers/translate-errors'
 
@@ -131,9 +145,14 @@ export default {
       refreshToken: {},
       apps: [],
 
-      appDraft: { name: '', type: 'App' },
+      appForAdd: { name: '', type: 'App' },
       isAddAppDialogVisible: false,
       isAddingApp: false,
+
+      appForEdit: { name: '', type: 'App' },
+      isEditAppDialogVisible: false,
+      isUpdatingApp: false,
+
       errors: {},
 
       isDeleteAppDialogVisible: false,
@@ -183,19 +202,19 @@ export default {
     },
 
     openAddAppDialog () {
+      this.errors = {}
+      this.appForAdd = { type: 'App', name: '' }
       this.isAddAppDialogVisible = true
     },
 
     closeAddAppDialog () {
       this.isAddAppDialogVisible = false
-      this.errors = {}
-      this.appDraft = { type: 'App', name: '' }
     },
 
     addApp () {
       this.isAddingApp = true
 
-      return freshcom.addApp(this.appDraft).then(() => {
+      return freshcom.addApp(this.appForAdd).then(() => {
         return this.listApp()
       }).then(() => {
         this.$message({
@@ -209,7 +228,37 @@ export default {
       }).catch(response => {
         this.errors = response.errors
         this.isAddingApp = false
-        this.closeAddAppDialog()
+        throw response
+      })
+    },
+
+    openEditAppDialog (targetApp) {
+      this.errors = {}
+      this.appForEdit = _.cloneDeep(targetApp)
+      this.isEditAppDialogVisible = true
+    },
+
+    closeEditAppDialog () {
+      this.isEditAppDialogVisible = false
+    },
+
+    updateApp () {
+      this.isUpdatingApp = true
+
+      return freshcom.updateApp(this.appForEdit.id, this.appForEdit).then(() => {
+        return this.listApp()
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: `App updated successfully.`,
+          type: 'success'
+        })
+
+        this.isUpdatingApp = false
+        this.closeEditAppDialog()
+      }).catch(response => {
+        this.errors = response.errors
+        this.isUpdatingApp = false
         throw response
       })
     },
@@ -240,10 +289,9 @@ export default {
       }).catch(response => {
         this.errors = response.errors
         this.isDeletingApp = false
-        this.closeDeleteAppDialog()
         throw response
       })
-    },
+    }
   }
 }
 </script>
