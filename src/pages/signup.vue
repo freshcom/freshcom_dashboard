@@ -1,5 +1,5 @@
 <template>
-<div id="register" class="page-wrapper">
+<div id="signup" class="page-wrapper">
   <div class="center">
 
     <h1>Freshcom</h1>
@@ -58,7 +58,7 @@
     </el-card>
 
     <p class="text-center">
-      Already have an account? <router-link :to="{ name: 'Signin' }" >Log in</router-link>
+      Already have an account? <router-link :to="{ name: 'Signin' }" >Sign in</router-link>
     </p>
   </div>
 </div>
@@ -71,7 +71,7 @@ import freshcom from '@/freshcom-sdk'
 import translateErrors from '@/helpers/translate-errors'
 
 export default {
-  name: 'Register',
+  name: 'Signup',
   data () {
     return {
       isCreating: false,
@@ -81,6 +81,7 @@ export default {
         email: '',
         name: '',
         defaultLocale: 'en',
+        isTermAccepted: true,
         password: '',
         confirmPassword: ''
       },
@@ -133,7 +134,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-.page-wrapper#register {
+.page-wrapper#signup {
   margin-top: 50px;
 }
 

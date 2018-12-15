@@ -231,7 +231,7 @@ export default {
 
     generatePasswordResetToken () {
       withLiveMode(() => {
-        return freshcom.generatePasswordResetTokenById(this.user.id).then((response) => {
+        return freshcom.generatePasswordResetToken({ id: this.user.id }).then((response) => {
           this.$message({
             showClose: true,
             message: `Password reset link generated successfully.`,

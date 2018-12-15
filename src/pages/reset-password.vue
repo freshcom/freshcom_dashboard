@@ -48,7 +48,7 @@
 
     <p class="pull-left" v-if="!isSubmitted"><router-link :to="{ name: 'Signin' }" >« Sign in</router-link></p>
     <p class="pull-right">
-      Don't have an account? <router-link :to="{ name: 'Register' }">Sign up</router-link>
+      Don't have an account? <router-link :to="{ name: 'Signup' }">Sign up</router-link>
     </p>
   </div>
 </div>

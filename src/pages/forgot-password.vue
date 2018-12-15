@@ -26,6 +26,14 @@
       </div>
 
       <div v-else>
+        <p class="m-t-0">
+          <el-alert
+            v-if="notFound"
+            :closable="false"
+            title="The email your entered does not exist"
+            type="error">
+          </el-alert>
+        </p>
         <p class="note">
           Enter your email below and we will send you instructions on
           how to reset it.
@@ -44,9 +52,9 @@
       </div>
     </el-card>
 
-    <p class="pull-left"><router-link :to="{ name: 'Signin' }" >« Log in</router-link></p>
+    <p class="pull-left"><router-link :to="{ name: 'Signin' }" >« Sign in</router-link></p>
     <p class="pull-right">
-      Don't have an account? <router-link :to="{ name: 'Register' }">Sign up</router-link>
+      Don't have an account? <router-link :to="{ name: 'Signup' }">Sign up</router-link>
     </p>
   </div>
 </div>
@@ -63,6 +71,7 @@ export default {
       username: '',
       isSubmitted: false,
       isSubmitting: false,
+      notFound: false,
       errors: {}
     }
   },
@@ -73,13 +82,18 @@ export default {
   },
   methods: {
     submit (form) {
+      this.notFound = false
       this.isSubmitting = true
-      freshcom.createPasswordResetToken({ username: this.username, type: 'PasswordResetToken' }).then(() => {
+      freshcom.generatePasswordResetToken({ username: this.username }).then(() => {
         this.isSubmitting = false
         this.isSubmitted = true
       }).catch(response => {
         this.errors = response.errors
         this.isSubmitting = false
+
+        if (response.status === 404) {
+          this.notFound = true
+        }
         throw response
       })
     }

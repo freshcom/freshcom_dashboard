@@ -55,7 +55,7 @@
       </el-form>
     </el-card>
 
-    <p class="text-center">New to Freshcom?<br/><router-link :to="{ name: 'Register' }" >Create a new Freshcom account</router-link></p>
+    <p class="text-center">New to Freshcom?<br/><router-link :to="{ name: 'Signup' }" >Create a new Freshcom account</router-link></p>
   </div>
 </div>
 </template>

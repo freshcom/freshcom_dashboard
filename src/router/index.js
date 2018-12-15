@@ -10,7 +10,7 @@ import HomePage from '@/pages/home'
 
 // Identity
 import SigninPage from '@/pages/signin'
-import RegisterPage from '@/pages/register'
+import SignupPage from '@/pages/signup'
 import ProfilePage from '@/pages/profile'
 
 import ForgotPasswordPage from '@/pages/forgot-password'
@@ -156,9 +156,9 @@ const router = new Router({
       }
     },
     {
-      path: '/register',
-      name: 'Register',
-      component: RegisterPage
+      path: '/signup',
+      name: 'Signup',
+      component: SignupPage
     },
     {
       path: '/forgot-password',
@@ -850,7 +850,7 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   let isSessionReady = store.state.session.ready
-  let excludedRouteNames = ['Signin', 'Register', 'ForgotPassword', 'ResetPassword']
+  let excludedRouteNames = ['Signin', 'Signup', 'ForgotPassword', 'ResetPassword']
 
   let _resolve
   let currentUserPromise = new Promise((resolve) => {
