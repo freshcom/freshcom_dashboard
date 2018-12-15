@@ -27,8 +27,9 @@
       <el-dropdown size="small" split-button @click="editUser()" @command="(cmd) => { this[cmd]() }">
         Edit
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="changePassword">Change Password</el-dropdown-item>
-          <el-dropdown-item command="changeRole">Change Role</el-dropdown-item>
+          <el-dropdown-item command="openGeneratePasswordResetLinkDialog">Generate Password Reset Link</el-dropdown-item>
+          <el-dropdown-item command="openChangePasswordDialog">Change Password</el-dropdown-item>
+          <el-dropdown-item command="openChangeRoleDialog">Change Role</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
@@ -63,12 +64,12 @@
     </div>
 
     <div class="foot text-right">
-      <el-button @click="attemptDeleteUser()" plain size="small">Delete</el-button>
+      <el-button @click="openDeleteUserDialog()" plain size="small">Delete</el-button>
     </div>
   </div>
 
   <div slot="launchable" class="launchable">
-    <el-dialog :show-close="false" :visible="isConfirmingDeleteUser" title="Delete user" width="500px" class="delete-user">
+    <el-dialog :show-close="false" :visible="isDeleteUserDialogVisible" title="Delete user" width="500px" class="delete-user">
       <p>
         Are you sure you want to delete this user?
         <br/><br/>
@@ -77,12 +78,12 @@
       </p>
 
       <div slot="footer">
-        <el-button :disabled="isDeletingUser" @click="cancelDeleteUser()" plain size="small">Cancel</el-button>
+        <el-button :disabled="isDeletingUser" @click="closeDeleteUserDialog()" plain size="small">Cancel</el-button>
         <el-button :loading="isDeletingUser" @click="deleteUser()" type="danger" size="small">Delete</el-button>
       </div>
     </el-dialog>
 
-    <el-dialog :show-close="false" :visible="isChangingPassword" title="Change password" width="400px">
+    <el-dialog :show-close="false" :visible="isChangePasswordDialogVisible" title="Change password" width="400px">
       <el-form @submit.native.prevent="updatePassword()" label-width="120px" size="small">
         <el-form-item :error="errorMsgs.newPassword" label="New Password" required>
           <el-input v-model="password.newPassword" id="password" type="password" placeholder="Enter a new password..."></el-input>
@@ -95,7 +96,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :show-close="false" :visible="isChangingRole" title="Change Role" width="300px">
+    <el-dialog :show-close="false" :visible="isChangeRoleDialogVisible" title="Change Role" width="300px">
       <el-form @submit.native.prevent="updateRole()" label-width="50px" size="small">
         <el-form-item label="Role" required>
           <el-select v-model="roleDraft.value">
@@ -138,14 +139,14 @@ export default {
       user: User.objectWithDefaults(),
       isLoading: false,
 
-      isConfirmingDeleteUser: false,
+      isDeleteUserDialogVisible: false,
       isDeletingUser: false,
 
-      isChangingPassword: false,
+      isChangePasswordDialogVisible: false,
       isUpdatingPassword: false,
 
       roleDraft: {},
-      isChangingRole: false,
+      isChangeRoleDialogVisible: false,
       isUpdatingRole: false,
 
       password: {},
@@ -179,18 +180,18 @@ export default {
       this.$store.dispatch('pushRoute', { name: 'EditUser', params: { id: this.user.id } })
     },
 
-    changePassword () {
+    openChangePasswordDialog () {
       this.password = {
         type: 'Password',
         newPassword: ''
       }
       this.errors = {}
 
-      this.isChangingPassword = true
+      this.isChangePasswordDialogVisible = true
     },
 
     closeChangePasswordDialog () {
-      this.isChangingPassword = false
+      this.isChangePasswordDialogVisible = false
     },
 
     updatePassword () {
@@ -214,8 +215,8 @@ export default {
       })
     },
 
-    changeRole () {
-      this.isChangingRole = true
+    openChangeRoleDialog () {
+      this.isChangeRoleDialogVisible = true
       this.roleDraft = {
         id: this.user.id,
         type: 'Role',
@@ -224,7 +225,7 @@ export default {
     },
 
     closeChangeRoleDialog () {
-      this.isChangingRole = false
+      this.isChangeRoleDialogVisible = false
     },
 
     updateRole () {
@@ -248,12 +249,12 @@ export default {
       })
     },
 
-    attemptDeleteUser () {
-      this.isConfirmingDeleteUser = true
+    openDeleteUserDialog () {
+      this.isDeleteUserDialogVisible = true
     },
 
-    cancelDeleteUser () {
-      this.isConfirmingDeleteUser = false
+    closeDeleteUserDialog () {
+      this.isDeleteUserDialogVisible = false
     },
 
     deleteUser () {

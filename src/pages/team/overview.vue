@@ -1,5 +1,5 @@
 <template>
-<content-container :disable-test-banner="true">
+<content-container :disable-test-banner="true" :ready="isReady">
   <div slot="header">
     <el-menu :router="true" default-active="/team" mode="horizontal" class="header-menu">
       <el-menu-item :route="{ name: 'TeamOverview' }" index="/team">
