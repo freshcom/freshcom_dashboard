@@ -24,14 +24,9 @@
     </div>
 
     <div class="brief-action-group">
-      <el-dropdown size="small" split-button @click="editUser()" @command="(cmd) => { this[cmd]() }">
+      <router-link :to="{ name: 'EditUser', params: { id: this.user.id } }" class="el-button el-button--small is-plain">
         Edit
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="openGeneratePasswordResetLinkDialog">Generate Password Reset Link</el-dropdown-item>
-          <el-dropdown-item command="openChangePasswordDialog">Change Password</el-dropdown-item>
-          <el-dropdown-item command="openChangeRoleDialog">Change Role</el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
+      </router-link>
     </div>
   </div>
 
@@ -47,17 +42,40 @@
             <dt>ID</dt>
             <dd>{{user.id}}</dd>
 
-            <dt>Name</dt>
-            <dd>{{user.name}}</dd>
-
             <dt>Username</dt>
             <dd>{{user.username}}</dd>
 
-            <dt>Email</dt>
-            <dd>{{user.email}}</dd>
+            <dt>Password</dt>
+            <dd>
+              <a @click="openChangePasswordDialog()" href="javascript:;" class="text-underline">
+                (Change Password)
+              </a>
+            </dd>
+
+            <dt>Password Reset Link</dt>
+            <dd>
+              <el-tooltip v-if="user.passwordResetToken" popper-class="tooltip-poppper-xl" effect="dark" :content="passwordResetLink" placement="top">
+                <a :href="passwordResetLink" target="_blank">{{passwordResetLinkTeaser}} </a>
+              </el-tooltip>
+              <span v-else>None Generated </span>
+              <small><a @click="openPasswordResetDialog()" href="javascript:;" class="text-underline">(Generate New Link)</a></small>
+            </dd>
 
             <dt>Role</dt>
-            <dd>{{$t(`enums.user.role.${user.role}`)}}</dd>
+            <dd>
+              <span>{{$t(`enums.user.role.${user.role}`)}} </span>
+              <small>
+                <a @click="openChangeRoleDialog()" href="javascript:;" class="text-underline">
+                  (Change)
+                </a>
+              </small>
+            </dd>
+
+            <dt>Name</dt>
+            <dd>{{user.name}}</dd>
+
+            <dt>Email</dt>
+            <dd>{{user.email}}</dd>
           </dl>
         </div>
       </div>
@@ -69,17 +87,18 @@
   </div>
 
   <div slot="launchable" class="launchable">
-    <el-dialog :show-close="false" :visible="isDeleteUserDialogVisible" title="Delete user" width="500px" class="delete-user">
+    <el-dialog :show-close="false" :visible="isPasswordResetDialogVisible" title="Password Reset Link" width="500px">
       <p>
-        Are you sure you want to delete this user?
-        <br/><br/>
+        Are you sure you want to generate a new password reset link for this user?
 
-        <b>This action cannot be undone.</b>
+        <br/><br/>
+        If this user have an email address, an email containing the link will also be
+        sent to that email address.
       </p>
 
-      <div slot="footer">
-        <el-button :disabled="isDeletingUser" @click="closeDeleteUserDialog()" plain size="small">Cancel</el-button>
-        <el-button :loading="isDeletingUser" @click="deleteUser()" type="danger" size="small">Delete</el-button>
+      <div slot="footer" class="dialog-footer">
+        <el-button :disabled="isGeneratingPasswordResetToken" @click="closePasswordResetDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isGeneratingPasswordResetToken" @click="generatePasswordResetToken()" type="primary" size="small">Generate</el-button>
       </div>
     </el-dialog>
 
@@ -110,12 +129,26 @@
         <el-button :loading="isUpdatingRole" @click="updateRole()" type="primary" size="small">Save</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog :show-close="false" :visible="isDeleteUserDialogVisible" title="Delete user" width="500px" class="delete-user">
+      <p>
+        Are you sure you want to delete this user?
+        <br/><br/>
+
+        <b>This action cannot be undone.</b>
+      </p>
+
+      <div slot="footer">
+        <el-button :disabled="isDeletingUser" @click="closeDeleteUserDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isDeletingUser" @click="deleteUser()" type="danger" size="small">Delete</el-button>
+      </div>
+    </el-dialog>
   </div>
 </content-container>
 </template>
 
 <script>
-import { ROLES } from '@/env'
+import { ROLES, PASSWORD_RESET_ROOT_URL } from '@/env'
 import freshcom from '@/freshcom-sdk'
 import withLiveMode from '@/helpers/with-live-mode'
 import translateErrors from '@/helpers/translate-errors'
@@ -139,8 +172,8 @@ export default {
       user: User.objectWithDefaults(),
       isLoading: false,
 
-      isDeleteUserDialogVisible: false,
-      isDeletingUser: false,
+      isPasswordResetDialogVisible: false,
+      isGeneratingPasswordResetToken: false,
 
       isChangePasswordDialogVisible: false,
       isUpdatingPassword: false,
@@ -150,6 +183,10 @@ export default {
       isUpdatingRole: false,
 
       password: {},
+
+      isDeleteUserDialogVisible: false,
+      isDeletingUser: false,
+
       errors: {}
     }
   },
@@ -159,6 +196,14 @@ export default {
   computed: {
     errorMsgs () {
       return translateErrors(this.errors, 'password')
+    },
+
+    passwordResetLink () {
+      return `${PASSWORD_RESET_ROOT_URL}?token=${this.user.passwordResetToken}`
+    },
+
+    passwordResetLinkTeaser () {
+      return `${PASSWORD_RESET_ROOT_URL}?tok...`
     }
   },
   methods: {
@@ -176,8 +221,32 @@ export default {
       })
     },
 
-    editUser () {
-      this.$store.dispatch('pushRoute', { name: 'EditUser', params: { id: this.user.id } })
+    openPasswordResetDialog () {
+      this.isPasswordResetDialogVisible = true
+    },
+
+    closePasswordResetDialog () {
+      this.isPasswordResetDialogVisible = false
+    },
+
+    generatePasswordResetToken () {
+      withLiveMode(() => {
+        return freshcom.generatePasswordResetTokenById(this.user.id).then((response) => {
+          this.$message({
+            showClose: true,
+            message: `Password reset link generated successfully.`,
+            type: 'success'
+          })
+
+          this.user = response.data
+          this.isGeneratingPasswordResetToken = false
+          this.closePasswordResetDialog()
+        }).catch(response => {
+          this.errors = response.errors
+          this.isGeneratingPasswordResetToken = false
+          throw response
+        })
+      })
     },
 
     openChangePasswordDialog () {

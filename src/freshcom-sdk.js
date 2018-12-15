@@ -106,10 +106,10 @@ const sdk = {
   //
   // MARK: Password Reset Token
   //
-  createPasswordResetToken (fields, params = {}, options = {}) {
-    let payload = SimpleJAS.serialize(fields)
-    return this.http.post('/password_reset_tokens', payload, { params: params }).then(response => {
-      return {}
+  generatePasswordResetTokenById (id, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize({ type: 'PasswordResetToken' })
+    return this.http.post(`/password_reset_tokens?id=${id}`, payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
     }).catch(this._processHttpError)
   },
 

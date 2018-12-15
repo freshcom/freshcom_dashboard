@@ -125,6 +125,10 @@ input::-webkit-inner-spin-button {
   width: 200px;
 }
 
+.tooltip-poppper-xl {
+  width: 600px;
+}
+
 //
 // MARK: Tab
 //
