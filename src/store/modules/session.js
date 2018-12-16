@@ -102,7 +102,6 @@ export default {
 
     reset ({ rootState, state, commit, dispatch }) {
       removeObjectFromStorage('state.session.liveToken')
-      removeObjectFromStorage('state.session.testToken')
       removeObjectFromStorage('state.session.mode')
 
       commit(MT.USER_CHANGED, undefined)
@@ -177,7 +176,11 @@ export default {
       }
     },
     [MT.LIVE_TOKEN_CHANGED] (state, liveToken) {
-      setObjectToStorage('state.session.liveToken', liveToken)
+      if (liveToken) {
+        setObjectToStorage('state.session.liveToken', liveToken)
+      } else {
+        removeObjectFromStorage('state.session.liveToken')
+      }
       state.liveToken = liveToken
     },
     [MT.USER_CHANGED] (state, user) {
