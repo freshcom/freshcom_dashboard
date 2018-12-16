@@ -86,12 +86,9 @@ export default {
       }
 
       return freshcom.createToken(payload).then(token => {
-        setObjectToStorage('state.session.liveToken', token)
         commit(MT.LIVE_TOKEN_CHANGED, token)
         commit(MT.TOKEN_CHANGED, token)
         commit(MT.MODE_CHANGED, 'live')
-
-        dispatch('startLiveTokenRefresher')
 
         return Promise.all([dispatch('getAccount'), dispatch('getUser')]).then(data => {
           let account = data[0]
@@ -108,16 +105,12 @@ export default {
       removeObjectFromStorage('state.session.testToken')
       removeObjectFromStorage('state.session.mode')
 
-      commit(MT.LIVE_TOKEN_REFRESHER_STOPPED)
-      commit(MT.TEST_TOKEN_REFRESHER_STOPPED)
       commit(MT.USER_CHANGED, undefined)
       commit(MT.ACCOUNT_CHANGED, undefined)
       commit(MT.LIVE_TOKEN_CHANGED, undefined)
       commit(MT.TOKEN_CHANGED, undefined)
       commit(MT.MODE_CHANGED, 'live')
       commit(MT.READY, true)
-
-      freshcom.setAccessToken(API_CLIENT_ID)
     },
 
     setMode ({ state, commit, dispatch }, mode) {
@@ -180,10 +173,11 @@ export default {
         freshcom.setAccessToken(token.access_token)
         freshcom.setRefreshToken(token.refresh_token)
       } else {
-        freshcom.setAccessToken(undefined)
+        freshcom.setAccessToken(API_CLIENT_ID)
       }
     },
     [MT.LIVE_TOKEN_CHANGED] (state, liveToken) {
+      setObjectToStorage('state.session.liveToken', liveToken)
       state.liveToken = liveToken
     },
     [MT.USER_CHANGED] (state, user) {
