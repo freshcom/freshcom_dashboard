@@ -8,10 +8,6 @@ const MT = {
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
   MODE_CHANGED: 'MODE_CHANGED',
   LIVE_TOKEN_CHANGED: 'LIVE_TOKEN_CHANGED',
-  LIVE_TOKEN_REFRESHER_STARTED: 'LIVE_TOKEN_REFRESHER_STARTED',
-  LIVE_TOKEN_REFRESHER_STOPPED: 'LIVE_TOKEN_REFRESHER_STOPPED',
-  TEST_TOKEN_REFRESHER_STARTED: 'TEST_TOKEN_REFRESHER_STARTED',
-  TEST_TOKEN_REFRESHER_STOPPED: 'TEST_TOKEN_REFRESHER_STOPPED',
   READY: 'READY'
 }
 
@@ -42,9 +38,7 @@ export default {
     token: undefined,
     user: undefined,
     account: undefined,
-    mode: 'live',
-    liveTokenRefresherId: undefined,
-    testTokenRefresherId: undefined
+    mode: 'live'
   },
   actions: {
     retrieveFromStorage ({ commit, dispatch }) {
@@ -57,11 +51,7 @@ export default {
       commit(MT.TOKEN_CHANGED, liveToken)
 
       // Setup session
-      return dispatch('refreshLiveToken').then(() => {
-        dispatch('startLiveTokenRefresher')
-
-        return Promise.all([dispatch('getAccount'), dispatch('getUser')])
-      }).then(() => {
+      return Promise.all([dispatch('getAccount'), dispatch('getUser')]).then(() => {
         // Retrieve mode
         let mode = getObjectFromStorage('state.session.mode')
         if (mode === 'test') {
@@ -72,6 +62,16 @@ export default {
       }).catch(() => {
         dispatch('reset')
       })
+    },
+
+    setToken ({ commit }, token) {
+      if (token.refresh_token.startsWith('urt-live')) {
+        commit(MT.LIVE_TOKEN_CHANGED, token)
+
+        if (this.mode === 'live') {
+          commit(MT.TOKEN_CHANGED, token)
+        }
+      }
     },
 
     create ({ state, commit, dispatch }, form) {
@@ -124,7 +124,6 @@ export default {
       if (state.mode === mode) { return }
 
       if (mode === 'live') {
-        commit(MT.TEST_TOKEN_REFRESHER_STOPPED)
         commit(MT.TOKEN_CHANGED, state.liveToken)
         commit(MT.MODE_CHANGED, 'live')
         return dispatch('getAccount')
@@ -139,71 +138,8 @@ export default {
         commit(MT.TOKEN_CHANGED, token)
         commit(MT.MODE_CHANGED, 'test')
 
-        dispatch('startTestTokenRefresher')
         return dispatch('getAccount')
       })
-    },
-
-    refreshLiveToken ({ dispatch, state, commit }) {
-      return freshcom.createToken({
-        refresh_token: state.liveToken.refresh_token,
-        grant_type: 'refresh_token',
-        client_id: API_CLIENT_ID
-      }).then(liveToken => {
-        setObjectToStorage('state.session.liveToken', liveToken)
-        commit(MT.LIVE_TOKEN_CHANGED, liveToken)
-
-        if (state.mode === 'live') {
-          commit(MT.TOKEN_CHANGED, liveToken)
-        }
-
-        return liveToken
-      }).catch(error => {
-        console.log(error)
-        return dispatch('reset')
-      })
-    },
-
-    startLiveTokenRefresher ({ dispatch, state, commit }) {
-      if (state.liveTokenRefresherId) {
-        return console.warn('Live token refresher already started')
-      }
-
-      let refresherId = setInterval(() => {
-        dispatch('refreshLiveToken')
-      }, FIFTY_MINUTES)
-
-      commit(MT.LIVE_TOKEN_REFRESHER_STARTED, refresherId)
-    },
-
-    refreshTestToken ({ state, commit }) {
-      if (state.mode === 'live') { Promise.reject(new Error('Currently in live mode')) }
-
-      return freshcom.createToken({
-        refresh_token: state.token.refresh_token,
-        grant_type: 'refresh_token',
-        client_id: API_CLIENT_ID
-      }).then(testToken => {
-        console.log('Refreshed test token')
-
-        if (state.mode === 'test') {
-          commit(MT.TOKEN_CHANGED, testToken)
-        }
-
-        return testToken
-      })
-    },
-
-    startTestTokenRefresher ({ dispatch, state, commit }) {
-      if (state.testTokenRefresherId) {
-        return console.warn('Test token refresher already started')
-      }
-
-      let refresherId = setInterval(() => {
-        dispatch('refreshTestToken')
-      }, FIFTY_MINUTES)
-
-      commit(MT.TEST_TOKEN_REFRESHER_STARTED, refresherId)
     },
 
     getUser ({ state, commit }) {
@@ -249,24 +185,6 @@ export default {
     },
     [MT.LIVE_TOKEN_CHANGED] (state, liveToken) {
       state.liveToken = liveToken
-    },
-    [MT.LIVE_TOKEN_REFRESHER_STARTED] (state, refresherId) {
-      state.liveTokenRefresherId = refresherId
-    },
-    [MT.LIVE_TOKEN_REFRESHER_STOPPED] (state) {
-      if (state.liveTokenRefresherId) {
-        clearInterval(state.liveTokenRefresherId)
-      }
-      state.liveTokenRefresherId = undefined
-    },
-    [MT.TEST_TOKEN_REFRESHER_STARTED] (state, refresherId) {
-      state.testTokenRefresherId = refresherId
-    },
-    [MT.TEST_TOKEN_REFRESHER_STOPPED] (state) {
-      if (state.testTokenRefresherId) {
-        clearInterval(state.testTokenRefresherId)
-      }
-      state.testTokenRefresherId = undefined
     },
     [MT.USER_CHANGED] (state, user) {
       state.user = user

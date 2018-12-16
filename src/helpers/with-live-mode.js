@@ -3,9 +3,6 @@ import freshcom from '@/freshcom-sdk'
 
 // TODO: rename this file
 export default function (callback) {
-  let currentAccessToken = store.state.session.token.access_token
-  let currentRefreshToken = store.state.session.token.refresh_token
-
   let liveAccessToken = store.state.session.liveToken.access_token
   let liveRefreshToken = store.state.session.liveToken.refresh_token
 
@@ -13,11 +10,11 @@ export default function (callback) {
   freshcom.setRefreshToken(liveRefreshToken)
 
   return callback().then(() => {
-    freshcom.setAccessToken(currentAccessToken)
-    freshcom.setRefreshToken(currentRefreshToken)
+    freshcom.setAccessToken(store.state.session.token.access_token)
+    freshcom.setRefreshToken(store.state.session.token.refresh_token)
   }).catch(response => {
-    freshcom.setAccessToken(currentAccessToken)
-    freshcom.setRefreshToken(currentRefreshToken)
+    freshcom.setAccessToken(store.state.session.token.access_token)
+    freshcom.setRefreshToken(store.state.session.token.refresh_token)
 
     throw response
   })

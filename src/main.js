@@ -79,6 +79,9 @@ Vue.use(money, { precision: 2, masked: false, prefix: '$ ' })
 
 // -- Freshcom --
 freshcom.setAccessToken(API_CLIENT_ID)
+freshcom.accessTokenRefreshed = function (token) {
+  return store.dispatch('session/setToken', token)
+}
 
 Vue.config.productionTip = false
 

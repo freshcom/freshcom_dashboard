@@ -4,7 +4,7 @@
     <div class="data">
       <div class="block detail" style="margin-top: 0px;">
         <div class="header">
-          <h2>API Credentials</h2>
+          <h2>API Keys</h2>
         </div>
 
         <div class="body">

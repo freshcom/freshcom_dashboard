@@ -19,6 +19,7 @@ let axiosInstance = axios.create({
 const sdk = {
   http: axiosInstance,
   refreshToken: undefined,
+  accessTokenRefreshed: undefined,
 
   _processHttpError (error) {
     let response
@@ -1176,6 +1177,12 @@ axiosInstance.interceptors.response.use(undefined, function (error) {
       client_id: API_CLIENT_ID
     }).then(token => {
       sdk.setAccessToken(token.access_token)
+      sdk.setRefreshToken(token.refresh_token)
+
+      if (sdk.accessTokenRefreshed) {
+        sdk.accessTokenRefreshed(token)
+      }
+
       config.headers['Authorization'] = `Bearer ${token.access_token}`
       return axiosInstance(config)
     })

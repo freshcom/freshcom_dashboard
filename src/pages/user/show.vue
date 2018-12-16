@@ -190,9 +190,6 @@ export default {
       errors: {}
     }
   },
-  created () {
-    this.loadUser()
-  },
   computed: {
     errorMsgs () {
       return translateErrors(this.errors, 'password')
