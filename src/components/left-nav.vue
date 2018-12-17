@@ -7,7 +7,7 @@
           {{sessionAccount.name}}<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item>List all accounts</el-dropdown-item>
+          <el-dropdown-item command="openListAccountDialog">List all accounts</el-dropdown-item>
           <el-dropdown-item divided command="openCreateAccountDialog">
             <a href="javascript:;">Create new account</a>
           </el-dropdown-item>
@@ -158,6 +158,38 @@
         <el-button :loading="isCreatingAccount" @click="createAccount()" type="primary" size="small">Create account</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog :show-close="false" :visible="isListAccountDialogVisible" title="All accounts" width="500px">
+      <div class="block">
+        <div class="body full">
+          <el-table :data="accounts" :show-header="false" class="data-table block-table">
+            <el-table-column prop="name" label="ACCOUNT">
+              <template slot-scope="scope">
+                <a href="javascript:;" class="primary">
+                  <span>{{scope.row.name}}</span>
+                </a>
+              </template>
+            </el-table-column>
+
+            <el-table-column align="right" width="130">
+              <template slot-scope="scope">
+                <p class="action-group">
+                  <el-button-group>
+                    <el-button size="mini" plain>
+                      View Account
+                    </el-button>
+                  </el-button-group>
+                </p>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="closeListAccountDialog()" plain size="small">Close</el-button>
+      </div>
+    </el-dialog>
   </div>
 </div>
 </template>
@@ -193,6 +225,12 @@ export default {
   data () {
     return {
       isTogglingMode: false,
+
+      accounts: [],
+      totalCount: 0,
+      allCount: 0,
+      isListAccountDialogVisible: false,
+      isLoadingAccountList: false,
 
       isCreateAccountDialogVisible: false,
       isCreatingAccount: false,
@@ -276,6 +314,31 @@ export default {
         default:
           return false
       }
+    },
+
+    openListAccountDialog () {
+      this.listAccount()
+      this.isListAccountDialogVisible = true
+    },
+
+    closeListAccountDialog () {
+      this.isListAccountDialogVisible = false
+    },
+
+    listAccount () {
+      this.isLoadingAccountList = true
+
+      return withLiveMode(() => {
+        return freshcom.listAccount().then(response => {
+          this.accounts = response.data
+          this.allCount = response.meta.allCount
+          this.totalCount = response.meta.totalCount
+
+          this.isLoadingAccountList = false
+        }).catch(errors => {
+          this.isLoadingAccountList = false
+        })
+      })
     },
 
     openCreateAccountDialog () {

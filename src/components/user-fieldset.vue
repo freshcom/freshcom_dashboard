@@ -8,6 +8,12 @@
     <el-input v-model="formModel.password" @input="updateValue()" name="password" type="password" placeholder="Enter your password..."></el-input>
   </el-form-item>
 
+  <el-form-item v-if="!formModel.id" :error="errorMsgs.role" label="Role" id="role" required>
+    <el-select v-model="formModel.role" @change="updateValue()" placeholder="Select a role">
+      <el-option v-for="role in roles" :key="role" :label="$t(`enums.user.role.${role}`)" :value="role"></el-option>
+    </el-select>
+  </el-form-item>
+
   <el-form-item :error="errorMsgs.email" label="Email">
     <el-input v-model="formModel.email" @input="updateValue()" name="email" placeholder="Enter a email..."></el-input>
   </el-form-item>
@@ -19,12 +25,18 @@
 </template>
 
 <script>
+import { ROLES } from '@/env'
 import fieldsetMixinFactory from '@/mixins/fieldset'
 let FieldsetMixin = fieldsetMixinFactory({ errorI18nKey: 'user' })
 
 export default {
   name: 'UserFieldset',
-  mixins: [FieldsetMixin]
+  mixins: [FieldsetMixin],
+  data () {
+    return {
+      roles: ROLES
+    }
+  }
 }
 </script>
 
