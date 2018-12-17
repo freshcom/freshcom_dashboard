@@ -11,8 +11,6 @@ const MT = {
   READY: 'READY'
 }
 
-const FIFTY_MINUTES = 3000000
-
 function getObjectFromStorage (key, defaultValue) {
   let rawData = Cookies.get(key)
   if (!rawData) {

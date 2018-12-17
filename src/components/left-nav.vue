@@ -2,13 +2,13 @@
 <div class="left-nav">
   <div class="account">
     <p class="text-center">
-      <el-dropdown trigger="click">
+      <el-dropdown trigger="click" @command="(cmd) => { this[cmd]() }">
         <span class="el-dropdown-link">
           {{sessionAccount.name}}<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item>List all accounts</el-dropdown-item>
-          <el-dropdown-item divided>
+          <el-dropdown-item divided command="openCreateAccountDialog">
             <a href="javascript:;">Create new account</a>
           </el-dropdown-item>
         </el-dropdown-menu>
@@ -137,6 +137,28 @@
       <span>Account Settings</span>
     </el-menu-item>
   </el-menu>
+
+  <div class="launchable">
+    <el-dialog :show-close="false" :visible="isCreateAccountDialogVisible" title="Create new account" width="400px">
+      <el-form @submit.native.prevent="submit()" label-width="120px" size="small">
+        <el-form-item :error="errorMsgs.name" label="Name">
+          <el-input v-model="accountDraft.name" id="name" placeholder="Enter a name..."></el-input>
+        </el-form-item>
+
+        <el-form-item :error="errorMsgs.defaultLocale" label="Default Locale">
+          <el-select v-model="accountDraft.defaultLocale" placeholder="Please select">
+            <el-option value="en" label="English (en)"></el-option>
+            <el-option value="zh-CN" label="简体中文 (zh-CN)"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button :disabled="isCreatingAccount" @click="closeCreateAccountDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isCreatingAccount" @click="createAccount()" type="primary" size="small">Create account</el-button>
+      </div>
+    </el-dialog>
+  </div>
 </div>
 </template>
 
@@ -162,14 +184,28 @@ import 'vue-awesome/icons/map'
 import 'vue-awesome/icons/map-marker'
 import 'vue-awesome/icons/globe'
 
+import freshcom from '@/freshcom-sdk'
+import translateErrors from '@/helpers/translate-errors'
+import withLiveMode from '@/helpers/with-live-mode'
+
 export default {
   name: 'LeftNav',
   data () {
     return {
-      isTogglingMode: false
+      isTogglingMode: false,
+
+      isCreateAccountDialogVisible: false,
+      isCreatingAccount: false,
+      accountDraft: { type: 'Account', name: 'Unamed Account', defaultLocale: 'en' },
+
+      errors: {}
     }
   },
   computed: {
+    errorMsgs () {
+      return translateErrors(this.errors, 'account')
+    },
+
     isViewingTestData () {
       return this.$store.state.session.mode === 'test'
     },
@@ -240,6 +276,36 @@ export default {
         default:
           return false
       }
+    },
+
+    openCreateAccountDialog () {
+      this.accountDraft = { type: 'Account', name: 'Unamed Account', defaultLocale: 'en' }
+      this.isCreateAccountDialogVisible = true
+    },
+
+    closeCreateAccountDialog () {
+      this.isCreateAccountDialogVisible = false
+    },
+
+    createAccount () {
+      this.isCreatingAccount = true
+
+      withLiveMode(() => {
+        return freshcom.createAccount(this.accountDraft).then((response) => {
+          this.$message({
+            showClose: true,
+            message: `Account created successfully.`,
+            type: 'success'
+          })
+
+          this.isCreatingAccount = false
+          this.closeCreateAccountDialog()
+        }).catch(response => {
+          this.errors = response.errors
+          this.isCreatingAccount = false
+          throw response
+        })
+      })
     },
 
     toggleMode () {

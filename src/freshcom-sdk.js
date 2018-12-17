@@ -131,6 +131,13 @@ const sdk = {
     }).catch(this._processHttpError)
   },
 
+  createAccount (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.post('/accounts', payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
   retrieveAccount (params = {}, options = {}) {
     return this.http.get('/account', { params: params }).then(response => {
       return SimpleJAS.deserialize(response.data)
