@@ -2,7 +2,7 @@
 <div class="left-nav">
   <div class="account">
     <p class="text-center">
-      <el-dropdown trigger="click" @command="(cmd) => { this[cmd]() }">
+      <el-dropdown v-if="can('manageAccount')" trigger="click" @command="(cmd) => { this[cmd]() }">
         <span class="el-dropdown-link">
           {{sessionAccount.name}}<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
@@ -13,6 +13,7 @@
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
+      <span v-else>{{sessionAccount.name}}</span>
     </p>
   </div>
 
@@ -175,7 +176,7 @@
               <template slot-scope="scope">
                 <p class="action-group">
                   <el-button-group>
-                    <el-button size="mini" plain>
+                    <el-button @click="viewAccount(scope.row)" size="mini" plain>
                       View Account
                     </el-button>
                   </el-button-group>
@@ -311,6 +312,8 @@ export default {
       switch (action) {
         case 'viewDevelopment':
           return ['developer'].includes(this.user.role)
+        case 'manageAccount':
+          return ['standard'].includes(this.user.type)
         default:
           return false
       }
@@ -337,6 +340,20 @@ export default {
           this.isLoadingAccountList = false
         }).catch(errors => {
           this.isLoadingAccountList = false
+        })
+      })
+    },
+
+    viewAccount (account) {
+      this.$store.dispatch('session/changeAccount', account.id).then(() => {
+        this.closeListAccountDialog()
+
+        this.$store.dispatch('pushRoute', { name: 'Home' })
+
+        this.$message({
+          showClose: true,
+          message: `You are now viewing the Dashboard for ${account.name}`,
+          type: 'success'
         })
       })
     },

@@ -62,6 +62,27 @@ export default {
       })
     },
 
+    changeAccount ({ state, commit, dispatch }, accountId) {
+      let payload = {
+        client_id: API_CLIENT_ID,
+        refresh_token: state.liveToken.refresh_token,
+        grant_type: 'refresh_token',
+        scope: `acc:${accountId}`
+      }
+
+      return freshcom.createToken(payload).then(token => {
+        commit(MT.LIVE_TOKEN_CHANGED, token)
+        commit(MT.TOKEN_CHANGED, token)
+        commit(MT.MODE_CHANGED, 'live')
+
+        return dispatch('getAccount').then((account) => {
+          if (!account.isReadyForLiveTransaction) {
+            dispatch('setMode', 'test')
+          }
+        })
+      })
+    },
+
     setToken ({ commit }, token) {
       if (token.refresh_token.startsWith('urt-live')) {
         commit(MT.LIVE_TOKEN_CHANGED, token)
