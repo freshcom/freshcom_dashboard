@@ -137,6 +137,12 @@ const sdk = {
     }).catch(this._processHttpError)
   },
 
+  closeAccount (id, params = {}, options = {}) {
+    return this.http.delete(`/accounts/${id}`, { params: params }).then(response => {
+      return {}
+    }).catch(this._processHttpError)
+  },
+
   createAccount (fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.post('/accounts', payload, { params: params }).then(response => {

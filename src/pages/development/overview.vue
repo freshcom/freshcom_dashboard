@@ -101,13 +101,13 @@
 
     <el-dialog :show-close="false" :visible="isDeleteAppDialogVisible" title="Delete App" width="600px">
       <p>
-      <el-alert
-        :closable="false"
-        title="Dangerous Action"
-        type="error"
-        description="Please read carefully before proceeding"
-        >
-      </el-alert>
+        <el-alert
+          :closable="false"
+          title="Dangerous Action"
+          type="error"
+          description="Please read carefully before proceeding"
+          >
+        </el-alert>
       </p>
 
       <p>

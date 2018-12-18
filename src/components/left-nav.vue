@@ -4,7 +4,7 @@
     <p class="text-center">
       <el-dropdown v-if="can('manageAccount')" trigger="click" @command="(cmd) => { this[cmd]() }">
         <span class="el-dropdown-link">
-          {{sessionAccount.name}}<i class="el-icon-arrow-down el-icon--right"></i>
+          {{currentAccount.name}}<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="openListAccountDialog">List all accounts</el-dropdown-item>
@@ -13,7 +13,7 @@
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
-      <span v-else>{{sessionAccount.name}}</span>
+      <span v-else>{{currentAccount.name}}</span>
     </p>
   </div>
 
@@ -160,7 +160,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :show-close="false" :visible="isListAccountDialogVisible" title="All accounts" width="500px">
+    <el-dialog :show-close="false" :visible="isListAccountDialogVisible" title="All accounts" width="600px">
       <div class="block">
         <div class="body full">
           <el-table :data="accounts" :show-header="false" class="data-table block-table">
@@ -172,12 +172,20 @@
               </template>
             </el-table-column>
 
-            <el-table-column align="right" width="130">
+            <el-table-column align="right" width="300">
               <template slot-scope="scope">
                 <p class="action-group">
                   <el-button-group>
                     <el-button @click="viewAccount(scope.row)" size="mini" plain>
-                      View Account
+                      View
+                    </el-button>
+
+                    <el-button v-if="scope.row.systemLabel != 'default'" size="mini" plain>
+                      Set as Default
+                    </el-button>
+
+                    <el-button v-if="scope.row.systemLabel != 'default'" @click="openCloseAccountDialog(scope.row)" size="mini" plain>
+                      Close Account
                     </el-button>
                   </el-button-group>
                 </p>
@@ -189,6 +197,32 @@
 
       <div slot="footer" class="dialog-footer">
         <el-button @click="closeListAccountDialog()" plain size="small">Close</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog :show-close="false" :visible="isCloseAccountDialogVisible" title="Confirm Close Account" width="500px">
+      <p>
+        <el-alert
+          :closable="false"
+          title="Dangerous Action"
+          type="error"
+          description="Please read carefully before proceeding"
+          >
+        </el-alert>
+      </p>
+
+      <p>
+        Are you sure you want to close this account?
+        Once you close this account, all resources under this account will be
+        marked for deletion and will be permanently deleted in the next 3-5 days.
+
+        <br/><br/>
+        <b>This action cannot be undone.</b>
+      </p>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button :disabled="isClosingAccount" @click="closeCloseAccountDialog()" plain size="small">Cancel</el-button>
+        <el-button :loading="isClosingAccount" @click="closeAccount()" type="danger" size="small">Close Account</el-button>
       </div>
     </el-dialog>
   </div>
@@ -237,6 +271,9 @@ export default {
       isCreatingAccount: false,
       accountDraft: { type: 'Account', name: 'Unamed Account', defaultLocale: 'en' },
 
+      isCloseAccountDialogVisible: false,
+      isClosingAccount: false,
+
       errors: {}
     }
   },
@@ -248,7 +285,7 @@ export default {
     isViewingTestData () {
       return this.$store.state.session.mode === 'test'
     },
-    sessionAccount () {
+    currentAccount () {
       if (this.$store.state.session.account) {
         return this.$store.state.session.account
       }
@@ -383,6 +420,54 @@ export default {
         }).catch(response => {
           this.errors = response.errors
           this.isCreatingAccount = false
+          throw response
+        })
+      })
+    },
+
+    openCloseAccountDialog (targetAccount) {
+      this.accountForClose = targetAccount
+      this.isCloseAccountDialogVisible = true
+    },
+
+    closeCloseAccountDialog () {
+      this.isCloseAccountDialogVisible = false
+    },
+
+    closeAccount () {
+      this.isClosingAccount = true
+
+      withLiveMode(() => {
+        return freshcom.closeAccount(this.accountForClose.id).then(() => {
+          return this.listAccount()
+        }).then((response) => {
+          let message = `Account closed successfully.`
+
+          if (this.accountForClose.id === this.currentAccount.id ||
+            this.accountForClose.testAccountId === this.currentAccount.id) {
+
+            let defaultAccount = this.accounts.find((account) => {
+              return account.systemLabel === 'default'
+            })
+
+            message += ' You will be redirected to your default account in 3 seconds...'
+            this.closeListAccountDialog()
+            setTimeout(() => {
+              this.viewAccount(defaultAccount)
+            }, 3000)
+          }
+
+          this.$message({
+            showClose: true,
+            message: message,
+            type: 'success'
+          })
+
+          this.isClosingAccount = false
+          this.closeCloseAccountDialog()
+        }).catch(response => {
+          this.errors = response.errors
+          this.isClosingAccount = false
           throw response
         })
       })
