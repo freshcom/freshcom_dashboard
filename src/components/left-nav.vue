@@ -213,8 +213,11 @@
 
       <p>
         Are you sure you want to close this account?
-        Once you close this account, all resources under this account will be
-        marked for deletion and will be permanently deleted in the next 3-5 days.
+        Once you close this account, you will no longer have access to it.
+
+        <br/><br/>
+        All resources under this account will be marked for deletion and will be
+        permanently deleted in the next 3-5 days.
 
         <br/><br/>
         <b>This action cannot be undone.</b>
@@ -342,13 +345,17 @@ export default {
   },
   methods: {
     can (action) {
-      if (['owner', 'administrator'].includes(this.user.role)) {
+      if (['owner'].includes(this.user.role)) {
         return true
       }
 
       switch (action) {
+        case 'viewAccountSettings':
+          return ['administrator'].includes(this.user.role)
+        case 'viewTeam':
+          return ['administrator'].includes(this.user.role)
         case 'viewDevelopment':
-          return ['developer'].includes(this.user.role)
+          return ['developer', 'administrator'].includes(this.user.role)
         case 'manageAccount':
           return ['standard'].includes(this.user.type)
         default:
