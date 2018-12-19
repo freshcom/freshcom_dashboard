@@ -451,8 +451,7 @@ export default {
           let message = `Account closed successfully.`
 
           if (this.accountForClose.id === this.currentAccount.id ||
-            this.accountForClose.testAccountId === this.currentAccount.id) {
-
+              this.accountForClose.testAccountId === this.currentAccount.id) {
             let defaultAccount = this.accounts.find((account) => {
               return account.systemLabel === 'default'
             })
