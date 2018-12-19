@@ -166,9 +166,12 @@
           <el-table :data="accounts" :show-header="false" class="data-table block-table">
             <el-table-column prop="name" label="ACCOUNT">
               <template slot-scope="scope">
-                <a href="javascript:;" class="primary">
-                  <span>{{scope.row.name}}</span>
+                <a @click="viewAccount(scope.row)" href="javascript:;" class="primary">
+                  <span>{{scope.row.name}} </span>
+
+                  <el-tag v-if="isDefaultAccount(scope.row)" size="mini" type="info">Default</el-tag>
                 </a>
+
               </template>
             </el-table-column>
 
@@ -180,11 +183,11 @@
                       View
                     </el-button>
 
-                    <el-button v-if="isDefaultAccount(scope.row)" size="mini" plain>
+                    <el-button v-if="!isDefaultAccount(scope.row)" @click="setAsDefault(scope.row)" size="mini" plain>
                       Set as Default
                     </el-button>
 
-                    <el-button v-if="isDefaultAccount(scope.row)" @click="openCloseAccountDialog(scope.row)" size="mini" plain>
+                    <el-button v-if="!isDefaultAccount(scope.row)" @click="openCloseAccountDialog(scope.row)" size="mini" plain>
                       Close Account
                     </el-button>
                   </el-button-group>
@@ -345,7 +348,7 @@ export default {
   },
   methods: {
     isDefaultAccount(account) {
-      return this.user.defaultAccountId === account.id
+      return this.user.defaultAccount.id === account.id
     },
 
     can (action) {
@@ -402,6 +405,22 @@ export default {
           showClose: true,
           message: `You are now viewing the Dashboard for ${account.name}`,
           type: 'success'
+        })
+      })
+    },
+
+    setAsDefault (account) {
+      withLiveMode(() => {
+        return freshcom.changeDefaultAccount({id: account.id, type: 'Account'}).then((response) => {
+          this.$message({
+            showClose: true,
+            message: `Default account changed successfully.`,
+            type: 'success'
+          })
+
+          this.$store.dispatch('session/setUser', response.data)
+        }).catch(response => {
+          throw response
         })
       })
     },

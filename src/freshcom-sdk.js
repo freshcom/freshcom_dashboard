@@ -242,6 +242,13 @@ const sdk = {
     }).catch(this._processHttpError)
   },
 
+  changeDefaultAccount (fields, params = {}, options = {}) {
+    let payload = SimpleJAS.serialize(fields)
+    return this.http.patch('/user/relationships/default_account', payload, { params: params }).then(response => {
+      return SimpleJAS.deserialize(response.data)
+    }).catch(this._processHttpError)
+  },
+
   changeUserRole (id, fields, params = {}, options = {}) {
     let payload = SimpleJAS.serialize(fields)
     return this.http.put(`/users/${id}/role`, payload, { params: params }).then(response => {
