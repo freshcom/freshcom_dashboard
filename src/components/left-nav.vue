@@ -180,11 +180,11 @@
                       View
                     </el-button>
 
-                    <el-button v-if="scope.row.systemLabel != 'default'" size="mini" plain>
+                    <el-button v-if="isDefaultAccount(scope.row)" size="mini" plain>
                       Set as Default
                     </el-button>
 
-                    <el-button v-if="scope.row.systemLabel != 'default'" @click="openCloseAccountDialog(scope.row)" size="mini" plain>
+                    <el-button v-if="isDefaultAccount(scope.row)" @click="openCloseAccountDialog(scope.row)" size="mini" plain>
                       Close Account
                     </el-button>
                   </el-button-group>
@@ -344,6 +344,10 @@ export default {
     }
   },
   methods: {
+    isDefaultAccount(account) {
+      return this.user.defaultAccountId === account.id
+    },
+
     can (action) {
       if (['owner'].includes(this.user.role)) {
         return true
@@ -453,7 +457,7 @@ export default {
           if (this.accountForClose.id === this.currentAccount.id ||
               this.accountForClose.testAccountId === this.currentAccount.id) {
             let defaultAccount = this.accounts.find((account) => {
-              return account.systemLabel === 'default'
+              return isDefaultAccount(account)
             })
 
             message += ' You will be redirected to your default account in 3 seconds...'
