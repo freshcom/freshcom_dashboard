@@ -347,7 +347,7 @@ export default {
     }
   },
   methods: {
-    isDefaultAccount(account) {
+    isDefaultAccount (account) {
       return this.user.defaultAccount.id === account.id
     },
 
@@ -411,7 +411,7 @@ export default {
 
     setAsDefault (account) {
       withLiveMode(() => {
-        return freshcom.changeDefaultAccount({id: account.id, type: 'Account'}).then((response) => {
+        return freshcom.changeDefaultAccount({ id: account.id, type: 'Account' }).then((response) => {
           this.$message({
             showClose: true,
             message: `Default account changed successfully.`,
@@ -476,7 +476,7 @@ export default {
           if (this.accountForClose.id === this.currentAccount.id ||
               this.accountForClose.testAccountId === this.currentAccount.id) {
             let defaultAccount = this.accounts.find((account) => {
-              return isDefaultAccount(account)
+              return this.isDefaultAccount(account)
             })
 
             message += ' You will be redirected to your default account in 3 seconds...'
