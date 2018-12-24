@@ -22,15 +22,11 @@
 </template>
 
 <script>
-import LeftNav from '@/components/left-nav'
 import PageMixin from '@/mixins/page'
 
 export default {
   name: 'Home',
-  mixins: [PageMixin],
-  components: {
-    LeftNav
-  }
+  mixins: [PageMixin]
 }
 </script>
 

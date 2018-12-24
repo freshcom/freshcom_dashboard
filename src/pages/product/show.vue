@@ -356,7 +356,6 @@ import translateErrors from '@/helpers/translate-errors'
 
 import Product from '@/models/product'
 import FileCollectionBlock from '@/components/file-collection-block'
-import ConfirmButton from '@/components/confirm-button'
 import HoverButton from '@/components/hover-button'
 import { dollar, chargeDollar } from '@/helpers/filters'
 
@@ -368,7 +367,6 @@ export default {
   mixins: [ResourcePageMixin],
   components: {
     FileCollectionBlock,
-    ConfirmButton,
     HoverButton
   },
   filters: {
