@@ -19,8 +19,14 @@
 
   <el-menu mode="vertical" :router="true" :default-active="selected">
     <el-menu-item :route="{ name: 'Home' }" index="/">
-      <icon name="home" scale="0.9" width="23px"></icon>
-      <span>Home</span>
+      <div class="content">
+        <div class="icon">
+          <icon name="home" scale="0.9"></icon>
+        </div>
+        <div class="text">
+          <span>Home</span>
+        </div>
+      </div>
     </el-menu-item>
 
 <!--     <el-submenu index="storefront">
@@ -113,29 +119,51 @@
     </el-menu-item> -->
 
     <el-menu-item v-if="can('viewDevelopment')" :router="{ name: 'DevelopmentOverview' }" index="/development">
-      <icon name="terminal" scale="0.9" width="23px"></icon>
-      <span>Development</span>
+      <div class="content">
+        <div class="icon">
+          <icon name="terminal" scale="0.9"></icon>
+        </div>
+        <div class="text">
+          <span>Development</span>
+        </div>
+      </div>
     </el-menu-item>
 
     <el-menu-item index="" class="no-active">
-      <el-switch :value="isViewingTestData" :width="23" @input="toggleMode()" active-color="#f79a59" class="nav-switch">
-      </el-switch>
+      <div class="content">
+        <div class="icon">
+          <el-switch :value="isViewingTestData" :width="23" @input="toggleMode()" active-color="#f79a59" class="nav-switch">
+          </el-switch>
+        </div>
 
-      <span @click="toggleMode()" :class="{ 'mode-test': isViewingTestData }">
-        <span v-if="isViewingTestData">Viewing test data</span>
-        <span v-else>View test data</span>
-        <span v-loading="isTogglingMode" element-loading-spinner="el-icon-loading" class="test-toggle-loading"></span>
-      </span>
+        <div @click="toggleMode()" :class="{ 'mode-test': isViewingTestData }" class="text">
+          <span v-if="isViewingTestData">Viewing test data</span>
+          <span v-else>View test data</span>
+          <span v-loading="isTogglingMode" element-loading-spinner="el-icon-loading" class="test-toggle-loading"></span>
+        </div>
+      </div>
     </el-menu-item>
 
     <el-menu-item v-if="can('viewTeam')" index="/team">
-      <icon name="id-card" scale="0.9" width="23px"></icon>
-      <span id="nav-team">Team</span>
+      <div class="content">
+        <div class="icon">
+          <icon name="id-card" scale="0.9"></icon>
+        </div>
+        <div class="text">
+          <span id="nav-team">Team</span>
+        </div>
+      </div>
     </el-menu-item>
 
     <el-menu-item v-if="can('viewAccountSettings')" :router="{ name: 'AccountOverview' }" index="/account">
-      <icon name="cog" scale="0.9" width="23px"></icon>
-      <span>Account Settings</span>
+      <div class="content">
+        <div class="icon">
+          <icon name="cog" scale="0.9"></icon>
+        </div>
+        <div class="text">
+          <span>Account Settings</span>
+        </div>
+      </div>
     </el-menu-item>
   </el-menu>
 
@@ -539,11 +567,27 @@ export default {
   }
 
   .el-submenu__title, .el-menu-item, .el-submenu .el-menu-item {
+    padding: 0 10px;
+
+    .content {
+      display: flex;
+      height: 40px;
+
+      .icon {
+        width: 24px;
+        margin-right: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+      }
+
+      .text {
+        display: flex;
+      }
+    }
+
     height: 40px;
     line-height: 40px;
-    svg {
-      margin-right: 6px;
-    }
   }
 
   .account {
@@ -559,9 +603,8 @@ export default {
   }
 
   .test-toggle-loading {
-    float: right;
-    margin-right: 6px;
-    margin-top: 22px;
+    align-self: flex-end;
+    height: 40px;
 
     .el-icon-loading {
       font-size: 16px;
@@ -575,8 +618,6 @@ export default {
 }
 
 .nav-switch {
-  margin-right: 6px;
-
   .el-switch__core {
     height: 14px;
 
