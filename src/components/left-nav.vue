@@ -19,11 +19,11 @@
 
   <el-menu mode="vertical" :router="true" :default-active="selected">
     <el-menu-item :route="{ name: 'Home' }" index="/">
-      <icon name="home" scale="0.9"></icon>
+      <icon name="home" scale="0.9" width="23px"></icon>
       <span>Home</span>
     </el-menu-item>
 
-    <el-submenu index="storefront">
+<!--     <el-submenu index="storefront">
       <template slot="title">
         <icon name="shopping-cart" scale="0.9"></icon>
         <span id="nav-storefront">Storefront</span>
@@ -110,14 +110,14 @@
     <el-menu-item :route="{ name: 'ListFileCollection' }" index="/file-collections">
       <icon name="folder" scale="0.9"></icon>
       <span>File Storage</span>
-    </el-menu-item>
+    </el-menu-item> -->
 
     <el-menu-item v-if="can('viewDevelopment')" :router="{ name: 'DevelopmentOverview' }" index="/development">
-      <icon name="terminal" scale="0.9"></icon>
+      <icon name="terminal" scale="0.9" width="23px"></icon>
       <span>Development</span>
     </el-menu-item>
 
-    <el-menu-item index="" style="padding-left: 12px;" class="no-active">
+    <el-menu-item index="" class="no-active">
       <el-switch :value="isViewingTestData" :width="23" @input="toggleMode()" active-color="#f79a59" class="nav-switch">
       </el-switch>
 
@@ -129,12 +129,12 @@
     </el-menu-item>
 
     <el-menu-item v-if="can('viewTeam')" index="/team">
-      <icon name="id-card" scale="0.9"></icon>
+      <icon name="id-card" scale="0.9" width="23px"></icon>
       <span id="nav-team">Team</span>
     </el-menu-item>
 
     <el-menu-item v-if="can('viewAccountSettings')" :router="{ name: 'AccountOverview' }" index="/account">
-      <icon name="cog" scale="0.9"></icon>
+      <icon name="cog" scale="0.9" width="23px"></icon>
       <span>Account Settings</span>
     </el-menu-item>
   </el-menu>
@@ -575,6 +575,8 @@ export default {
 }
 
 .nav-switch {
+  margin-right: 6px;
+
   .el-switch__core {
     height: 14px;
 
