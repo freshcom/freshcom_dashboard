@@ -31,16 +31,16 @@ export default function (opts = {}) {
         required: true
       },
 
-      filterObject: {
-        type: Object,
+      filter: {
+        type: Array,
         default () {
-          return {}
+          return []
         }
       }
     },
     data () {
       return {
-        filterObjectDraft: _.cloneDeep(this.filterObject)
+        filterDraft: _.cloneDeep(this.filter)
       }
     },
     computed: {
@@ -50,17 +50,6 @@ export default function (opts = {}) {
 
       currentRoutePath () {
         return this.$store.state.route.fullPath
-      },
-
-      normalizedFilter () {
-        let nf = []
-        for (let key in this.filterObject) {
-          let condition = {}
-          condition[key] = this.filterObject[key]
-          nf.push(condition)
-        }
-
-        return nf
       }
     },
     watch: {
@@ -72,11 +61,11 @@ export default function (opts = {}) {
         this[opts.listMethodName]()
       },
 
-      filterObject (newObject, oldObject) {
-        if (_.isEqual(newObject, oldObject)) {
+      filter (newFilter, oldFilter) {
+        if (_.isEqual(newFilter, oldFilter)) {
           return
         }
-        this.filterObjectDraft = _.cloneDeep(this.filterObject)
+        this.filterDraft = _.cloneDeep(this.filter)
         this[opts.listMethodName]()
       },
 
@@ -89,11 +78,11 @@ export default function (opts = {}) {
     },
     methods: {
       clearFilter () {
-        this.filterObjectDraft = {}
+        this.filterDraft = []
       },
 
       resetFilter () {
-        this.filterObjectDraft = _.cloneDeep(this.filterObject)
+        this.filterDraft = _.cloneDeep(this.filter)
       }
     }
   }

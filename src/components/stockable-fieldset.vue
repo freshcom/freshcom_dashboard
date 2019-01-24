@@ -4,10 +4,6 @@
     <avatar-input v-model="formModel.avatar" @input="updateValue()"></avatar-input>
   </el-form-item>
 
-  <el-form-item label="Code" :error="errorMsgs.code">
-    <el-input v-model="formModel.code" @input="updateValue()"></el-input>
-  </el-form-item>
-
   <el-form-item label="Status" :error="errorMsgs.status" required>
     <el-select v-model="formModel.status" @change="updateValue()">
       <el-option label="Active" value="active"></el-option>
@@ -16,8 +12,20 @@
     </el-select>
   </el-form-item>
 
+  <el-form-item label="SKU" :error="errorMsgs.number">
+    <el-input v-model="formModel.number" @input="updateValue()"></el-input>
+  </el-form-item>
+
+  <el-form-item label="Barcode" :error="errorMsgs.barcode">
+    <el-input v-model="formModel.barcode" @input="updateValue()"></el-input>
+  </el-form-item>
+
   <el-form-item label="Name" :error="errorMsgs.name" required>
     <el-input v-model="formModel.name" @input="updateValue()" name="name"></el-input>
+  </el-form-item>
+
+  <el-form-item label="Label" :error="errorMsgs.label">
+    <el-input v-model="formModel.label" @input="updateValue()" name="label"></el-input>
   </el-form-item>
 
   <el-form-item label="Print Name" :error="errorMsgs.printName">
@@ -28,6 +36,12 @@
     <el-input v-model="formModel.unitOfMeasure" @input="updateValue()" name="unit-of-measure" width="200px"></el-input>
   </el-form-item>
 
+  <el-form-item label="Specification">
+    <el-input v-model="formModel.specification" @input="updateValue()" type="textarea"></el-input>
+  </el-form-item>
+
+  <hr>
+
   <el-form-item label="Variable Weight" :error="errorMsgs.variableWeight" required>
     <el-switch
       v-model="formModel.variableWeight"
@@ -37,7 +51,13 @@
     </el-switch>
   </el-form-item>
 
-  <hr>
+  <el-form-item label="Weight" :error="errorMsgs.weight">
+    <el-input-number v-model="formModel.weight" :min="0" :step="100" @input="updateValue()"></el-input-number>
+  </el-form-item>
+
+  <el-form-item label="Weight Unit" :error="errorMsgs.weightUnit">
+    <el-input v-model="formModel.weightUnit" @input="updateValue()" name="weight-unit" width="200px"></el-input>
+  </el-form-item>
 
   <el-form-item label="Storage Type" :error="errorMsgs.storageType">
     <el-select v-model="formModel.storageType" @change="updateValue()" placeholder="Select Storage Type">
@@ -45,6 +65,14 @@
       <el-option label="Frozen" value="frozen"></el-option>
       <el-option label="Refrigerated" value="refrigerated"></el-option>
     </el-select>
+  </el-form-item>
+
+  <el-form-item label="Storage Size" :error="errorMsgs.storageSize">
+    <el-input-number v-model="formModel.storageSize" :min="0" :step="100" @input="updateValue()"></el-input-number>
+  </el-form-item>
+
+  <el-form-item label="Storage Description">
+    <el-input v-model="formModel.storageDescription" @input="updateValue()" type="textarea"></el-input>
   </el-form-item>
 
   <el-form-item label="Stackable" :error="errorMsgs.stackable" required>
@@ -56,19 +84,7 @@
     </el-switch>
   </el-form-item>
 
-  <el-form-item label="Storage Size" :error="errorMsgs.storageSize" required>
-    <el-input-number v-model="formModel.storageSize" :min="0" :step="100" @input="updateValue()"></el-input-number>
-  </el-form-item>
-
-  <el-form-item label="Storage Description">
-    <el-input v-model="formModel.storageDescription" @input="updateValue()" type="textarea"></el-input>
-  </el-form-item>
-
   <hr>
-
-  <el-form-item label="Specification">
-    <el-input v-model="formModel.specification" @input="updateValue()" type="textarea"></el-input>
-  </el-form-item>
 
   <el-form-item label="Caption">
     <el-input v-model="formModel.caption" @input="updateValue()"></el-input>

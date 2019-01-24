@@ -15,11 +15,12 @@
   <div slot="content-header">
     <el-row>
       <el-col :span="16">
-        <filter-button :current="filterObject" :draft="filterObjectDraft" @cancel="resetFilter" @clear="clearFilter">
-          <filter-condition v-model="filterObjectDraft" filter-key="role" default="">
+        <filter-button :current="filter" :draft="filterDraft" @cancel="resetFilter" @clear="clearFilter">
+          <filter-condition v-model="filterDraft" statement-key="role" :default="{ '$eq': '' }">
             <span slot="key">Role</span>
-            <div slot="value">
-              <select v-model="filterObjectDraft.role">
+
+            <div slot="comparison" slot-scope="scope">
+              <select @input="scope.setValue($event.target.value)" :value="scope.value">
                 <option value="">Please select a role</option>
                 <option v-for="role in roles" :key="role" :value="role">is {{$t(`enums.user.role.${role}`)}}</option>
               </select>
@@ -141,7 +142,7 @@ export default {
       return withLiveMode(() => {
         return freshcom.listUser({
           search: this.searchKeyword,
-          filter: this.normalizedFilter,
+          filter: JSON.stringify(this.filter),
           page: this.page
         }).then(response => {
           this.users = response.data

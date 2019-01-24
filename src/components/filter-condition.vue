@@ -7,8 +7,8 @@
       </label>
     </div>
 
-    <div v-show="checked" class="value">
-      <slot name="value"></slot>
+    <div v-show="checked" class="comparison">
+      <slot name="comparison" :operator="statementOperator" :value="statementValue" :set-operator="setStatementOperator" :set-value="setStatementValue"></slot>
     </div>
   </div>
 </template>
@@ -19,18 +19,28 @@ import _ from 'lodash'
 export default {
   name: 'FilterCondition',
   props: {
-    filterKey: {
+    statementKey: {
       type: String,
       required: true
     },
-    value: {
-      type: Object,
+    value: { // Filter
+      type: Array,
       required: true
     },
     default: {
-      type: [String, Array],
+      type: Object,
       required: true
     }
+  },
+  data () {
+    return {
+      statement: undefined,
+      statementOperator: undefined,
+      statementValue: undefined
+    }
+  },
+  created () {
+    this.setDataFromFilter(this.value)
   },
   computed: {
     elementId () {
@@ -42,27 +52,67 @@ export default {
     },
 
     checked () {
-      if (this.filterKey && this.value) {
-        return this.filterKey in this.value
+      if (this.statementKey && this.value) {
+        return this.statement
       } else {
         return false
       }
     }
   },
   watch: {
-    value (v) {
-      this.formModel = _.cloneDeep(v)
+    value (filter) {
+      this.setDataFromFilter(filter)
     }
   },
   methods: {
-    toggleValue () {
-      if (this.filterKey in this.value) {
-        let updatedFilter = _.omit(this.value, this.filterKey)
-        this.$emit('input', updatedFilter)
-      } else {
-        let updatedFilter = _.merge({}, _.set(this.value, this.filterKey, this.default))
-        this.$emit('input', updatedFilter)
+    setDataFromFilter (filter) {
+      this.statement = _.find(filter, (statement) => {
+        return _.cloneDeep(statement[this.statementKey])
+      })
+
+      if (this.statement) {
+        let comparison = this.statement[this.statementKey]
+        this.statementOperator = Object.keys(comparison)[0]
+        this.statementValue = Object.values(comparison)[0]
       }
+    },
+
+    isKeyExist (filter, key) {
+      return !!_.find(filter, (statement) => {
+        return !!statement[key]
+      })
+    },
+
+    removeStatement (filter, key) {
+      return _.reject(filter, (statement) => {
+        return !!statement[key]
+      })
+    },
+
+    setStatement () {
+      let filter = this.removeStatement(this.value, this.statementKey)
+      this.$emit('input', _.concat(filter, this.statement))
+    },
+
+    toggleValue () {
+      if (this.isKeyExist(this.value, this.statementKey)) {
+        let filter = this.removeStatement(this.value, this.statementKey)
+        this.$emit('input', filter)
+      } else {
+        let statement = {}
+        statement[this.statementKey] = this.default
+        this.$emit('input', _.concat(this.value, statement))
+      }
+    },
+
+    setStatementOperator (operator) {
+      this.statement = { [this.statementKey]: { [operator]: this.statementValue } }
+      this.setStatement()
+    },
+
+    setStatementValue (value) {
+      this.statement[this.statementKey][this.statementOperator] = value
+      this.setStatement()
     }
   }
 }
@@ -91,7 +141,7 @@ export default {
     }
   }
 
-  .value {
+  .comparison {
     padding: 10px;
     background-color: #eef1f6;
 

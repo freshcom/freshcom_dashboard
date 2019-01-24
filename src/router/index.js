@@ -129,6 +129,11 @@ function extractPagination (route) {
   return { number: parseInt(pageNumber), size: parseInt(pageSize) }
 }
 
+function extractFilter (route) {
+  let query = route.query
+  return JSON.parse(route.query.filter || JSON.stringify([]))
+}
+
 const router = new Router({
   mode: 'history',
   parseQuery (query) {
@@ -194,7 +199,7 @@ const router = new Router({
         let page = extractPagination(route)
         return {
           searchKeyword: route.query.search,
-          filterObject: route.query.filter,
+          filter: extractFilter(route),
           page: page
         }
       }
@@ -339,7 +344,7 @@ const router = new Router({
         let page = extractPagination(route)
         return {
           searchKeyword: route.query.search,
-          filterObject: route.query.filter,
+          filter: extractFilter(route),
           page: page
         }
       }

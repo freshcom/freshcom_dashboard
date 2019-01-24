@@ -1,6 +1,6 @@
 <template>
 <div class="filter-button">
-  <el-popover v-model="isPopoverVisible" :visible-arrow="false" @hide="cancel()" ref="filter" placement="bottom-start" width="240" trigger="click" popper-class="filter">
+  <el-popover v-model="isPopoverVisible" :visible-arrow="false" @hide="cancel()" ref="filter" placement="bottom-start" width="280" trigger="click" popper-class="filter">
     <form @submit.prevent="done()">
       <el-row class="header">
         <el-col :span="8">
@@ -42,11 +42,11 @@ export default {
   name: 'FilterButton',
   props: {
     current: {
-      type: Object,
+      type: Array,
       required: true
     },
     draft: {
-      type: Object,
+      type: Array,
       required: true
     }
   },
@@ -58,7 +58,7 @@ export default {
   },
   computed: {
     activeFilterCount () {
-      return _.keys(this.current).length
+      return this.current.length
     }
   },
   methods: {
@@ -80,9 +80,10 @@ export default {
     },
 
     setFilter () {
-      let compact = _.pickBy(this.draft, (v) => {
-        if (v === '' || v === undefined) { return false }
-        return true
+      let compact = _.reject(this.draft, (statement) => {
+        let comparison = Object.values(statement)[0]
+        let value = Object.values(comparison)[0]
+        return value === '' || value === undefined
       })
 
       if (_.isEqual(this.current, compact)) {
@@ -95,7 +96,7 @@ export default {
         q = _.omit(this.$route.query, ['filter', 'page'])
       } else {
         q = _.omit(this.$route.query, 'page')
-        q.filter = compact
+        q.filter = JSON.stringify(compact)
       }
 
       this.$router.replace({ name: this.$route.name, query: q })
@@ -154,5 +155,48 @@ export default {
 // actual popover container is outside the scope
 .el-popover.filter {
   padding: 0px;
+
+  .el-date-editor.el-range-editor {
+    display: block;
+    border: none;
+    background: none;
+    height: auto;
+    width: 100%;
+    padding: 0px;
+
+    .el-range__icon.el-icon-time {
+      display: none;
+    }
+
+    .el-range__close-icon {
+      display: none;
+    }
+
+    .el-range-input {
+      display: block;
+      width: 100%;
+      height: 22px;
+      border-radius: 4px;
+      border: 1px solid #dcdfe6;
+
+      &:focus {
+        outline: none;
+        border-color: #409EFF;
+      }
+    }
+
+    .el-range-separator {
+      display: block;
+      text-align: center;
+      width: 100%
+    }
+  }
+
+  .el-input--mini .el-input__inner {
+    height: 24px;
+    line-height: 24px;
+    padding: 0 8px
+  }
 }
+
 </style>

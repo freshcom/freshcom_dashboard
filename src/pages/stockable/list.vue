@@ -11,26 +11,52 @@
   <div v-if="allCount > 0" slot="content-header">
     <el-row>
       <el-col :span="16">
-        <filter-button :current="filterObject" :draft="filterObjectDraft" @cancel="resetFilter" @clear="clearFilter">
-          <filter-condition v-model="filterObjectDraft" filter-key="status" default="active">
+        <filter-button :current="filter" :draft="filterDraft" @cancel="resetFilter" @clear="clearFilter">
+          <filter-condition v-model="filterDraft" statement-key="status" :default="{$eq: 'active'}">
             <span slot="key">Status</span>
-            <div slot="value">
-              <select v-model="filterObjectDraft.status">
+
+            <div slot="comparison" slot-scope="scope">
+              <select @input="scope.setValue($event.target.value)" :value="scope.value">
                 <option v-for="status in ['active', 'draft']" :key="status" :value="status">is {{status}}</option>
               </select>
             </div>
           </filter-condition>
 
-          <filter-condition v-model="filterObjectDraft" filter-key="label" default="">
+          <filter-condition v-model="filterDraft" statement-key="label" :default="{$eq: ''}">
             <span slot="key">Label</span>
-            <div slot="value">
-              <select value="$eq">
+            <div slot="comparison" slot-scope="scope">
+              <select @input="scope.setOperator($event.target.value)" :value="scope.operator">
                 <option value="$eq">is equal to</option>
+                <option value="$neq">is NOT equal to</option>
+              </select>
+
+              <div class="m-t-5">
+                <icon name="share" class="fa-flip-vertical" scale="0.8"></icon>
+                <el-input :value="scope.value" @input="scope.setValue($event)" size="mini" style="width: 160px;">
+                </el-input>
+              </div>
+            </div>
+          </filter-condition>
+
+          <filter-condition v-model="filterDraft" statement-key="updatedAt" :default="{$btwn: ['2019-01-17T08:00:00.000Z', '2019-01-20T08:00:00.000Z']}">
+            <span slot="key">Updated Date</span>
+            <div slot="comparison" slot-scope="scope">
+              <select @input="scope.setOperator($event.target.value)" :value="scope.operator">
+                <option value="$eq">is equal to</option>
+                <option value="$btwn">is between</option>
               </select>
 
               <div style="vertical-align: middle;" class="m-t-5">
-                <icon name="share" class="fa-flip-vertical" scale="0.8"></icon>
-                <input v-model="filterObjectDraft.label" type="text">
+                <el-date-picker
+                  v-if="scope.operator === '$btwn'"
+                  :value="scope.value"
+                  @input="scope.setValue"
+                  size="mini"
+                  type="datetimerange"
+                  range-separator="and"
+                  start-placeholder="Start Date"
+                  end-placeholder="End Date">
+                </el-date-picker>
               </div>
             </div>
           </filter-condition>
@@ -129,6 +155,7 @@
 
 <script>
 import freshcom from '@/freshcom-sdk'
+import qs from 'qs'
 
 import listPageMixinFactory from '@/mixins/list-page'
 let ListPageMixin = listPageMixinFactory({ listMethodName: 'listStockable' })
@@ -153,7 +180,7 @@ export default {
 
       return freshcom.listStockable({
         search: this.searchKeyword,
-        filter: this.filterObject,
+        filter: JSON.stringify(this.filter),
         page: this.page
       }).then(response => {
         this.stockables = response.data
