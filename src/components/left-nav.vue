@@ -74,25 +74,6 @@
       </el-menu-item>
     </el-submenu>
 
-    <el-submenu index="inventory">
-      <template slot="title">
-        <icon name="archive" scale="0.9"></icon>
-        <span id="nav-goods">Goods</span>
-      </template>
-      <el-menu-item :route="{ name: 'ListStockable' }" index="/stockables">
-        <icon name="cubes" scale="0.9"></icon>
-        <span id="nav-stockables">Stockables</span>
-      </el-menu-item>
-      <el-menu-item :route="{ name: 'ListUnlockable' }" index="/unlockables">
-        <icon name="unlock-alt" scale="0.9"></icon>
-        <span>Unlockables</span>
-      </el-menu-item>
-      <el-menu-item :route="{ name: 'ListDepositable' }" index="/depositables">
-        <icon name="gem" scale="0.9"></icon>
-        <span>Depositables</span>
-      </el-menu-item>
-    </el-submenu>
-
     <el-submenu index="notification">
       <template slot="title">
         <icon name="paper-plane" scale="0.9"></icon>
@@ -117,6 +98,37 @@
       <icon name="folder" scale="0.9"></icon>
       <span>File Storage</span>
     </el-menu-item> -->
+
+    <el-submenu index="inventory">
+      <template slot="title">
+        <div class="content">
+          <div class="icon">
+            <icon name="archive" scale="0.9"></icon>
+          </div>
+          <div class="text">
+            <span id="nav-goods">Goods</span>
+          </div>
+        </div>
+      </template>
+      <el-menu-item :route="{ name: 'ListStockable' }" index="/stockables">
+        <div class="content">
+          <div class="icon">
+            <icon name="cubes" scale="0.9"></icon>
+          </div>
+          <div class="text">
+            <span id="nav-stockables">Stockables</span>
+          </div>
+        </div>
+      </el-menu-item>
+<!--       <el-menu-item :route="{ name: 'ListUnlockable' }" index="/unlockables">
+        <icon name="unlock-alt" scale="0.9"></icon>
+        <span>Unlockables</span>
+      </el-menu-item>
+      <el-menu-item :route="{ name: 'ListDepositable' }" index="/depositables">
+        <icon name="gem" scale="0.9"></icon>
+        <span>Depositables</span>
+      </el-menu-item> -->
+    </el-submenu>
 
     <el-menu-item v-if="can('viewDevelopment')" :router="{ name: 'DevelopmentOverview' }" index="/development">
       <div class="content">

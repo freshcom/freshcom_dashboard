@@ -4,21 +4,32 @@ export default {
       id: undefined,
       type: 'Stockable',
 
-      code: '',
       status: 'active',
+      number: '',
+      barcode: '',
+
       name: '',
+      label: '',
       printName: '',
-      unitOfMeasure: null,
+      unitOfMeasure: 'EA',
+      specification: '',
+
       variableWeight: false,
+      weight: 0,
+      weightUnit: null,
 
       storageType: null,
       storageSize: 0,
-      stackable: true,
+      storageDescription: null,
+      stackable: false,
+
+      width: null,
+      length: null,
+      height: null,
+      dimenstion_unit: null,
 
       caption: '',
-      desecription: '',
-      specification: '',
-      storageDescription: ''
+      desecription: ''
     }
   }
 }
