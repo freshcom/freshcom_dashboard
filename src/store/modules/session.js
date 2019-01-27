@@ -84,12 +84,20 @@ export default {
     },
 
     setToken ({ commit }, token) {
+      // If we just refreshed live access token
       if (token.refresh_token.startsWith('urt-live')) {
         commit(MT.LIVE_TOKEN_CHANGED, token)
 
+        // Only change the token if we are also in live mode.
+        // It could be that we are actually in test mode but
+        // viewing a section that is only avilable in live mode
+        // in which case will be in test mode but trying to
+        // refresh the live token
         if (this.mode === 'live') {
           commit(MT.TOKEN_CHANGED, token)
         }
+      } else {
+        commit(MT.TOKEN_CHANGED, token)
       }
     },
 
