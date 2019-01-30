@@ -536,6 +536,19 @@ input::-webkit-inner-spin-button {
     padding: 20px;
     clear: both;
 
+    .sub-header {
+      margin: -20px -20px 0px -20px;
+      padding: 10px 20px;
+      border-bottom: 1px solid #eaeefb;
+
+      h3 {
+        display: inline-block;
+        margin: 0px;
+        line-height: 16px;
+        font-size: 16px;
+      }
+    }
+
     &.full {
       padding: 0;
     }
@@ -550,6 +563,16 @@ input::-webkit-inner-spin-button {
 
       .view-more {
         font-size: 15px;
+      }
+    }
+
+    .el-form-item {
+      &:first-child {
+        margin-top: 0px;
+      }
+
+      &:last-child {
+        margin-bottom: 0px;
       }
     }
   }
@@ -829,6 +852,28 @@ small {
 
 .el-form-item {
   margin: 22px 0px;
+}
+
+.el-form--label-top {
+  .el-form-item {
+    margin: 20px 0px;
+
+    &.label-only {
+      margin-bottom: 0px;
+    }
+  }
+
+  .el-col > .el-form-item {
+    margin: 0px;
+  }
+
+  .el-col .el-input-number {
+    width: 100%;
+  }
+
+  .el-row {
+    margin: 20px 0px;
+  }
 }
 
 .el-autocomplete {

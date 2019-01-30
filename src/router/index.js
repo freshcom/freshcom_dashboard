@@ -130,7 +130,6 @@ function extractPagination (route) {
 }
 
 function extractFilter (route) {
-  let query = route.query
   return JSON.parse(route.query.filter || JSON.stringify([]))
 }
 

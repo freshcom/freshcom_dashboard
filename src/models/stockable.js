@@ -15,18 +15,18 @@ export default {
       specification: '',
 
       variableWeight: false,
-      weight: 0,
-      weightUnit: null,
+      weight: undefined,
+      weightUnit: undefined,
 
-      storageType: null,
-      storageSize: 0,
-      storageDescription: null,
+      storageType: undefined,
+      storageSize: undefined,
+      storageDescription: undefined,
       stackable: false,
 
-      width: null,
-      length: null,
-      height: null,
-      dimenstion_unit: null,
+      width: undefined,
+      length: undefined,
+      height: undefined,
+      dimenstion_unit: undefined,
 
       caption: '',
       desecription: ''

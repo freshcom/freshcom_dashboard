@@ -25,8 +25,8 @@
   <div slot="content-body">
     <div class="data">
       <el-row>
-        <el-col :span="16" :offset="4">
-          <el-form @submit.native.prevent="submit()" label-width="140px" size="small">
+        <el-col :span="24">
+          <el-form @submit.native.prevent="submit()" label-position="top" size="small">
             <stockable-fieldset v-model="stockableDraft" :errors="errors"></stockable-fieldset>
           </el-form>
         </el-col>

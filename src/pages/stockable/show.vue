@@ -40,47 +40,84 @@
 
         <div class="body">
           <dl>
-            <dt>ID</dt>
-            <dd>{{stockable.id}}</dd>
+            <el-collapse v-model="expandedSections">
+              <el-collapse-item title="Basic Information" name="basic">
+                <dt>ID</dt>
+                <dd>{{stockable.id}}</dd>
 
-            <dt>Code</dt>
-            <dd>{{stockable.code}}</dd>
+                <dt>Status</dt>
+                <dd>{{stockable.status}}</dd>
 
-            <dt>Status</dt>
-            <dd>{{stockable.status}}</dd>
+                <dt>Number</dt>
+                <dd>{{stockable.number}}</dd>
 
-            <dt>Name</dt>
-            <dd>{{stockable.name}}</dd>
+                <dt>Barcode</dt>
+                <dd>{{stockable.barcode}}</dd>
 
-            <dt>Print Name</dt>
-            <dd>{{stockable.printName}}</dd>
+                <dt>Name</dt>
+                <dd>{{stockable.name}}</dd>
 
-            <dt>Unit of Measure</dt>
-            <dd>{{stockable.unitOfMeasure}}</dd>
+                <dt>Label</dt>
+                <dd>{{stockable.label}}</dd>
 
-            <dt>Variable Weight</dt>
-            <dd>{{stockable.variableWeight}}</dd>
+                <dt>Print Name</dt>
+                <dd>{{stockable.printName}}</dd>
 
-            <dt>Storage Type</dt>
-            <dd>{{stockable.storageType}}</dd>
+                <dt>Unit of Measure</dt>
+                <dd>{{stockable.unitOfMeasure}}</dd>
 
-            <dt>Stackable</dt>
-            <dd>{{stockable.stackable}}</dd>
+                <dt>Specification</dt>
+                <dd>{{stockable.specification}}</dd>
+              </el-collapse-item>
 
-            <dt>Storage Size</dt>
-            <dd>{{stockable.storageSize}}</dd>
+              <el-collapse-item title="Weight" name="weight">
+                <dt>Variable Weight</dt>
+                <dd>{{stockable.variableWeight}}</dd>
 
-            <dt>Storage Description</dt>
-            <dd>{{stockable.storageDescription}}</dd>
+                <dt>Weight</dt>
+                <dd>{{stockable.weight}}</dd>
 
-            <dt>Specification</dt>
-            <dd>{{stockable.specification}}</dd>
+                <dt>Weight Unit</dt>
+                <dd>{{stockable.weightUnit}}</dd>
+              </el-collapse-item>
 
-            <dt>Caption</dt>
-            <dd>{{stockable.caption}}</dd>
+              <el-collapse-item title="Storage" name="storage">
+                <dt>Storage Type</dt>
+                <dd>{{stockable.storageType}}</dd>
 
-            <dt>Description</dt>
-            <dd>{{stockable.description}}</dd>
+                <dt>Storage Size</dt>
+                <dd>{{stockable.storageSize}}</dd>
+
+                <dt>Storage Description</dt>
+                <dd>{{stockable.storageDescription}}</dd>
+
+                <dt>Stackable</dt>
+                <dd>{{stockable.stackable}}</dd>
+              </el-collapse-item>
+
+              <el-collapse-item title="Dimension" name="dimension">
+                <dt>Width</dt>
+                <dd>{{stockable.width}}</dd>
+
+                <dt>Length</dt>
+                <dd>{{stockable.length}}</dd>
+
+                <dt>Height</dt>
+                <dd>{{stockable.height}}</dd>
+
+                <dt>Dimension Unit</dt>
+                <dd>{{stockable.dimensionUnit}}</dd>
+              </el-collapse-item>
+
+              <el-collapse-item title="Description" name="description">
+                <dt>Caption</dt>
+                <dd>{{stockable.caption}}</dd>
+
+                <dt>Description</dt>
+                <dd>{{stockable.description}}</dd>
+              </el-collapse-item>
+
+            </el-collapse>
           </dl>
         </div>
       </div>
@@ -172,6 +209,7 @@ export default {
     return {
       stockable: Stockable.objectWithDefaults(),
       isLoading: false,
+      expandedSections: ['basic'],
 
       isConfirmingDeleteStockable: false,
       isDeletingStockable: false
