@@ -61,7 +61,7 @@
 
     <el-col :span="8">
       <div class="block">
-        <div class="body">
+        <div class="body with-sub-header">
           <div class="sub-header">
             <h3>Status</h3>
           </div>
@@ -77,41 +77,44 @@
       </div>
 
       <div class="block">
-        <div class="body">
+        <div class="body with-sub-header">
           <div class="sub-header">
             <h3>Weight</h3>
           </div>
-          <el-form-item label="Variable Weight" :error="errorMsgs.variableWeight">
-            <el-switch
-              v-model="formModel.variableWeight"
-              @change="updateValue()"
-              active-text="Yes"
-              inactive-text="No">
-            </el-switch>
-          </el-form-item>
 
-          <el-row :gutter="5">
-            <el-col :span="12">
-              <el-form-item label="Weight" :error="errorMsgs.weight">
-                <el-input-number v-model="formModel.weight" :controls="false" @input="updateValue()"></el-input-number>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="Weight Unit" :error="errorMsgs.weightUnit">
-                <el-input v-model="formModel.weightUnit" @input="updateValue()" name="weight-unit" width="200px"></el-input>
-              </el-form-item>
-            </el-col>
-          </el-row>
+          <div class="form-item-group">
+            <el-form-item label="Variable Weight" :error="errorMsgs.variableWeight">
+              <el-switch
+                v-model="formModel.variableWeight"
+                @change="updateValue()"
+                active-text="Yes"
+                inactive-text="No">
+              </el-switch>
+            </el-form-item>
+
+            <el-row :gutter="5">
+              <el-col :span="12">
+                <el-form-item label="Weight" :error="errorMsgs.weight">
+                  <el-input-number v-model="formModel.weight" :controls="false" @input="updateValue()"></el-input-number>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="Weight Unit" :error="errorMsgs.weightUnit">
+                  <el-input v-model="formModel.weightUnit" @input="updateValue()" name="weight-unit" width="200px"></el-input>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </div>
         </div>
       </div>
 
       <div class="block">
-        <div class="body">
+        <div class="body with-sub-header">
           <div class="sub-header">
             <h3>Storage</h3>
           </div>
 
-          <el-row :gutter="5">
+          <div class="form-item-group">
             <el-form-item label="Storage Type" :error="errorMsgs.storageType">
               <el-select v-model="formModel.storageType" @change="updateValue()" placeholder="Select Storage Type">
                 <el-option label="Room" value="room"></el-option>
@@ -123,51 +126,53 @@
             <el-form-item label="Storage Size" :error="errorMsgs.storageSize">
               <el-input-number v-model="formModel.storageSize" :controls="false" :step="100" @input="updateValue()"></el-input-number>
             </el-form-item>
-          </el-row>
 
-          <el-form-item label="Storage Description">
-            <el-input v-model="formModel.storageDescription" @input="updateValue()" type="textarea"></el-input>
-          </el-form-item>
+            <el-form-item label="Storage Description">
+              <el-input v-model="formModel.storageDescription" @input="updateValue()" type="textarea"></el-input>
+            </el-form-item>
 
-          <el-form-item label="Stackable" :error="errorMsgs.stackable">
-            <el-switch
-              v-model="formModel.stackable"
-              @change="updateValue()"
-              active-text="Yes"
-              inactive-text="No">
-            </el-switch>
-          </el-form-item>
+            <el-form-item label="Stackable" :error="errorMsgs.stackable">
+              <el-switch
+                v-model="formModel.stackable"
+                @change="updateValue()"
+                active-text="Yes"
+                inactive-text="No">
+              </el-switch>
+            </el-form-item>
+          </div>
         </div>
       </div>
 
       <div class="block">
-        <div class="body">
+        <div class="body with-sub-header">
           <div class="sub-header">
             <h3>Dimension</h3>
           </div>
-          <el-row :gutter="5">
-            <el-col :span="8">
-              <el-form-item label="Length" :error="errorMsgs.length">
-                <el-input-number v-model="formModel.length" :controls="false" @input="updateValue()"></el-input-number>
-              </el-form-item>
-            </el-col>
+          <div class="form-item-group">
+            <el-row :gutter="5">
+              <el-col :span="8">
+                <el-form-item label="Length" :error="errorMsgs.length">
+                  <el-input-number v-model="formModel.length" :controls="false" @input="updateValue()"></el-input-number>
+                </el-form-item>
+              </el-col>
 
-            <el-col :span="8">
-              <el-form-item label="Width" :error="errorMsgs.width">
-                <el-input-number v-model="formModel.width" :controls="false" @input="updateValue()"></el-input-number>
-              </el-form-item>
-            </el-col>
+              <el-col :span="8">
+                <el-form-item label="Width" :error="errorMsgs.width">
+                  <el-input-number v-model="formModel.width" :controls="false" @input="updateValue()"></el-input-number>
+                </el-form-item>
+              </el-col>
 
-            <el-col :span="8">
-              <el-form-item label="Height" :error="errorMsgs.height">
-                <el-input-number v-model="formModel.height" :controls="false" @input="updateValue()"></el-input-number>
-              </el-form-item>
-            </el-col>
-          </el-row>
+              <el-col :span="8">
+                <el-form-item label="Height" :error="errorMsgs.height">
+                  <el-input-number v-model="formModel.height" :controls="false" @input="updateValue()"></el-input-number>
+                </el-form-item>
+              </el-col>
+            </el-row>
 
-          <el-form-item label="Dimension Unit" :error="errorMsgs.dimensionUnit">
-            <el-input v-model="formModel.dimensionUnit" @input="updateValue()" name="weight-unit" width="200px"></el-input>
-          </el-form-item>
+            <el-form-item label="Dimension Unit" :error="errorMsgs.dimensionUnit">
+              <el-input v-model="formModel.dimensionUnit" @input="updateValue()" name="weight-unit" width="200px"></el-input>
+            </el-form-item>
+          </div>
         </div>
       </div>
     </el-col>

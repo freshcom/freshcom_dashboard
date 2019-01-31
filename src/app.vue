@@ -470,25 +470,36 @@ input::-webkit-inner-spin-button {
   dl {
     margin: 0px;
     font-size: 14px;
+    padding: 20px 0px;
 
     dt {
       padding: 0px 15px 0px 0;
       width: 150px;
       float: left;
       text-align: right;
-      color: #888;
+      color: #697386;
       line-height: 25px;
     }
 
     dd {
       min-height: 25px;
       line-height: 25px;
-      color: #48576a;
+      color: #2c3e50;
       margin-left: 165px;
     }
   }
 
-  dl.thin {
+  dl.dl-sm {
+    dt {
+      width: 130px;
+    }
+
+    dd {
+      margin-left: 145px;
+    }
+  }
+
+  dl.dl-xs {
     dt {
       width: 100px;
     }
@@ -496,6 +507,11 @@ input::-webkit-inner-spin-button {
     dd {
       margin-left: 115px;
     }
+  }
+
+  .empty {
+    color: #a3acb9;
+    font-style: italic;
   }
 }
 
@@ -533,11 +549,16 @@ input::-webkit-inner-spin-button {
     border: 1px solid #eaeefb;
     border-radius: 4px;
     overflow: hidden;
-    padding: 20px;
+    padding: 0px 20px;
     clear: both;
+    min-height: 60px;
+
+    &.with-sub-header {
+      padding-top: 0px;
+    }
 
     .sub-header {
-      margin: -20px -20px 0px -20px;
+      margin: 0px -20px;
       padding: 10px 20px;
       border-bottom: 1px solid #eaeefb;
 
@@ -545,7 +566,8 @@ input::-webkit-inner-spin-button {
         display: inline-block;
         margin: 0px;
         line-height: 16px;
-        font-size: 16px;
+        font-size: 14px;
+        font-weight: 500;
       }
     }
 
@@ -566,13 +588,21 @@ input::-webkit-inner-spin-button {
       }
     }
 
-    .el-form-item {
-      &:first-child {
-        margin-top: 0px;
+    .el-col.with-divider-left {
+      border-left: 1px solid #eaeefb;
+
+      .el-collapse-item__header {
+        padding-left: 20px;
+        padding-right: 10px;
       }
 
-      &:last-child {
-        margin-bottom: 0px;
+      .el-collapse {
+        border: none;
+        margin-right: -20px;
+
+        dl {
+          padding: 0px;
+        }
       }
     }
   }
@@ -854,9 +884,13 @@ small {
   margin: 22px 0px;
 }
 
-.el-form--label-top {
+.el-form.el-form--label-top {
   .el-form-item {
     margin: 20px 0px;
+
+    & > .el-form-item__label {
+      line-height: inherit;
+    }
 
     &.label-only {
       margin-bottom: 0px;
@@ -880,8 +914,8 @@ small {
   width: 100%;
 }
 
-.el-form.el-form--label-top .el-form-item > .el-form-item__label {
-  line-height: inherit;
+.el-collapse-item__content {
+  padding-bottom: 15px;
 }
 /* END Common Overwrite */
 

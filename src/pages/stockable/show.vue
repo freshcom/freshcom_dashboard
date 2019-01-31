@@ -39,26 +39,35 @@
         </div>
 
         <div class="body">
-          <dl>
-            <el-collapse v-model="expandedSections">
-              <el-collapse-item title="Basic Information" name="basic">
+          <el-row type="flex" align="stretch">
+            <el-col :span="14">
+              <dl class="dl-sm">
                 <dt>ID</dt>
                 <dd>{{stockable.id}}</dd>
 
                 <dt>Status</dt>
                 <dd>{{stockable.status}}</dd>
 
-                <dt>Number</dt>
-                <dd>{{stockable.number}}</dd>
+                <dt>SKU</dt>
+                <dd>
+                  <span v-if="stockable.number">{{stockable.number}}</span>
+                  <span v-else class="empty">Not Specified</span>
+                </dd>
 
                 <dt>Barcode</dt>
-                <dd>{{stockable.barcode}}</dd>
+                <dd>
+                  <span v-if="stockable.barcode">{{stockable.barcode}}</span>
+                  <span v-else class="empty">Not Specified</span>
+                </dd>
 
                 <dt>Name</dt>
                 <dd>{{stockable.name}}</dd>
 
                 <dt>Label</dt>
-                <dd>{{stockable.label}}</dd>
+                <dd>
+                  <span v-if="stockable.label">{{stockable.label}}</span>
+                  <span v-else class="empty">Not Specified</span>
+                </dd>
 
                 <dt>Print Name</dt>
                 <dd>{{stockable.printName}}</dd>
@@ -66,59 +75,89 @@
                 <dt>Unit of Measure</dt>
                 <dd>{{stockable.unitOfMeasure}}</dd>
 
-                <dt>Specification</dt>
-                <dd>{{stockable.specification}}</dd>
-              </el-collapse-item>
-
-              <el-collapse-item title="Weight" name="weight">
-                <dt>Variable Weight</dt>
-                <dd>{{stockable.variableWeight}}</dd>
-
-                <dt>Weight</dt>
-                <dd>{{stockable.weight}}</dd>
-
-                <dt>Weight Unit</dt>
-                <dd>{{stockable.weightUnit}}</dd>
-              </el-collapse-item>
-
-              <el-collapse-item title="Storage" name="storage">
-                <dt>Storage Type</dt>
-                <dd>{{stockable.storageType}}</dd>
-
-                <dt>Storage Size</dt>
-                <dd>{{stockable.storageSize}}</dd>
-
-                <dt>Storage Description</dt>
-                <dd>{{stockable.storageDescription}}</dd>
-
-                <dt>Stackable</dt>
-                <dd>{{stockable.stackable}}</dd>
-              </el-collapse-item>
-
-              <el-collapse-item title="Dimension" name="dimension">
-                <dt>Width</dt>
-                <dd>{{stockable.width}}</dd>
-
-                <dt>Length</dt>
-                <dd>{{stockable.length}}</dd>
-
-                <dt>Height</dt>
-                <dd>{{stockable.height}}</dd>
-
-                <dt>Dimension Unit</dt>
-                <dd>{{stockable.dimensionUnit}}</dd>
-              </el-collapse-item>
-
-              <el-collapse-item title="Description" name="description">
-                <dt>Caption</dt>
+                <dt>Short Description</dt>
                 <dd>{{stockable.caption}}</dd>
 
-                <dt>Description</dt>
-                <dd>{{stockable.description}}</dd>
-              </el-collapse-item>
+                <template v-if="!isBlockDescription">
+                  <dt>Long Description</dt>
+                  <dd>
+                    <span v-if="stockable.description">{{stockable.description}}</span>
+                    <span v-else class="empty">Not Specified</span>
+                  </dd>
+                </template>
+              </dl>
+            </el-col>
+            <el-col :span="10" class="with-divider-left">
+              <el-collapse v-model="activeSection" accordion>
+                <el-collapse-item title="Weight" name="weight">
+                  <dl class="dl-sm">
+                    <dt>Variable Weight</dt>
+                    <dd>{{stockable.variableWeight}}</dd>
 
-            </el-collapse>
-          </dl>
+                    <dt>Weight</dt>
+                    <dd>
+                      <span v-if="stockable.weight">{{stockable.weight}}</span>
+                      <span v-else class="empty">Not Specified</span>
+                    </dd>
+
+                    <dt>Weight Unit</dt>
+                    <dd>
+                      <span v-if="stockable.weightUnit">{{stockable.weightUnit}}</span>
+                      <span v-else class="empty">Not Specified</span>
+                    </dd>
+                  </dl>
+                </el-collapse-item>
+
+                <el-collapse-item title="Storage" name="storage">
+                  <dl class="dl-sm">
+                    <dt>Storage Type</dt>
+                    <dd>
+                      <span v-if="stockable.storageType">{{stockable.storageType}}</span>
+                      <span v-else class="empty">Not Specified</span>
+                    </dd>
+
+                    <dt>Storage Size</dt>
+                    <dd>{{stockable.storageSize}}</dd>
+
+                    <dt>Description</dt>
+                    <dd>{{stockable.storageDescription}}</dd>
+
+                    <dt>Stackable</dt>
+                    <dd>{{stockable.stackable}}</dd>
+                  </dl>
+                </el-collapse-item>
+
+                <el-collapse-item title="Dimension" name="dimension">
+                  <dl class="dl-sm">
+                    <dt>Width</dt>
+                    <dd>{{stockable.width}}</dd>
+
+                    <dt>Length</dt>
+                    <dd>{{stockable.length}}</dd>
+
+                    <dt>Height</dt>
+                    <dd>{{stockable.height}}</dd>
+
+                    <dt>Dimension Unit</dt>
+                    <dd>
+                      <span v-if="stockable.dimensionUnit">{{stockable.dimensionUnit}}</span>
+                      <span v-else class="empty">Not Specified</span>
+                    </dd>
+                  </dl>
+                </el-collapse-item>
+              </el-collapse>
+            </el-col>
+          </el-row>
+        </div>
+      </div>
+
+      <div v-if="isBlockDescription" class="block">
+        <div class="body with-sub-header">
+          <div class="sub-header">
+            <h3>Long Description</h3>
+          </div>
+
+          <div v-html="descriptionAsHtml" class="markdown-preview"></div>
         </div>
       </div>
 
@@ -186,6 +225,7 @@
 
 <script>
 import freshcom from '@/freshcom-sdk'
+import marked from 'marked'
 
 import Stockable from '@/models/stockable'
 import FileCollectionBlock from '@/components/file-collection-block'
@@ -209,7 +249,7 @@ export default {
     return {
       stockable: Stockable.objectWithDefaults(),
       isLoading: false,
-      expandedSections: ['basic'],
+      activeSection: undefined,
 
       isConfirmingDeleteStockable: false,
       isDeletingStockable: false
@@ -231,6 +271,14 @@ export default {
       if (!this.stockable.fileCollections) { return [] }
 
       return this.stockable.fileCollections
+    },
+
+    isBlockDescription () {
+      return this.stockable.description && (this.stockable.description.length > 200)
+    },
+
+    descriptionAsHtml () {
+      return marked(this.stockable.description)
     }
   },
   methods: {
