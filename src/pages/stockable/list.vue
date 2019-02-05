@@ -88,7 +88,7 @@
         <div slot="no-content">
           <p><icon name="cubes" scale="3"></icon></p>
           <p>
-            <span>You haven't created any stockable yet.</span>
+            <span>You haven't created any stockable yet. </span>
             <a href="javascript:;">Learn more &rarr;</a>
           </p>
 
@@ -155,7 +155,6 @@
 
 <script>
 import freshcom from '@/freshcom-sdk'
-import qs from 'qs'
 
 import listPageMixinFactory from '@/mixins/list-page'
 let ListPageMixin = listPageMixinFactory({ listMethodName: 'listStockable' })

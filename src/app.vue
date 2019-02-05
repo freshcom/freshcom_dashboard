@@ -551,7 +551,7 @@ input::-webkit-inner-spin-button {
     overflow: hidden;
     padding: 0px 20px;
     clear: both;
-    min-height: 60px;
+    min-height: 40px;
 
     &.with-sub-header {
       padding-top: 0px;
